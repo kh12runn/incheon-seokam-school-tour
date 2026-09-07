@@ -19,6 +19,7 @@ Windows에서는 `start-tour.bat`을 더블 클릭하면 브라우저에서 열�
 2. `js/scenes.js`에서 비슷한 장면 하나를 복사합니다.
 3. `id`, `title`, `floor`, `panorama`를 새 사진에 맞게 바꿉니다.
 4. `connections`에 연결할 장면 ID와 화살표 위치를 적습니다.
+5. 임시 사진이면 `photoStatus: "sample"`, 실제 촬영 사진이면 `photoStatus: "ready"`를 적습니다. 디지털 배치도의 색상이 자동으로 바뀝니다.
 
 ```js
 {
@@ -27,6 +28,7 @@ Windows에서는 `start-tour.bat`을 더블 클릭하면 브라우저에서 열�
   floor: "1F",
   breadcrumb: ["1층", "중앙복도", "복도 3"],
   panorama: "images/1F/hall03.jpg",
+  photoStatus: "ready",
   initialView: { pitch: 0, yaw: 90, hfov: 100 },
   connections: [
     { target: "nurse", text: "오른쪽 문으로 보건실 들어가기", pitch: -8, yaw: 90 }

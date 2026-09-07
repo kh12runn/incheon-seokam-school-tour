@@ -7,6 +7,8 @@
   var viewer = null;
   var currentSceneId = data.firstScene;
   var isPanelOpen = window.innerWidth > 900;
+  var selectedMapFloorId = null;
+  var sceneByLocation = {};
 
   var elements = {
     shell: document.querySelector(".tour-shell"),
@@ -27,11 +29,21 @@
     infoMedia: document.getElementById("info-media"),
     infoTitle: document.getElementById("info-title"),
     infoText: document.getElementById("info-text"),
-    infoLink: document.getElementById("info-link")
+    infoLink: document.getElementById("info-link"),
+    mapToggle: document.getElementById("map-toggle"),
+    mapModal: document.getElementById("map-modal"),
+    mapClose: document.getElementById("map-close"),
+    mapFloorTabs: document.getElementById("map-floor-tabs"),
+    mapFloorTitle: document.getElementById("map-floor-title"),
+    mapFloorNote: document.getElementById("map-floor-note"),
+    schoolMap: document.getElementById("school-map")
   };
 
   data.scenes.forEach(function (scene) {
     sceneMap[scene.id] = scene;
+    if (scene.locationId && !sceneByLocation[scene.locationId]) {
+      sceneByLocation[scene.locationId] = scene;
+    }
   });
 
   function safeText(value) {
@@ -51,6 +63,169 @@
       location: getLayoutLocation(scene),
       layout: layout
     };
+  }
+
+  function createSvgElement(name, attributes) {
+    var element = document.createElementNS("http://www.w3.org/2000/svg", name);
+    Object.keys(attributes || {}).forEach(function (key) {
+      element.setAttribute(key, attributes[key]);
+    });
+    return element;
+  }
+
+  function shortMapLabel(name) {
+    if (name.length <= 9) return name;
+    return name.slice(0, 8) + "…";
+  }
+
+  function orderedFloorIds() {
+    var preferred = [
+      "outdoor-ground",
+      "main-1f", "main-2f", "main-3f", "main-4f",
+      "east-1f", "east-2f", "east-3f", "east-4f"
+    ];
+    return preferred.filter(function (id) { return layout && layout.floors[id]; });
+  }
+
+  function renderMapFloorTabs() {
+    elements.mapFloorTabs.innerHTML = "";
+    orderedFloorIds().forEach(function (floorId) {
+      var floor = layout.floors[floorId];
+      var button = document.createElement("button");
+      button.type = "button";
+      button.textContent = floor.label.replace("오른쪽 건물", "별관").replace("본관 ", "본관");
+      button.className = floorId === selectedMapFloorId ? "is-active" : "";
+      button.addEventListener("click", function () {
+        selectedMapFloorId = floorId;
+        renderMapFloorTabs();
+        renderSchoolMap(floorId);
+      });
+      elements.mapFloorTabs.appendChild(button);
+    });
+  }
+
+  function sceneForPlace(item) {
+    if (sceneByLocation[item.id]) return sceneByLocation[item.id];
+    if (item.sameAs && sceneByLocation[item.sameAs]) return sceneByLocation[item.sameAs];
+    return null;
+  }
+
+  function renderSchoolMap(floorId) {
+    if (!layout || !layout.floors[floorId]) return;
+    var floor = layout.floors[floorId];
+    var currentLocation = getLayoutLocation(sceneMap[currentSceneId]);
+    var rowHeight = 104;
+    var mapHeight = Math.max(220, floor.routes.length * rowHeight + 52);
+    var usableWidth = 920;
+    elements.schoolMap.innerHTML = "";
+    elements.schoolMap.setAttribute("viewBox", "0 0 1000 " + mapHeight);
+    elements.schoolMap.setAttribute("height", mapHeight);
+    elements.mapFloorTitle.textContent = floor.label;
+    elements.mapFloorNote.textContent = "정확한 크기보다 복도에서 만나는 공간 순서를 나타냅니다.";
+
+    floor.routes.forEach(function (route, routeIndex) {
+      var y = 42 + routeIndex * rowHeight;
+      var items = route.orderedPlaces;
+      var cellWidth = usableWidth / Math.max(items.length, 1);
+      var label = createSvgElement("text", { x: 40, y: y - 12, class: "map-route-label" });
+      label.textContent = route.label;
+      elements.schoolMap.appendChild(label);
+
+      var corridor = createSvgElement("rect", {
+        x: 34,
+        y: y + 21,
+        width: 932,
+        height: 24,
+        rx: 12,
+        class: "map-corridor"
+      });
+      elements.schoolMap.appendChild(corridor);
+
+      items.forEach(function (item, itemIndex) {
+        var x = 40 + itemIndex * cellWidth;
+        var width = Math.max(38, cellWidth - 6);
+        var linkedScene = sceneForPlace(item);
+        var status = linkedScene ? (linkedScene.photoStatus || "sample") : "pending";
+        var isCurrent = currentLocation && (currentLocation.id === item.id || currentLocation.id === item.sameAs);
+        var group = createSvgElement("g", {
+          class: "map-place type-" + item.type + " status-" + status + (isCurrent ? " is-current" : ""),
+          "data-location-id": item.id
+        });
+        var title = createSvgElement("title");
+        title.textContent = item.name + (linkedScene ? " · 눌러서 이동" : " · 사진 촬영 예정");
+        group.appendChild(title);
+
+        var room = createSvgElement("rect", {
+          x: x,
+          y: y,
+          width: width,
+          height: 54,
+          rx: Math.min(9, width / 4)
+        });
+        group.appendChild(room);
+
+        var name = createSvgElement("text", {
+          x: x + width / 2,
+          y: y + 28,
+          "text-anchor": "middle"
+        });
+        name.textContent = shortMapLabel(item.name);
+        group.appendChild(name);
+
+        if (isCurrent) {
+          var marker = createSvgElement("circle", {
+            cx: x + width / 2,
+            cy: y - 7,
+            r: 7,
+            class: "map-current-marker"
+          });
+          group.appendChild(marker);
+        }
+
+        if (linkedScene) {
+          group.setAttribute("role", "button");
+          group.setAttribute("tabindex", "0");
+          group.setAttribute("aria-label", item.name + " 위치로 이동");
+          var activate = function () {
+            closeMap();
+            goToScene(linkedScene.id);
+          };
+          group.addEventListener("click", activate);
+          group.addEventListener("keydown", function (event) {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              activate();
+            }
+          });
+        }
+        elements.schoolMap.appendChild(group);
+      });
+    });
+  }
+
+  function centerMapOnCurrentLocation() {
+    var scroller = elements.schoolMap.parentElement;
+    var currentPlace = elements.schoolMap.querySelector(".map-place.is-current");
+    if (!scroller || !currentPlace) return;
+    var scrollerBox = scroller.getBoundingClientRect();
+    var placeBox = currentPlace.getBoundingClientRect();
+    scroller.scrollLeft += placeBox.left - scrollerBox.left - (scroller.clientWidth - placeBox.width) / 2;
+  }
+
+  function openMap() {
+    if (!layout) return;
+    var currentLocation = getLayoutLocation(sceneMap[currentSceneId]);
+    selectedMapFloorId = currentLocation ? currentLocation.floorMapId : "main-1f";
+    renderMapFloorTabs();
+    renderSchoolMap(selectedMapFloorId);
+    if (typeof elements.mapModal.showModal === "function") elements.mapModal.showModal();
+    else elements.mapModal.setAttribute("open", "");
+    window.requestAnimationFrame(centerMapOnCurrentLocation);
+  }
+
+  function closeMap() {
+    if (typeof elements.mapModal.close === "function") elements.mapModal.close();
+    else elements.mapModal.removeAttribute("open");
   }
 
   function buildPannellumScenes() {
@@ -171,6 +346,12 @@
     window.dispatchEvent(new CustomEvent("schooltour:scenechange", {
       detail: getCurrentState()
     }));
+    if (elements.mapModal.open && physicalLocation) {
+      selectedMapFloorId = physicalLocation.floorMapId;
+      renderMapFloorTabs();
+      renderSchoolMap(selectedMapFloorId);
+      window.requestAnimationFrame(centerMapOnCurrentLocation);
+    }
   }
 
   function goToScene(sceneId) {
@@ -302,6 +483,11 @@
   elements.modalClose.addEventListener("click", closeInfo);
   elements.modal.addEventListener("click", function (event) {
     if (event.target === elements.modal) closeInfo();
+  });
+  elements.mapToggle.addEventListener("click", openMap);
+  elements.mapClose.addEventListener("click", closeMap);
+  elements.mapModal.addEventListener("click", function (event) {
+    if (event.target === elements.mapModal) closeMap();
   });
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && !elements.modal.open && isPanelOpen && window.innerWidth <= 900) {

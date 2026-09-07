@@ -33,16 +33,24 @@
               <h1>석암초 가상학교</h1>
             </div>
           </div>
-          <button
-            id="menu-toggle"
-            class="icon-button menu-toggle"
-            type="button"
-            aria-controls="place-panel"
-            aria-expanded="true"
-          >
-            <span class="menu-lines" aria-hidden="true"></span>
-            <span class="button-text">장소</span>
-          </button>
+          <div class="top-actions">
+            <button id="map-toggle" class="icon-button map-toggle" type="button" aria-haspopup="dialog">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="m3 6 5-3 8 3 5-3v15l-5 3-8-3-5 3V6Zm5-3v15m8-12v15" />
+              </svg>
+              <span class="button-text">배치도</span>
+            </button>
+            <button
+              id="menu-toggle"
+              class="icon-button menu-toggle"
+              type="button"
+              aria-controls="place-panel"
+              aria-expanded="true"
+            >
+              <span class="menu-lines" aria-hidden="true"></span>
+              <span class="button-text">장소</span>
+            </button>
+          </div>
         </header>
 
         <section class="location-card" aria-live="polite">
@@ -94,6 +102,33 @@
           자세히 보기 <span aria-hidden="true">↗</span>
         </a>
       </div>
+    </dialog>
+
+    <dialog id="map-modal" class="map-modal" aria-labelledby="map-title">
+      <header class="map-head">
+        <div>
+          <span class="modal-eyebrow">학교 공간 안내</span>
+          <h2 id="map-title">디지털 배치도</h2>
+          <p>교실을 누르면 사진이 준비된 위치로 이동합니다.</p>
+        </div>
+        <button id="map-close" class="modal-close map-close" type="button" aria-label="배치도 닫기">×</button>
+      </header>
+      <nav id="map-floor-tabs" class="map-floor-tabs" aria-label="배치도 층 선택"></nav>
+      <section class="map-canvas-wrap" aria-live="polite">
+        <div class="map-caption">
+          <strong id="map-floor-title">본관 1층</strong>
+          <span id="map-floor-note">공간 관계를 단순화한 배치도입니다.</span>
+        </div>
+        <div class="map-scroll">
+          <svg id="school-map" class="school-map" role="img" aria-label="학교 공간 배치도"></svg>
+        </div>
+      </section>
+      <footer class="map-legend">
+        <span><i class="legend-current"></i> 현재 위치</span>
+        <span><i class="legend-sample"></i> 샘플 사진</span>
+        <span><i class="legend-ready"></i> 실제 사진</span>
+        <span><i class="legend-pending"></i> 촬영 예정</span>
+      </footer>
     </dialog>
 
     <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
