@@ -268,6 +268,29 @@ button { font: inherit; }
 .viewer-help > span { color: var(--teal); font-size: 17px; }
 .viewer-help button { border: 0; color: var(--muted); background: none; cursor: pointer; font-size: 17px; line-height: 1; }
 
+.keyboard-guide {
+  position: absolute;
+  z-index: 14;
+  right: 18px;
+  bottom: 22px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px 8px 9px;
+  border: 1px solid rgba(255, 255, 255, 0.65);
+  border-radius: 14px;
+  color: white;
+  background: rgba(8, 39, 56, 0.82);
+  box-shadow: 0 8px 24px rgba(7, 31, 45, 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.keyboard-guide > span { font-size: 10px; color: #cce9e5; }
+.keyboard-guide strong { display: block; color: white; font-size: 11px; }
+.key-grid { display: grid; grid-template-columns: repeat(3, 19px); grid-template-rows: repeat(2, 18px); gap: 2px; }
+.key-grid kbd { display: grid; place-items: center; border: 1px solid rgba(255,255,255,.55); border-radius: 4px; color: white; font: 700 9px/1 "Noto Sans KR", sans-serif; background: rgba(255,255,255,.12); box-shadow: 0 2px 0 rgba(0,0,0,.2); }
+.key-grid kbd:first-child { grid-column: 2; }
+
 .place-panel {
   position: relative;
   z-index: 30;
@@ -597,6 +620,7 @@ button { font: inherit; }
   .map-toggle { width: 54px; height: 54px; border-radius: 15px; }
   .top-actions { gap: 5px; }
   .viewer-help { top: 83px; white-space: nowrap; }
+  .keyboard-guide { display: none; }
   .floor-nav { top: auto; right: auto; bottom: max(92px, calc(env(safe-area-inset-bottom) + 82px)); left: 50%; flex-direction: row; transform: translateX(-50%); }
   .floor-nav button { width: 46px; height: 42px; }
   .location-card { bottom: max(17px, calc(env(safe-area-inset-bottom) + 8px)); min-width: 0; width: calc(100% - 24px); padding: 10px 15px; }

@@ -11,6 +11,10 @@
 window.SCHOOL_TOUR_DATA = {
   schoolName: "인천석암초등학교",
   tourName: "석암초 가상학교",
+  settings: {
+    renderMode: "stylized-panorama",
+    keyboardPan: { enabled: true, degreesPerSecond: 58 }
+  },
   firstScene: "entrance",
   floorOrder: ["OUT", "1F", "2F", "3F", "4F"],
   floorLabels: { "OUT": "외부", "1F": "1층", "2F": "2층", "3F": "3층", "4F": "4층" },
@@ -22,7 +26,7 @@ window.SCHOOL_TOUR_DATA = {
       title: "중앙현관",
       floor: "1F",
       breadcrumb: ["1층", "중앙현관"],
-      panorama: "images/1F/sample-hall.png",
+      panorama: "images/1F/sample-hall-3d.png",
       description: "가상학교 둘러보기를 시작하는 중앙현관입니다.",
       initialView: { pitch: -2, yaw: 0, hfov: 105 },
       connections: [
@@ -43,7 +47,7 @@ window.SCHOOL_TOUR_DATA = {
       title: "1층 복도 1",
       floor: "1F",
       breadcrumb: ["1층", "중앙복도", "복도 1"],
-      panorama: "images/1F/sample-hall.png",
+      panorama: "images/1F/sample-hall-3d.png",
       description: "중앙현관과 복도 2를 잇는 공간입니다.",
       initialView: { pitch: -3, yaw: -82, hfov: 100 },
       connections: [
@@ -57,7 +61,7 @@ window.SCHOOL_TOUR_DATA = {
       title: "1층 복도 2",
       floor: "1F",
       breadcrumb: ["1층", "중앙복도", "복도 2"],
-      panorama: "images/1F/sample-hall.png",
+      panorama: "images/1F/sample-hall-3d.png",
       description: "교실과 보건실, 계단으로 이어지는 복도입니다.",
       initialView: { pitch: -2, yaw: 72, hfov: 100 },
       connections: [
@@ -73,7 +77,7 @@ window.SCHOOL_TOUR_DATA = {
       title: "교실",
       floor: "1F",
       breadcrumb: ["1층", "중앙복도", "교실"],
-      panorama: "images/1F/sample-classroom.png",
+      panorama: "images/1F/sample-classroom-3d.png",
       description: "밝고 편안한 샘플 교실입니다.",
       initialView: { pitch: -5, yaw: 3, hfov: 105 },
       connections: [
@@ -94,7 +98,7 @@ window.SCHOOL_TOUR_DATA = {
       title: "보건실",
       floor: "1F",
       breadcrumb: ["1층", "중앙복도", "보건실"],
-      panorama: "images/1F/sample-nurse.png",
+      panorama: "images/1F/sample-nurse-3d.png",
       description: "학생들이 휴식하고 건강 상담을 받는 공간입니다.",
       initialView: { pitch: -3, yaw: 0, hfov: 105 },
       connections: [
@@ -115,7 +119,7 @@ window.SCHOOL_TOUR_DATA = {
       title: "중앙계단",
       floor: "1F",
       breadcrumb: ["1층", "중앙계단"],
-      panorama: "images/1F/sample-hall.png",
+      panorama: "images/1F/sample-hall-3d.png",
       description: "2층으로 올라가는 중앙계단입니다.",
       initialView: { pitch: 4, yaw: 0, hfov: 95 },
       connections: [
@@ -129,7 +133,7 @@ window.SCHOOL_TOUR_DATA = {
       title: "2층 복도",
       floor: "2F",
       breadcrumb: ["2층", "중앙복도"],
-      panorama: "images/1F/sample-hall.png",
+      panorama: "images/1F/sample-hall-3d.png",
       description: "2층의 대표 장소로 설정된 샘플 복도입니다.",
       initialView: { pitch: -3, yaw: 84, hfov: 100 },
       connections: [

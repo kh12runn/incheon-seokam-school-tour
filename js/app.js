@@ -9,6 +9,9 @@
   var isPanelOpen = window.innerWidth > 900;
   var selectedMapFloorId = null;
   var sceneByLocation = {};
+  var pressedViewKeys = {};
+  var keyboardFrameId = null;
+  var previousFrameTime = null;
 
   var elements = {
     shell: document.querySelector(".tour-shell"),
@@ -226,6 +229,59 @@
   function closeMap() {
     if (typeof elements.mapModal.close === "function") elements.mapModal.close();
     else elements.mapModal.removeAttribute("open");
+  }
+
+  function keyboardPanSettings() {
+    return (data.settings && data.settings.keyboardPan) || { enabled: true, degreesPerSecond: 58 };
+  }
+
+  function keyboardIsBlocked() {
+    var active = document.activeElement;
+    var tagName = active && active.tagName;
+    return elements.modal.open ||
+      elements.mapModal.open ||
+      tagName === "INPUT" || tagName === "TEXTAREA" || tagName === "SELECT";
+  }
+
+  function animateKeyboardView(time) {
+    var keys = Object.keys(pressedViewKeys).filter(function (key) { return pressedViewKeys[key]; });
+    if (!viewer || !keys.length) {
+      keyboardFrameId = null;
+      previousFrameTime = null;
+      return;
+    }
+
+    var elapsedSeconds = previousFrameTime === null ? 0 : Math.min((time - previousFrameTime) / 1000, 0.05);
+    var speed = keyboardPanSettings().degreesPerSecond || 58;
+    var yawChange = ((pressedViewKeys.d ? 1 : 0) - (pressedViewKeys.a ? 1 : 0)) * speed * elapsedSeconds;
+    var pitchChange = ((pressedViewKeys.w ? 1 : 0) - (pressedViewKeys.s ? 1 : 0)) * speed * elapsedSeconds;
+    previousFrameTime = time;
+
+    if (yawChange) viewer.setYaw(viewer.getYaw() + yawChange, false);
+    if (pitchChange) {
+      var nextPitch = Math.max(-85, Math.min(85, viewer.getPitch() + pitchChange));
+      viewer.setPitch(nextPitch, false);
+    }
+    keyboardFrameId = window.requestAnimationFrame(animateKeyboardView);
+  }
+
+  function startKeyboardView(event) {
+    var key = event.key.toLowerCase();
+    if (!["w", "a", "s", "d"].includes(key) || !keyboardPanSettings().enabled || keyboardIsBlocked()) return;
+    event.preventDefault();
+    pressedViewKeys[key] = true;
+    if (keyboardFrameId === null) keyboardFrameId = window.requestAnimationFrame(animateKeyboardView);
+  }
+
+  function stopKeyboardView(event) {
+    var key = event.key.toLowerCase();
+    if (!["w", "a", "s", "d"].includes(key)) return;
+    pressedViewKeys[key] = false;
+  }
+
+  function clearKeyboardView() {
+    pressedViewKeys = {};
+    previousFrameTime = null;
   }
 
   function buildPannellumScenes() {
@@ -489,6 +545,12 @@
   elements.mapModal.addEventListener("click", function (event) {
     if (event.target === elements.mapModal) closeMap();
   });
+  window.addEventListener("keydown", startKeyboardView);
+  window.addEventListener("keyup", stopKeyboardView);
+  window.addEventListener("blur", clearKeyboardView);
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) clearKeyboardView();
+  });
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && !elements.modal.open && isPanelOpen && window.innerWidth <= 900) {
       setPanel(false);
@@ -499,6 +561,9 @@
     goToScene: goToScene,
     openInfo: openInfo,
     getCurrentState: getCurrentState,
+    getView: function () {
+      return viewer ? { yaw: viewer.getYaw(), pitch: viewer.getPitch(), hfov: viewer.getHfov() } : null;
+    },
     layout: layout
   };
   renderMenu();
