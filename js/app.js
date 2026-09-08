@@ -6,12 +6,14 @@
   var sceneMap = {};
   var viewer = null;
   var currentSceneId = data.firstScene;
+  var activeScenes = data.scenes.filter(function (scene) { return scene.published !== false; });
   var isPanelOpen = window.innerWidth > 900;
   var selectedMapFloorId = null;
   var sceneByLocation = {};
-  var pressedViewKeys = {};
-  var keyboardFrameId = null;
-  var previousFrameTime = null;
+  var sceneTransitioning = false;
+  var heldWalkKeys = {};
+  var activeWalkKey = null;
+  var walkContinueTimer = null;
 
   var elements = {
     shell: document.querySelector(".tour-shell"),
@@ -42,7 +44,7 @@
     schoolMap: document.getElementById("school-map")
   };
 
-  data.scenes.forEach(function (scene) {
+  activeScenes.forEach(function (scene) {
     sceneMap[scene.id] = scene;
     if (scene.locationId && !sceneByLocation[scene.locationId]) {
       sceneByLocation[scene.locationId] = scene;
@@ -231,8 +233,8 @@
     else elements.mapModal.removeAttribute("open");
   }
 
-  function keyboardPanSettings() {
-    return (data.settings && data.settings.keyboardPan) || { enabled: true, degreesPerSecond: 58 };
+  function keyboardMoveSettings() {
+    return (data.settings && data.settings.keyboardMove) || { enabled: true, maxAngle: 70, transitionMs: 520, repeatDelay: 120 };
   }
 
   function keyboardIsBlocked() {
@@ -243,53 +245,82 @@
       tagName === "INPUT" || tagName === "TEXTAREA" || tagName === "SELECT";
   }
 
-  function animateKeyboardView(time) {
-    var keys = Object.keys(pressedViewKeys).filter(function (key) { return pressedViewKeys[key]; });
-    if (!viewer || !keys.length) {
-      keyboardFrameId = null;
-      previousFrameTime = null;
+  function normalizeYaw(yaw) {
+    return ((yaw + 180) % 360 + 360) % 360 - 180;
+  }
+
+  function yawDistance(first, second) {
+    return Math.abs(normalizeYaw(first - second));
+  }
+
+  function connectionForMoveKey(key) {
+    var scene = sceneMap[currentSceneId];
+    if (!viewer || !scene) return null;
+
+    var viewOffset = { w: 0, s: 180, a: -90, d: 90 }[key];
+    var targetYaw = normalizeYaw(viewer.getYaw() + viewOffset);
+    var choices = (scene.connections || []).filter(function (connection) {
+      return Boolean(sceneMap[connection.target]);
+    }).map(function (connection) {
+      return {
+        connection: connection,
+        distance: yawDistance(connection.yaw || 0, targetYaw)
+      };
+    }).sort(function (first, second) {
+      return first.distance - second.distance;
+    });
+
+    var maxAngle = keyboardMoveSettings().maxAngle || 70;
+    return choices.length && choices[0].distance <= maxAngle ? choices[0].connection : null;
+  }
+
+  function startWalkingMove(key) {
+    if (sceneTransitioning || keyboardIsBlocked()) return;
+    var connection = connectionForMoveKey(key);
+    if (!connection) {
+      activeWalkKey = null;
       return;
     }
-
-    var elapsedSeconds = previousFrameTime === null ? 0 : Math.min((time - previousFrameTime) / 1000, 0.05);
-    var speed = keyboardPanSettings().degreesPerSecond || 58;
-    var yawChange = ((pressedViewKeys.d ? 1 : 0) - (pressedViewKeys.a ? 1 : 0)) * speed * elapsedSeconds;
-    var pitchChange = ((pressedViewKeys.w ? 1 : 0) - (pressedViewKeys.s ? 1 : 0)) * speed * elapsedSeconds;
-    previousFrameTime = time;
-
-    if (yawChange) viewer.setYaw(viewer.getYaw() + yawChange, false);
-    if (pitchChange) {
-      var nextPitch = Math.max(-85, Math.min(85, viewer.getPitch() + pitchChange));
-      viewer.setPitch(nextPitch, false);
-    }
-    keyboardFrameId = window.requestAnimationFrame(animateKeyboardView);
+    activeWalkKey = key;
+    goToScene(connection.target, key);
   }
 
-  function startKeyboardView(event) {
+  function moveWithKeyboard(event) {
     var key = event.key.toLowerCase();
-    if (!["w", "a", "s", "d"].includes(key) || !keyboardPanSettings().enabled || keyboardIsBlocked()) return;
+    if (!["w", "a", "s", "d"].includes(key) || !keyboardMoveSettings().enabled || keyboardIsBlocked()) return;
     event.preventDefault();
-    pressedViewKeys[key] = true;
-    if (keyboardFrameId === null) keyboardFrameId = window.requestAnimationFrame(animateKeyboardView);
+    heldWalkKeys[key] = true;
+    if (!event.repeat) startWalkingMove(key);
   }
 
-  function stopKeyboardView(event) {
+  function stopWalkingMove(event) {
     var key = event.key.toLowerCase();
     if (!["w", "a", "s", "d"].includes(key)) return;
-    pressedViewKeys[key] = false;
+    heldWalkKeys[key] = false;
   }
 
-  function clearKeyboardView() {
-    pressedViewKeys = {};
-    previousFrameTime = null;
+  function clearWalkingKeys() {
+    heldWalkKeys = {};
+    activeWalkKey = null;
+    window.clearTimeout(walkContinueTimer);
+  }
+
+  function walkingClass(key) {
+    return { w: "walk-forward", s: "walk-backward", a: "walk-left", d: "walk-right" }[key] || "walk-forward";
+  }
+
+  function clearWalkingAnimation() {
+    elements.viewerWrap.classList.remove("is-walking", "walk-forward", "walk-backward", "walk-left", "walk-right");
   }
 
   function buildPannellumScenes() {
     var result = {};
 
-    data.scenes.forEach(function (scene) {
+    activeScenes.forEach(function (scene) {
       var view = scene.initialView || {};
-      var hotspots = (scene.connections || []).map(function (connection) {
+      var hotspots = (scene.connections || []).filter(function (connection) {
+        return Boolean(sceneMap[connection.target]);
+      }).map(function (connection) {
         return {
           pitch: connection.pitch || 0,
           yaw: connection.yaw || 0,
@@ -331,7 +362,7 @@
     elements.placeList.innerHTML = "";
 
     data.floorOrder.forEach(function (floor) {
-      var floorScenes = data.scenes.filter(function (scene) {
+      var floorScenes = activeScenes.filter(function (scene) {
         return scene.floor === floor;
       });
       if (!floorScenes.length) return;
@@ -410,12 +441,17 @@
     }
   }
 
-  function goToScene(sceneId) {
-    if (!viewer || !sceneMap[sceneId] || sceneId === currentSceneId) return;
+  function goToScene(sceneId, movementKey) {
+    if (!viewer || !sceneMap[sceneId] || sceneId === currentSceneId || sceneTransitioning) return;
+    sceneTransitioning = true;
+    clearWalkingAnimation();
+    if (movementKey) {
+      elements.viewerWrap.classList.add("is-walking", walkingClass(movementKey));
+    }
     elements.fade.classList.add("is-visible");
     window.setTimeout(function () {
       viewer.loadScene(sceneId);
-    }, 130);
+    }, movementKey ? Math.min(keyboardMoveSettings().transitionMs || 520, 420) : 130);
   }
 
   function setPanel(open) {
@@ -518,9 +554,22 @@
       updateCurrentScene(sceneId);
     });
     viewer.on("load", function () {
+      var completedWalkKey = activeWalkKey;
+      sceneTransitioning = false;
+      activeWalkKey = null;
+      clearWalkingAnimation();
       elements.fade.classList.remove("is-visible");
+      if (completedWalkKey && heldWalkKeys[completedWalkKey]) {
+        window.clearTimeout(walkContinueTimer);
+        walkContinueTimer = window.setTimeout(function () {
+          if (heldWalkKeys[completedWalkKey]) startWalkingMove(completedWalkKey);
+        }, keyboardMoveSettings().repeatDelay || 120);
+      }
     });
     viewer.on("error", function () {
+      sceneTransitioning = false;
+      activeWalkKey = null;
+      clearWalkingAnimation();
       elements.fade.classList.remove("is-visible");
       elements.error.hidden = false;
     });
@@ -545,12 +594,9 @@
   elements.mapModal.addEventListener("click", function (event) {
     if (event.target === elements.mapModal) closeMap();
   });
-  window.addEventListener("keydown", startKeyboardView);
-  window.addEventListener("keyup", stopKeyboardView);
-  window.addEventListener("blur", clearKeyboardView);
-  document.addEventListener("visibilitychange", function () {
-    if (document.hidden) clearKeyboardView();
-  });
+  window.addEventListener("keydown", moveWithKeyboard);
+  window.addEventListener("keyup", stopWalkingMove);
+  window.addEventListener("blur", clearWalkingKeys);
   document.addEventListener("keydown", function (event) {
     if (event.key === "Escape" && !elements.modal.open && isPanelOpen && window.innerWidth <= 900) {
       setPanel(false);

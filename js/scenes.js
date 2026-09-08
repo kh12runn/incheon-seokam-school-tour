@@ -13,12 +13,12 @@ window.SCHOOL_TOUR_DATA = {
   tourName: "석암초 가상학교",
   settings: {
     renderMode: "stylized-panorama",
-    keyboardPan: { enabled: true, degreesPerSecond: 58 }
+    keyboardMove: { enabled: true, maxAngle: 70, transitionMs: 520, repeatDelay: 120 }
   },
-  firstScene: "entrance",
+  firstScene: "4f_hall_6_1",
   floorOrder: ["OUT", "1F", "2F", "3F", "4F"],
   floorLabels: { "OUT": "외부", "1F": "1층", "2F": "2층", "3F": "3층", "4F": "4층" },
-  floorHome: { "OUT": null, "1F": "entrance", "2F": "2f_hall", "3F": null, "4F": null },
+  floorHome: { "OUT": null, "1F": "entrance", "2F": "2f_hall", "3F": null, "4F": "4f_hall_6_1" },
   scenes: [
     {
       id: "entrance",
@@ -138,6 +138,144 @@ window.SCHOOL_TOUR_DATA = {
       initialView: { pitch: -3, yaw: 84, hfov: 100 },
       connections: [
         { target: "stairs", text: "1층 중앙계단으로 내려가기", pitch: -6, yaw: -4 }
+      ]
+    },
+    {
+      id: "4f_hall_6_1",
+      locationId: "main-4f-room-6-1",
+      title: "6-1 앞 복도",
+      floor: "4F",
+      breadcrumb: ["본관", "4층", "6-1 앞 복도"],
+      panorama: "images/4F/game/main-4f-hall-6-1-game.png",
+      photoStatus: "ready",
+      description: "실제 촬영 자료에서 촬영자를 제거하고 색감을 가볍게 게임풍으로 다듬은 6학년 1반 앞 360도 복도입니다.",
+      initialView: { pitch: -2, yaw: -20, hfov: 100 },
+      connections: [
+        { target: "4f_hall_6_2", text: "6-2 앞 복도로 이동", pitch: -11, yaw: -20 }
+      ]
+    },
+    {
+      id: "4f_hall_6_2",
+      locationId: "main-4f-room-6-2",
+      title: "6-2 앞 복도",
+      floor: "4F",
+      breadcrumb: ["본관", "4층", "6-2 앞 복도"],
+      panorama: "images/4F/game/main-4f-hall-6-2-game.png",
+      photoStatus: "ready",
+      description: "실제 촬영 자료에서 촬영자를 제거하고 색감을 가볍게 게임풍으로 다듬은 6학년 2반 앞 360도 복도입니다.",
+      initialView: { pitch: -2, yaw: -20, hfov: 100 },
+      connections: [
+        { target: "4f_hall_6_1", text: "6-1 앞 복도로 이동", pitch: -11, yaw: 160 },
+        { target: "4f_hall_6_3", text: "6-3 앞 복도로 이동", pitch: -11, yaw: -20 }
+      ]
+    },
+    {
+      id: "4f_hall_6_3",
+      locationId: "main-4f-room-6-3",
+      title: "6-3 앞 복도",
+      floor: "4F",
+      breadcrumb: ["본관", "4층", "6-3 앞 복도"],
+      panorama: "images/4F/game/main-4f-hall-6-3-game.png",
+      photoStatus: "ready",
+      description: "실제 촬영 자료에서 촬영자를 제거하고 색감을 가볍게 게임풍으로 다듬은 6학년 3반 앞 360도 복도입니다.",
+      initialView: { pitch: -2, yaw: -20, hfov: 100 },
+      connections: [
+        { target: "4f_hall_6_2", text: "6-2 앞 복도로 이동", pitch: -11, yaw: 160 },
+        { target: "4f_hall_6_4", text: "6-4 앞 복도로 이동", pitch: -11, yaw: -20 }
+      ]
+    },
+    {
+      id: "4f_hall_6_4",
+      published: false,
+      locationId: "main-4f-room-6-4",
+      title: "6-4 앞 복도",
+      floor: "4F",
+      breadcrumb: ["본관", "4층", "6-4 앞 복도"],
+      panorama: "images/4F/main-4f-hall-6-4.jpg",
+      photoStatus: "real",
+      description: "6학년 4반 앞에서 촬영한 4층 복도입니다.",
+      initialView: { pitch: -2, yaw: -20, hfov: 100 },
+      connections: [
+        { target: "4f_hall_6_3", text: "6-3 앞 복도로 이동", pitch: -11, yaw: 160 },
+        { target: "4f_hall_6_5", text: "6-5 앞 복도로 이동", pitch: -11, yaw: -20 }
+      ]
+    },
+    {
+      id: "4f_hall_6_5",
+      locationId: "main-4f-room-6-5",
+      title: "6-5 앞 복도",
+      floor: "4F",
+      breadcrumb: ["본관", "4층", "6-5 앞 복도"],
+      panorama: "images/4F/game/main-4f-hall-6-5-game.png",
+      photoStatus: "ready",
+      description: "실제 촬영 자료에서 촬영자를 제거하고 색감을 가볍게 게임풍으로 다듬은 6학년 5반 앞 360도 복도입니다.",
+      initialView: { pitch: -2, yaw: -20, hfov: 100 },
+      connections: [
+        { target: "4f_hall_6_4", text: "6-4 앞 복도로 이동", pitch: -11, yaw: 160 },
+        { target: "4f_hall_6_6", text: "6-6 앞 복도로 이동", pitch: -11, yaw: -20 }
+      ]
+    },
+    {
+      id: "4f_hall_6_6",
+      published: false,
+      locationId: "main-4f-room-6-6",
+      title: "6-6 앞 복도",
+      floor: "4F",
+      breadcrumb: ["본관", "4층", "6-6 앞 복도"],
+      panorama: "images/4F/main-4f-hall-6-6.jpg",
+      photoStatus: "real",
+      description: "6학년 6반 앞에서 촬영한 4층 복도입니다.",
+      initialView: { pitch: -2, yaw: -20, hfov: 100 },
+      connections: [
+        { target: "4f_hall_6_5", text: "6-5 앞 복도로 이동", pitch: -11, yaw: 160 },
+        { target: "4f_hall_6_7", text: "6-7 앞 복도로 이동", pitch: -11, yaw: -20 }
+      ]
+    },
+    {
+      id: "4f_hall_6_7",
+      published: false,
+      locationId: "main-4f-room-6-7",
+      title: "6-7 앞 복도",
+      floor: "4F",
+      breadcrumb: ["본관", "4층", "6-7 앞 복도"],
+      panorama: "images/4F/main-4f-hall-6-7.jpg",
+      photoStatus: "real",
+      description: "6학년 7반과 서쪽 계단 사이의 복도입니다.",
+      initialView: { pitch: -2, yaw: -20, hfov: 100 },
+      connections: [
+        { target: "4f_hall_6_6", text: "6-6 앞 복도로 이동", pitch: -11, yaw: -20 },
+        { target: "4f_stairs_west_01", text: "6-7 쪽 계단 입구로 이동", pitch: -10, yaw: 160 }
+      ]
+    },
+    {
+      id: "4f_stairs_west_01",
+      published: false,
+      locationId: "main-stairs-a-4f",
+      title: "6-7 쪽 계단 입구",
+      floor: "4F",
+      breadcrumb: ["본관", "4층", "6-7 쪽 계단", "입구"],
+      panorama: "images/4F/main-4f-stairs-west-01.jpg",
+      photoStatus: "real",
+      description: "6학년 7반 옆에 있는 4층 계단 입구입니다.",
+      initialView: { pitch: -3, yaw: 0, hfov: 100 },
+      connections: [
+        { target: "4f_hall_6_7", text: "6-7 앞 복도로 돌아가기", pitch: -10, yaw: 0 },
+        { target: "4f_stairs_west_02", text: "계단참으로 이동", pitch: -5, yaw: 142 }
+      ]
+    },
+    {
+      id: "4f_stairs_west_02",
+      published: false,
+      locationId: "main-stairs-a-4f",
+      title: "6-7 쪽 계단참",
+      floor: "4F",
+      breadcrumb: ["본관", "4층", "6-7 쪽 계단", "계단참"],
+      panorama: "images/4F/main-4f-stairs-west-02.jpg",
+      photoStatus: "real",
+      description: "4층과 아래층을 잇는 6학년 7반 쪽 계단참입니다.",
+      initialView: { pitch: -3, yaw: -142, hfov: 100 },
+      connections: [
+        { target: "4f_stairs_west_01", text: "4층 복도 입구로 돌아가기", pitch: 5, yaw: -142 }
       ]
     }
   ]

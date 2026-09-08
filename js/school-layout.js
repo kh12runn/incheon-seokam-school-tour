@@ -73,8 +73,8 @@
           label: "중앙입구 기준 왼쪽 복도",
           orderAccuracy: "대략적인 순서",
           orderedPlaces: [
-            place("main-stairs-a-1f", "서쪽 계단", "stairs", { stairId: "MAIN_STAIRS_A" }),
-            place("main-1f-restroom-west", "화장실", "restroom"),
+            place("main-stairs-a-1f", "다목적실·3-4 쪽 계단", "stairs", { stairId: "MAIN_STAIRS_A" }),
+            place("main-1f-restroom-west", "다목적실 쪽 화장실", "restroom"),
             place("main-1f-multipurpose", "다목적실", "special-room"),
             place("main-1f-room-3-4", "3-4", "classroom"),
             place("main-1f-room-3-3", "3-3", "classroom"),
@@ -91,12 +91,12 @@
           orderAccuracy: "대략적인 순서",
           orderedPlaces: [
             place("main-1f-central-entrance", "본관 중앙입구", "entrance"),
-            place("main-stairs-b-1f", "중앙 계단", "stairs", { stairId: "MAIN_STAIRS_B" }),
+            place("main-stairs-b-1f", "3-1·본관 중앙입구 사이 계단", "stairs", { stairId: "MAIN_STAIRS_B" }),
             place("main-1f-admin", "행정실", "office"),
             place("main-1f-nurse", "보건실", "special-room"),
             place("main-1f-publishing", "발간실", "special-room"),
             place("main-1f-broadcast", "방송실", "special-room"),
-            place("main-1f-restroom-center", "화장실", "restroom")
+            place("main-1f-restroom-center", "방송실 쪽 화장실", "restroom")
           ]
         },
         {
@@ -124,15 +124,15 @@
           label: "본관 2층 복도",
           orderAccuracy: "왼쪽에서 오른쪽 방향의 대략적인 순서",
           orderedPlaces: [
-            place("main-stairs-a-2f", "서쪽 계단", "stairs", { stairId: "MAIN_STAIRS_A" }),
-            place("main-2f-restroom-west", "화장실", "restroom"),
+            place("main-stairs-a-2f", "돌봄교실 쪽 계단", "stairs", { stairId: "MAIN_STAIRS_A" }),
+            place("main-2f-restroom-west", "돌봄교실 쪽 화장실", "restroom"),
             place("main-2f-care", "돌봄교실", "classroom"),
             place("main-2f-principal", "교장실", "office"),
             place("main-2f-broadcast-related", "방송 관련 공간", "special-room"),
             place("main-2f-teachers", "교무실", "office"),
             place("main-2f-registration", "등록 관련 공간", "office"),
-            place("main-stairs-b-2f", "중앙 계단", "stairs", { stairId: "MAIN_STAIRS_B" }),
-            place("main-2f-restroom-center", "화장실", "restroom"),
+            place("main-stairs-b-2f", "교무실·3-5 사이 계단", "stairs", { stairId: "MAIN_STAIRS_B" }),
+            place("main-2f-restroom-center", "3-5 쪽 화장실", "restroom"),
             place("main-2f-hall-central", "2층 중앙복도 촬영점", "capture-anchor"),
             place("main-2f-room-3-5", "3-5", "classroom"),
             place("main-2f-room-3-6", "3-6", "classroom"),
@@ -157,15 +157,15 @@
           orderAccuracy: "왼쪽에서 오른쪽 방향의 대략적인 순서",
           orderedPlaces: [
             place("main-3f-counseling", "상담실", "special-room"),
-            place("main-stairs-a-3f", "서쪽 계단", "stairs", { stairId: "MAIN_STAIRS_A" }),
-            place("main-3f-restroom-west", "화장실", "restroom"),
+            place("main-stairs-a-3f", "상담실·5-7 사이 계단", "stairs", { stairId: "MAIN_STAIRS_A" }),
+            place("main-3f-restroom-west", "5-7 쪽 화장실", "restroom"),
             place("main-3f-room-5-7", "5-7", "classroom"),
             place("main-3f-room-5-6", "5-6", "classroom"),
             place("main-3f-room-5-5", "5-5", "classroom"),
             place("main-3f-room-5-4", "5-4", "classroom"),
             place("main-3f-room-5-3", "5-3", "classroom"),
-            place("main-stairs-b-3f", "중앙 계단", "stairs", { stairId: "MAIN_STAIRS_B" }),
-            place("main-3f-restroom-center", "화장실", "restroom"),
+            place("main-stairs-b-3f", "5-3·5-2 사이 계단", "stairs", { stairId: "MAIN_STAIRS_B" }),
+            place("main-3f-restroom-center", "5-2 쪽 화장실", "restroom"),
             place("main-3f-room-5-2", "5-2", "classroom"),
             place("main-3f-room-5-1", "5-1", "classroom"),
             place("main-3f-room-4-5", "4-5", "classroom"),
@@ -188,15 +188,15 @@
           label: "본관 4층 복도",
           orderAccuracy: "왼쪽에서 오른쪽 방향의 대략적인 순서",
           orderedPlaces: [
-            place("main-stairs-a-4f", "서쪽 계단", "stairs", { stairId: "MAIN_STAIRS_A" }),
-            place("main-4f-restroom-west", "화장실", "restroom"),
+            place("main-stairs-a-4f", "6-7 쪽 계단", "stairs", { stairId: "MAIN_STAIRS_A" }),
+            place("main-4f-restroom-west", "6-7 쪽 화장실", "restroom"),
             place("main-4f-room-6-7", "6-7", "classroom"),
             place("main-4f-room-6-6", "6-6", "classroom"),
             place("main-4f-room-6-5", "6-5", "classroom"),
             place("main-4f-room-6-4", "6-4", "classroom"),
             place("main-4f-room-6-3", "6-3", "classroom"),
-            place("main-stairs-b-4f", "중앙 계단", "stairs", { stairId: "MAIN_STAIRS_B" }),
-            place("main-4f-restroom-center", "화장실", "restroom"),
+            place("main-stairs-b-4f", "6-3·6-2 사이 계단", "stairs", { stairId: "MAIN_STAIRS_B" }),
+            place("main-4f-restroom-center", "6-2 쪽 화장실", "restroom"),
             place("main-4f-room-6-2", "6-2", "classroom"),
             place("main-4f-room-6-1", "6-1", "classroom"),
             place("main-4f-room-4-1", "4-1", "classroom"),
@@ -225,8 +225,8 @@
             place("east-1f-room-1-1", "1-1", "classroom"),
             place("east-1f-room-1-2", "1-2", "classroom"),
             place("east-1f-individual-learning", "개별학습실", "special-room"),
-            place("east-stairs-a-1f", "계단", "stairs", { stairId: "EAST_STAIRS_A" }),
-            place("east-1f-restroom", "화장실", "restroom"),
+            place("east-stairs-a-1f", "1-4 쪽 계단", "stairs", { stairId: "EAST_STAIRS_A" }),
+            place("east-1f-restroom", "1-4 쪽 화장실", "restroom"),
             place("east-1f-entrance", "오른쪽 건물 출입구", "entrance")
           ]
         }
@@ -250,8 +250,8 @@
             place("east-2f-room-1-6", "1-6", "classroom"),
             place("east-2f-room-3-7", "3-7", "classroom"),
             place("east-2f-room-2-5", "2-5", "classroom"),
-            place("east-stairs-a-2f", "계단", "stairs", { stairId: "EAST_STAIRS_A" }),
-            place("east-2f-restroom", "화장실", "restroom")
+            place("east-stairs-a-2f", "1-5 쪽 계단", "stairs", { stairId: "EAST_STAIRS_A" }),
+            place("east-2f-restroom", "1-5 쪽 화장실", "restroom")
           ]
         }
       ]
@@ -274,8 +274,8 @@
             place("east-3f-room-4-7", "4-7", "classroom"),
             place("east-3f-room-4-8", "4-8", "classroom"),
             place("east-3f-room-2-4", "2-4", "classroom"),
-            place("east-stairs-a-3f", "계단", "stairs", { stairId: "EAST_STAIRS_A" }),
-            place("east-3f-restroom", "화장실", "restroom")
+            place("east-stairs-a-3f", "2-6 쪽 계단", "stairs", { stairId: "EAST_STAIRS_A" }),
+            place("east-3f-restroom", "2-6 쪽 화장실", "restroom")
           ]
         }
       ]
@@ -297,8 +297,8 @@
             place("east-4f-room-2-3", "2-3", "classroom"),
             place("east-4f-room-2-2", "2-2", "classroom"),
             place("east-4f-room-2-1", "2-1", "classroom"),
-            place("east-stairs-a-4f", "계단", "stairs", { stairId: "EAST_STAIRS_A" }),
-            place("east-4f-restroom", "화장실", "restroom")
+            place("east-stairs-a-4f", "4-4 쪽 계단", "stairs", { stairId: "EAST_STAIRS_A" }),
+            place("east-4f-restroom", "4-4 쪽 화장실", "restroom")
           ]
         }
       ]
@@ -338,17 +338,17 @@
     stairStacks: [
       {
         id: "MAIN_STAIRS_A",
-        name: "본관 서쪽 계단",
+        name: "본관 다목적실·5-7·6-7 쪽 계단",
         levels: ["main-stairs-a-1f", "main-stairs-a-2f", "main-stairs-a-3f", "main-stairs-a-4f"]
       },
       {
         id: "MAIN_STAIRS_B",
-        name: "본관 중앙 계단",
+        name: "본관 중앙 교실 사이 계단",
         levels: ["main-stairs-b-1f", "main-stairs-b-2f", "main-stairs-b-3f", "main-stairs-b-4f"]
       },
       {
         id: "EAST_STAIRS_A",
-        name: "오른쪽 건물 계단",
+        name: "오른쪽 건물 교실 쪽 계단",
         levels: ["east-stairs-a-1f", "east-stairs-a-2f", "east-stairs-a-3f", "east-stairs-a-4f"]
       }
     ],
