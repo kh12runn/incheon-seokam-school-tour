@@ -1,0 +1,3171 @@
+{
+  "schemaVersion": 1,
+  "source": "data/spaces.json",
+  "note": "Landmarks are approximate; verify on site. Raw photos are not public.",
+  "counts": {
+    "classroom": 41,
+    "special_room": 39,
+    "corridor": 15,
+    "stair": 16,
+    "stair_landing": 16,
+    "stair_flight": 12,
+    "toilet": 12,
+    "exterior": 7,
+    "entrance": 3,
+    "corridor_doorway": 80,
+    "unassigned": 1
+  },
+  "folders": [
+    {
+      "captureId": "1F_3-1",
+      "spaceId": "1F_3-1",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "3-1 교실",
+      "folder": "촬영사진_넣는곳/1층/교실/본관__3-1 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_3-2",
+      "spaceId": "1F_3-2",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "3-2 교실",
+      "folder": "촬영사진_넣는곳/1층/교실/본관__3-2 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_3-3",
+      "spaceId": "1F_3-3",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "3-3 교실",
+      "folder": "촬영사진_넣는곳/1층/교실/본관__3-3 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_3-4",
+      "spaceId": "1F_3-4",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "3-4 교실",
+      "folder": "촬영사진_넣는곳/1층/교실/본관__3-4 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_1-1",
+      "spaceId": "2F_1-1",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "classroom",
+      "label": "1-1 교실",
+      "folder": "촬영사진_넣는곳/2층/교실/별관__1-1 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_1-2",
+      "spaceId": "2F_1-2",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "classroom",
+      "label": "1-2 교실",
+      "folder": "촬영사진_넣는곳/2층/교실/별관__1-2 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_1-3",
+      "spaceId": "1F_1-3",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "classroom",
+      "label": "1-3 교실",
+      "folder": "촬영사진_넣는곳/1층/교실/별관__1-3 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_1-4",
+      "spaceId": "1F_1-4",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "classroom",
+      "label": "1-4 교실",
+      "folder": "촬영사진_넣는곳/1층/교실/별관__1-4 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_1-5",
+      "spaceId": "1F_1-5",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "classroom",
+      "label": "1-5 교실",
+      "folder": "촬영사진_넣는곳/1층/교실/별관__1-5 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_1-6",
+      "spaceId": "1F_1-6",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "classroom",
+      "label": "1-6 교실",
+      "folder": "촬영사진_넣는곳/1층/교실/별관__1-6 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_3-5",
+      "spaceId": "2F_3-5",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "3-5 교실",
+      "folder": "촬영사진_넣는곳/2층/교실/본관__3-5 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_3-6",
+      "spaceId": "2F_3-6",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "3-6 교실",
+      "folder": "촬영사진_넣는곳/2층/교실/본관__3-6 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_2-1",
+      "spaceId": "4F_2-1",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "classroom",
+      "label": "2-1 교실",
+      "folder": "촬영사진_넣는곳/4층/교실/별관__2-1 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_2-2",
+      "spaceId": "4F_2-2",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "classroom",
+      "label": "2-2 교실",
+      "folder": "촬영사진_넣는곳/4층/교실/별관__2-2 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_2-3",
+      "spaceId": "4F_2-3",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "classroom",
+      "label": "2-3 교실",
+      "folder": "촬영사진_넣는곳/4층/교실/별관__2-3 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_2-4",
+      "spaceId": "3F_2-4",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "classroom",
+      "label": "2-4 교실",
+      "folder": "촬영사진_넣는곳/3층/교실/별관__2-4 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_2-5",
+      "spaceId": "3F_2-5",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "classroom",
+      "label": "2-5 교실",
+      "folder": "촬영사진_넣는곳/3층/교실/별관__2-5 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_2-6",
+      "spaceId": "2F_2-6",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "classroom",
+      "label": "2-6 교실",
+      "folder": "촬영사진_넣는곳/2층/교실/별관__2-6 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_5-1",
+      "spaceId": "3F_5-1",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "5-1 교실",
+      "folder": "촬영사진_넣는곳/3층/교실/본관__5-1 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_5-2",
+      "spaceId": "3F_5-2",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "5-2 교실",
+      "folder": "촬영사진_넣는곳/3층/교실/본관__5-2 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_5-3",
+      "spaceId": "3F_5-3",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "5-3 교실",
+      "folder": "촬영사진_넣는곳/3층/교실/본관__5-3 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_5-4",
+      "spaceId": "3F_5-4",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "5-4 교실",
+      "folder": "촬영사진_넣는곳/3층/교실/본관__5-4 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_5-5",
+      "spaceId": "3F_5-5",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "5-5 교실",
+      "folder": "촬영사진_넣는곳/3층/교실/본관__5-5 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_5-6",
+      "spaceId": "3F_5-6",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "5-6 교실",
+      "folder": "촬영사진_넣는곳/3층/교실/본관__5-6 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_5-7",
+      "spaceId": "3F_5-7",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "5-7 교실",
+      "folder": "촬영사진_넣는곳/3층/교실/본관__5-7 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_4-5",
+      "spaceId": "3F_4-5",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "4-5 교실",
+      "folder": "촬영사진_넣는곳/3층/교실/본관__4-5 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_4-6",
+      "spaceId": "3F_4-6",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "4-6 교실",
+      "folder": "촬영사진_넣는곳/3층/교실/본관__4-6 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_3-7",
+      "spaceId": "2F_3-7",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "classroom",
+      "label": "3-7 교실",
+      "folder": "촬영사진_넣는곳/2층/교실/별관__3-7 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_6-1",
+      "spaceId": "4F_6-1",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "6-1 교실",
+      "folder": "촬영사진_넣는곳/4층/교실/본관__6-1 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_6-2",
+      "spaceId": "4F_6-2",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "6-2 교실",
+      "folder": "촬영사진_넣는곳/4층/교실/본관__6-2 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_6-3",
+      "spaceId": "4F_6-3",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "6-3 교실",
+      "folder": "촬영사진_넣는곳/4층/교실/본관__6-3 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_6-4",
+      "spaceId": "4F_6-4",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "6-4 교실",
+      "folder": "촬영사진_넣는곳/4층/교실/본관__6-4 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_6-5",
+      "spaceId": "4F_6-5",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "6-5 교실",
+      "folder": "촬영사진_넣는곳/4층/교실/본관__6-5 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_6-6",
+      "spaceId": "4F_6-6",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "6-6 교실",
+      "folder": "촬영사진_넣는곳/4층/교실/본관__6-6 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_6-7",
+      "spaceId": "4F_6-7",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "6-7 교실",
+      "folder": "촬영사진_넣는곳/4층/교실/본관__6-7 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_4-1",
+      "spaceId": "4F_4-1",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "4-1 교실",
+      "folder": "촬영사진_넣는곳/4층/교실/본관__4-1 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_4-2",
+      "spaceId": "4F_4-2",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "4-2 교실",
+      "folder": "촬영사진_넣는곳/4층/교실/본관__4-2 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_4-3",
+      "spaceId": "4F_4-3",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "classroom",
+      "label": "4-3 교실",
+      "folder": "촬영사진_넣는곳/4층/교실/본관__4-3 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_4-4",
+      "spaceId": "4F_4-4",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "classroom",
+      "label": "4-4 교실",
+      "folder": "촬영사진_넣는곳/4층/교실/별관__4-4 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_4-7",
+      "spaceId": "3F_4-7",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "classroom",
+      "label": "4-7 교실",
+      "folder": "촬영사진_넣는곳/3층/교실/별관__4-7 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_4-8",
+      "spaceId": "3F_4-8",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "classroom",
+      "label": "4-8 교실",
+      "folder": "촬영사진_넣는곳/3층/교실/별관__4-8 교실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_STORAGE_1",
+      "spaceId": "1F_STORAGE_1",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "창고 1",
+      "folder": "촬영사진_넣는곳/1층/특별실_지원실/본관__창고 1",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_STORAGE_2",
+      "spaceId": "1F_STORAGE_2",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "창고 2",
+      "folder": "촬영사진_넣는곳/1층/특별실_지원실/본관__창고 2",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_MULTIPURPOSE",
+      "spaceId": "1F_MULTIPURPOSE",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "다목적실",
+      "folder": "촬영사진_넣는곳/1층/특별실_지원실/본관__다목적실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_NIGHT_DUTY",
+      "spaceId": "1F_NIGHT_DUTY",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "숙직실",
+      "folder": "촬영사진_넣는곳/1층/특별실_지원실/본관__숙직실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_ADMIN",
+      "spaceId": "1F_ADMIN",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "행정실",
+      "folder": "촬영사진_넣는곳/1층/특별실_지원실/본관__행정실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_NURSE",
+      "spaceId": "1F_NURSE",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "보건실",
+      "folder": "촬영사진_넣는곳/1층/특별실_지원실/본관__보건실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_PRINTING",
+      "spaceId": "1F_PRINTING",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "발간실",
+      "folder": "촬영사진_넣는곳/1층/특별실_지원실/본관__발간실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_MEAL_CART_STORAGE",
+      "spaceId": "1F_MEAL_CART_STORAGE",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "배식차 보관실",
+      "folder": "촬영사진_넣는곳/1층/특별실_지원실/본관__배식차 보관실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_NUTRITION",
+      "spaceId": "1F_NUTRITION",
+      "floor": "1F",
+      "building": "EAST_WING",
+      "kind": "special_room",
+      "label": "영양교사실",
+      "folder": "촬영사진_넣는곳/1층/특별실_지원실/본관_동쪽__영양교사실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_COOKING",
+      "spaceId": "1F_COOKING",
+      "floor": "1F",
+      "building": "EAST_WING",
+      "kind": "special_room",
+      "label": "조리실",
+      "folder": "촬영사진_넣는곳/1층/특별실_지원실/본관_동쪽__조리실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_CAFETERIA",
+      "spaceId": "1F_CAFETERIA",
+      "floor": "1F",
+      "building": "EAST_WING",
+      "kind": "special_room",
+      "label": "급식실",
+      "folder": "촬영사진_넣는곳/1층/특별실_지원실/본관_동쪽__급식실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_GRADE1_RESEARCH",
+      "spaceId": "3F_GRADE1_RESEARCH",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "special_room",
+      "label": "1학년 연수실",
+      "folder": "촬영사진_넣는곳/3층/특별실_지원실/별관__1학년 연수실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_KINDERGARTEN",
+      "spaceId": "4F_KINDERGARTEN",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "special_room",
+      "label": "까치방",
+      "folder": "촬영사진_넣는곳/4층/특별실_지원실/별관__까치방",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_COMPUTER",
+      "spaceId": "4F_COMPUTER",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "special_room",
+      "label": "컴퓨터실",
+      "folder": "촬영사진_넣는곳/4층/특별실_지원실/별관__컴퓨터실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_AUDIO_VISUAL",
+      "spaceId": "2F_AUDIO_VISUAL",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "시청각실",
+      "folder": "촬영사진_넣는곳/2층/특별실_지원실/본관__시청각실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_KOREAN_CLASS",
+      "spaceId": "2F_KOREAN_CLASS",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "한국어학급",
+      "folder": "촬영사진_넣는곳/2층/특별실_지원실/본관__한국어학급",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_CARE_DREAM_HOPE",
+      "spaceId": "2F_CARE_DREAM_HOPE",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "돌봄교실(꿈희망)",
+      "folder": "촬영사진_넣는곳/2층/특별실_지원실/본관__돌봄교실(꿈희망)",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_CARE_DREAM_WISH",
+      "spaceId": "2F_CARE_DREAM_WISH",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "돌봄교실(꿈소망)",
+      "folder": "촬영사진_넣는곳/2층/특별실_지원실/본관__돌봄교실(꿈소망)",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_CARE_DREAM_LOVE",
+      "spaceId": "2F_CARE_DREAM_LOVE",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "돌봄교실(꿈사랑)",
+      "folder": "촬영사진_넣는곳/2층/특별실_지원실/본관__돌봄교실(꿈사랑)",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_PRINCIPAL",
+      "spaceId": "2F_PRINCIPAL",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "교장실",
+      "folder": "촬영사진_넣는곳/2층/특별실_지원실/본관__교장실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_OPERATIONS_MEETING",
+      "spaceId": "2F_OPERATIONS_MEETING",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "학교운영위원회 회의실",
+      "folder": "촬영사진_넣는곳/2층/특별실_지원실/본관__학교운영위원회 회의실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_STAFF",
+      "spaceId": "2F_STAFF",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "교무실",
+      "folder": "촬영사진_넣는곳/2층/특별실_지원실/본관__교무실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_BROADCAST",
+      "spaceId": "2F_BROADCAST",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "방송실(교원회의실)",
+      "folder": "촬영사진_넣는곳/2층/특별실_지원실/본관__방송실(교원회의실)",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_SCIENCE_PREP",
+      "spaceId": "2F_SCIENCE_PREP",
+      "floor": "2F",
+      "building": "EAST_WING",
+      "kind": "special_room",
+      "label": "과학준비실",
+      "folder": "촬영사진_넣는곳/2층/특별실_지원실/본관_동쪽__과학준비실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_INTELLIGENT_SCIENCE",
+      "spaceId": "2F_INTELLIGENT_SCIENCE",
+      "floor": "2F",
+      "building": "EAST_WING",
+      "kind": "special_room",
+      "label": "지능형과학실",
+      "folder": "촬영사진_넣는곳/2층/특별실_지원실/본관_동쪽__지능형과학실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_SCIENCE",
+      "spaceId": "2F_SCIENCE",
+      "floor": "2F",
+      "building": "EAST_WING",
+      "kind": "special_room",
+      "label": "과학실",
+      "folder": "촬영사진_넣는곳/2층/특별실_지원실/본관_동쪽__과학실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_GRADE2_RESEARCH",
+      "spaceId": "4F_GRADE2_RESEARCH",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "special_room",
+      "label": "2학년 연수실",
+      "folder": "촬영사진_넣는곳/4층/특별실_지원실/별관__2학년 연수실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_COUNSELING",
+      "spaceId": "3F_COUNSELING",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "상담실",
+      "folder": "촬영사진_넣는곳/3층/특별실_지원실/본관__상담실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_GRADE5_RESEARCH",
+      "spaceId": "3F_GRADE5_RESEARCH",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "5학년 연수실",
+      "folder": "촬영사진_넣는곳/3층/특별실_지원실/본관__5학년 연수실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_BOOK_LIBRARY",
+      "spaceId": "3F_BOOK_LIBRARY",
+      "floor": "3F",
+      "building": "EAST_WING",
+      "kind": "special_room",
+      "label": "책터 도서관",
+      "folder": "촬영사진_넣는곳/3층/특별실_지원실/본관_동쪽__책터 도서관",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_GRADE6_RESEARCH",
+      "spaceId": "4F_GRADE6_RESEARCH",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "6학년 연수실",
+      "folder": "촬영사진_넣는곳/4층/특별실_지원실/본관__6학년 연수실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_GRADE4_RESEARCH",
+      "spaceId": "4F_GRADE4_RESEARCH",
+      "floor": "4F",
+      "building": "EAST_WING",
+      "kind": "special_room",
+      "label": "4학년 연수실",
+      "folder": "촬영사진_넣는곳/4층/특별실_지원실/본관_동쪽__4학년 연수실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_INDIVIDUAL_1",
+      "spaceId": "2F_INDIVIDUAL_1",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "special_room",
+      "label": "개별학습실1",
+      "folder": "촬영사진_넣는곳/2층/특별실_지원실/별관__개별학습실1",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_INDIVIDUAL_2",
+      "spaceId": "2F_INDIVIDUAL_2",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "special_room",
+      "label": "개별학습실2",
+      "folder": "촬영사진_넣는곳/2층/특별실_지원실/별관__개별학습실2",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_INDIVIDUAL_3",
+      "spaceId": "3F_INDIVIDUAL_3",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "special_room",
+      "label": "개별학습실3",
+      "folder": "촬영사진_넣는곳/3층/특별실_지원실/별관__개별학습실3",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_INDIVIDUAL_4",
+      "spaceId": "1F_INDIVIDUAL_4",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "special_room",
+      "label": "개별학습실4",
+      "folder": "촬영사진_넣는곳/1층/특별실_지원실/별관__개별학습실4",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_INDIVIDUAL_5",
+      "spaceId": "1F_INDIVIDUAL_5",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "special_room",
+      "label": "개별학습실5",
+      "folder": "촬영사진_넣는곳/1층/특별실_지원실/별관__개별학습실5",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_MAIN_CORRIDOR_01",
+      "spaceId": "1F_MAIN_CORRIDOR_01",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor",
+      "label": "본관__3-4 교실·본관 현관_구간",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__3-4 교실·본관 현관_구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_3-4",
+        "1F_MAIN_LOBBY"
+      ],
+      "note": "구간 전체를 여러 촬영 지점으로 나누고 인접 구간의 끝부분과 겹치게 촬영하세요. 구간 이름은 모델 기준 별칭입니다."
+    },
+    {
+      "captureId": "1F_MAIN_CORRIDOR_02",
+      "spaceId": "1F_MAIN_CORRIDOR_02",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor",
+      "label": "본관__행정실·급식실_구간",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__행정실·급식실_구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_ADMIN",
+        "1F_CAFETERIA"
+      ],
+      "note": "구간 전체를 여러 촬영 지점으로 나누고 인접 구간의 끝부분과 겹치게 촬영하세요. 구간 이름은 모델 기준 별칭입니다."
+    },
+    {
+      "captureId": "1F_ANNEX_CORRIDOR_01",
+      "spaceId": "1F_ANNEX_CORRIDOR_01",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "corridor",
+      "label": "별관__1-6 교실·1-3 교실_구간",
+      "folder": "촬영사진_넣는곳/1층/복도/별관__1-6 교실·1-3 교실_구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_1-6",
+        "1F_1-3"
+      ],
+      "note": "구간 전체를 여러 촬영 지점으로 나누고 인접 구간의 끝부분과 겹치게 촬영하세요. 구간 이름은 모델 기준 별칭입니다."
+    },
+    {
+      "captureId": "1F_MAIN_STAIR_A",
+      "spaceId": "1F_MAIN_STAIR_A",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "stair",
+      "label": "본관_서쪽_A__3-4 교실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/1층/계단/본관_서쪽_A__3-4 교실_앞_계단_위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_3-4"
+      ],
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다.",
+      "stairShaft": "MAIN_STAIR_A",
+      "connectsTo": "2F_MAIN_STAIR_A"
+    },
+    {
+      "captureId": "1F_MAIN_STAIR_A_LANDING",
+      "spaceId": "1F_MAIN_STAIR_A",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "stair_landing",
+      "label": "1층 본관_서쪽_A__3-4 교실_앞_계단_위치확인필요 입구와 계단참",
+      "folder": "촬영사진_넣는곳/1층/계단/본관_서쪽_A__3-4 교실_앞_계단_위치확인필요/01_해당층_계단입구와참",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다."
+    },
+    {
+      "captureId": "1F_MAIN_STAIR_A_UP",
+      "spaceId": "1F_MAIN_STAIR_A",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "stair_flight",
+      "label": "1층→2층 본관_서쪽_A__3-4 교실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/1층/계단/본관_서쪽_A__3-4 교실_앞_계단_위치확인필요/02_1층에서_2층으로_올라가는구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "connectsTo": "2F_MAIN_STAIR_A",
+      "note": "아래층 폴더에 올라가는 구간 전체(하단·디딤판·중간참·상단)를 넣습니다. 위층에 같은 사진을 중복 저장할 필요는 없습니다. 옥상·지하는 확인 전 촬영 대상으로 추정하지 않았습니다."
+    },
+    {
+      "captureId": "1F_MAIN_STAIR_B",
+      "spaceId": "1F_MAIN_STAIR_B",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "stair",
+      "label": "본관_중앙_B__행정실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/1층/계단/본관_중앙_B__행정실_앞_계단_위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_ADMIN"
+      ],
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다.",
+      "stairShaft": "MAIN_STAIR_B",
+      "connectsTo": "2F_MAIN_STAIR_B"
+    },
+    {
+      "captureId": "1F_MAIN_STAIR_B_LANDING",
+      "spaceId": "1F_MAIN_STAIR_B",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "stair_landing",
+      "label": "1층 본관_중앙_B__행정실_앞_계단_위치확인필요 입구와 계단참",
+      "folder": "촬영사진_넣는곳/1층/계단/본관_중앙_B__행정실_앞_계단_위치확인필요/01_해당층_계단입구와참",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다."
+    },
+    {
+      "captureId": "1F_MAIN_STAIR_B_UP",
+      "spaceId": "1F_MAIN_STAIR_B",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "stair_flight",
+      "label": "1층→2층 본관_중앙_B__행정실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/1층/계단/본관_중앙_B__행정실_앞_계단_위치확인필요/02_1층에서_2층으로_올라가는구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "connectsTo": "2F_MAIN_STAIR_B",
+      "note": "아래층 폴더에 올라가는 구간 전체(하단·디딤판·중간참·상단)를 넣습니다. 위층에 같은 사진을 중복 저장할 필요는 없습니다. 옥상·지하는 확인 전 촬영 대상으로 추정하지 않았습니다."
+    },
+    {
+      "captureId": "1F_ANNEX_STAIR_D",
+      "spaceId": "1F_ANNEX_STAIR_D",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "stair",
+      "label": "별관_북쪽_D__1-6 교실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/1층/계단/별관_북쪽_D__1-6 교실_앞_계단_위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_1-6"
+      ],
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다.",
+      "stairShaft": "ANNEX_STAIR_D",
+      "connectsTo": "2F_ANNEX_STAIR_D"
+    },
+    {
+      "captureId": "1F_ANNEX_STAIR_D_LANDING",
+      "spaceId": "1F_ANNEX_STAIR_D",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "stair_landing",
+      "label": "1층 별관_북쪽_D__1-6 교실_앞_계단_위치확인필요 입구와 계단참",
+      "folder": "촬영사진_넣는곳/1층/계단/별관_북쪽_D__1-6 교실_앞_계단_위치확인필요/01_해당층_계단입구와참",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다."
+    },
+    {
+      "captureId": "1F_ANNEX_STAIR_D_UP",
+      "spaceId": "1F_ANNEX_STAIR_D",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "stair_flight",
+      "label": "1층→2층 별관_북쪽_D__1-6 교실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/1층/계단/별관_북쪽_D__1-6 교실_앞_계단_위치확인필요/02_1층에서_2층으로_올라가는구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "connectsTo": "2F_ANNEX_STAIR_D",
+      "note": "아래층 폴더에 올라가는 구간 전체(하단·디딤판·중간참·상단)를 넣습니다. 위층에 같은 사진을 중복 저장할 필요는 없습니다. 옥상·지하는 확인 전 촬영 대상으로 추정하지 않았습니다."
+    },
+    {
+      "captureId": "1F_MAIN_TOILET_A",
+      "spaceId": "1F_MAIN_TOILET_A",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "toilet",
+      "label": "1F 본관 화장실 A",
+      "folder": "촬영사진_넣는곳/1층/기타_촬영전허가필요/본관__1F 본관 화장실 A",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_MAIN_TOILET_B",
+      "spaceId": "1F_MAIN_TOILET_B",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "toilet",
+      "label": "1F 본관 화장실 B",
+      "folder": "촬영사진_넣는곳/1층/기타_촬영전허가필요/본관__1F 본관 화장실 B",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_ANNEX_TOILET_A",
+      "spaceId": "1F_ANNEX_TOILET_A",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "toilet",
+      "label": "1F 별관 화장실",
+      "folder": "촬영사진_넣는곳/1층/기타_촬영전허가필요/별관__1F 별관 화장실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_MAIN_CORRIDOR_01",
+      "spaceId": "2F_MAIN_CORRIDOR_01",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor",
+      "label": "본관__돌봄교실(꿈희망)·교무실_구간",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__돌봄교실(꿈희망)·교무실_구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_CARE_DREAM_HOPE",
+        "2F_STAFF"
+      ],
+      "note": "구간 전체를 여러 촬영 지점으로 나누고 인접 구간의 끝부분과 겹치게 촬영하세요. 구간 이름은 모델 기준 별칭입니다."
+    },
+    {
+      "captureId": "2F_MAIN_CORRIDOR_02",
+      "spaceId": "2F_MAIN_CORRIDOR_02",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor",
+      "label": "본관__교무실·과학실_구간",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__교무실·과학실_구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_STAFF",
+        "2F_SCIENCE"
+      ],
+      "note": "구간 전체를 여러 촬영 지점으로 나누고 인접 구간의 끝부분과 겹치게 촬영하세요. 구간 이름은 모델 기준 별칭입니다."
+    },
+    {
+      "captureId": "2F_ANNEX_CORRIDOR_01",
+      "spaceId": "2F_ANNEX_CORRIDOR_01",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "corridor",
+      "label": "별관__개별학습실2·1-1 교실_구간",
+      "folder": "촬영사진_넣는곳/2층/복도/별관__개별학습실2·1-1 교실_구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_INDIVIDUAL_2",
+        "2F_1-1"
+      ],
+      "note": "구간 전체를 여러 촬영 지점으로 나누고 인접 구간의 끝부분과 겹치게 촬영하세요. 구간 이름은 모델 기준 별칭입니다."
+    },
+    {
+      "captureId": "2F_MAIN_STAIR_A",
+      "spaceId": "2F_MAIN_STAIR_A",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "stair",
+      "label": "본관_서쪽_A__돌봄교실(꿈희망)_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/2층/계단/본관_서쪽_A__돌봄교실(꿈희망)_앞_계단_위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_CARE_DREAM_HOPE"
+      ],
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다.",
+      "stairShaft": "MAIN_STAIR_A",
+      "connectsTo": "3F_MAIN_STAIR_A"
+    },
+    {
+      "captureId": "2F_MAIN_STAIR_A_LANDING",
+      "spaceId": "2F_MAIN_STAIR_A",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "stair_landing",
+      "label": "2층 본관_서쪽_A__돌봄교실(꿈희망)_앞_계단_위치확인필요 입구와 계단참",
+      "folder": "촬영사진_넣는곳/2층/계단/본관_서쪽_A__돌봄교실(꿈희망)_앞_계단_위치확인필요/01_해당층_계단입구와참",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다."
+    },
+    {
+      "captureId": "2F_MAIN_STAIR_A_UP",
+      "spaceId": "2F_MAIN_STAIR_A",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "stair_flight",
+      "label": "2층→3층 본관_서쪽_A__돌봄교실(꿈희망)_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/2층/계단/본관_서쪽_A__돌봄교실(꿈희망)_앞_계단_위치확인필요/02_2층에서_3층으로_올라가는구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "connectsTo": "3F_MAIN_STAIR_A",
+      "note": "아래층 폴더에 올라가는 구간 전체(하단·디딤판·중간참·상단)를 넣습니다. 위층에 같은 사진을 중복 저장할 필요는 없습니다. 옥상·지하는 확인 전 촬영 대상으로 추정하지 않았습니다."
+    },
+    {
+      "captureId": "2F_MAIN_STAIR_B",
+      "spaceId": "2F_MAIN_STAIR_B",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "stair",
+      "label": "본관_중앙_B__교무실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/2층/계단/본관_중앙_B__교무실_앞_계단_위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_STAFF"
+      ],
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다.",
+      "stairShaft": "MAIN_STAIR_B",
+      "connectsTo": "3F_MAIN_STAIR_B"
+    },
+    {
+      "captureId": "2F_MAIN_STAIR_B_LANDING",
+      "spaceId": "2F_MAIN_STAIR_B",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "stair_landing",
+      "label": "2층 본관_중앙_B__교무실_앞_계단_위치확인필요 입구와 계단참",
+      "folder": "촬영사진_넣는곳/2층/계단/본관_중앙_B__교무실_앞_계단_위치확인필요/01_해당층_계단입구와참",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다."
+    },
+    {
+      "captureId": "2F_MAIN_STAIR_B_UP",
+      "spaceId": "2F_MAIN_STAIR_B",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "stair_flight",
+      "label": "2층→3층 본관_중앙_B__교무실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/2층/계단/본관_중앙_B__교무실_앞_계단_위치확인필요/02_2층에서_3층으로_올라가는구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "connectsTo": "3F_MAIN_STAIR_B",
+      "note": "아래층 폴더에 올라가는 구간 전체(하단·디딤판·중간참·상단)를 넣습니다. 위층에 같은 사진을 중복 저장할 필요는 없습니다. 옥상·지하는 확인 전 촬영 대상으로 추정하지 않았습니다."
+    },
+    {
+      "captureId": "2F_ANNEX_STAIR_D",
+      "spaceId": "2F_ANNEX_STAIR_D",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "stair",
+      "label": "별관_북쪽_D__개별학습실2_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/2층/계단/별관_북쪽_D__개별학습실2_앞_계단_위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_INDIVIDUAL_2"
+      ],
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다.",
+      "stairShaft": "ANNEX_STAIR_D",
+      "connectsTo": "3F_ANNEX_STAIR_D"
+    },
+    {
+      "captureId": "2F_ANNEX_STAIR_D_LANDING",
+      "spaceId": "2F_ANNEX_STAIR_D",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "stair_landing",
+      "label": "2층 별관_북쪽_D__개별학습실2_앞_계단_위치확인필요 입구와 계단참",
+      "folder": "촬영사진_넣는곳/2층/계단/별관_북쪽_D__개별학습실2_앞_계단_위치확인필요/01_해당층_계단입구와참",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다."
+    },
+    {
+      "captureId": "2F_ANNEX_STAIR_D_UP",
+      "spaceId": "2F_ANNEX_STAIR_D",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "stair_flight",
+      "label": "2층→3층 별관_북쪽_D__개별학습실2_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/2층/계단/별관_북쪽_D__개별학습실2_앞_계단_위치확인필요/02_2층에서_3층으로_올라가는구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "connectsTo": "3F_ANNEX_STAIR_D",
+      "note": "아래층 폴더에 올라가는 구간 전체(하단·디딤판·중간참·상단)를 넣습니다. 위층에 같은 사진을 중복 저장할 필요는 없습니다. 옥상·지하는 확인 전 촬영 대상으로 추정하지 않았습니다."
+    },
+    {
+      "captureId": "2F_MAIN_TOILET_A",
+      "spaceId": "2F_MAIN_TOILET_A",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "toilet",
+      "label": "2F 본관 화장실 A",
+      "folder": "촬영사진_넣는곳/2층/기타_촬영전허가필요/본관__2F 본관 화장실 A",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_MAIN_TOILET_B",
+      "spaceId": "2F_MAIN_TOILET_B",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "toilet",
+      "label": "2F 본관 화장실 B",
+      "folder": "촬영사진_넣는곳/2층/기타_촬영전허가필요/본관__2F 본관 화장실 B",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_ANNEX_TOILET_A",
+      "spaceId": "2F_ANNEX_TOILET_A",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "toilet",
+      "label": "2F 별관 화장실",
+      "folder": "촬영사진_넣는곳/2층/기타_촬영전허가필요/별관__2F 별관 화장실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_MAIN_CORRIDOR_01",
+      "spaceId": "3F_MAIN_CORRIDOR_01",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "corridor",
+      "label": "본관__5-7 교실·5-3 교실_구간",
+      "folder": "촬영사진_넣는곳/3층/복도/본관__5-7 교실·5-3 교실_구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_5-7",
+        "3F_5-3"
+      ],
+      "note": "구간 전체를 여러 촬영 지점으로 나누고 인접 구간의 끝부분과 겹치게 촬영하세요. 구간 이름은 모델 기준 별칭입니다."
+    },
+    {
+      "captureId": "3F_MAIN_CORRIDOR_02",
+      "spaceId": "3F_MAIN_CORRIDOR_02",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "corridor",
+      "label": "본관__5-2 교실·4-6 교실_구간",
+      "folder": "촬영사진_넣는곳/3층/복도/본관__5-2 교실·4-6 교실_구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_5-2",
+        "3F_4-6"
+      ],
+      "note": "구간 전체를 여러 촬영 지점으로 나누고 인접 구간의 끝부분과 겹치게 촬영하세요. 구간 이름은 모델 기준 별칭입니다."
+    },
+    {
+      "captureId": "3F_ANNEX_CORRIDOR_01",
+      "spaceId": "3F_ANNEX_CORRIDOR_01",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "corridor",
+      "label": "별관__4-7 교실·개별학습실3_구간",
+      "folder": "촬영사진_넣는곳/3층/복도/별관__4-7 교실·개별학습실3_구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_4-7",
+        "3F_INDIVIDUAL_3"
+      ],
+      "note": "구간 전체를 여러 촬영 지점으로 나누고 인접 구간의 끝부분과 겹치게 촬영하세요. 구간 이름은 모델 기준 별칭입니다."
+    },
+    {
+      "captureId": "3F_MAIN_STAIR_A",
+      "spaceId": "3F_MAIN_STAIR_A",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "stair",
+      "label": "본관_서쪽_A__5-7 교실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/3층/계단/본관_서쪽_A__5-7 교실_앞_계단_위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_5-7"
+      ],
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다.",
+      "stairShaft": "MAIN_STAIR_A",
+      "connectsTo": "4F_MAIN_STAIR_A"
+    },
+    {
+      "captureId": "3F_MAIN_STAIR_A_LANDING",
+      "spaceId": "3F_MAIN_STAIR_A",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "stair_landing",
+      "label": "3층 본관_서쪽_A__5-7 교실_앞_계단_위치확인필요 입구와 계단참",
+      "folder": "촬영사진_넣는곳/3층/계단/본관_서쪽_A__5-7 교실_앞_계단_위치확인필요/01_해당층_계단입구와참",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다."
+    },
+    {
+      "captureId": "3F_MAIN_STAIR_A_UP",
+      "spaceId": "3F_MAIN_STAIR_A",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "stair_flight",
+      "label": "3층→4층 본관_서쪽_A__5-7 교실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/3층/계단/본관_서쪽_A__5-7 교실_앞_계단_위치확인필요/02_3층에서_4층으로_올라가는구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "connectsTo": "4F_MAIN_STAIR_A",
+      "note": "아래층 폴더에 올라가는 구간 전체(하단·디딤판·중간참·상단)를 넣습니다. 위층에 같은 사진을 중복 저장할 필요는 없습니다. 옥상·지하는 확인 전 촬영 대상으로 추정하지 않았습니다."
+    },
+    {
+      "captureId": "3F_MAIN_STAIR_B",
+      "spaceId": "3F_MAIN_STAIR_B",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "stair",
+      "label": "본관_중앙_B__5-2 교실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/3층/계단/본관_중앙_B__5-2 교실_앞_계단_위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_5-2"
+      ],
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다.",
+      "stairShaft": "MAIN_STAIR_B",
+      "connectsTo": "4F_MAIN_STAIR_B"
+    },
+    {
+      "captureId": "3F_MAIN_STAIR_B_LANDING",
+      "spaceId": "3F_MAIN_STAIR_B",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "stair_landing",
+      "label": "3층 본관_중앙_B__5-2 교실_앞_계단_위치확인필요 입구와 계단참",
+      "folder": "촬영사진_넣는곳/3층/계단/본관_중앙_B__5-2 교실_앞_계단_위치확인필요/01_해당층_계단입구와참",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다."
+    },
+    {
+      "captureId": "3F_MAIN_STAIR_B_UP",
+      "spaceId": "3F_MAIN_STAIR_B",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "stair_flight",
+      "label": "3층→4층 본관_중앙_B__5-2 교실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/3층/계단/본관_중앙_B__5-2 교실_앞_계단_위치확인필요/02_3층에서_4층으로_올라가는구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "connectsTo": "4F_MAIN_STAIR_B",
+      "note": "아래층 폴더에 올라가는 구간 전체(하단·디딤판·중간참·상단)를 넣습니다. 위층에 같은 사진을 중복 저장할 필요는 없습니다. 옥상·지하는 확인 전 촬영 대상으로 추정하지 않았습니다."
+    },
+    {
+      "captureId": "3F_ANNEX_STAIR_D",
+      "spaceId": "3F_ANNEX_STAIR_D",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "stair",
+      "label": "별관_북쪽_D__4-7 교실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/3층/계단/별관_북쪽_D__4-7 교실_앞_계단_위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_4-7"
+      ],
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다.",
+      "stairShaft": "ANNEX_STAIR_D",
+      "connectsTo": "4F_ANNEX_STAIR_D"
+    },
+    {
+      "captureId": "3F_ANNEX_STAIR_D_LANDING",
+      "spaceId": "3F_ANNEX_STAIR_D",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "stair_landing",
+      "label": "3층 별관_북쪽_D__4-7 교실_앞_계단_위치확인필요 입구와 계단참",
+      "folder": "촬영사진_넣는곳/3층/계단/별관_북쪽_D__4-7 교실_앞_계단_위치확인필요/01_해당층_계단입구와참",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다."
+    },
+    {
+      "captureId": "3F_ANNEX_STAIR_D_UP",
+      "spaceId": "3F_ANNEX_STAIR_D",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "stair_flight",
+      "label": "3층→4층 별관_북쪽_D__4-7 교실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/3층/계단/별관_북쪽_D__4-7 교실_앞_계단_위치확인필요/02_3층에서_4층으로_올라가는구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "connectsTo": "4F_ANNEX_STAIR_D",
+      "note": "아래층 폴더에 올라가는 구간 전체(하단·디딤판·중간참·상단)를 넣습니다. 위층에 같은 사진을 중복 저장할 필요는 없습니다. 옥상·지하는 확인 전 촬영 대상으로 추정하지 않았습니다."
+    },
+    {
+      "captureId": "3F_MAIN_TOILET_A",
+      "spaceId": "3F_MAIN_TOILET_A",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "toilet",
+      "label": "3F 본관 화장실 A",
+      "folder": "촬영사진_넣는곳/3층/기타_촬영전허가필요/본관__3F 본관 화장실 A",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_MAIN_TOILET_B",
+      "spaceId": "3F_MAIN_TOILET_B",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "toilet",
+      "label": "3F 본관 화장실 B",
+      "folder": "촬영사진_넣는곳/3층/기타_촬영전허가필요/본관__3F 본관 화장실 B",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "3F_ANNEX_TOILET_A",
+      "spaceId": "3F_ANNEX_TOILET_A",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "toilet",
+      "label": "3F 별관 화장실",
+      "folder": "촬영사진_넣는곳/3층/기타_촬영전허가필요/별관__3F 별관 화장실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_MAIN_CORRIDOR_01",
+      "spaceId": "4F_MAIN_CORRIDOR_01",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "corridor",
+      "label": "본관__6-7 교실·6-3 교실_구간",
+      "folder": "촬영사진_넣는곳/4층/복도/본관__6-7 교실·6-3 교실_구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_6-7",
+        "4F_6-3"
+      ],
+      "note": "구간 전체를 여러 촬영 지점으로 나누고 인접 구간의 끝부분과 겹치게 촬영하세요. 구간 이름은 모델 기준 별칭입니다."
+    },
+    {
+      "captureId": "4F_MAIN_CORRIDOR_02",
+      "spaceId": "4F_MAIN_CORRIDOR_02",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "corridor",
+      "label": "본관__6-2 교실·4-2 교실_구간",
+      "folder": "촬영사진_넣는곳/4층/복도/본관__6-2 교실·4-2 교실_구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_6-2",
+        "4F_4-2"
+      ],
+      "note": "구간 전체를 여러 촬영 지점으로 나누고 인접 구간의 끝부분과 겹치게 촬영하세요. 구간 이름은 모델 기준 별칭입니다."
+    },
+    {
+      "captureId": "4F_ANNEX_CORRIDOR_01",
+      "spaceId": "4F_ANNEX_CORRIDOR_01",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "corridor",
+      "label": "별관__4-4 교실·컴퓨터실_구간",
+      "folder": "촬영사진_넣는곳/4층/복도/별관__4-4 교실·컴퓨터실_구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_4-4",
+        "4F_COMPUTER"
+      ],
+      "note": "구간 전체를 여러 촬영 지점으로 나누고 인접 구간의 끝부분과 겹치게 촬영하세요. 구간 이름은 모델 기준 별칭입니다."
+    },
+    {
+      "captureId": "4F_MAIN_STAIR_A",
+      "spaceId": "4F_MAIN_STAIR_A",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "stair",
+      "label": "본관_서쪽_A__6-7 교실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/4층/계단/본관_서쪽_A__6-7 교실_앞_계단_위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_6-7"
+      ],
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다.",
+      "stairShaft": "MAIN_STAIR_A",
+      "connectsTo": null
+    },
+    {
+      "captureId": "4F_MAIN_STAIR_A_LANDING",
+      "spaceId": "4F_MAIN_STAIR_A",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "stair_landing",
+      "label": "4층 본관_서쪽_A__6-7 교실_앞_계단_위치확인필요 입구와 계단참",
+      "folder": "촬영사진_넣는곳/4층/계단/본관_서쪽_A__6-7 교실_앞_계단_위치확인필요/01_해당층_계단입구와참",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다."
+    },
+    {
+      "captureId": "4F_MAIN_STAIR_B",
+      "spaceId": "4F_MAIN_STAIR_B",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "stair",
+      "label": "본관_중앙_B__6-2 교실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/4층/계단/본관_중앙_B__6-2 교실_앞_계단_위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_6-2"
+      ],
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다.",
+      "stairShaft": "MAIN_STAIR_B",
+      "connectsTo": null
+    },
+    {
+      "captureId": "4F_MAIN_STAIR_B_LANDING",
+      "spaceId": "4F_MAIN_STAIR_B",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "stair_landing",
+      "label": "4층 본관_중앙_B__6-2 교실_앞_계단_위치확인필요 입구와 계단참",
+      "folder": "촬영사진_넣는곳/4층/계단/본관_중앙_B__6-2 교실_앞_계단_위치확인필요/01_해당층_계단입구와참",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다."
+    },
+    {
+      "captureId": "4F_ANNEX_STAIR_D",
+      "spaceId": "4F_ANNEX_STAIR_D",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "stair",
+      "label": "별관_북쪽_D__4-4 교실_앞_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/4층/계단/별관_북쪽_D__4-4 교실_앞_계단_위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_4-4"
+      ],
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다.",
+      "stairShaft": "ANNEX_STAIR_D",
+      "connectsTo": null
+    },
+    {
+      "captureId": "4F_ANNEX_STAIR_D_LANDING",
+      "spaceId": "4F_ANNEX_STAIR_D",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "stair_landing",
+      "label": "4층 별관_북쪽_D__4-4 교실_앞_계단_위치확인필요 입구와 계단참",
+      "folder": "촬영사진_넣는곳/4층/계단/별관_북쪽_D__4-4 교실_앞_계단_위치확인필요/01_해당층_계단입구와참",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다."
+    },
+    {
+      "captureId": "4F_MAIN_TOILET_A",
+      "spaceId": "4F_MAIN_TOILET_A",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "toilet",
+      "label": "4F 본관 화장실 A",
+      "folder": "촬영사진_넣는곳/4층/기타_촬영전허가필요/본관__4F 본관 화장실 A",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_MAIN_TOILET_B",
+      "spaceId": "4F_MAIN_TOILET_B",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "toilet",
+      "label": "4F 본관 화장실 B",
+      "folder": "촬영사진_넣는곳/4층/기타_촬영전허가필요/본관__4F 본관 화장실 B",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "4F_ANNEX_TOILET_A",
+      "spaceId": "4F_ANNEX_TOILET_A",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "toilet",
+      "label": "4F 별관 화장실",
+      "folder": "촬영사진_넣는곳/4층/기타_촬영전허가필요/별관__4F 별관 화장실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_CONNECTOR",
+      "spaceId": "2F_CONNECTOR",
+      "floor": "2F",
+      "building": "CONNECTOR",
+      "kind": "corridor",
+      "label": "본관-별관_연결복도",
+      "folder": "촬영사진_넣는곳/2층/복도/본관-별관_연결복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": "구간 전체를 여러 촬영 지점으로 나누고 인접 구간의 끝부분과 겹치게 촬영하세요. 구간 이름은 모델 기준 별칭입니다."
+    },
+    {
+      "captureId": "3F_CONNECTOR",
+      "spaceId": "3F_CONNECTOR",
+      "floor": "3F",
+      "building": "CONNECTOR",
+      "kind": "corridor",
+      "label": "본관-별관_연결복도",
+      "folder": "촬영사진_넣는곳/3층/복도/본관-별관_연결복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": "구간 전체를 여러 촬영 지점으로 나누고 인접 구간의 끝부분과 겹치게 촬영하세요. 구간 이름은 모델 기준 별칭입니다."
+    },
+    {
+      "captureId": "4F_CONNECTOR",
+      "spaceId": "4F_CONNECTOR",
+      "floor": "4F",
+      "building": "CONNECTOR",
+      "kind": "corridor",
+      "label": "본관-별관_연결복도",
+      "folder": "촬영사진_넣는곳/4층/복도/본관-별관_연결복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": "구간 전체를 여러 촬영 지점으로 나누고 인접 구간의 끝부분과 겹치게 촬영하세요. 구간 이름은 모델 기준 별칭입니다."
+    },
+    {
+      "captureId": "EXT_MAIN_GATE",
+      "spaceId": "EXT_MAIN_GATE",
+      "floor": "EXTERIOR",
+      "building": "EXTERIOR",
+      "kind": "exterior",
+      "label": "정문",
+      "folder": "촬영사진_넣는곳/외부/외부공간/외부__정문",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "EXT_REAR_GATE",
+      "spaceId": "EXT_REAR_GATE",
+      "floor": "EXTERIOR",
+      "building": "EXTERIOR",
+      "kind": "exterior",
+      "label": "후문",
+      "folder": "촬영사진_넣는곳/외부/외부공간/외부__후문",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "EXT_PLAYGROUND",
+      "spaceId": "EXT_PLAYGROUND",
+      "floor": "EXTERIOR",
+      "building": "EXTERIOR",
+      "kind": "exterior",
+      "label": "운동장",
+      "folder": "촬영사진_넣는곳/외부/외부공간/외부__운동장",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "EXT_PLAY_AREA",
+      "spaceId": "EXT_PLAY_AREA",
+      "floor": "EXTERIOR",
+      "building": "EXTERIOR",
+      "kind": "exterior",
+      "label": "놀이터 및 모래터",
+      "folder": "촬영사진_넣는곳/외부/외부공간/외부__놀이터 및 모래터",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "EXT_SCHOOL_GARDEN",
+      "spaceId": "EXT_SCHOOL_GARDEN",
+      "floor": "EXTERIOR",
+      "building": "EXTERIOR",
+      "kind": "exterior",
+      "label": "학교텃밭",
+      "folder": "촬영사진_넣는곳/외부/외부공간/외부__학교텃밭",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "EXT_MEDITATION_GROVE",
+      "spaceId": "EXT_MEDITATION_GROVE",
+      "floor": "EXTERIOR",
+      "building": "EXTERIOR",
+      "kind": "exterior",
+      "label": "명상숲",
+      "folder": "촬영사진_넣는곳/외부/외부공간/외부__명상숲",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "EXT_ROSTRUM",
+      "spaceId": "EXT_ROSTRUM",
+      "floor": "EXTERIOR",
+      "building": "EXTERIOR",
+      "kind": "exterior",
+      "label": "구령대",
+      "folder": "촬영사진_넣는곳/외부/외부공간/외부__구령대",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "EXT_MAIN_ENTRANCE",
+      "spaceId": "EXT_MAIN_ENTRANCE",
+      "floor": "EXTERIOR",
+      "building": "EXTERIOR",
+      "kind": "entrance",
+      "label": "본관 출입구",
+      "folder": "촬영사진_넣는곳/외부/출입구_현관/외부__본관 출입구",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "EXT_ANNEX_ENTRANCE",
+      "spaceId": "EXT_ANNEX_ENTRANCE",
+      "floor": "EXTERIOR",
+      "building": "EXTERIOR",
+      "kind": "entrance",
+      "label": "별관 출입구",
+      "folder": "촬영사진_넣는곳/외부/출입구_현관/외부__별관 출입구",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "EXT_GUARD_POST",
+      "spaceId": "EXT_GUARD_POST",
+      "floor": "EXTERIOR",
+      "building": "EXTERIOR",
+      "kind": "special_room",
+      "label": "배움터지킴이실",
+      "folder": "촬영사진_넣는곳/외부/특별실_지원실/외부__배움터지킴이실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "2F_GRADE3_RESEARCH",
+      "spaceId": "2F_GRADE3_RESEARCH",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "special_room",
+      "label": "3학년 연수실",
+      "folder": "촬영사진_넣는곳/2층/특별실_지원실/본관__3학년 연수실",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_MAIN_LOBBY",
+      "spaceId": "1F_MAIN_LOBBY",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "entrance",
+      "label": "본관 현관",
+      "folder": "촬영사진_넣는곳/1층/출입구_현관/본관__본관 현관",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [],
+      "note": ""
+    },
+    {
+      "captureId": "1F_ANNEX_STAIR_E",
+      "spaceId": "1F_ANNEX_STAIR_E",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "stair",
+      "label": "별관_중간_E__개별학습실5·개별학습실4_사이_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/1층/계단/별관_중간_E__개별학습실5·개별학습실4_사이_계단_위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_INDIVIDUAL_5",
+        "1F_INDIVIDUAL_4"
+      ],
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다.",
+      "stairShaft": "ANNEX_STAIR_E",
+      "connectsTo": "2F_ANNEX_STAIR_E"
+    },
+    {
+      "captureId": "1F_ANNEX_STAIR_E_LANDING",
+      "spaceId": "1F_ANNEX_STAIR_E",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "stair_landing",
+      "label": "1층 별관_중간_E__개별학습실5·개별학습실4_사이_계단_위치확인필요 입구와 계단참",
+      "folder": "촬영사진_넣는곳/1층/계단/별관_중간_E__개별학습실5·개별학습실4_사이_계단_위치확인필요/01_해당층_계단입구와참",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다."
+    },
+    {
+      "captureId": "1F_ANNEX_STAIR_E_UP",
+      "spaceId": "1F_ANNEX_STAIR_E",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "stair_flight",
+      "label": "1층→2층 별관_중간_E__개별학습실5·개별학습실4_사이_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/1층/계단/별관_중간_E__개별학습실5·개별학습실4_사이_계단_위치확인필요/02_1층에서_2층으로_올라가는구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "connectsTo": "2F_ANNEX_STAIR_E",
+      "note": "아래층 폴더에 올라가는 구간 전체(하단·디딤판·중간참·상단)를 넣습니다. 위층에 같은 사진을 중복 저장할 필요는 없습니다. 옥상·지하는 확인 전 촬영 대상으로 추정하지 않았습니다."
+    },
+    {
+      "captureId": "2F_ANNEX_STAIR_E",
+      "spaceId": "2F_ANNEX_STAIR_E",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "stair",
+      "label": "별관_중간_E__3-7 교실·2-6 교실_사이_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/2층/계단/별관_중간_E__3-7 교실·2-6 교실_사이_계단_위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_3-7",
+        "2F_2-6"
+      ],
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다.",
+      "stairShaft": "ANNEX_STAIR_E",
+      "connectsTo": "3F_ANNEX_STAIR_E"
+    },
+    {
+      "captureId": "2F_ANNEX_STAIR_E_LANDING",
+      "spaceId": "2F_ANNEX_STAIR_E",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "stair_landing",
+      "label": "2층 별관_중간_E__3-7 교실·2-6 교실_사이_계단_위치확인필요 입구와 계단참",
+      "folder": "촬영사진_넣는곳/2층/계단/별관_중간_E__3-7 교실·2-6 교실_사이_계단_위치확인필요/01_해당층_계단입구와참",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다."
+    },
+    {
+      "captureId": "2F_ANNEX_STAIR_E_UP",
+      "spaceId": "2F_ANNEX_STAIR_E",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "stair_flight",
+      "label": "2층→3층 별관_중간_E__3-7 교실·2-6 교실_사이_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/2층/계단/별관_중간_E__3-7 교실·2-6 교실_사이_계단_위치확인필요/02_2층에서_3층으로_올라가는구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "connectsTo": "3F_ANNEX_STAIR_E",
+      "note": "아래층 폴더에 올라가는 구간 전체(하단·디딤판·중간참·상단)를 넣습니다. 위층에 같은 사진을 중복 저장할 필요는 없습니다. 옥상·지하는 확인 전 촬영 대상으로 추정하지 않았습니다."
+    },
+    {
+      "captureId": "3F_ANNEX_STAIR_E",
+      "spaceId": "3F_ANNEX_STAIR_E",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "stair",
+      "label": "별관_중간_E__2-5 교실·2-4 교실_사이_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/3층/계단/별관_중간_E__2-5 교실·2-4 교실_사이_계단_위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_2-5",
+        "3F_2-4"
+      ],
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다.",
+      "stairShaft": "ANNEX_STAIR_E",
+      "connectsTo": "4F_ANNEX_STAIR_E"
+    },
+    {
+      "captureId": "3F_ANNEX_STAIR_E_LANDING",
+      "spaceId": "3F_ANNEX_STAIR_E",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "stair_landing",
+      "label": "3층 별관_중간_E__2-5 교실·2-4 교실_사이_계단_위치확인필요 입구와 계단참",
+      "folder": "촬영사진_넣는곳/3층/계단/별관_중간_E__2-5 교실·2-4 교실_사이_계단_위치확인필요/01_해당층_계단입구와참",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다."
+    },
+    {
+      "captureId": "3F_ANNEX_STAIR_E_UP",
+      "spaceId": "3F_ANNEX_STAIR_E",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "stair_flight",
+      "label": "3층→4층 별관_중간_E__2-5 교실·2-4 교실_사이_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/3층/계단/별관_중간_E__2-5 교실·2-4 교실_사이_계단_위치확인필요/02_3층에서_4층으로_올라가는구간",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "connectsTo": "4F_ANNEX_STAIR_E",
+      "note": "아래층 폴더에 올라가는 구간 전체(하단·디딤판·중간참·상단)를 넣습니다. 위층에 같은 사진을 중복 저장할 필요는 없습니다. 옥상·지하는 확인 전 촬영 대상으로 추정하지 않았습니다."
+    },
+    {
+      "captureId": "4F_ANNEX_STAIR_E",
+      "spaceId": "4F_ANNEX_STAIR_E",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "stair",
+      "label": "별관_중간_E__2-2 교실·2-1 교실_사이_계단_위치확인필요",
+      "folder": "촬영사진_넣는곳/4층/계단/별관_중간_E__2-2 교실·2-1 교실_사이_계단_위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_2-2",
+        "4F_2-1"
+      ],
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다.",
+      "stairShaft": "ANNEX_STAIR_E",
+      "connectsTo": null
+    },
+    {
+      "captureId": "4F_ANNEX_STAIR_E_LANDING",
+      "spaceId": "4F_ANNEX_STAIR_E",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "stair_landing",
+      "label": "4층 별관_중간_E__2-2 교실·2-1 교실_사이_계단_위치확인필요 입구와 계단참",
+      "folder": "촬영사진_넣는곳/4층/계단/별관_중간_E__2-2 교실·2-1 교실_사이_계단_위치확인필요/01_해당층_계단입구와참",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "앞/사이는 현재 근사 모델에서 붙인 촬영용 별칭이며 학교의 공식 명칭이 아닙니다. 현장에서 확인하세요. A/B/D/E는 층이 바뀌어도 동일한 계단입니다."
+    },
+    {
+      "captureId": "1F_3-1_FRONT_CORRIDOR",
+      "spaceId": "1F_MAIN_CORRIDOR_01",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "3-1 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__3-4 교실·본관 현관_구간/3-1 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_3-1"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_3-2_FRONT_CORRIDOR",
+      "spaceId": "1F_MAIN_CORRIDOR_01",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "3-2 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__3-4 교실·본관 현관_구간/3-2 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_3-2"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_3-3_FRONT_CORRIDOR",
+      "spaceId": "1F_MAIN_CORRIDOR_01",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "3-3 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__3-4 교실·본관 현관_구간/3-3 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_3-3"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_3-4_FRONT_CORRIDOR",
+      "spaceId": "1F_MAIN_CORRIDOR_01",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "3-4 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__3-4 교실·본관 현관_구간/3-4 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_3-4"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_1-1_FRONT_CORRIDOR",
+      "spaceId": "2F_ANNEX_CORRIDOR_01",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "1-1 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/별관__개별학습실2·1-1 교실_구간/1-1 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_1-1"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_1-2_FRONT_CORRIDOR",
+      "spaceId": "2F_ANNEX_CORRIDOR_01",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "1-2 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/별관__개별학습실2·1-1 교실_구간/1-2 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_1-2"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_1-3_FRONT_CORRIDOR",
+      "spaceId": "1F_ANNEX_CORRIDOR_01",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "1-3 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/별관__1-6 교실·1-3 교실_구간/1-3 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_1-3"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_1-4_FRONT_CORRIDOR",
+      "spaceId": "1F_ANNEX_CORRIDOR_01",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "1-4 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/별관__1-6 교실·1-3 교실_구간/1-4 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_1-4"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_1-5_FRONT_CORRIDOR",
+      "spaceId": "1F_ANNEX_CORRIDOR_01",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "1-5 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/별관__1-6 교실·1-3 교실_구간/1-5 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_1-5"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_1-6_FRONT_CORRIDOR",
+      "spaceId": "1F_ANNEX_CORRIDOR_01",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "1-6 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/별관__1-6 교실·1-3 교실_구간/1-6 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_1-6"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_3-5_FRONT_CORRIDOR",
+      "spaceId": "2F_MAIN_CORRIDOR_02",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "3-5 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__교무실·과학실_구간/3-5 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_3-5"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_3-6_FRONT_CORRIDOR",
+      "spaceId": "2F_MAIN_CORRIDOR_02",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "3-6 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__교무실·과학실_구간/3-6 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_3-6"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_2-1_FRONT_CORRIDOR",
+      "spaceId": "4F_ANNEX_CORRIDOR_01",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "2-1 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/별관__4-4 교실·컴퓨터실_구간/2-1 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_2-1"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_2-2_FRONT_CORRIDOR",
+      "spaceId": "4F_ANNEX_CORRIDOR_01",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "2-2 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/별관__4-4 교실·컴퓨터실_구간/2-2 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_2-2"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_2-3_FRONT_CORRIDOR",
+      "spaceId": "4F_ANNEX_CORRIDOR_01",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "2-3 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/별관__4-4 교실·컴퓨터실_구간/2-3 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_2-3"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_2-4_FRONT_CORRIDOR",
+      "spaceId": "3F_ANNEX_CORRIDOR_01",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "2-4 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/별관__4-7 교실·개별학습실3_구간/2-4 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_2-4"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_2-5_FRONT_CORRIDOR",
+      "spaceId": "3F_ANNEX_CORRIDOR_01",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "2-5 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/별관__4-7 교실·개별학습실3_구간/2-5 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_2-5"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_2-6_FRONT_CORRIDOR",
+      "spaceId": "2F_ANNEX_CORRIDOR_01",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "2-6 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/별관__개별학습실2·1-1 교실_구간/2-6 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_2-6"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_5-1_FRONT_CORRIDOR",
+      "spaceId": "3F_MAIN_CORRIDOR_02",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "5-1 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/본관__5-2 교실·4-6 교실_구간/5-1 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_5-1"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_5-2_FRONT_CORRIDOR",
+      "spaceId": "3F_MAIN_CORRIDOR_02",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "5-2 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/본관__5-2 교실·4-6 교실_구간/5-2 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_5-2"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_5-3_FRONT_CORRIDOR",
+      "spaceId": "3F_MAIN_CORRIDOR_01",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "5-3 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/본관__5-7 교실·5-3 교실_구간/5-3 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_5-3"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_5-4_FRONT_CORRIDOR",
+      "spaceId": "3F_MAIN_CORRIDOR_01",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "5-4 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/본관__5-7 교실·5-3 교실_구간/5-4 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_5-4"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_5-5_FRONT_CORRIDOR",
+      "spaceId": "3F_MAIN_CORRIDOR_01",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "5-5 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/본관__5-7 교실·5-3 교실_구간/5-5 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_5-5"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_5-6_FRONT_CORRIDOR",
+      "spaceId": "3F_MAIN_CORRIDOR_01",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "5-6 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/본관__5-7 교실·5-3 교실_구간/5-6 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_5-6"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_5-7_FRONT_CORRIDOR",
+      "spaceId": "3F_MAIN_CORRIDOR_01",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "5-7 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/본관__5-7 교실·5-3 교실_구간/5-7 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_5-7"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_4-5_FRONT_CORRIDOR",
+      "spaceId": "3F_MAIN_CORRIDOR_02",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "4-5 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/본관__5-2 교실·4-6 교실_구간/4-5 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_4-5"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_4-6_FRONT_CORRIDOR",
+      "spaceId": "3F_MAIN_CORRIDOR_02",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "4-6 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/본관__5-2 교실·4-6 교실_구간/4-6 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_4-6"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_3-7_FRONT_CORRIDOR",
+      "spaceId": "2F_ANNEX_CORRIDOR_01",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "3-7 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/별관__개별학습실2·1-1 교실_구간/3-7 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_3-7"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_6-1_FRONT_CORRIDOR",
+      "spaceId": "4F_MAIN_CORRIDOR_02",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "6-1 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/본관__6-2 교실·4-2 교실_구간/6-1 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_6-1"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_6-2_FRONT_CORRIDOR",
+      "spaceId": "4F_MAIN_CORRIDOR_02",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "6-2 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/본관__6-2 교실·4-2 교실_구간/6-2 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_6-2"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_6-3_FRONT_CORRIDOR",
+      "spaceId": "4F_MAIN_CORRIDOR_01",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "6-3 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/본관__6-7 교실·6-3 교실_구간/6-3 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_6-3"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_6-4_FRONT_CORRIDOR",
+      "spaceId": "4F_MAIN_CORRIDOR_01",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "6-4 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/본관__6-7 교실·6-3 교실_구간/6-4 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_6-4"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_6-5_FRONT_CORRIDOR",
+      "spaceId": "4F_MAIN_CORRIDOR_01",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "6-5 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/본관__6-7 교실·6-3 교실_구간/6-5 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_6-5"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_6-6_FRONT_CORRIDOR",
+      "spaceId": "4F_MAIN_CORRIDOR_01",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "6-6 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/본관__6-7 교실·6-3 교실_구간/6-6 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_6-6"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_6-7_FRONT_CORRIDOR",
+      "spaceId": "4F_MAIN_CORRIDOR_01",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "6-7 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/본관__6-7 교실·6-3 교실_구간/6-7 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_6-7"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_4-1_FRONT_CORRIDOR",
+      "spaceId": "4F_MAIN_CORRIDOR_02",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "4-1 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/본관__6-2 교실·4-2 교실_구간/4-1 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_4-1"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_4-2_FRONT_CORRIDOR",
+      "spaceId": "4F_MAIN_CORRIDOR_02",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "4-2 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/본관__6-2 교실·4-2 교실_구간/4-2 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_4-2"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_4-3_FRONT_CORRIDOR",
+      "spaceId": "4F_MAIN_CORRIDOR_02",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "4-3 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/본관__6-2 교실·4-2 교실_구간/4-3 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_4-3"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_4-4_FRONT_CORRIDOR",
+      "spaceId": "4F_ANNEX_CORRIDOR_01",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "4-4 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/별관__4-4 교실·컴퓨터실_구간/4-4 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_4-4"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_4-7_FRONT_CORRIDOR",
+      "spaceId": "3F_ANNEX_CORRIDOR_01",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "4-7 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/별관__4-7 교실·개별학습실3_구간/4-7 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_4-7"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_4-8_FRONT_CORRIDOR",
+      "spaceId": "3F_ANNEX_CORRIDOR_01",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "4-8 교실 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/별관__4-7 교실·개별학습실3_구간/4-8 교실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_4-8"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_STORAGE_1_FRONT_CORRIDOR",
+      "spaceId": "1F_MAIN_CORRIDOR_01",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "창고 1 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__3-4 교실·본관 현관_구간/창고 1_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_STORAGE_1"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_STORAGE_2_FRONT_CORRIDOR",
+      "spaceId": "1F_MAIN_CORRIDOR_01",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "창고 2 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__3-4 교실·본관 현관_구간/창고 2_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_STORAGE_2"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_MULTIPURPOSE_FRONT_CORRIDOR",
+      "spaceId": "1F_MAIN_CORRIDOR_01",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "다목적실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__3-4 교실·본관 현관_구간/다목적실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_MULTIPURPOSE"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_NIGHT_DUTY_FRONT_CORRIDOR",
+      "spaceId": "1F_MAIN_CORRIDOR_01",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "숙직실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__3-4 교실·본관 현관_구간/숙직실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_NIGHT_DUTY"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_ADMIN_FRONT_CORRIDOR",
+      "spaceId": "1F_MAIN_CORRIDOR_02",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "행정실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__행정실·급식실_구간/행정실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_ADMIN"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_NURSE_FRONT_CORRIDOR",
+      "spaceId": "1F_MAIN_CORRIDOR_02",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "보건실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__행정실·급식실_구간/보건실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_NURSE"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_PRINTING_FRONT_CORRIDOR",
+      "spaceId": "1F_MAIN_CORRIDOR_02",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "발간실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__행정실·급식실_구간/발간실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_PRINTING"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_MEAL_CART_STORAGE_FRONT_CORRIDOR",
+      "spaceId": "1F_MAIN_CORRIDOR_02",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "배식차 보관실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__행정실·급식실_구간/배식차 보관실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_MEAL_CART_STORAGE"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_NUTRITION_FRONT_CORRIDOR",
+      "spaceId": "1F_MAIN_CORRIDOR_02",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "영양교사실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__행정실·급식실_구간/영양교사실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_NUTRITION"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_COOKING_FRONT_CORRIDOR",
+      "spaceId": "1F_MAIN_CORRIDOR_02",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "조리실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__행정실·급식실_구간/조리실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_COOKING"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_CAFETERIA_FRONT_CORRIDOR",
+      "spaceId": "1F_MAIN_CORRIDOR_02",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "급식실 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__행정실·급식실_구간/급식실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_CAFETERIA"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_GRADE1_RESEARCH_FRONT_CORRIDOR",
+      "spaceId": "3F_ANNEX_CORRIDOR_01",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "1학년 연수실 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/별관__4-7 교실·개별학습실3_구간/1학년 연수실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_GRADE1_RESEARCH"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_KINDERGARTEN_FRONT_CORRIDOR",
+      "spaceId": "4F_ANNEX_CORRIDOR_01",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "까치방 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/별관__4-4 교실·컴퓨터실_구간/까치방_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_KINDERGARTEN"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_COMPUTER_FRONT_CORRIDOR",
+      "spaceId": "4F_ANNEX_CORRIDOR_01",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "컴퓨터실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/별관__4-4 교실·컴퓨터실_구간/컴퓨터실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_COMPUTER"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_AUDIO_VISUAL_FRONT_CORRIDOR",
+      "spaceId": "2F_MAIN_CORRIDOR_01",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "시청각실 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__돌봄교실(꿈희망)·교무실_구간/시청각실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_AUDIO_VISUAL"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_KOREAN_CLASS_FRONT_CORRIDOR",
+      "spaceId": "2F_MAIN_CORRIDOR_01",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "한국어학급 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__돌봄교실(꿈희망)·교무실_구간/한국어학급_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_KOREAN_CLASS"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_CARE_DREAM_HOPE_FRONT_CORRIDOR",
+      "spaceId": "2F_MAIN_CORRIDOR_01",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "돌봄교실(꿈희망) 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__돌봄교실(꿈희망)·교무실_구간/돌봄교실(꿈희망)_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_CARE_DREAM_HOPE"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_CARE_DREAM_WISH_FRONT_CORRIDOR",
+      "spaceId": "2F_MAIN_CORRIDOR_01",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "돌봄교실(꿈소망) 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__돌봄교실(꿈희망)·교무실_구간/돌봄교실(꿈소망)_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_CARE_DREAM_WISH"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_CARE_DREAM_LOVE_FRONT_CORRIDOR",
+      "spaceId": "2F_MAIN_CORRIDOR_01",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "돌봄교실(꿈사랑) 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__돌봄교실(꿈희망)·교무실_구간/돌봄교실(꿈사랑)_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_CARE_DREAM_LOVE"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_PRINCIPAL_FRONT_CORRIDOR",
+      "spaceId": "2F_MAIN_CORRIDOR_01",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "교장실 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__돌봄교실(꿈희망)·교무실_구간/교장실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_PRINCIPAL"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_OPERATIONS_MEETING_FRONT_CORRIDOR",
+      "spaceId": "2F_MAIN_CORRIDOR_01",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "학교운영위원회 회의실 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__돌봄교실(꿈희망)·교무실_구간/학교운영위원회 회의실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_OPERATIONS_MEETING"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_STAFF_FRONT_CORRIDOR",
+      "spaceId": "2F_MAIN_CORRIDOR_01",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "교무실 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__돌봄교실(꿈희망)·교무실_구간/교무실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_STAFF"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_BROADCAST_FRONT_CORRIDOR",
+      "spaceId": "2F_MAIN_CORRIDOR_02",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "방송실(교원회의실) 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__교무실·과학실_구간/방송실(교원회의실)_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_BROADCAST"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_SCIENCE_PREP_FRONT_CORRIDOR",
+      "spaceId": "2F_MAIN_CORRIDOR_02",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "과학준비실 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__교무실·과학실_구간/과학준비실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_SCIENCE_PREP"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_INTELLIGENT_SCIENCE_FRONT_CORRIDOR",
+      "spaceId": "2F_MAIN_CORRIDOR_02",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "지능형과학실 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__교무실·과학실_구간/지능형과학실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_INTELLIGENT_SCIENCE"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_SCIENCE_FRONT_CORRIDOR",
+      "spaceId": "2F_MAIN_CORRIDOR_02",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "과학실 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__교무실·과학실_구간/과학실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_SCIENCE"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_GRADE2_RESEARCH_FRONT_CORRIDOR",
+      "spaceId": "4F_ANNEX_CORRIDOR_01",
+      "floor": "4F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "2학년 연수실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/별관__4-4 교실·컴퓨터실_구간/2학년 연수실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_GRADE2_RESEARCH"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_COUNSELING_FRONT_CORRIDOR",
+      "spaceId": "3F_MAIN_CORRIDOR_01",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "상담실 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/본관__5-7 교실·5-3 교실_구간/상담실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_COUNSELING"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_GRADE5_RESEARCH_FRONT_CORRIDOR",
+      "spaceId": "3F_MAIN_CORRIDOR_01",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "5학년 연수실 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/본관__5-7 교실·5-3 교실_구간/5학년 연수실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_GRADE5_RESEARCH"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_BOOK_LIBRARY_FRONT_CORRIDOR",
+      "spaceId": "3F_MAIN_CORRIDOR_02",
+      "floor": "3F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "책터 도서관 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/본관__5-2 교실·4-6 교실_구간/책터 도서관_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_BOOK_LIBRARY"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_GRADE6_RESEARCH_FRONT_CORRIDOR",
+      "spaceId": "4F_MAIN_CORRIDOR_01",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "6학년 연수실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/본관__6-7 교실·6-3 교실_구간/6학년 연수실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_GRADE6_RESEARCH"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "4F_GRADE4_RESEARCH_FRONT_CORRIDOR",
+      "spaceId": "4F_MAIN_CORRIDOR_02",
+      "floor": "4F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "4학년 연수실 앞 복도",
+      "folder": "촬영사진_넣는곳/4층/복도/본관__6-2 교실·4-2 교실_구간/4학년 연수실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "4F_GRADE4_RESEARCH"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_INDIVIDUAL_1_FRONT_CORRIDOR",
+      "spaceId": "2F_ANNEX_CORRIDOR_01",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "개별학습실1 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/별관__개별학습실2·1-1 교실_구간/개별학습실1_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_INDIVIDUAL_1"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_INDIVIDUAL_2_FRONT_CORRIDOR",
+      "spaceId": "2F_ANNEX_CORRIDOR_01",
+      "floor": "2F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "개별학습실2 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/별관__개별학습실2·1-1 교실_구간/개별학습실2_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_INDIVIDUAL_2"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "3F_INDIVIDUAL_3_FRONT_CORRIDOR",
+      "spaceId": "3F_ANNEX_CORRIDOR_01",
+      "floor": "3F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "개별학습실3 앞 복도",
+      "folder": "촬영사진_넣는곳/3층/복도/별관__4-7 교실·개별학습실3_구간/개별학습실3_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "3F_INDIVIDUAL_3"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_INDIVIDUAL_4_FRONT_CORRIDOR",
+      "spaceId": "1F_ANNEX_CORRIDOR_01",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "개별학습실4 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/별관__1-6 교실·1-3 교실_구간/개별학습실4_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_INDIVIDUAL_4"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_INDIVIDUAL_5_FRONT_CORRIDOR",
+      "spaceId": "1F_ANNEX_CORRIDOR_01",
+      "floor": "1F",
+      "building": "ANNEX",
+      "kind": "corridor_doorway",
+      "label": "개별학습실5 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/별관__1-6 교실·1-3 교실_구간/개별학습실5_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_INDIVIDUAL_5"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "2F_GRADE3_RESEARCH_FRONT_CORRIDOR",
+      "spaceId": "2F_MAIN_CORRIDOR_01",
+      "floor": "2F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "3학년 연수실 앞 복도",
+      "folder": "촬영사진_넣는곳/2층/복도/본관__돌봄교실(꿈희망)·교무실_구간/3학년 연수실_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "2F_GRADE3_RESEARCH"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "1F_MAIN_LOBBY_FRONT_CORRIDOR",
+      "spaceId": "1F_MAIN_CORRIDOR_01",
+      "floor": "1F",
+      "building": "MAIN",
+      "kind": "corridor_doorway",
+      "label": "본관 현관 앞 복도",
+      "folder": "촬영사진_넣는곳/1층/복도/본관__3-4 교실·본관 현관_구간/본관 현관_앞_복도",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "landmarkSpaceIds": [
+        "1F_MAIN_LOBBY"
+      ],
+      "note": "해당 실 출입문 앞에서 복도 양방향과 문 안쪽이 겹쳐 보이도록 촬영합니다. 도면상 복도 끝에 붙은 실은 실제 출입 동선을 현장에서 확인하세요."
+    },
+    {
+      "captureId": "TODO_UNASSIGNED",
+      "spaceId": "TODO_UNASSIGNED",
+      "floor": "UNKNOWN",
+      "building": "UNKNOWN",
+      "kind": "unassigned",
+      "label": "촬영 위치 미확인",
+      "folder": "촬영사진_넣는곳/미분류_촬영위치확인필요",
+      "positionStatus": "estimated_needs_field_confirmation",
+      "note": "기존 INSP 한 장은 photos/raw/TODO_unassigned에 원본 그대로 보관했습니다. 위치를 확인하면 해당 실 폴더로 분류합니다."
+    }
+  ]
+}

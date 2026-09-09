@@ -1,0 +1,134 @@
+﻿층,건물,공간명,공간ID,Blender Object,촬영사진 넣는 폴더,내부 처리용 기존 폴더
+1F,MAIN,3-1 교실,1F_3-1,SPACE_1F_3-1,촬영사진_넣는곳/1층/교실/본관__3-1 교실/,photos/raw/1F/classrooms/3-1/
+1F,MAIN,3-2 교실,1F_3-2,SPACE_1F_3-2,촬영사진_넣는곳/1층/교실/본관__3-2 교실/,photos/raw/1F/classrooms/3-2/
+1F,MAIN,3-3 교실,1F_3-3,SPACE_1F_3-3,촬영사진_넣는곳/1층/교실/본관__3-3 교실/,photos/raw/1F/classrooms/3-3/
+1F,MAIN,3-4 교실,1F_3-4,SPACE_1F_3-4,촬영사진_넣는곳/1층/교실/본관__3-4 교실/,photos/raw/1F/classrooms/3-4/
+2F,ANNEX,1-1 교실,2F_1-1,SPACE_2F_1-1,촬영사진_넣는곳/2층/교실/별관__1-1 교실/,photos/raw/2F/classrooms/1-1/
+2F,ANNEX,1-2 교실,2F_1-2,SPACE_2F_1-2,촬영사진_넣는곳/2층/교실/별관__1-2 교실/,photos/raw/2F/classrooms/1-2/
+1F,ANNEX,1-3 교실,1F_1-3,SPACE_1F_1-3,촬영사진_넣는곳/1층/교실/별관__1-3 교실/,photos/raw/1F/classrooms/1-3/
+1F,ANNEX,1-4 교실,1F_1-4,SPACE_1F_1-4,촬영사진_넣는곳/1층/교실/별관__1-4 교실/,photos/raw/1F/classrooms/1-4/
+1F,ANNEX,1-5 교실,1F_1-5,SPACE_1F_1-5,촬영사진_넣는곳/1층/교실/별관__1-5 교실/,photos/raw/1F/classrooms/1-5/
+1F,ANNEX,1-6 교실,1F_1-6,SPACE_1F_1-6,촬영사진_넣는곳/1층/교실/별관__1-6 교실/,photos/raw/1F/classrooms/1-6/
+2F,MAIN,3-5 교실,2F_3-5,SPACE_2F_3-5,촬영사진_넣는곳/2층/교실/본관__3-5 교실/,photos/raw/2F/classrooms/3-5/
+2F,MAIN,3-6 교실,2F_3-6,SPACE_2F_3-6,촬영사진_넣는곳/2층/교실/본관__3-6 교실/,photos/raw/2F/classrooms/3-6/
+4F,ANNEX,2-1 교실,4F_2-1,SPACE_4F_2-1,촬영사진_넣는곳/4층/교실/별관__2-1 교실/,photos/raw/4F/classrooms/2-1/
+4F,ANNEX,2-2 교실,4F_2-2,SPACE_4F_2-2,촬영사진_넣는곳/4층/교실/별관__2-2 교실/,photos/raw/4F/classrooms/2-2/
+4F,ANNEX,2-3 교실,4F_2-3,SPACE_4F_2-3,촬영사진_넣는곳/4층/교실/별관__2-3 교실/,photos/raw/4F/classrooms/2-3/
+3F,ANNEX,2-4 교실,3F_2-4,SPACE_3F_2-4,촬영사진_넣는곳/3층/교실/별관__2-4 교실/,photos/raw/3F/classrooms/2-4/
+3F,ANNEX,2-5 교실,3F_2-5,SPACE_3F_2-5,촬영사진_넣는곳/3층/교실/별관__2-5 교실/,photos/raw/3F/classrooms/2-5/
+2F,ANNEX,2-6 교실,2F_2-6,SPACE_2F_2-6,촬영사진_넣는곳/2층/교실/별관__2-6 교실/,photos/raw/2F/classrooms/2-6/
+3F,MAIN,5-1 교실,3F_5-1,SPACE_3F_5-1,촬영사진_넣는곳/3층/교실/본관__5-1 교실/,photos/raw/3F/classrooms/5-1/
+3F,MAIN,5-2 교실,3F_5-2,SPACE_3F_5-2,촬영사진_넣는곳/3층/교실/본관__5-2 교실/,photos/raw/3F/classrooms/5-2/
+3F,MAIN,5-3 교실,3F_5-3,SPACE_3F_5-3,촬영사진_넣는곳/3층/교실/본관__5-3 교실/,photos/raw/3F/classrooms/5-3/
+3F,MAIN,5-4 교실,3F_5-4,SPACE_3F_5-4,촬영사진_넣는곳/3층/교실/본관__5-4 교실/,photos/raw/3F/classrooms/5-4/
+3F,MAIN,5-5 교실,3F_5-5,SPACE_3F_5-5,촬영사진_넣는곳/3층/교실/본관__5-5 교실/,photos/raw/3F/classrooms/5-5/
+3F,MAIN,5-6 교실,3F_5-6,SPACE_3F_5-6,촬영사진_넣는곳/3층/교실/본관__5-6 교실/,photos/raw/3F/classrooms/5-6/
+3F,MAIN,5-7 교실,3F_5-7,SPACE_3F_5-7,촬영사진_넣는곳/3층/교실/본관__5-7 교실/,photos/raw/3F/classrooms/5-7/
+3F,MAIN,4-5 교실,3F_4-5,SPACE_3F_4-5,촬영사진_넣는곳/3층/교실/본관__4-5 교실/,photos/raw/3F/classrooms/4-5/
+3F,MAIN,4-6 교실,3F_4-6,SPACE_3F_4-6,촬영사진_넣는곳/3층/교실/본관__4-6 교실/,photos/raw/3F/classrooms/4-6/
+2F,ANNEX,3-7 교실,2F_3-7,SPACE_2F_3-7,촬영사진_넣는곳/2층/교실/별관__3-7 교실/,photos/raw/2F/classrooms/3-7/
+4F,MAIN,6-1 교실,4F_6-1,SPACE_4F_6-1,촬영사진_넣는곳/4층/교실/본관__6-1 교실/,photos/raw/4F/classrooms/6-1/
+4F,MAIN,6-2 교실,4F_6-2,SPACE_4F_6-2,촬영사진_넣는곳/4층/교실/본관__6-2 교실/,photos/raw/4F/classrooms/6-2/
+4F,MAIN,6-3 교실,4F_6-3,SPACE_4F_6-3,촬영사진_넣는곳/4층/교실/본관__6-3 교실/,photos/raw/4F/classrooms/6-3/
+4F,MAIN,6-4 교실,4F_6-4,SPACE_4F_6-4,촬영사진_넣는곳/4층/교실/본관__6-4 교실/,photos/raw/4F/classrooms/6-4/
+4F,MAIN,6-5 교실,4F_6-5,SPACE_4F_6-5,촬영사진_넣는곳/4층/교실/본관__6-5 교실/,photos/raw/4F/classrooms/6-5/
+4F,MAIN,6-6 교실,4F_6-6,SPACE_4F_6-6,촬영사진_넣는곳/4층/교실/본관__6-6 교실/,photos/raw/4F/classrooms/6-6/
+4F,MAIN,6-7 교실,4F_6-7,SPACE_4F_6-7,촬영사진_넣는곳/4층/교실/본관__6-7 교실/,photos/raw/4F/classrooms/6-7/
+4F,MAIN,4-1 교실,4F_4-1,SPACE_4F_4-1,촬영사진_넣는곳/4층/교실/본관__4-1 교실/,photos/raw/4F/classrooms/4-1/
+4F,MAIN,4-2 교실,4F_4-2,SPACE_4F_4-2,촬영사진_넣는곳/4층/교실/본관__4-2 교실/,photos/raw/4F/classrooms/4-2/
+4F,MAIN,4-3 교실,4F_4-3,SPACE_4F_4-3,촬영사진_넣는곳/4층/교실/본관__4-3 교실/,photos/raw/4F/classrooms/4-3/
+4F,ANNEX,4-4 교실,4F_4-4,SPACE_4F_4-4,촬영사진_넣는곳/4층/교실/별관__4-4 교실/,photos/raw/4F/classrooms/4-4/
+3F,ANNEX,4-7 교실,3F_4-7,SPACE_3F_4-7,촬영사진_넣는곳/3층/교실/별관__4-7 교실/,photos/raw/3F/classrooms/4-7/
+3F,ANNEX,4-8 교실,3F_4-8,SPACE_3F_4-8,촬영사진_넣는곳/3층/교실/별관__4-8 교실/,photos/raw/3F/classrooms/4-8/
+1F,MAIN,창고 1,1F_STORAGE_1,SPACE_1F_STORAGE_1,촬영사진_넣는곳/1층/특별실_지원실/본관__창고 1/,photos/raw/1F/special_rooms/storage_1/
+1F,MAIN,창고 2,1F_STORAGE_2,SPACE_1F_STORAGE_2,촬영사진_넣는곳/1층/특별실_지원실/본관__창고 2/,photos/raw/1F/special_rooms/storage_2/
+1F,MAIN,다목적실,1F_MULTIPURPOSE,SPACE_1F_MULTIPURPOSE,촬영사진_넣는곳/1층/특별실_지원실/본관__다목적실/,photos/raw/1F/special_rooms/multipurpose/
+1F,MAIN,숙직실,1F_NIGHT_DUTY,SPACE_1F_NIGHT_DUTY,촬영사진_넣는곳/1층/특별실_지원실/본관__숙직실/,photos/raw/1F/special_rooms/night_duty/
+1F,MAIN,행정실,1F_ADMIN,SPACE_1F_ADMIN,촬영사진_넣는곳/1층/특별실_지원실/본관__행정실/,photos/raw/1F/special_rooms/admin/
+1F,MAIN,보건실,1F_NURSE,SPACE_1F_NURSE,촬영사진_넣는곳/1층/특별실_지원실/본관__보건실/,photos/raw/1F/special_rooms/nurse/
+1F,MAIN,발간실,1F_PRINTING,SPACE_1F_PRINTING,촬영사진_넣는곳/1층/특별실_지원실/본관__발간실/,photos/raw/1F/special_rooms/printing/
+1F,MAIN,배식차 보관실,1F_MEAL_CART_STORAGE,SPACE_1F_MEAL_CART_STORAGE,촬영사진_넣는곳/1층/특별실_지원실/본관__배식차 보관실/,photos/raw/1F/special_rooms/meal_cart_storage/
+1F,EAST_WING,영양교사실,1F_NUTRITION,SPACE_1F_NUTRITION,촬영사진_넣는곳/1층/특별실_지원실/본관_동쪽__영양교사실/,photos/raw/1F/special_rooms/nutrition/
+1F,EAST_WING,조리실,1F_COOKING,SPACE_1F_COOKING,촬영사진_넣는곳/1층/특별실_지원실/본관_동쪽__조리실/,photos/raw/1F/special_rooms/cooking/
+1F,EAST_WING,급식실,1F_CAFETERIA,SPACE_1F_CAFETERIA,촬영사진_넣는곳/1층/특별실_지원실/본관_동쪽__급식실/,photos/raw/1F/special_rooms/cafeteria/
+3F,ANNEX,1학년 연수실,3F_GRADE1_RESEARCH,SPACE_3F_GRADE1_RESEARCH,촬영사진_넣는곳/3층/특별실_지원실/별관__1학년 연수실/,photos/raw/3F/special_rooms/grade1_research/
+4F,ANNEX,까치방,4F_KINDERGARTEN,SPACE_4F_KINDERGARTEN,촬영사진_넣는곳/4층/특별실_지원실/별관__까치방/,photos/raw/4F/special_rooms/kindergarten/
+4F,ANNEX,컴퓨터실,4F_COMPUTER,SPACE_4F_COMPUTER,촬영사진_넣는곳/4층/특별실_지원실/별관__컴퓨터실/,photos/raw/4F/special_rooms/computer/
+2F,MAIN,시청각실,2F_AUDIO_VISUAL,SPACE_2F_AUDIO_VISUAL,촬영사진_넣는곳/2층/특별실_지원실/본관__시청각실/,photos/raw/2F/special_rooms/audio_visual/
+2F,MAIN,한국어학급,2F_KOREAN_CLASS,SPACE_2F_KOREAN_CLASS,촬영사진_넣는곳/2층/특별실_지원실/본관__한국어학급/,photos/raw/2F/special_rooms/korean_class/
+2F,MAIN,돌봄교실(꿈희망),2F_CARE_DREAM_HOPE,SPACE_2F_CARE_DREAM_HOPE,촬영사진_넣는곳/2층/특별실_지원실/본관__돌봄교실(꿈희망)/,photos/raw/2F/special_rooms/care_dream_hope/
+2F,MAIN,돌봄교실(꿈소망),2F_CARE_DREAM_WISH,SPACE_2F_CARE_DREAM_WISH,촬영사진_넣는곳/2층/특별실_지원실/본관__돌봄교실(꿈소망)/,photos/raw/2F/special_rooms/care_dream_wish/
+2F,MAIN,돌봄교실(꿈사랑),2F_CARE_DREAM_LOVE,SPACE_2F_CARE_DREAM_LOVE,촬영사진_넣는곳/2층/특별실_지원실/본관__돌봄교실(꿈사랑)/,photos/raw/2F/special_rooms/care_dream_love/
+2F,MAIN,교장실,2F_PRINCIPAL,SPACE_2F_PRINCIPAL,촬영사진_넣는곳/2층/특별실_지원실/본관__교장실/,photos/raw/2F/special_rooms/principal/
+2F,MAIN,학교운영위원회 회의실,2F_OPERATIONS_MEETING,SPACE_2F_OPERATIONS_MEETING,촬영사진_넣는곳/2층/특별실_지원실/본관__학교운영위원회 회의실/,photos/raw/2F/special_rooms/operations_meeting/
+2F,MAIN,교무실,2F_STAFF,SPACE_2F_STAFF,촬영사진_넣는곳/2층/특별실_지원실/본관__교무실/,photos/raw/2F/special_rooms/staff/
+2F,MAIN,방송실(교원회의실),2F_BROADCAST,SPACE_2F_BROADCAST,촬영사진_넣는곳/2층/특별실_지원실/본관__방송실(교원회의실)/,photos/raw/2F/special_rooms/broadcast/
+2F,EAST_WING,과학준비실,2F_SCIENCE_PREP,SPACE_2F_SCIENCE_PREP,촬영사진_넣는곳/2층/특별실_지원실/본관_동쪽__과학준비실/,photos/raw/2F/special_rooms/science_prep/
+2F,EAST_WING,지능형과학실,2F_INTELLIGENT_SCIENCE,SPACE_2F_INTELLIGENT_SCIENCE,촬영사진_넣는곳/2층/특별실_지원실/본관_동쪽__지능형과학실/,photos/raw/2F/special_rooms/intelligent_science/
+2F,EAST_WING,과학실,2F_SCIENCE,SPACE_2F_SCIENCE,촬영사진_넣는곳/2층/특별실_지원실/본관_동쪽__과학실/,photos/raw/2F/special_rooms/science/
+4F,ANNEX,2학년 연수실,4F_GRADE2_RESEARCH,SPACE_4F_GRADE2_RESEARCH,촬영사진_넣는곳/4층/특별실_지원실/별관__2학년 연수실/,photos/raw/4F/special_rooms/grade2_research/
+3F,MAIN,상담실,3F_COUNSELING,SPACE_3F_COUNSELING,촬영사진_넣는곳/3층/특별실_지원실/본관__상담실/,photos/raw/3F/special_rooms/counseling/
+3F,MAIN,5학년 연수실,3F_GRADE5_RESEARCH,SPACE_3F_GRADE5_RESEARCH,촬영사진_넣는곳/3층/특별실_지원실/본관__5학년 연수실/,photos/raw/3F/special_rooms/grade5_research/
+3F,EAST_WING,책터 도서관,3F_BOOK_LIBRARY,SPACE_3F_BOOK_LIBRARY,촬영사진_넣는곳/3층/특별실_지원실/본관_동쪽__책터 도서관/,photos/raw/3F/special_rooms/book_library/
+4F,MAIN,6학년 연수실,4F_GRADE6_RESEARCH,SPACE_4F_GRADE6_RESEARCH,촬영사진_넣는곳/4층/특별실_지원실/본관__6학년 연수실/,photos/raw/4F/special_rooms/grade6_research/
+4F,EAST_WING,4학년 연수실,4F_GRADE4_RESEARCH,SPACE_4F_GRADE4_RESEARCH,촬영사진_넣는곳/4층/특별실_지원실/본관_동쪽__4학년 연수실/,photos/raw/4F/special_rooms/grade4_research/
+2F,ANNEX,개별학습실1,2F_INDIVIDUAL_1,SPACE_2F_INDIVIDUAL_1,촬영사진_넣는곳/2층/특별실_지원실/별관__개별학습실1/,photos/raw/2F/special_rooms/individual_1/
+2F,ANNEX,개별학습실2,2F_INDIVIDUAL_2,SPACE_2F_INDIVIDUAL_2,촬영사진_넣는곳/2층/특별실_지원실/별관__개별학습실2/,photos/raw/2F/special_rooms/individual_2/
+3F,ANNEX,개별학습실3,3F_INDIVIDUAL_3,SPACE_3F_INDIVIDUAL_3,촬영사진_넣는곳/3층/특별실_지원실/별관__개별학습실3/,photos/raw/3F/special_rooms/individual_3/
+1F,ANNEX,개별학습실4,1F_INDIVIDUAL_4,SPACE_1F_INDIVIDUAL_4,촬영사진_넣는곳/1층/특별실_지원실/별관__개별학습실4/,photos/raw/1F/special_rooms/individual_4/
+1F,ANNEX,개별학습실5,1F_INDIVIDUAL_5,SPACE_1F_INDIVIDUAL_5,촬영사진_넣는곳/1층/특별실_지원실/별관__개별학습실5/,photos/raw/1F/special_rooms/individual_5/
+1F,MAIN,1F 본관 복도 01,1F_MAIN_CORRIDOR_01,SPACE_1F_MAIN_CORRIDOR_01,촬영사진_넣는곳/1층/복도/본관__3-4 교실·본관 현관_구간/,photos/raw/1F/corridors/main_01/
+1F,MAIN,1F 본관 복도 02,1F_MAIN_CORRIDOR_02,SPACE_1F_MAIN_CORRIDOR_02,촬영사진_넣는곳/1층/복도/본관__행정실·급식실_구간/,photos/raw/1F/corridors/main_02/
+1F,ANNEX,1F 별관 복도,1F_ANNEX_CORRIDOR_01,SPACE_1F_ANNEX_CORRIDOR_01,촬영사진_넣는곳/1층/복도/별관__1-6 교실·1-3 교실_구간/,photos/raw/1F/corridors/annex_01/
+1F,MAIN,1F 본관 계단 A,1F_MAIN_STAIR_A,SPACE_1F_MAIN_STAIR_A,촬영사진_넣는곳/1층/계단/본관_서쪽_A__3-4 교실_앞_계단_위치확인필요/,photos/raw/1F/stairs/main_a/
+1F,MAIN,1F 본관 계단 B,1F_MAIN_STAIR_B,SPACE_1F_MAIN_STAIR_B,촬영사진_넣는곳/1층/계단/본관_중앙_B__행정실_앞_계단_위치확인필요/,photos/raw/1F/stairs/main_b/
+1F,ANNEX,1F 별관 계단 D,1F_ANNEX_STAIR_D,SPACE_1F_ANNEX_STAIR_D,촬영사진_넣는곳/1층/계단/별관_북쪽_D__1-6 교실_앞_계단_위치확인필요/,photos/raw/1F/stairs/annex_d/
+1F,MAIN,1F 본관 화장실 A,1F_MAIN_TOILET_A,SPACE_1F_MAIN_TOILET_A,촬영사진_넣는곳/1층/기타_촬영전허가필요/본관__1F 본관 화장실 A/,photos/raw/1F/toilets/main_a/
+1F,MAIN,1F 본관 화장실 B,1F_MAIN_TOILET_B,SPACE_1F_MAIN_TOILET_B,촬영사진_넣는곳/1층/기타_촬영전허가필요/본관__1F 본관 화장실 B/,photos/raw/1F/toilets/main_b/
+1F,ANNEX,1F 별관 화장실,1F_ANNEX_TOILET_A,SPACE_1F_ANNEX_TOILET_A,촬영사진_넣는곳/1층/기타_촬영전허가필요/별관__1F 별관 화장실/,photos/raw/1F/toilets/annex_a/
+2F,MAIN,2F 본관 복도 01,2F_MAIN_CORRIDOR_01,SPACE_2F_MAIN_CORRIDOR_01,촬영사진_넣는곳/2층/복도/본관__돌봄교실(꿈희망)·교무실_구간/,photos/raw/2F/corridors/main_01/
+2F,MAIN,2F 본관 복도 02,2F_MAIN_CORRIDOR_02,SPACE_2F_MAIN_CORRIDOR_02,촬영사진_넣는곳/2층/복도/본관__교무실·과학실_구간/,photos/raw/2F/corridors/main_02/
+2F,ANNEX,2F 별관 복도,2F_ANNEX_CORRIDOR_01,SPACE_2F_ANNEX_CORRIDOR_01,촬영사진_넣는곳/2층/복도/별관__개별학습실2·1-1 교실_구간/,photos/raw/2F/corridors/annex_01/
+2F,MAIN,2F 본관 계단 A,2F_MAIN_STAIR_A,SPACE_2F_MAIN_STAIR_A,촬영사진_넣는곳/2층/계단/본관_서쪽_A__돌봄교실(꿈희망)_앞_계단_위치확인필요/,photos/raw/2F/stairs/main_a/
+2F,MAIN,2F 본관 계단 B,2F_MAIN_STAIR_B,SPACE_2F_MAIN_STAIR_B,촬영사진_넣는곳/2층/계단/본관_중앙_B__교무실_앞_계단_위치확인필요/,photos/raw/2F/stairs/main_b/
+2F,ANNEX,2F 별관 계단 D,2F_ANNEX_STAIR_D,SPACE_2F_ANNEX_STAIR_D,촬영사진_넣는곳/2층/계단/별관_북쪽_D__개별학습실2_앞_계단_위치확인필요/,photos/raw/2F/stairs/annex_d/
+2F,MAIN,2F 본관 화장실 A,2F_MAIN_TOILET_A,SPACE_2F_MAIN_TOILET_A,촬영사진_넣는곳/2층/기타_촬영전허가필요/본관__2F 본관 화장실 A/,photos/raw/2F/toilets/main_a/
+2F,MAIN,2F 본관 화장실 B,2F_MAIN_TOILET_B,SPACE_2F_MAIN_TOILET_B,촬영사진_넣는곳/2층/기타_촬영전허가필요/본관__2F 본관 화장실 B/,photos/raw/2F/toilets/main_b/
+2F,ANNEX,2F 별관 화장실,2F_ANNEX_TOILET_A,SPACE_2F_ANNEX_TOILET_A,촬영사진_넣는곳/2층/기타_촬영전허가필요/별관__2F 별관 화장실/,photos/raw/2F/toilets/annex_a/
+3F,MAIN,3F 본관 복도 01,3F_MAIN_CORRIDOR_01,SPACE_3F_MAIN_CORRIDOR_01,촬영사진_넣는곳/3층/복도/본관__5-7 교실·5-3 교실_구간/,photos/raw/3F/corridors/main_01/
+3F,MAIN,3F 본관 복도 02,3F_MAIN_CORRIDOR_02,SPACE_3F_MAIN_CORRIDOR_02,촬영사진_넣는곳/3층/복도/본관__5-2 교실·4-6 교실_구간/,photos/raw/3F/corridors/main_02/
+3F,ANNEX,3F 별관 복도,3F_ANNEX_CORRIDOR_01,SPACE_3F_ANNEX_CORRIDOR_01,촬영사진_넣는곳/3층/복도/별관__4-7 교실·개별학습실3_구간/,photos/raw/3F/corridors/annex_01/
+3F,MAIN,3F 본관 계단 A,3F_MAIN_STAIR_A,SPACE_3F_MAIN_STAIR_A,촬영사진_넣는곳/3층/계단/본관_서쪽_A__5-7 교실_앞_계단_위치확인필요/,photos/raw/3F/stairs/main_a/
+3F,MAIN,3F 본관 계단 B,3F_MAIN_STAIR_B,SPACE_3F_MAIN_STAIR_B,촬영사진_넣는곳/3층/계단/본관_중앙_B__5-2 교실_앞_계단_위치확인필요/,photos/raw/3F/stairs/main_b/
+3F,ANNEX,3F 별관 계단 D,3F_ANNEX_STAIR_D,SPACE_3F_ANNEX_STAIR_D,촬영사진_넣는곳/3층/계단/별관_북쪽_D__4-7 교실_앞_계단_위치확인필요/,photos/raw/3F/stairs/annex_d/
+3F,MAIN,3F 본관 화장실 A,3F_MAIN_TOILET_A,SPACE_3F_MAIN_TOILET_A,촬영사진_넣는곳/3층/기타_촬영전허가필요/본관__3F 본관 화장실 A/,photos/raw/3F/toilets/main_a/
+3F,MAIN,3F 본관 화장실 B,3F_MAIN_TOILET_B,SPACE_3F_MAIN_TOILET_B,촬영사진_넣는곳/3층/기타_촬영전허가필요/본관__3F 본관 화장실 B/,photos/raw/3F/toilets/main_b/
+3F,ANNEX,3F 별관 화장실,3F_ANNEX_TOILET_A,SPACE_3F_ANNEX_TOILET_A,촬영사진_넣는곳/3층/기타_촬영전허가필요/별관__3F 별관 화장실/,photos/raw/3F/toilets/annex_a/
+4F,MAIN,4F 본관 복도 01,4F_MAIN_CORRIDOR_01,SPACE_4F_MAIN_CORRIDOR_01,촬영사진_넣는곳/4층/복도/본관__6-7 교실·6-3 교실_구간/,photos/raw/4F/corridors/main_01/
+4F,MAIN,4F 본관 복도 02,4F_MAIN_CORRIDOR_02,SPACE_4F_MAIN_CORRIDOR_02,촬영사진_넣는곳/4층/복도/본관__6-2 교실·4-2 교실_구간/,photos/raw/4F/corridors/main_02/
+4F,ANNEX,4F 별관 복도,4F_ANNEX_CORRIDOR_01,SPACE_4F_ANNEX_CORRIDOR_01,촬영사진_넣는곳/4층/복도/별관__4-4 교실·컴퓨터실_구간/,photos/raw/4F/corridors/annex_01/
+4F,MAIN,4F 본관 계단 A,4F_MAIN_STAIR_A,SPACE_4F_MAIN_STAIR_A,촬영사진_넣는곳/4층/계단/본관_서쪽_A__6-7 교실_앞_계단_위치확인필요/,photos/raw/4F/stairs/main_a/
+4F,MAIN,4F 본관 계단 B,4F_MAIN_STAIR_B,SPACE_4F_MAIN_STAIR_B,촬영사진_넣는곳/4층/계단/본관_중앙_B__6-2 교실_앞_계단_위치확인필요/,photos/raw/4F/stairs/main_b/
+4F,ANNEX,4F 별관 계단 D,4F_ANNEX_STAIR_D,SPACE_4F_ANNEX_STAIR_D,촬영사진_넣는곳/4층/계단/별관_북쪽_D__4-4 교실_앞_계단_위치확인필요/,photos/raw/4F/stairs/annex_d/
+4F,MAIN,4F 본관 화장실 A,4F_MAIN_TOILET_A,SPACE_4F_MAIN_TOILET_A,촬영사진_넣는곳/4층/기타_촬영전허가필요/본관__4F 본관 화장실 A/,photos/raw/4F/toilets/main_a/
+4F,MAIN,4F 본관 화장실 B,4F_MAIN_TOILET_B,SPACE_4F_MAIN_TOILET_B,촬영사진_넣는곳/4층/기타_촬영전허가필요/본관__4F 본관 화장실 B/,photos/raw/4F/toilets/main_b/
+4F,ANNEX,4F 별관 화장실,4F_ANNEX_TOILET_A,SPACE_4F_ANNEX_TOILET_A,촬영사진_넣는곳/4층/기타_촬영전허가필요/별관__4F 별관 화장실/,photos/raw/4F/toilets/annex_a/
+2F,CONNECTOR,2F 연결복도,2F_CONNECTOR,SPACE_2F_CONNECTOR,촬영사진_넣는곳/2층/복도/본관-별관_연결복도/,photos/raw/2F/corridors/connector/
+3F,CONNECTOR,3F 연결복도,3F_CONNECTOR,SPACE_3F_CONNECTOR,촬영사진_넣는곳/3층/복도/본관-별관_연결복도/,photos/raw/3F/corridors/connector/
+4F,CONNECTOR,4F 연결복도,4F_CONNECTOR,SPACE_4F_CONNECTOR,촬영사진_넣는곳/4층/복도/본관-별관_연결복도/,photos/raw/4F/corridors/connector/
+EXTERIOR,EXTERIOR,정문,EXT_MAIN_GATE,SPACE_EXT_MAIN_GATE,촬영사진_넣는곳/외부/외부공간/외부__정문/,photos/raw/exterior/main_gate/
+EXTERIOR,EXTERIOR,후문,EXT_REAR_GATE,SPACE_EXT_REAR_GATE,촬영사진_넣는곳/외부/외부공간/외부__후문/,photos/raw/exterior/rear_gate/
+EXTERIOR,EXTERIOR,운동장,EXT_PLAYGROUND,SPACE_EXT_PLAYGROUND,촬영사진_넣는곳/외부/외부공간/외부__운동장/,photos/raw/exterior/playground/
+EXTERIOR,EXTERIOR,놀이터 및 모래터,EXT_PLAY_AREA,SPACE_EXT_PLAY_AREA,촬영사진_넣는곳/외부/외부공간/외부__놀이터 및 모래터/,photos/raw/exterior/play_area/
+EXTERIOR,EXTERIOR,학교텃밭,EXT_SCHOOL_GARDEN,SPACE_EXT_SCHOOL_GARDEN,촬영사진_넣는곳/외부/외부공간/외부__학교텃밭/,photos/raw/exterior/school_garden/
+EXTERIOR,EXTERIOR,명상숲,EXT_MEDITATION_GROVE,SPACE_EXT_MEDITATION_GROVE,촬영사진_넣는곳/외부/외부공간/외부__명상숲/,photos/raw/exterior/meditation_grove/
+EXTERIOR,EXTERIOR,구령대,EXT_ROSTRUM,SPACE_EXT_ROSTRUM,촬영사진_넣는곳/외부/외부공간/외부__구령대/,photos/raw/exterior/rostrum/
+EXTERIOR,EXTERIOR,본관 출입구,EXT_MAIN_ENTRANCE,SPACE_EXT_MAIN_ENTRANCE,촬영사진_넣는곳/외부/출입구_현관/외부__본관 출입구/,photos/raw/exterior/main_entrance/
+EXTERIOR,EXTERIOR,별관 출입구,EXT_ANNEX_ENTRANCE,SPACE_EXT_ANNEX_ENTRANCE,촬영사진_넣는곳/외부/출입구_현관/외부__별관 출입구/,photos/raw/exterior/annex_entrance/
+EXTERIOR,EXTERIOR,배움터지킴이실,EXT_GUARD_POST,SPACE_EXT_GUARD_POST,촬영사진_넣는곳/외부/특별실_지원실/외부__배움터지킴이실/,photos/raw/exterior/guard_post/
+2F,MAIN,3학년 연수실,2F_GRADE3_RESEARCH,SPACE_2F_GRADE3_RESEARCH,촬영사진_넣는곳/2층/특별실_지원실/본관__3학년 연수실/,photos/raw/2F/special_rooms/grade3_research/
+1F,MAIN,본관 현관,1F_MAIN_LOBBY,SPACE_1F_MAIN_LOBBY,촬영사진_넣는곳/1층/출입구_현관/본관__본관 현관/,photos/raw/1F/entrances/1F_MAIN_LOBBY/
+1F,ANNEX,별관 계단 E,1F_ANNEX_STAIR_E,SPACE_1F_ANNEX_STAIR_E,촬영사진_넣는곳/1층/계단/별관_중간_E__개별학습실5·개별학습실4_사이_계단_위치확인필요/,photos/raw/1F/stairs/1F_ANNEX_STAIR_E/
+2F,ANNEX,별관 계단 E,2F_ANNEX_STAIR_E,SPACE_2F_ANNEX_STAIR_E,촬영사진_넣는곳/2층/계단/별관_중간_E__3-7 교실·2-6 교실_사이_계단_위치확인필요/,photos/raw/2F/stairs/2F_ANNEX_STAIR_E/
+3F,ANNEX,별관 계단 E,3F_ANNEX_STAIR_E,SPACE_3F_ANNEX_STAIR_E,촬영사진_넣는곳/3층/계단/별관_중간_E__2-5 교실·2-4 교실_사이_계단_위치확인필요/,photos/raw/3F/stairs/3F_ANNEX_STAIR_E/
+4F,ANNEX,별관 계단 E,4F_ANNEX_STAIR_E,SPACE_4F_ANNEX_STAIR_E,촬영사진_넣는곳/4층/계단/별관_중간_E__2-2 교실·2-1 교실_사이_계단_위치확인필요/,photos/raw/4F/stairs/4F_ANNEX_STAIR_E/

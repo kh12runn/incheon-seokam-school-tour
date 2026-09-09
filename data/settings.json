@@ -1,0 +1,74 @@
+{
+  "schemaVersion": 1,
+  "units": "meters",
+  "sourceNote": "All dimensions are temporary estimates, not measured dimensions of Incheon Seokam Elementary School.",
+  "dimensions": {
+    "classroom_width": {
+      "value": 8.0,
+      "status": "estimated"
+    },
+    "classroom_depth": {
+      "value": 7.0,
+      "status": "estimated"
+    },
+    "corridor_width": {
+      "value": 2.8,
+      "status": "estimated"
+    },
+    "floor_height": {
+      "value": 3.2,
+      "status": "estimated"
+    },
+    "clear_height": {
+      "value": 3.0,
+      "status": "estimated"
+    },
+    "wall_thickness": {
+      "value": 0.2,
+      "status": "estimated"
+    },
+    "door_width": {
+      "value": 0.9,
+      "status": "estimated"
+    },
+    "door_height": {
+      "value": 2.1,
+      "status": "estimated"
+    },
+    "window_sill_height": {
+      "value": 0.9,
+      "status": "estimated"
+    },
+    "camera_height": {
+      "value": 1.6,
+      "status": "estimated"
+    },
+    "camera_fov_degrees": {
+      "value": 78.0,
+      "status": "estimated"
+    },
+    "walk_speed_mps": {
+      "value": 1.25,
+      "status": "estimated"
+    }
+  },
+  "prototype": {
+    "floor": "3F",
+    "building": "MAIN",
+    "scope": "Low-poly spatial relationship and eye-level movement only"
+  },
+  "campus": {
+    "shape": "L",
+    "floors": 4,
+    "main_length": 103,
+    "annex_room_depth": 8,
+    "annex_length": 60,
+    "corridor_width": 3,
+    "floor_height": 3.4,
+    "wall_height": 3.15,
+    "wall_thickness": 0.18,
+    "status": "estimated",
+    "source": "attached 1F-4F architectural plans + 2026 classroom layout",
+    "basement": "partial outline, use and dimensions UNKNOWN"
+  }
+}

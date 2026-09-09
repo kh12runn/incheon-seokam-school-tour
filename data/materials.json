@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "status": "reference_only",
+  "items": [
+    {
+      "id": "WALL_INTERIOR",
+      "name": "실내 벽",
+      "source": "INSP 참고",
+      "confirmed": false
+    },
+    {
+      "id": "FLOOR_CORRIDOR",
+      "name": "복도 바닥",
+      "source": "INSP 참고",
+      "confirmed": false
+    },
+    {
+      "id": "WINDOW_FRAME",
+      "name": "창호",
+      "source": "INSP 참고",
+      "confirmed": false
+    }
+  ]
+}

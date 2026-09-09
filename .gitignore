@@ -1,8 +1,22 @@
-# 원본 촬영 파일은 용량이 크므로 로컬에만 보관합니다.
-# 웹사이트에는 Insta360 Studio에서 변환한 images/ 아래 JPG만 올립니다.
-/촬영사진_넣는곳/**/*.insp
-/촬영사진_넣는곳/**/*.insv
-/촬영사진_넣는곳/**/*.dng
+# Public repository: raw school photos and source documents stay local.
+/photos/raw/**
+/photos/processed/**
+/references/**
+/blender/backups/**
+*.blend1
+*.blend2
+__pycache__/
+.DS_Store
+.env*
+*.pem
 
-# 촬영자가 제거되기 전의 펼친 JPG도 로컬에만 보관합니다.
-/images/4F/main-4f-*.jpg
+# Only generated instructions are tracked in the photo intake tree.
+/촬영사진_넣는곳/**/*
+!/촬영사진_넣는곳/**/
+!/촬영사진_넣는곳/**/촬영안내.md
+/exports/renders/3F-*.png
+
+# Authoritative registry and Blender model must be included.
+!/data/
+!/data/**
+!/blender/school_master.blend

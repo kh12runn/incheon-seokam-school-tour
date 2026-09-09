@@ -1,0 +1,37 @@
+{
+  "scene": "Harness_Seokam_Campus",
+  "objects": 2212,
+  "walkTests": [
+    {
+      "floor": 1,
+      "path_samples": 755,
+      "wall_window_offfloor_blocked": true,
+      "door_passable": "1F_3-2",
+      "sweep_no_tunneling": true
+    },
+    {
+      "floor": 2,
+      "path_samples": 755,
+      "wall_window_offfloor_blocked": true,
+      "door_passable": "2F_CARE_DREAM_LOVE",
+      "sweep_no_tunneling": true
+    },
+    {
+      "floor": 3,
+      "path_samples": 755,
+      "wall_window_offfloor_blocked": true,
+      "door_passable": "3F_5-5",
+      "sweep_no_tunneling": true
+    },
+    {
+      "floor": 4,
+      "path_samples": 755,
+      "wall_window_offfloor_blocked": true,
+      "door_passable": "4F_6-5",
+      "sweep_no_tunneling": true
+    }
+  ],
+  "captureMappings": 133,
+  "projectRelativeScripts": true,
+  "note": "Background geometry/registration tests, not new GUI keyboard input tests."
+}

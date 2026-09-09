@@ -1,0 +1,7 @@
+{
+  "corridor_and_door_samples": 420,
+  "blocked_path_samples": [],
+  "wall_blocked": true,
+  "window_blocked": true,
+  "off_floor_blocked": true
+}

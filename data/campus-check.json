@@ -1,0 +1,13 @@
+{
+  "scene": "Harness_Seokam_Campus",
+  "floors": 4,
+  "classrooms": 41,
+  "rooms_and_specials": 92,
+  "modeled_spaces": 123,
+  "objects": 2212,
+  "missing_classrooms": [],
+  "room_overlaps": [],
+  "dimensions": "estimated",
+  "basement": "partial UNKNOWN; hidden",
+  "old_prototype_preserved": true
+}

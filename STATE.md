@@ -1,0 +1,16 @@
+# 현재 상태
+- 목표: 사용자 추가 요청에 따라 설계도면과 2026배치도 비교 후 학교 전체 재구축
+- 범위: ㄱ자 두 동 1~4층, 운동장과 명명된 외부 영역
+- 모델: blender/school_master.blend / Harness_Seokam_Campus; 이전 장면 및 백업 보존
+- 입력: 대화의 1~4층·지하/PIT 도면 5장, 2026 교실배치도
+- 근거: 형태는 설계도면, 현행 명칭은 2026배치도, 크기는 근사값
+- 결과: 일반 교실 41개 모두 포함, 실 공간 92개, 공간 앵커·복도·계단 123개
+- 검사: 누락 학급 0, 방 평면 겹침 0; data/campus-check.json
+- 자료: docs/PLAN_COMPARISON.md, docs/ROOM_NAMES.md, data/room_names.csv
+- 이미지: exports/renders/campus-overview.png 및 campus-1F~4F-names.png
+- UI: 학교 전체 / 층별 보기 / 충돌 걷기, WASD·마우스·1~4층 선택·ESC 종료
+- 걷기 검사: 4층 합계 3020 경로 샘플 통과, 문 통과·벽/창문/바닥외부 차단; data/walk-check.json
+- 실행 수정/검증: Event.timer 참조 제거 및 전진 방향 수정; 1686 타이머 처리·613 키 이벤트, 시작 x=20에서 x=58.02로 이동, 기록된 오류 없음
+- 제한: 계단 진입 차단, 층 전환은 숫자키; 지하 UNKNOWN, 3DGS 미실행
+- 촬영 준비: school-tour로 통합, 133공간 대응·촬영 안내 폴더 242개; 계단 별칭은 현장 확인 필요
+- 다음: 교실 하나와 앞 복도 시험 촬영; 원본은 로컬 보관하고 공개 Git 업로드 제외
