@@ -1,7 +1,5 @@
 name: Deploy current school project
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 permissions:
   contents: read
@@ -21,14 +19,15 @@ jobs:
       - uses: actions/configure-pages@v5
       - name: Package public preview only
         run: |
-          mkdir -p public-site/exports/renders public-site/blender public-site/data
-          cp index.html public-site/
-          cp exports/renders/campus-*.png public-site/exports/renders/
-          cp blender/school_master.blend public-site/blender/
-          cp data/*.csv public-site/data/
+          mkdir -p 배포자료/결과물/미리보기 배포자료/모델 배포자료/공간자료
+          cp index.html 배포자료/
+          cp -R 웹학교 배포자료/웹학교
+          cp 결과물/미리보기/campus-*.png 배포자료/결과물/미리보기/
+          cp 모델/school_master.blend 배포자료/모델/
+          cp 공간자료/*.csv 배포자료/공간자료/
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: public-site
+          path: 배포자료
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4

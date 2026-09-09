@@ -1,0 +1,10 @@
+{
+  "ok": true,
+  "photos": 9,
+  "distinctPhotos": 9,
+  "panoramaRatio": "2:1",
+  "originalHashesUnchanged": 9,
+  "validModelReturnPositions": 9,
+  "processing": "Local template reprojection and built-in image_gen photographer removal; not calibrated optical flow or 3DGS",
+  "visualReview": "All nine generated outputs inspected; no photographer fragments seen. Small lens seam/AI reconstruction differences remain possible."
+}

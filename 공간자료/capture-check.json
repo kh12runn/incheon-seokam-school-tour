@@ -1,0 +1,22 @@
+{
+  "spaces": 133,
+  "mappedSpaces": 133,
+  "folders": 243,
+  "counts": {
+    "classroom": 41,
+    "special_room": 39,
+    "corridor": 15,
+    "stair": 16,
+    "stair_landing": 16,
+    "stair_flight": 12,
+    "toilet": 12,
+    "exterior": 7,
+    "entrance": 3,
+    "corridor_doorway": 80,
+    "exterior_stair": 1,
+    "unassigned": 1
+  },
+  "uniqueFolders": 243,
+  "uniqueCaptureIds": 243,
+  "allFoldersExist": true
+}

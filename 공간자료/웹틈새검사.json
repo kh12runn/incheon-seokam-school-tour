@@ -1,0 +1,7 @@
+{
+  "ok": true,
+  "points": 456,
+  "rays": 131287,
+  "leaks": [],
+  "scope": "Sampled rays at eye level and upper wall junction; intentional courtyard door excluded. Not an exhaustive mesh proof."
+}

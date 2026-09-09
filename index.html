@@ -2,29 +2,84 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>인천석암초등학교 | 3D 학교 모델</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="./웹학교/실사보기.css">
+  <title>석암초등학교 · 걸어서 탐험하기</title>
   <style>
-    :root{color-scheme:light;font-family:system-ui,'Malgun Gothic',sans-serif;color:#18382f;background:#f3f5ee}
-    *{box-sizing:border-box}body{margin:0}main{max-width:1120px;margin:auto;padding:48px 22px}header{padding:22px 0 30px}h1{font-size:clamp(30px,5vw,52px);margin:10px 0}h2{margin-top:36px}p{line-height:1.8;color:#425c54}a{color:#176748;text-underline-offset:4px}.tag{letter-spacing:.12em;font-size:13px}.actions{display:flex;flex-wrap:wrap;gap:12px;margin:24px 0}.button{background:#17563f;color:white;border-radius:8px;padding:13px 20px;text-decoration:none}.secondary{background:white;color:#17563f;border:1px solid #bccdc1}.hero{width:100%;border-radius:16px;border:1px solid #d5ded2;background:white}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}.card{background:white;border-radius:12px;padding:18px}.card img{width:100%;display:block}.notice{padding:18px 22px;border-left:4px solid #b48a34;background:#fff9e9}.links{line-height:2.2}footer{margin-top:40px;border-top:1px solid #cbd8ce;padding-top:20px;font-size:14px}code{overflow-wrap:anywhere}@media(max-width:640px){main{padding:24px 16px}.grid{grid-template-columns:1fr}}
+    *{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:system-ui,'Malgun Gothic',sans-serif;color:#f4f8fb;background:#193143}button,select,input{font:inherit}button,select{border:1px solid #59758b;border-radius:6px;background:#173347;color:white;padding:9px 12px;cursor:pointer}button:hover{background:#295773}button:disabled{opacity:.5;cursor:wait}button:focus-visible,select:focus-visible{outline:3px solid #ffdc68}canvas#화면{display:block;width:100%;height:100%;outline:none;touch-action:none}header{position:absolute;top:14px;left:16px;right:16px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;pointer-events:none}header>*{pointer-events:auto}header strong{padding:9px 13px;background:#102b3dd9;border-radius:6px}#시작안내{position:absolute;top:90px;left:22px;width:350px;max-width:calc(100vw - 44px);background:#102b3dec;border:1px solid #5c7b90;padding:24px;border-radius:10px}#시작안내[hidden]{display:none}h1{font-size:27px;margin:8px 0 18px}p{line-height:1.65;color:#cbdce8;font-size:14px}.primary{background:#eec05b;color:#172d3c;font-weight:700;border-color:#eec05b;width:100%;padding:13px}.primary:hover{background:#ffda85}#드래그걷기{width:100%;margin-top:9px;font-size:13px}details{margin-top:16px;font-size:13px}details>div{padding-top:12px;display:grid;gap:10px}#층보기{max-width:140px}#방선택{width:100%}label{display:flex;justify-content:space-between;gap:8px;align-items:center}#불러오기{font-size:12px;color:#96ddc4}#지도상자{position:absolute;right:18px;bottom:64px;background:#142633dd;border:1px solid #688091;border-radius:8px;overflow:hidden;pointer-events:none}#지도{display:block;width:250px;height:185px}#탐험{padding:8px 12px;font-size:12px;color:#ffdc68}footer{position:absolute;bottom:12px;left:16px;right:16px;display:flex;justify-content:space-between;gap:10px;pointer-events:none}footer>span{background:#102b3ddd;padding:9px 12px;border-radius:6px;font-size:12px}#현재위치{font-weight:600;font-size:14px}#조준점{position:absolute;top:50%;left:50%;width:5px;height:5px;background:#fff;border-radius:50%;box-shadow:0 0 2px 1px #153843;pointer-events:none}#조준점[hidden]{display:none}.key{background:#324f62;padding:1px 5px;border-radius:3px;font-size:12px}@media(max-width:650px){header{top:8px;left:8px;right:8px;gap:5px}header strong{display:none}button,select{font-size:12px;padding:8px}#시작안내{top:58px;left:12px;max-width:calc(100vw - 24px);padding:18px}#지도상자{right:8px;bottom:65px;transform:scale(.7);transform-origin:bottom right}footer{left:8px;right:8px}#상태{max-width:60%;font-size:10px}h1{font-size:23px}}
+  </style>
+  <style>
+    #승강기호출{position:absolute;bottom:75px;left:50%;transform:translateX(-50%);background:#e0c777;color:#182a31;font-weight:700}
+    #승강기호출[hidden],#승강기전환[hidden]{display:none}
+    #승강기창{width:280px;padding:20px;border:1px solid #6e858c;border-radius:8px;background:#19313b;color:white}
+    #승강기창::backdrop{background:#0009}#승강기창 h2{margin:0 0 10px;font-size:19px}
+    #승강기창 .층버튼{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0}
+    #승강기닫기{width:100%}#승강기전환{position:fixed;inset:0;z-index:50;background:#101a22;display:grid;place-items:center}
+  </style>
+  <style>
+    #시작안내{top:auto;bottom:68px;left:18px;width:280px;padding:15px;max-height:calc(100dvh - 160px);overflow-y:auto}
+    #시작안내 h1{font-size:19px;line-height:1.4;margin:8px 0 10px}
+    #시작안내 p{font-size:12px;line-height:1.55;margin:8px 0 12px}
+    #시작안내 .primary{padding:10px;font-size:13px}
+    #시작안내 details{margin-top:10px;font-size:12px}
+    #시작안내 summary{cursor:pointer;color:#cbdce8}
+    #시작안내 #드래그걷기{margin-top:0;font-size:12px}
+    @media(max-width:650px){#시작안내{top:auto;bottom:70px;left:10px;width:250px;padding:12px;max-height:calc(100dvh - 190px)}#시작안내 h1{font-size:17px}body:has(#시작안내:not([hidden])) #지도상자{display:none}}
   </style>
 </head>
-<body><main>
-  <header><span class="tag">INCHEON SEOKAM · CAMPUS PROJECT</span>
-    <h1>학교 전체를, 하나의 3D 공간으로.</h1>
-    <p>ㄱ자로 연결된 본관과 별관 · 1–4층 · 현재 교실명 41개<br>설계도면과 2026 교실배치도를 바탕으로 만든 근사 모델입니다.</p>
-    <div class="actions"><a class="button" href="https://github.com/kh12runn/incheon-seokam-school-tour/archive/refs/heads/main.zip">프로젝트 전체 다운로드</a><a class="button secondary" href="blender/school_master.blend" download>Blender 모델 다운로드</a><a class="button secondary" href="https://github.com/kh12runn/incheon-seokam-school-tour">사용 안내 · GitHub</a></div>
-    <div class="notice">이 페이지의 그림은 미리보기입니다. 실제 3D 회전·걷기는 프로젝트 압축을 풀고 <strong>학교_3D_열기.cmd</strong>를 실행하세요. Blender 5.2가 필요합니다. 웹 3D와 가우시안 스플래팅은 아직 구현 전입니다.</div>
+<body>
+  <canvas id="화면" tabindex="0" aria-label="마우스와 WASD로 탐험하는 학교 3D 화면"></canvas>
+  <header>
+    <strong>석암초등학교 · 3D 탐험</strong>
+    <button id="걷기" disabled>걷기 시작 / 계속</button>
+    <button id="전체" disabled>학교 전체 보기</button>
+    <button id="항공회전" aria-pressed="true" disabled>항공뷰 회전 멈춤</button>
+    <button id="처음" disabled>처음 위치</button>
+    <select id="동층이동" aria-label="본관·별관 층별 중앙현관 이동" disabled>
+      <option value="">본관·별관 층 이동</option>
+      <optgroup label="본관 중앙현관">
+        <option value="MAIN:1">본관 1층 중앙현관</option><option value="MAIN:2">본관 2층 중앙현관</option>
+        <option value="MAIN:3">본관 3층 중앙현관</option><option value="MAIN:4">본관 4층 중앙현관</option>
+      </optgroup>
+      <optgroup label="별관 중앙현관">
+        <option value="ANNEX:1">별관 1층 중앙현관</option><option value="ANNEX:2">별관 2층 중앙현관</option>
+        <option value="ANNEX:3">별관 3층 중앙현관</option><option value="ANNEX:4">별관 4층 중앙현관</option>
+      </optgroup>
+    </select>
+    <button id="실사보기" disabled>4층 실사 360도</button>
+    <select id="층보기" aria-label="전체 또는 층별 단면 보기"><option value="0">전체 건물</option><option value="1">1층 단면</option><option value="2">2층 단면</option><option value="3">3층 단면</option><option value="4">4층 단면</option></select>
   </header>
-  <a href="exports/renders/campus-overview.png"><img class="hero" src="exports/renders/campus-overview.png" alt="ㄱ자 두 동과 운동장을 포함한 학교 3D 모델"></a>
-  <h2>층별 교실 이름 확인</h2><p>이미지를 누르면 크게 볼 수 있습니다. 치수·문·계단 위치는 현장 확인이 필요한 근사값입니다.</p>
-  <div class="grid">
-    <a class="card" href="exports/renders/campus-1F-names.png">1층 배치도<img src="exports/renders/campus-1F-names.png" alt="1층 공간 이름" loading="lazy"></a>
-    <a class="card" href="exports/renders/campus-2F-names.png">2층 배치도<img src="exports/renders/campus-2F-names.png" alt="2층 공간 이름" loading="lazy"></a>
-    <a class="card" href="exports/renders/campus-3F-names.png">3층 배치도<img src="exports/renders/campus-3F-names.png" alt="3층 공간 이름" loading="lazy"></a>
-    <a class="card" href="exports/renders/campus-4F-names.png">4층 배치도<img src="exports/renders/campus-4F-names.png" alt="4층 공간 이름" loading="lazy"></a>
-  </div>
-  <h2>이제 실제 공간을 촬영할 차례</h2>
-  <p>다운로드한 프로젝트의 <strong>촬영사진_넣는곳</strong>에서 층·교실명을 찾으세요. 교실과 특별실뿐 아니라 문 앞 복도, 계단참, 올라가는 구간도 구분했습니다. 여러 위치에서 찍은 원본을 넣은 후 해당 폴더를 알려주세요. 자동 학습·자동 공개는 하지 않습니다.</p>
-  <div class="links"><a href="data/촬영폴더_목록.csv" download>촬영 폴더 전체 목록 내려받기 (CSV)</a><br><a href="https://github.com/kh12runn/incheon-seokam-school-tour/blob/main/docs/STAIR_PHOTO_MAP.md">계단 위치 이름 확인</a></div>
-  <footer>사진 원본은 공개 Git 업로드에서 제외됩니다. 얼굴·명단 등 개인정보가 담기지 않도록 촬영하세요. 계단 별칭은 근사 모델 기준으로, 현장에서 확인이 필요합니다.</footer>
-</main></body></html>
+  <section id="시작안내" aria-label="학교 탐험 안내">
+    <span id="불러오기">Blender 학교 구조를 불러오는 중…</span>
+    <h1>학교 안으로 들어가 볼까요?</h1>
+    <p><span class="key">W A S D</span> 이동 · 마우스로 둘러보기<br>계단으로 층 이동 · <span class="key">ESC</span> 일시정지</p>
+    <button id="시작" class="primary" disabled>학교 탐험 시작하기</button>
+    <details><summary>조작 설정 · 교실 바로 가기</summary><div>
+      <button id="드래그걷기" disabled>마우스 잠금 없이 드래그로 걷기</button>
+      <label>마우스 감도 <input id="감도" type="range" min="0.5" max="4" step="0.1" value="1.8"></label>
+      <label>걷기 시 화면 흔들림 <input id="흔들림" type="checkbox"></label>
+      <select id="방선택" aria-label="바로 이동할 교실"></select>
+      <button id="방이동" disabled>선택한 실에서 시작</button>
+    </div></details>
+    <details><summary>사진 반영 범위 · 탐험 안내</summary><div>
+      <p>Shift로 빠르게 이동합니다. 지도에서 보라색은 계단입니다. 벽과 창문은 통과할 수 없습니다.</p>
+      <p>동·층을 선택하면 해당 층의 중앙 계단 앞 복도로 이동합니다. 마우스를 드래그해 시점을 바꾸고 WASD로 바로 걸을 수 있습니다.</p>
+      <p>본관 1~3층 복도는 4층 사진의 색과 마감을 참고한 근사 표현입니다. 별관은 변경하지 않았습니다.</p>
+      <p>‘4층 실사 360도’에서 복도·계단 9개 지점을 볼 수 있습니다. 촬영자와 가려진 바닥은 AI 편집했습니다. 촬영 지점 간 이동 방식이며 가우시안 스플래팅은 아닙니다.</p>
+    </div></details>
+  </section>
+  <div id="조준점" hidden></div>
+  <button id="승강기호출" hidden>E · 엘리베이터 층 선택</button>
+  <dialog id="승강기창" aria-labelledby="승강기제목">
+    <h2 id="승강기제목">엘리베이터 · <span id="승강기현재층"></span></h2>
+    <p>이동할 층을 선택하세요.</p>
+    <div class="층버튼"><button data-elevator-floor="1">1층</button><button data-elevator-floor="2">2층</button><button data-elevator-floor="3">3층</button><button data-elevator-floor="4">4층</button></div>
+    <button id="승강기닫기">닫기</button>
+  </dialog>
+  <div id="승강기전환" role="status" hidden>엘리베이터로 이동 중…</div>
+  <aside id="지도상자" aria-label="현재 층 지도와 탐험 진행"><canvas id="지도" width="250" height="185"></canvas><div id="탐험">교실 탐험 0/41 · 층별 표식 0/4</div></aside>
+  <footer><span id="현재위치">학교 전체</span><span id="상태" role="status">구조 불러오는 중…</span></footer>
+  <script type="module" src="./웹학교/게임.mjs?v=20260909-후면주차장"></script>
+  <noscript>학교를 보려면 브라우저에서 자바스크립트를 허용하세요.</noscript>
+</body>
+</html>

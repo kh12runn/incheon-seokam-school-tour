@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "mainFloors": [
+    1,
+    2,
+    3
+  ],
+  "addedBoxes": 1918,
+  "doorPaths": 27,
+  "annexOverlap": 0,
+  "originalModelDataUnchanged": true
+}

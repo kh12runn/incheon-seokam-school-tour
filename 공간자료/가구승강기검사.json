@@ -1,0 +1,30 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "floor": 1,
+      "cabinets": 0,
+      "cellsPerCabinet": 21,
+      "elevatorLanding": true
+    },
+    {
+      "floor": 2,
+      "cabinets": 0,
+      "cellsPerCabinet": 21,
+      "elevatorLanding": true
+    },
+    {
+      "floor": 3,
+      "cabinets": 9,
+      "cellsPerCabinet": 21,
+      "elevatorLanding": true
+    },
+    {
+      "floor": 4,
+      "cabinets": 10,
+      "cellsPerCabinet": 21,
+      "elevatorLanding": true
+    }
+  ],
+  "annexCabinetsAdded": 0
+}

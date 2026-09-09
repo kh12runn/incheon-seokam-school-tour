@@ -1,0 +1,1394 @@
+{
+  "schemaVersion": 1,
+  "photoPoints": [
+    {
+      "photoPointId": "PHOTOPOINT_1F_3-4",
+      "spaceId": "1F_3-4",
+      "rawFolder": "사진보관/원본/1층/교실/3-4 교실/",
+      "processedFolder": "사진보관/변환본/1층/교실/3-4 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        5,
+        -3.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/교실/3-4 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_3-3",
+      "spaceId": "1F_3-3",
+      "rawFolder": "사진보관/원본/1층/교실/3-3 교실/",
+      "processedFolder": "사진보관/변환본/1층/교실/3-3 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        15,
+        -3.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/교실/3-3 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_3-2",
+      "spaceId": "1F_3-2",
+      "rawFolder": "사진보관/원본/1층/교실/3-2 교실/",
+      "processedFolder": "사진보관/변환본/1층/교실/3-2 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        25,
+        -3.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/교실/3-2 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_3-1",
+      "spaceId": "1F_3-1",
+      "rawFolder": "사진보관/원본/1층/교실/3-1 교실/",
+      "processedFolder": "사진보관/변환본/1층/교실/3-1 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        35,
+        -3.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/교실/3-1 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_MAIN_LOBBY",
+      "spaceId": "1F_MAIN_LOBBY",
+      "rawFolder": "사진보관/원본/1층/출입구_현관/본관 출입구/",
+      "processedFolder": "사진보관/변환본/1층/출입구_현관/본관 출입구/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        45,
+        -3.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/출입구_현관/본관 출입구/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_ADMIN",
+      "spaceId": "1F_ADMIN",
+      "rawFolder": "사진보관/원본/1층/특별실_지원실/행정실/",
+      "processedFolder": "사진보관/변환본/1층/특별실_지원실/행정실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        54.5,
+        -3.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/특별실_지원실/행정실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_NURSE",
+      "spaceId": "1F_NURSE",
+      "rawFolder": "사진보관/원본/1층/특별실_지원실/보건실/",
+      "processedFolder": "사진보관/변환본/1층/특별실_지원실/보건실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        62,
+        -3.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/특별실_지원실/보건실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_PRINTING",
+      "spaceId": "1F_PRINTING",
+      "rawFolder": "사진보관/원본/1층/특별실_지원실/발간실/",
+      "processedFolder": "사진보관/변환본/1층/특별실_지원실/발간실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        68,
+        -3.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/특별실_지원실/발간실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_MEAL_CART_STORAGE",
+      "spaceId": "1F_MEAL_CART_STORAGE",
+      "rawFolder": "사진보관/원본/1층/특별실_지원실/배식차 보관실/",
+      "processedFolder": "사진보관/변환본/1층/특별실_지원실/배식차 보관실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        75.5,
+        -3.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/특별실_지원실/배식차 보관실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_MAIN_TOILET_A",
+      "spaceId": "1F_MAIN_TOILET_A",
+      "rawFolder": "사진보관/원본/1층/기타_촬영전허가필요/3-4 교실 쪽 화장실/",
+      "processedFolder": "사진보관/변환본/1층/기타_촬영전허가필요/3-4 교실 쪽 화장실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        7.5,
+        6.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/기타_촬영전허가필요/3-4 교실 쪽 화장실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_MAIN_TOILET_B",
+      "spaceId": "1F_MAIN_TOILET_B",
+      "rawFolder": "사진보관/원본/1층/기타_촬영전허가필요/행정실 쪽 화장실/",
+      "processedFolder": "사진보관/변환본/1층/기타_촬영전허가필요/행정실 쪽 화장실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        58,
+        6.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/기타_촬영전허가필요/행정실 쪽 화장실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_STORAGE_1",
+      "spaceId": "1F_STORAGE_1",
+      "rawFolder": "사진보관/원본/1층/특별실_지원실/창고 1/",
+      "processedFolder": "사진보관/변환본/1층/특별실_지원실/창고 1/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        41.5,
+        6.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/특별실_지원실/창고 1/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_NIGHT_DUTY",
+      "spaceId": "1F_NIGHT_DUTY",
+      "rawFolder": "사진보관/원본/1층/특별실_지원실/숙직실/",
+      "processedFolder": "사진보관/변환본/1층/특별실_지원실/숙직실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        47.5,
+        6.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/특별실_지원실/숙직실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_STORAGE_2",
+      "spaceId": "1F_STORAGE_2",
+      "rawFolder": "사진보관/원본/1층/특별실_지원실/창고 2/",
+      "processedFolder": "사진보관/변환본/1층/특별실_지원실/창고 2/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        -6,
+        6,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/특별실_지원실/창고 2/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_MULTIPURPOSE",
+      "spaceId": "1F_MULTIPURPOSE",
+      "rawFolder": "사진보관/원본/1층/특별실_지원실/다목적실/",
+      "processedFolder": "사진보관/변환본/1층/특별실_지원실/다목적실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        -6,
+        -2.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/특별실_지원실/다목적실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_CAFETERIA",
+      "spaceId": "1F_CAFETERIA",
+      "rawFolder": "사진보관/원본/1층/특별실_지원실/급식실/",
+      "processedFolder": "사진보관/변환본/1층/특별실_지원실/급식실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        90,
+        -3.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/특별실_지원실/급식실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_NUTRITION",
+      "spaceId": "1F_NUTRITION",
+      "rawFolder": "사진보관/원본/1층/특별실_지원실/영양교사실/",
+      "processedFolder": "사진보관/변환본/1층/특별실_지원실/영양교사실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        83.5,
+        6.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/특별실_지원실/영양교사실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_COOKING",
+      "spaceId": "1F_COOKING",
+      "rawFolder": "사진보관/원본/1층/특별실_지원실/조리실/",
+      "processedFolder": "사진보관/변환본/1층/특별실_지원실/조리실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        93.5,
+        6.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/특별실_지원실/조리실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_ANNEX_TOILET_A",
+      "spaceId": "1F_ANNEX_TOILET_A",
+      "rawFolder": "사진보관/원본/1층/기타_촬영전허가필요/1-6 교실 쪽 화장실/",
+      "processedFolder": "사진보관/변환본/1층/기타_촬영전허가필요/1-6 교실 쪽 화장실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -10,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/기타_촬영전허가필요/1-6 교실 쪽 화장실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_1-6",
+      "spaceId": "1F_1-6",
+      "rawFolder": "사진보관/원본/1층/교실/1-6 교실/",
+      "processedFolder": "사진보관/변환본/1층/교실/1-6 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -22.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/교실/1-6 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_1-5",
+      "spaceId": "1F_1-5",
+      "rawFolder": "사진보관/원본/1층/교실/1-5 교실/",
+      "processedFolder": "사진보관/변환본/1층/교실/1-5 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -29.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/교실/1-5 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_INDIVIDUAL_5",
+      "spaceId": "1F_INDIVIDUAL_5",
+      "rawFolder": "사진보관/원본/1층/특별실_지원실/개별학습실5/",
+      "processedFolder": "사진보관/변환본/1층/특별실_지원실/개별학습실5/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -36.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/특별실_지원실/개별학습실5/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_INDIVIDUAL_4",
+      "spaceId": "1F_INDIVIDUAL_4",
+      "rawFolder": "사진보관/원본/1층/특별실_지원실/개별학습실4/",
+      "processedFolder": "사진보관/변환본/1층/특별실_지원실/개별학습실4/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -50.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/특별실_지원실/개별학습실4/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_1-4",
+      "spaceId": "1F_1-4",
+      "rawFolder": "사진보관/원본/1층/교실/1-4 교실/",
+      "processedFolder": "사진보관/변환본/1층/교실/1-4 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -59.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/교실/1-4 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_1F_1-3",
+      "spaceId": "1F_1-3",
+      "rawFolder": "사진보관/원본/1층/교실/1-3 교실/",
+      "processedFolder": "사진보관/변환본/1층/교실/1-3 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -68.5,
+        1.600000023841858
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/1층/교실/1-3 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_CARE_DREAM_HOPE",
+      "spaceId": "2F_CARE_DREAM_HOPE",
+      "rawFolder": "사진보관/원본/2층/특별실_지원실/돌봄교실(꿈희망)/",
+      "processedFolder": "사진보관/변환본/2층/특별실_지원실/돌봄교실(꿈희망)/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        5,
+        -3.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/특별실_지원실/돌봄교실(꿈희망)/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_CARE_DREAM_WISH",
+      "spaceId": "2F_CARE_DREAM_WISH",
+      "rawFolder": "사진보관/원본/2층/특별실_지원실/돌봄교실(꿈소망)/",
+      "processedFolder": "사진보관/변환본/2층/특별실_지원실/돌봄교실(꿈소망)/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        15,
+        -3.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/특별실_지원실/돌봄교실(꿈소망)/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_CARE_DREAM_LOVE",
+      "spaceId": "2F_CARE_DREAM_LOVE",
+      "rawFolder": "사진보관/원본/2층/특별실_지원실/돌봄교실(꿈사랑)/",
+      "processedFolder": "사진보관/변환본/2층/특별실_지원실/돌봄교실(꿈사랑)/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        25,
+        -3.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/특별실_지원실/돌봄교실(꿈사랑)/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_PRINCIPAL",
+      "spaceId": "2F_PRINCIPAL",
+      "rawFolder": "사진보관/원본/2층/특별실_지원실/교장실/",
+      "processedFolder": "사진보관/변환본/2층/특별실_지원실/교장실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        33.5,
+        -3.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/특별실_지원실/교장실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_OPERATIONS_MEETING",
+      "spaceId": "2F_OPERATIONS_MEETING",
+      "rawFolder": "사진보관/원본/2층/특별실_지원실/학교운영위원회의실/",
+      "processedFolder": "사진보관/변환본/2층/특별실_지원실/학교운영위원회의실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        40,
+        -3.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/특별실_지원실/학교운영위원회의실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_STAFF",
+      "spaceId": "2F_STAFF",
+      "rawFolder": "사진보관/원본/2층/특별실_지원실/교무실/",
+      "processedFolder": "사진보관/변환본/2층/특별실_지원실/교무실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        49.5,
+        -3.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/특별실_지원실/교무실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_BROADCAST",
+      "spaceId": "2F_BROADCAST",
+      "rawFolder": "사진보관/원본/2층/특별실_지원실/방송실(교원회의실)/",
+      "processedFolder": "사진보관/변환본/2층/특별실_지원실/방송실(교원회의실)/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        60,
+        -3.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/특별실_지원실/방송실(교원회의실)/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_3-5",
+      "spaceId": "2F_3-5",
+      "rawFolder": "사진보관/원본/2층/교실/3-5 교실/",
+      "processedFolder": "사진보관/변환본/2층/교실/3-5 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        68,
+        -3.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/교실/3-5 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_3-6",
+      "spaceId": "2F_3-6",
+      "rawFolder": "사진보관/원본/2층/교실/3-6 교실/",
+      "processedFolder": "사진보관/변환본/2층/교실/3-6 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        76,
+        -3.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/교실/3-6 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_MAIN_TOILET_A",
+      "spaceId": "2F_MAIN_TOILET_A",
+      "rawFolder": "사진보관/원본/2층/기타_촬영전허가필요/돌봄교실(꿈희망) 쪽 화장실/",
+      "processedFolder": "사진보관/변환본/2층/기타_촬영전허가필요/돌봄교실(꿈희망) 쪽 화장실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        7.5,
+        6.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/기타_촬영전허가필요/돌봄교실(꿈희망) 쪽 화장실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_MAIN_TOILET_B",
+      "spaceId": "2F_MAIN_TOILET_B",
+      "rawFolder": "사진보관/원본/2층/기타_촬영전허가필요/방송실(교원회의실) 쪽 화장실/",
+      "processedFolder": "사진보관/변환본/2층/기타_촬영전허가필요/방송실(교원회의실) 쪽 화장실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        58,
+        6.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/기타_촬영전허가필요/방송실(교원회의실) 쪽 화장실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_GRADE3_RESEARCH",
+      "spaceId": "2F_GRADE3_RESEARCH",
+      "rawFolder": "사진보관/원본/2층/특별실_지원실/3학년 연수실/",
+      "processedFolder": "사진보관/변환본/2층/특별실_지원실/3학년 연수실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        47,
+        6.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/특별실_지원실/3학년 연수실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_AUDIO_VISUAL",
+      "spaceId": "2F_AUDIO_VISUAL",
+      "rawFolder": "사진보관/원본/2층/특별실_지원실/시청각실/",
+      "processedFolder": "사진보관/변환본/2층/특별실_지원실/시청각실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        -8.5,
+        1.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/특별실_지원실/시청각실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_KOREAN_CLASS",
+      "spaceId": "2F_KOREAN_CLASS",
+      "rawFolder": "사진보관/원본/2층/특별실_지원실/한국어학급/",
+      "processedFolder": "사진보관/변환본/2층/특별실_지원실/한국어학급/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        -1.5,
+        1.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/특별실_지원실/한국어학급/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_SCIENCE",
+      "spaceId": "2F_SCIENCE",
+      "rawFolder": "사진보관/원본/2층/특별실_지원실/과학실/",
+      "processedFolder": "사진보관/변환본/2층/특별실_지원실/과학실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        90,
+        -3.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/특별실_지원실/과학실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_SCIENCE_PREP",
+      "spaceId": "2F_SCIENCE_PREP",
+      "rawFolder": "사진보관/원본/2층/특별실_지원실/과학준비실/",
+      "processedFolder": "사진보관/변환본/2층/특별실_지원실/과학준비실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        83.5,
+        6.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/특별실_지원실/과학준비실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_INTELLIGENT_SCIENCE",
+      "spaceId": "2F_INTELLIGENT_SCIENCE",
+      "rawFolder": "사진보관/원본/2층/특별실_지원실/지능형과학실/",
+      "processedFolder": "사진보관/변환본/2층/특별실_지원실/지능형과학실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        93.5,
+        6.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/특별실_지원실/지능형과학실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_ANNEX_TOILET_A",
+      "spaceId": "2F_ANNEX_TOILET_A",
+      "rawFolder": "사진보관/원본/2층/기타_촬영전허가필요/개별학습실2 쪽 화장실/",
+      "processedFolder": "사진보관/변환본/2층/기타_촬영전허가필요/개별학습실2 쪽 화장실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -10,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/기타_촬영전허가필요/개별학습실2 쪽 화장실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_INDIVIDUAL_2",
+      "spaceId": "2F_INDIVIDUAL_2",
+      "rawFolder": "사진보관/원본/2층/특별실_지원실/개별학습실2/",
+      "processedFolder": "사진보관/변환본/2층/특별실_지원실/개별학습실2/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -22.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/특별실_지원실/개별학습실2/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_INDIVIDUAL_1",
+      "spaceId": "2F_INDIVIDUAL_1",
+      "rawFolder": "사진보관/원본/2층/특별실_지원실/개별학습실1/",
+      "processedFolder": "사진보관/변환본/2층/특별실_지원실/개별학습실1/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -29.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/특별실_지원실/개별학습실1/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_3-7",
+      "spaceId": "2F_3-7",
+      "rawFolder": "사진보관/원본/2층/교실/3-7 교실/",
+      "processedFolder": "사진보관/변환본/2층/교실/3-7 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -36.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/교실/3-7 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_2-6",
+      "spaceId": "2F_2-6",
+      "rawFolder": "사진보관/원본/2층/교실/2-6 교실/",
+      "processedFolder": "사진보관/변환본/2층/교실/2-6 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -50.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/교실/2-6 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_1-2",
+      "spaceId": "2F_1-2",
+      "rawFolder": "사진보관/원본/2층/교실/1-2 교실/",
+      "processedFolder": "사진보관/변환본/2층/교실/1-2 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -59.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/교실/1-2 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_2F_1-1",
+      "spaceId": "2F_1-1",
+      "rawFolder": "사진보관/원본/2층/교실/1-1 교실/",
+      "processedFolder": "사진보관/변환본/2층/교실/1-1 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -68.5,
+        5
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/2층/교실/1-1 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_5-7.001",
+      "spaceId": "3F_5-7",
+      "rawFolder": "사진보관/원본/3층/교실/5-7 교실/",
+      "processedFolder": "사진보관/변환본/3층/교실/5-7 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        5,
+        -3.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/교실/5-7 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_5-6.001",
+      "spaceId": "3F_5-6",
+      "rawFolder": "사진보관/원본/3층/교실/5-6 교실/",
+      "processedFolder": "사진보관/변환본/3층/교실/5-6 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        15,
+        -3.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/교실/5-6 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_5-5.001",
+      "spaceId": "3F_5-5",
+      "rawFolder": "사진보관/원본/3층/교실/5-5 교실/",
+      "processedFolder": "사진보관/변환본/3층/교실/5-5 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        25,
+        -3.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/교실/5-5 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_5-4.001",
+      "spaceId": "3F_5-4",
+      "rawFolder": "사진보관/원본/3층/교실/5-4 교실/",
+      "processedFolder": "사진보관/변환본/3층/교실/5-4 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        35,
+        -3.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/교실/5-4 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_5-3.001",
+      "spaceId": "3F_5-3",
+      "rawFolder": "사진보관/원본/3층/교실/5-3 교실/",
+      "processedFolder": "사진보관/변환본/3층/교실/5-3 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        45,
+        -3.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/교실/5-3 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_5-2.001",
+      "spaceId": "3F_5-2",
+      "rawFolder": "사진보관/원본/3층/교실/5-2 교실/",
+      "processedFolder": "사진보관/변환본/3층/교실/5-2 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        55,
+        -3.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/교실/5-2 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_5-1.001",
+      "spaceId": "3F_5-1",
+      "rawFolder": "사진보관/원본/3층/교실/5-1 교실/",
+      "processedFolder": "사진보관/변환본/3층/교실/5-1 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        65,
+        -3.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/교실/5-1 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_4-5.001",
+      "spaceId": "3F_4-5",
+      "rawFolder": "사진보관/원본/3층/교실/4-5 교실/",
+      "processedFolder": "사진보관/변환본/3층/교실/4-5 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        75,
+        -3.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/교실/4-5 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_MAIN_TOILET_A.001",
+      "spaceId": "3F_MAIN_TOILET_A",
+      "rawFolder": "사진보관/원본/3층/기타_촬영전허가필요/5-7 교실 쪽 화장실/",
+      "processedFolder": "사진보관/변환본/3층/기타_촬영전허가필요/5-7 교실 쪽 화장실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        7.5,
+        6.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/기타_촬영전허가필요/5-7 교실 쪽 화장실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_MAIN_TOILET_B.001",
+      "spaceId": "3F_MAIN_TOILET_B",
+      "rawFolder": "사진보관/원본/3층/기타_촬영전허가필요/5-2 교실 쪽 화장실/",
+      "processedFolder": "사진보관/변환본/3층/기타_촬영전허가필요/5-2 교실 쪽 화장실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        58,
+        6.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/기타_촬영전허가필요/5-2 교실 쪽 화장실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_COUNSELING.001",
+      "spaceId": "3F_COUNSELING",
+      "rawFolder": "사진보관/원본/3층/특별실_지원실/상담실/",
+      "processedFolder": "사진보관/변환본/3층/특별실_지원실/상담실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        -5,
+        -3.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/특별실_지원실/상담실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_GRADE5_RESEARCH.001",
+      "spaceId": "3F_GRADE5_RESEARCH",
+      "rawFolder": "사진보관/원본/3층/특별실_지원실/5학년 연수실/",
+      "processedFolder": "사진보관/변환본/3층/특별실_지원실/5학년 연수실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        47,
+        6.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/특별실_지원실/5학년 연수실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_4-6.001",
+      "spaceId": "3F_4-6",
+      "rawFolder": "사진보관/원본/3층/교실/4-6 교실/",
+      "processedFolder": "사진보관/변환본/3층/교실/4-6 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        90,
+        -3.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/교실/4-6 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_BOOK_LIBRARY.001",
+      "spaceId": "3F_BOOK_LIBRARY",
+      "rawFolder": "사진보관/원본/3층/특별실_지원실/책터 도서관/",
+      "processedFolder": "사진보관/변환본/3층/특별실_지원실/책터 도서관/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        90,
+        6.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/특별실_지원실/책터 도서관/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_ANNEX_TOILET_A",
+      "spaceId": "3F_ANNEX_TOILET_A",
+      "rawFolder": "사진보관/원본/3층/기타_촬영전허가필요/4-7 교실 쪽 화장실/",
+      "processedFolder": "사진보관/변환본/3층/기타_촬영전허가필요/4-7 교실 쪽 화장실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -10,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/기타_촬영전허가필요/4-7 교실 쪽 화장실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_4-7",
+      "spaceId": "3F_4-7",
+      "rawFolder": "사진보관/원본/3층/교실/4-7 교실/",
+      "processedFolder": "사진보관/변환본/3층/교실/4-7 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -22.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/교실/4-7 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_4-8",
+      "spaceId": "3F_4-8",
+      "rawFolder": "사진보관/원본/3층/교실/4-8 교실/",
+      "processedFolder": "사진보관/변환본/3층/교실/4-8 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -29.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/교실/4-8 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_2-5",
+      "spaceId": "3F_2-5",
+      "rawFolder": "사진보관/원본/3층/교실/2-5 교실/",
+      "processedFolder": "사진보관/변환본/3층/교실/2-5 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -36.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/교실/2-5 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_2-4",
+      "spaceId": "3F_2-4",
+      "rawFolder": "사진보관/원본/3층/교실/2-4 교실/",
+      "processedFolder": "사진보관/변환본/3층/교실/2-4 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -50.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/교실/2-4 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_GRADE1_RESEARCH",
+      "spaceId": "3F_GRADE1_RESEARCH",
+      "rawFolder": "사진보관/원본/3층/특별실_지원실/1학년 연수실/",
+      "processedFolder": "사진보관/변환본/3층/특별실_지원실/1학년 연수실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -59.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/특별실_지원실/1학년 연수실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_3F_INDIVIDUAL_3",
+      "spaceId": "3F_INDIVIDUAL_3",
+      "rawFolder": "사진보관/원본/3층/특별실_지원실/개별학습실3/",
+      "processedFolder": "사진보관/변환본/3층/특별실_지원실/개별학습실3/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -68.5,
+        8.399999618530273
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/3층/특별실_지원실/개별학습실3/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_6-7",
+      "spaceId": "4F_6-7",
+      "rawFolder": "사진보관/원본/4층/교실/6-7 교실/",
+      "processedFolder": "사진보관/변환본/4층/교실/6-7 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        5,
+        -3.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/교실/6-7 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_6-6",
+      "spaceId": "4F_6-6",
+      "rawFolder": "사진보관/원본/4층/교실/6-6 교실/",
+      "processedFolder": "사진보관/변환본/4층/교실/6-6 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        15,
+        -3.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/교실/6-6 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_6-5",
+      "spaceId": "4F_6-5",
+      "rawFolder": "사진보관/원본/4층/교실/6-5 교실/",
+      "processedFolder": "사진보관/변환본/4층/교실/6-5 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        25,
+        -3.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/교실/6-5 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_6-4",
+      "spaceId": "4F_6-4",
+      "rawFolder": "사진보관/원본/4층/교실/6-4 교실/",
+      "processedFolder": "사진보관/변환본/4층/교실/6-4 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        35,
+        -3.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/교실/6-4 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_6-3",
+      "spaceId": "4F_6-3",
+      "rawFolder": "사진보관/원본/4층/교실/6-3 교실/",
+      "processedFolder": "사진보관/변환본/4층/교실/6-3 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        45,
+        -3.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/교실/6-3 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_6-2",
+      "spaceId": "4F_6-2",
+      "rawFolder": "사진보관/원본/4층/교실/6-2 교실/",
+      "processedFolder": "사진보관/변환본/4층/교실/6-2 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        55,
+        -3.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/교실/6-2 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_6-1",
+      "spaceId": "4F_6-1",
+      "rawFolder": "사진보관/원본/4층/교실/6-1 교실/",
+      "processedFolder": "사진보관/변환본/4층/교실/6-1 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        65,
+        -3.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/교실/6-1 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_4-1",
+      "spaceId": "4F_4-1",
+      "rawFolder": "사진보관/원본/4층/교실/4-1 교실/",
+      "processedFolder": "사진보관/변환본/4층/교실/4-1 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        75,
+        -3.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/교실/4-1 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_MAIN_TOILET_A",
+      "spaceId": "4F_MAIN_TOILET_A",
+      "rawFolder": "사진보관/원본/4층/기타_촬영전허가필요/6-7 교실 쪽 화장실/",
+      "processedFolder": "사진보관/변환본/4층/기타_촬영전허가필요/6-7 교실 쪽 화장실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        7.5,
+        6.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/기타_촬영전허가필요/6-7 교실 쪽 화장실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_MAIN_TOILET_B",
+      "spaceId": "4F_MAIN_TOILET_B",
+      "rawFolder": "사진보관/원본/4층/기타_촬영전허가필요/6-2 교실 쪽 화장실/",
+      "processedFolder": "사진보관/변환본/4층/기타_촬영전허가필요/6-2 교실 쪽 화장실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        58,
+        6.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/기타_촬영전허가필요/6-2 교실 쪽 화장실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_GRADE6_RESEARCH",
+      "spaceId": "4F_GRADE6_RESEARCH",
+      "rawFolder": "사진보관/원본/4층/특별실_지원실/6학년 연수실/",
+      "processedFolder": "사진보관/변환본/4층/특별실_지원실/6학년 연수실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        47,
+        6.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/특별실_지원실/6학년 연수실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_4-2",
+      "spaceId": "4F_4-2",
+      "rawFolder": "사진보관/원본/4층/교실/4-2 교실/",
+      "processedFolder": "사진보관/변환본/4층/교실/4-2 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        90,
+        -3.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/교실/4-2 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_GRADE4_RESEARCH",
+      "spaceId": "4F_GRADE4_RESEARCH",
+      "rawFolder": "사진보관/원본/4층/특별실_지원실/4학년 연수실/",
+      "processedFolder": "사진보관/변환본/4층/특별실_지원실/4학년 연수실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        84,
+        6.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/특별실_지원실/4학년 연수실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_4-3",
+      "spaceId": "4F_4-3",
+      "rawFolder": "사진보관/원본/4층/교실/4-3 교실/",
+      "processedFolder": "사진보관/변환본/4층/교실/4-3 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        94,
+        6.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/교실/4-3 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_ANNEX_TOILET_A",
+      "spaceId": "4F_ANNEX_TOILET_A",
+      "rawFolder": "사진보관/원본/4층/기타_촬영전허가필요/4-4 교실 쪽 화장실/",
+      "processedFolder": "사진보관/변환본/4층/기타_촬영전허가필요/4-4 교실 쪽 화장실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -10,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/기타_촬영전허가필요/4-4 교실 쪽 화장실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_4-4",
+      "spaceId": "4F_4-4",
+      "rawFolder": "사진보관/원본/4층/교실/4-4 교실/",
+      "processedFolder": "사진보관/변환본/4층/교실/4-4 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -22.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/교실/4-4 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_2-3",
+      "spaceId": "4F_2-3",
+      "rawFolder": "사진보관/원본/4층/교실/2-3 교실/",
+      "processedFolder": "사진보관/변환본/4층/교실/2-3 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -29.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/교실/2-3 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_2-2",
+      "spaceId": "4F_2-2",
+      "rawFolder": "사진보관/원본/4층/교실/2-2 교실/",
+      "processedFolder": "사진보관/변환본/4층/교실/2-2 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -36.5,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/교실/2-2 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_2-1",
+      "spaceId": "4F_2-1",
+      "rawFolder": "사진보관/원본/4층/교실/2-1 교실/",
+      "processedFolder": "사진보관/변환본/4층/교실/2-1 교실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -49.375,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/교실/2-1 교실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_KINDERGARTEN",
+      "spaceId": "4F_KINDERGARTEN",
+      "rawFolder": "사진보관/원본/4층/특별실_지원실/까치방/",
+      "processedFolder": "사진보관/변환본/4층/특별실_지원실/까치방/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -56.125,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/특별실_지원실/까치방/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_GRADE2_RESEARCH",
+      "spaceId": "4F_GRADE2_RESEARCH",
+      "rawFolder": "사진보관/원본/4층/특별실_지원실/2학년 연수실/",
+      "processedFolder": "사진보관/변환본/4층/특별실_지원실/2학년 연수실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -62.875,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/특별실_지원실/2학년 연수실/"
+    },
+    {
+      "photoPointId": "PHOTOPOINT_4F_COMPUTER",
+      "spaceId": "4F_COMPUTER",
+      "rawFolder": "사진보관/원본/4층/특별실_지원실/컴퓨터실/",
+      "processedFolder": "사진보관/변환본/4층/특별실_지원실/컴퓨터실/",
+      "panorama": null,
+      "position": null,
+      "prototypePosition": [
+        96,
+        -69.625,
+        11.800000190734863
+      ],
+      "positionStatus": "estimated",
+      "intakeFolder": "촬영사진_넣는곳/4층/특별실_지원실/컴퓨터실/"
+    }
+  ],
+  "unassigned": [
+    {
+      "file": "사진보관/원본/촬영위치미확인/IMG_20260908_095512_00_001.insp",
+      "camera": "Insta360 X6",
+      "capturedAt": "2026-09-08T09:55:11",
+      "spaceId": null,
+      "reason": "촬영 위치가 배치도에 표시되지 않음"
+    }
+  ]
+}

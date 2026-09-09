@@ -1,0 +1,72 @@
+{
+  "ok": true,
+  "views": [
+    {
+      "floor": 1,
+      "building": "MAIN",
+      "room": "1F_3-4",
+      "visibleField": true,
+      "windowBlocksWalking": true
+    },
+    {
+      "floor": 1,
+      "building": "ANNEX",
+      "room": "1F_1-6",
+      "visibleField": true,
+      "windowBlocksWalking": true
+    },
+    {
+      "floor": 2,
+      "building": "MAIN",
+      "room": "2F_3-5",
+      "visibleField": true,
+      "windowBlocksWalking": true
+    },
+    {
+      "floor": 2,
+      "building": "ANNEX",
+      "room": "2F_3-7",
+      "visibleField": true,
+      "windowBlocksWalking": true
+    },
+    {
+      "floor": 3,
+      "building": "MAIN",
+      "room": "3F_5-7",
+      "visibleField": true,
+      "windowBlocksWalking": true
+    },
+    {
+      "floor": 3,
+      "building": "ANNEX",
+      "room": "3F_4-7",
+      "visibleField": true,
+      "windowBlocksWalking": true
+    },
+    {
+      "floor": 4,
+      "building": "MAIN",
+      "room": "4F_6-7",
+      "visibleField": true,
+      "windowBlocksWalking": true
+    },
+    {
+      "floor": 4,
+      "building": "ANNEX",
+      "room": "4F_4-4",
+      "visibleField": true,
+      "windowBlocksWalking": true
+    }
+  ],
+  "fields": 1,
+  "courtyardFieldBounds": [
+    -9.5,
+    -69,
+    -0.6,
+    85.5,
+    -11,
+    -0.3
+  ],
+  "corridorFieldRequestCancelled": true,
+  "originalDataUnchanged": true
+}

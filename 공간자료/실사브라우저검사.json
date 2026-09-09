@@ -1,0 +1,11 @@
+{
+  "ok": true,
+  "allNinePhotosLoaded": true,
+  "lastNextButtonDisabled": true,
+  "dragChangesYawAndPitch": true,
+  "keyboardPreviousNext": true,
+  "returnToStairLanding": { "x": 1.25, "y": 9.4, "z": 8.5 },
+  "resumed3DDragWalk": true,
+  "pageConsoleErrors": 0,
+  "method": "Playwright actual button, keyboard and mouse input; assertions completed. Evidence file written separately because the browser runner does not support Node dynamic import."
+}

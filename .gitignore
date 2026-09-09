@@ -1,22 +1,28 @@
 # Public repository: raw school photos and source documents stay local.
-/photos/raw/**
-/photos/processed/**
-/references/**
-/blender/backups/**
+/사진보관/원본/**
+/사진보관/변환본/**
+/사진보관/웹용/**
+!/사진보관/웹용/4층/
+!/사진보관/웹용/4층/6-[1-7]_교실_앞_복도.jpg
+!/사진보관/웹용/4층/6-7_교실_옆_계단_[1-2].jpg
+/참고자료/**
+/모델/백업/**
 *.blend1
 *.blend2
 __pycache__/
 .DS_Store
 .env*
 *.pem
+node_modules/
+.railway/
 
 # Only generated instructions are tracked in the photo intake tree.
 /촬영사진_넣는곳/**/*
 !/촬영사진_넣는곳/**/
 !/촬영사진_넣는곳/**/촬영안내.md
-/exports/renders/3F-*.png
+/결과물/미리보기/3F-*.png
 
 # Authoritative registry and Blender model must be included.
-!/data/
-!/data/**
-!/blender/school_master.blend
+!/공간자료/
+!/공간자료/**
+!/모델/school_master.blend

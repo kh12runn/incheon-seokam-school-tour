@@ -1,0 +1,12 @@
+.git/
+node_modules/
+.env*
+*.pem
+사진보관/원본/
+사진보관/변환본/
+참고자료/
+모델/백업/
+촬영사진_넣는곳/
+*.blend1
+*.blend2
+.railway/

@@ -1,0 +1,11 @@
+{
+  "testEnvironment": "Chromium 152, local HTTP, actual keyboard and mouse input",
+  "wasd": {"startX": 20, "endX": 21.595143939812818, "passed": true},
+  "stairKeyboardTest": {"shaft": "MAIN_STAIR_A", "startZ": 0, "middleLandingZ": 1.7, "endZ": 3.4, "passed": true},
+  "mouseLook": {"yawBefore": 0, "yawAfter": -1.1754, "pitchAfter": -0.0468, "passed": true},
+  "escapePause": {"locked": false, "dragMode": false, "passed": true},
+  "fallbackDragMovement": {"startX": 20, "endX": 21.99940485578514, "passed": true},
+  "runtimeConsoleErrorsBeforeSecurityTests": 0,
+  "privateFileRequests": {"rawPhoto": 403, "floorplanPdf": 403, "photoRegistry": 403, "gitConfig": 403},
+  "note": "Full 1-to-4-to-1 routing on all four stairs is additionally tested by the shared physics tests. The browser keyboard stair test covers 1F to 2F. Public deployment was not performed."
+}

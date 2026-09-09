@@ -1,0 +1,3 @@
+# Keep upstream third-party library bytes unchanged, including its whitespace.
+웹학교/외부도구/*.js -whitespace
+*.cmd text eol=crlf

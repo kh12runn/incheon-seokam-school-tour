@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 setlocal
 if defined BLENDER_EXE if exist "%BLENDER_EXE%" goto launch
 set "BLENDER_EXE=C:\Program Files\Blender Foundation\Blender 5.2\blender.exe"
@@ -9,4 +10,4 @@ echo Blender was not found. Install Blender 5.2 or set BLENDER_EXE.
 pause
 exit /b 1
 :launch
-start "" "%BLENDER_EXE%" "%~dp0blender\school_master.blend" --python "%~dp0blender\scripts\campus_controls.py"
+start "" "%BLENDER_EXE%" "%~dp0모델\school_master.blend" --python "%~dp0모델\실행도구\campus_controls.py"

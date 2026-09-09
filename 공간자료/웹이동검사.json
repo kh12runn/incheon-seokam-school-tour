@@ -1,0 +1,59 @@
+{
+  "ok": true,
+  "checks": [
+    {
+      "floor": 1,
+      "corridor": true,
+      "door": true,
+      "wall": true,
+      "window": true
+    },
+    {
+      "floor": 2,
+      "corridor": true,
+      "door": true,
+      "wall": true,
+      "window": true
+    },
+    {
+      "floor": 3,
+      "corridor": true,
+      "door": true,
+      "wall": true,
+      "window": true
+    },
+    {
+      "floor": 4,
+      "corridor": true,
+      "door": true,
+      "wall": true,
+      "window": true
+    },
+    {
+      "stair": "MAIN_STAIR_A",
+      "upFloors": 3,
+      "downFloors": 3
+    },
+    {
+      "stair": "MAIN_STAIR_B",
+      "upFloors": 3,
+      "downFloors": 3
+    },
+    {
+      "stair": "ANNEX_STAIR_D",
+      "upFloors": 3,
+      "downFloors": 3
+    },
+    {
+      "stair": "ANNEX_STAIR_E",
+      "upFloors": 3,
+      "downFloors": 3
+    },
+    {
+      "all41ClassroomDoorsReachable": true
+    },
+    {
+      "courtyardRoundTrip": true
+    }
+  ]
+}

@@ -1,0 +1,20 @@
+{
+  "ok": true,
+  "goalEnds": "상하",
+  "goalCenters": [
+    [
+      38,
+      -64
+    ],
+    [
+      38,
+      -16
+    ]
+  ],
+  "parkingSpaces": 16,
+  "parkedCars": 4,
+  "parkingBehindMain": true,
+  "entranceAisleClear": true,
+  "carCollision": true,
+  "originalFieldAndSiteUnchanged": true
+}
