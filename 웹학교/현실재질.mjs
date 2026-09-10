@@ -3,6 +3,7 @@ import * as THREE from './외부도구/three.module.js';
 // Code-native surface detail, referenced to the supplied corridor photos.
 // World-space grain avoids stretching a single image across a 100 m corridor.
 export function surfaceKind(b){
+  if(b.material)return b.material;
   if(b.name.startsWith('주차장 아스팔트'))return 'asphalt';
   if(b.name.startsWith('주차장 주차선'))return 'chalk';
   if(b.name.startsWith('주차장 자동차 유리'))return 'glass';
@@ -34,7 +35,7 @@ export function finishMaterial(b){
     material.color.set('#e5f3ee');material.transparent=true;material.opacity=.1;material.depthWrite=false;
     material.roughness=.08;material.envMapIntensity=.35;return material;
   }
-  if(!['wood','terrazzo','paint','metal','soil','ground','chalk','asphalt'].includes(kind))return material;
+  if(!['wood','room_floor','terrazzo','paint','metal','soil','ground','chalk','asphalt'].includes(kind))return material;
   material.onBeforeCompile=shader=>{
     shader.vertexShader='varying vec3 vSurfacePoint;\n'+shader.vertexShader;
     shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
@@ -47,7 +48,14 @@ export function finishMaterial(b){
       float grainHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
       float grainNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(grainHash(i),grainHash(i+vec2(1.,0.)),f.x),mix(grainHash(i+vec2(0.,1.)),grainHash(i+vec2(1.,1.)),f.x),f.y);}
       `+shader.fragmentShader;
-    const detail=kind==='asphalt'?`
+    const detail=kind==='room_floor'?`
+      vec2 uv=vSurfacePoint.xz;
+      float row=floor(uv.y/.18),offset=grainHash(vec2(row,1.))*1.2;
+      vec2 board=vec2(fract((uv.x+offset)/1.2),fract(uv.y/.18));
+      float seam=step(.006,board.x)*step(.013,board.y);
+      float grain=grainNoise(vec2(uv.x*4.,uv.y*180.));
+      diffuseColor.rgb*=mix(.85,1.,seam)*(.95+.09*grain)*(.96+.06*grainHash(vec2(floor((uv.x+offset)/1.2),row)));`
+      :kind==='asphalt'?`
       vec2 uv=vSurfacePoint.xz;
       float grains=grainNoise(uv*130.0);
       diffuseColor.rgb*=.82+.14*grainNoise(uv*.5)+.16*grains;`

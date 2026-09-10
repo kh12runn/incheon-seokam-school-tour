@@ -1,0 +1,111 @@
+{
+  "ok": true,
+  "unchangedClassrooms": 41,
+  "otherRoomsUnchanged": true,
+  "originalExportUnchanged": true,
+  "rooms": [
+    {
+      "id": "1F_PRINTING",
+      "name": "발간실",
+      "bounds": [
+        65,
+        68,
+        -7,
+        0,
+        0,
+        3.15
+      ],
+      "building": "MAIN"
+    },
+    {
+      "id": "1F_MEAL_CART_STORAGE",
+      "name": "배식차보관실",
+      "bounds": [
+        68,
+        82,
+        -7,
+        0,
+        0,
+        3.15
+      ],
+      "building": "MAIN",
+      "mergedFrom": [
+        "교원휴게실",
+        "배식차 보관실"
+      ]
+    },
+    {
+      "id": "1F_CAFETERIA",
+      "name": "식당",
+      "bounds": [
+        82,
+        100,
+        -7,
+        0,
+        0,
+        3.15
+      ],
+      "building": "EAST_WING"
+    },
+    {
+      "id": "1F_COOKING",
+      "name": "조리실",
+      "bounds": [
+        80,
+        100,
+        3,
+        10,
+        0,
+        3.15
+      ],
+      "building": "EAST_WING",
+      "mergedFrom": [
+        "영양사실",
+        "비품창고",
+        "조리실"
+      ]
+    }
+  ],
+  "lobbyWidth": 8,
+  "lobbyWalkSamples": [
+    41.5,
+    43,
+    45,
+    47,
+    48.5
+  ],
+  "elevators": [
+    {
+      "floor": 1,
+      "landing": {
+        "x": 78.5,
+        "y": 1.5,
+        "z": 0
+      }
+    },
+    {
+      "floor": 2,
+      "landing": {
+        "x": 78.5,
+        "y": 1.5,
+        "z": 3.4
+      }
+    },
+    {
+      "floor": 3,
+      "landing": {
+        "x": 78.5,
+        "y": 1.5,
+        "z": 6.8
+      }
+    },
+    {
+      "floor": 4,
+      "landing": {
+        "x": 78.5,
+        "y": 1.5,
+        "z": 10.2
+      }
+    }
+  ]
+}

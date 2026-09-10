@@ -10,3 +10,7 @@ node_modules/
 *.blend1
 *.blend2
 .railway/
+배포자료/
+결과물/
+사진보관/웹용/
+모델/

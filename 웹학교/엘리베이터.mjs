@@ -1,4 +1,5 @@
-export const ELEVATOR={x:101.5,y:1.5};
+export const ELEVATOR={x:78.5,y:1.5};
+export const ELEVATOR_SPAN=[77.04,80.16];
 export function elevatorDestination(floor,height){
   return Number.isInteger(floor)&&floor>=1&&floor<=4?{...ELEVATOR,z:(floor-1)*height}:null;
 }
@@ -7,12 +8,12 @@ export function nearElevator(p,height){
   return floor>=1&&floor<=4&&Math.abs(p.z-(floor-1)*height)<.15&&Math.hypot(p.x-ELEVATOR.x,p.y-ELEVATOR.y)<2.2;
 }
 export function addElevator(data,addBox){
-  // External shaft at the right-hand corner of 4-3 (x=88..100, y=3..10).
+  // Supplied plan: ELEV sits just west of the kitchen/preparation block.
   // Closed landing doors stay solid; E opens a simulated floor-selection ride.
   const metal=[.42,.46,.47],stone=[.59,.6,.57],dark=[.035,.045,.045];
   for(let floor=1;floor<=4;floor++){
     const z=(floor-1)*data.floorHeight;
-    const box=(name,b,c=metal,kind='wall')=>addBox(`${floor}층 엘리베이터 `+name,b,c,kind,floor);
+    const box=(name,b,c=metal,kind='wall')=>{const moved=[...b];moved[0]+=ELEVATOR.x-101.5;moved[3]+=ELEVATOR.x-101.5;return addBox(`${floor}층 엘리베이터 `+name,moved,c,kind,floor);};
     box('승강로 오른벽',[102.94,3,z,103.16,6.2,z+data.floorHeight],stone);
     box('승강로 왼벽',[100.04,3,z,100.22,6.2,z+data.floorHeight],stone);
     box('승강로 뒷벽',[100.04,6.02,z,103.16,6.2,z+data.floorHeight],stone);

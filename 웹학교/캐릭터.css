@@ -1,0 +1,13 @@
+#캐릭터창{width:460px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 30px);overflow:auto;padding:22px;border:1px solid #809599;border-radius:18px;background:#f4f4ed;color:#19313b;box-shadow:0 24px 80px #0006}
+#캐릭터창::backdrop{background:#102c3aaa;backdrop-filter:blur(5px)}
+#캐릭터창 h2{font-size:21px;margin:0 0 5px}#캐릭터창 p{color:#5c747a;font-size:12px;margin:0 0 12px}
+#캐릭터창 canvas{display:block;width:100%;height:255px;border-radius:12px;background:#e5edec}
+.캐릭터선택줄{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 16px}
+.캐릭터선택줄 button{background:#fff;color:#25474e;border:2px solid #d0dcd9;font-weight:700;padding:10px 5px;border-radius:10px}
+.캐릭터선택줄 button[aria-pressed=true]{border-color:#467f7e;background:#e3efea;box-shadow:0 0 0 2px #467f7e22}
+.캐릭터선택줄 span{display:block;font-size:10px;font-weight:400;margin-top:5px;color:#657d82}
+#캐릭터닫기{display:block;background:transparent;color:#607a80;border:0;margin:8px auto 0;padding:5px 15px}
+#캐릭터상태{font-size:11px;color:#aaddcf}
+#인사말{position:fixed;z-index:8;transform:translate(-50%,-100%);background:#fff8e9;color:#37473b;border:2px solid #eac77a;border-radius:18px;padding:9px 17px;font-weight:750;box-shadow:0 5px 18px #0003;pointer-events:none;white-space:nowrap}
+#인사말[hidden]{display:none}
+@media(max-width:650px){#캐릭터창{padding:16px}#캐릭터창 canvas{height:225px}#캐릭터창 h2{font-size:18px}}

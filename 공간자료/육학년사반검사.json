@@ -1,0 +1,12 @@
+{
+  "ok": true,
+  "room": "4F_6-4",
+  "otherRoomsAndCorridorsUnchanged": true,
+  "originalExportUnchanged": true,
+  "desks": 24,
+  "chairs": 24,
+  "seatCountApproximate": true,
+  "deskChairCollision": true,
+  "entranceAndAisles": true,
+  "addedBoxes": 469
+}

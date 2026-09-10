@@ -1,0 +1,28 @@
+{
+  "ok": true,
+  "cameraSamples": 1248,
+  "retractedSamples": 920,
+  "wallAndWindowClipping": false,
+  "variants": [
+    {
+      "variant": "boy",
+      "runOnly": true,
+      "running": true,
+      "armsOutward": true,
+      "elbowsBent": true,
+      "alternatingSwing": true,
+      "idle": true,
+      "finiteRig": true
+    },
+    {
+      "variant": "girl",
+      "runOnly": true,
+      "running": true,
+      "armsOutward": true,
+      "elbowsBent": true,
+      "alternatingSwing": true,
+      "idle": true,
+      "finiteRig": true
+    }
+  ]
+}

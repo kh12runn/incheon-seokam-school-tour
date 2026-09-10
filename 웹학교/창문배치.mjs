@@ -1,4 +1,5 @@
 // Window/cabinet spans shared by rendering and collision tests.
+import {ELEVATOR_SPAN} from './엘리베이터.mjs';
 export function windowBays(data,floor){
   const panes=data.boxes.filter(b=>b.floor===floor&&b.name.includes('_NorthGlass')).sort((a,b)=>a.bounds[0]-b.bounds[0]);
   const bays=[];
@@ -12,7 +13,8 @@ export function windowBays(data,floor){
     const lo=room.bounds[0]-.12,hi=room.bounds[1]+.12;
     result=result.flatMap(([a,b])=>b<=lo||a>=hi?[[a,b]]:[[a,Math.min(b,lo)],[Math.max(a,hi),b]].filter(([x,y])=>y-x>.3));
   }
-  return result;
+  const [lo,hi]=ELEVATOR_SPAN;
+  return result.flatMap(([a,b])=>b<=lo||a>=hi?[[a,b]]:[[a,Math.min(b,lo)],[Math.max(a,hi),b]].filter(([x,y])=>y-x>.3));
 }
 export function windowOpenings(data,floor){
   const z=(floor-1)*data.floorHeight;

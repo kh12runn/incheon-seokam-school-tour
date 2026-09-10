@@ -3,11 +3,11 @@ import * as THREE from './외부도구/three.module.js';
 // Discrete captured viewpoints: this does not claim novel-view 3D reconstruction.
 export function createPhotoTour({onClose}){
   const host=document.createElement('section');host.id='실사화면';host.hidden=true;
-  host.innerHTML=`<canvas tabindex="0" aria-label="4층 실제 360도 사진"></canvas><div class="사진메뉴"><strong>4층 실사 360도</strong><button data-action="close">3D 걷기로 돌아가기</button><select aria-label="촬영 위치"></select></div><div class="사진하단"><button data-action="prev">← 이전 위치</button><span role="status">사진 준비 중</span><button data-action="next">다음 위치 →</button><small>화면 드래그: 둘러보기 · W/S 또는 ↑/↓: 촬영 위치 이동 · A/D: 시점 회전 · Esc: 3D 복귀<br>촬영 위치 사이를 연결한 360도 보기입니다. 가려진 바닥 등 일부 영역은 생성 보완했습니다.</small></div>`;
+  host.innerHTML=`<canvas tabindex="0" aria-label="4층 실제 360도 사진"></canvas><div class="사진메뉴"><strong>4층 실사 360도</strong><button data-action="close">3D 탐험으로 돌아가기</button><select aria-label="촬영 위치"></select></div><div class="사진하단"><button data-action="prev">← 이전 위치</button><span role="status">사진 준비 중</span><button data-action="next">다음 위치 →</button><small>화면 드래그: 둘러보기 · W/S 또는 ↑/↓: 촬영 위치 이동 · A/D: 시점 회전 · Esc: 3D 복귀<br>촬영 위치 사이를 연결한 360도 보기입니다. 가려진 바닥 등 일부 영역은 생성 보완했습니다.</small></div>`;
   document.body.append(host);
   const canvas=host.querySelector('canvas'),status=host.querySelector('[role=status]'),select=host.querySelector('select');
   let renderer,scene,camera,sphere,entries=[],index=0,yaw=0,pitch=0,drag=null,sequence=0,texture=null;
-  let active=false,loaded=false,frameId=0;
+  let active=false,loaded=false,loadedFrom='',frameId=0;
   function resize(){if(!renderer)return;renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
   function draw(){if(!active)return;frameId=requestAnimationFrame(draw);camera.rotation.set(pitch,yaw,0,'YXZ');renderer.render(scene,camera);}
   function close(){active=false;sequence++;host.hidden=true;drag=null;cancelAnimationFrame(frameId);onClose(entries[index]);}
@@ -29,16 +29,16 @@ export function createPhotoTour({onClose}){
       status.textContent=`${index+1}/${entries.length} · ${item.name}`;
     }catch(error){if(ticket===sequence)status.textContent='사진을 불러오지 못했습니다. 인터넷 연결을 확인하고 다시 시도해 주세요.';}
   }
-  async function open(fromPosition){
+  async function open(fromPosition,manifestUrl='./웹학교/실사목록.json'){
     active=true;host.hidden=false;status.textContent='사진 목록을 불러오는 중…';
     if(!renderer){
       renderer=new THREE.WebGLRenderer({canvas,antialias:true});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;
       scene=new THREE.Scene();scene.background=new THREE.Color('#121b22');camera=new THREE.PerspectiveCamera(78,1,.05,20);camera.rotation.order='YXZ';
       sphere=new THREE.Mesh(new THREE.SphereGeometry(10,96,64),new THREE.MeshBasicMaterial({side:THREE.BackSide}));sphere.scale.x=-1;scene.add(sphere);
     }
-    resize();cancelAnimationFrame(frameId);draw();canvas.focus();
+    sphere.visible=false;resize();cancelAnimationFrame(frameId);draw();canvas.focus();
     try{
-      if(!loaded){const response=await fetch('./웹학교/실사목록.json');if(!response.ok)throw new Error();const manifest=await response.json();entries=manifest.photos.filter(p=>p.ready);loaded=true;
+      if(!loaded||loadedFrom!==manifestUrl){const response=await fetch(manifestUrl);if(!response.ok)throw new Error();const manifest=await response.json();entries=manifest.photos.filter(p=>p.ready);loaded=true;loadedFrom=manifestUrl;index=0;select.replaceChildren();host.querySelector('strong').textContent=manifest.title??'4층 실사 360도';
         entries.forEach((p,i)=>{const o=document.createElement('option');o.value=String(i);o.textContent=p.name;select.append(o);});}
       if(!active)return;
       if(!entries.length){status.textContent='사진 변환·검수 중입니다.';return;}
@@ -68,5 +68,5 @@ export function createPhotoTour({onClose}){
     if(['KeyW','ArrowUp'].includes(e.code))show(index+1);
     if(['KeyS','ArrowDown'].includes(e.code))show(index-1);
   },true);
-  return {open,close,isActive:()=>active,getState:()=>({active,index,count:entries.length,name:entries[index]?.name,loadedTexture:!!sphere?.visible,yaw,pitch})};
+  return {open,close,isActive:()=>active,getState:()=>({active,index,count:entries.length,name:entries[index]?.name,manifest:loadedFrom,loadedTexture:!!sphere?.visible,yaw,pitch})};
 }

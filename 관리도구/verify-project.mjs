@@ -26,7 +26,8 @@ const git=args=>execFileSync('git',['-C',root,...args],{encoding:'utf8'});
 const tracked=git(['ls-files','-z']).split('\0').filter(Boolean);
 assert.equal(tracked.filter(p=>p.endsWith('/촬영안내.md')).length,243);
 for(const p of tracked) {
-  assert(!/^(사진보관|참고자료|모델\/백업)\//.test(p),'Private file tracked: '+p);
+  const approvedPhoto=/^사진보관\/웹용\/4층\/(?:6-[1-7]_교실_앞_복도|6-7_교실_옆_계단_[1-2])\.jpg$/.test(p);
+  assert(approvedPhoto||!/^(사진보관|참고자료|모델\/백업)\//.test(p),'Private file tracked: '+p);
   if(p.startsWith('촬영사진_넣는곳/')) assert(p.endsWith('/촬영안내.md'),'Raw intake tracked: '+p);
   assert(!/\.(insp|insv|mp4|pem|blend1)$/i.test(p),'Unexpected media/backup: '+p);
   assert(fs.statSync(path.join(root,p)).size<100*1024*1024,'GitHub file too large: '+p);
@@ -38,7 +39,7 @@ for(const ext of ['insp','insv','jpg','png','mp4','json','txt']) {
 }
 const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 for(const [,ref] of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
-  if(!/^(https?:|data:|#)/.test(ref)) assert(fs.existsSync(path.join(root,ref)),'Broken site link: '+ref);
+  if(!/^(https?:|data:|#)/.test(ref)) assert(fs.existsSync(path.join(root,ref.split(/[?#]/)[0])),'Broken site link: '+ref);
 }
 const release=load('공간자료/release-check.json');
 function verifyDirs(dir){for(const ent of fs.readdirSync(dir,{withFileTypes:true})){

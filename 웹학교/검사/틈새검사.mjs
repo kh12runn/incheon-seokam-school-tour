@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {buildWorld} from '../이동물리.mjs';
+import {LOBBY_OPEN} from '../일층배치.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8'));
 const world=buildWorld(data);
 function hit(p,d,b){
@@ -12,7 +13,7 @@ function hit(p,d,b){
   }return hi>1e-5;
 }
 let rays=0,points=0;const leaks=[];
-for(const room of data.rooms.filter(r=>r.type!=='stair')){
+for(const room of world.data.rooms.filter(r=>r.type!=='stair')){
   const [x0,x1,y0,y1,z]=room.bounds;
   const samples=[[(x0+x1)/2,(y0+y1)/2]];
   if(room.type==='corridor'){
@@ -25,7 +26,7 @@ for(const room of data.rooms.filter(r=>r.type!=='stair')){
       const p=[x,y,z+height],d=[Math.cos(a*Math.PI/18),Math.sin(a*Math.PI/18),rise];
       // Only deliberate opening is the ground-floor courtyard entrance.
       const t=(-7-y)/d[1],exitX=x+t*d[0],exitZ=p[2]+t*d[2];
-      if(z===0&&t>0&&exitX>=43.65&&exitX<=46.35&&exitZ<2.35)continue;
+      if(z===0&&t>0&&exitX>=LOBBY_OPEN.left-.15&&exitX<=LOBBY_OPEN.right+.15&&exitZ<LOBBY_OPEN.height)continue;
       rays++;
       if(!world.boxes.some(b=>hit(p,d,b.bounds)))leaks.push({room:room.id,p,d});
     }

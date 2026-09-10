@@ -11,7 +11,7 @@ const input=path.join(root,'촬영사진_넣는곳','4층');
 const output=path.join(root,'사진보관','변환본','4층_직접변환');
 fs.mkdirSync(output,{recursive:true});
 const files=[];
-function walk(dir){for(const f of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,f.name);if(f.isDirectory())walk(p);else if(f.name.endsWith('.insp'))files.push(p);}}
+function walk(dir){for(const f of fs.readdirSync(dir,{withFileTypes:true})){const p=path.join(dir,f.name);if(f.isDirectory()&&f.name!=='교실')walk(p);else if(f.isFile()&&/^IMG_\d{8}_\d{6}_\d{2}_\d{3}\.insp$/i.test(f.name))files.push(p);}}
 walk(input);files.sort((a,b)=>path.basename(a).localeCompare(path.basename(b)));
 const report=[];
 for(const p of files){

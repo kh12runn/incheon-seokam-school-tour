@@ -15,6 +15,7 @@ __pycache__/
 *.pem
 node_modules/
 .railway/
+/배포자료/
 
 # Only generated instructions are tracked in the photo intake tree.
 /촬영사진_넣는곳/**/*

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {shoeCabinets} from '../사진참고마감.mjs';
-import {elevatorDestination,nearElevator} from '../엘리베이터.mjs';
+import {ELEVATOR,elevatorDestination,nearElevator} from '../엘리베이터.mjs';
 import {buildWorld} from '../이동물리.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),world=buildWorld(data),checks=[];
 for(const floor of [1,2,3,4]){
@@ -21,7 +21,7 @@ for(const floor of [1,2,3,4]){
   const p=elevatorDestination(floor,data.floorHeight);
   assert(world.candidate(p.x,p.y,p.z));assert(nearElevator(p,data.floorHeight));
   assert(!nearElevator({x:50,y:1.5,z:p.z},data.floorHeight));
-  assert(world.blocked(101.5,2.92,p.z),'Elevator closed doors must be solid');
+  assert(world.blocked(ELEVATOR.x,2.92,p.z),'Elevator closed doors must be solid');
   const q=world.move(p,0,-1);assert(q.y<.6,'Elevator landing exit');
   checks.push({floor,cabinets:expected,cellsPerCabinet:21,elevatorLanding:true});
 }

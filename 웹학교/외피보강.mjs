@@ -1,4 +1,5 @@
 // Close the union of room footprints, not each room: shared doors and stair entries stay open.
+import {LOBBY_OPEN} from './일층배치.mjs';
 export function sealEnvelope(data,addBox){
   const wall=[.86,.87,.84],ceiling=[.93,.93,.89];
   for(let floor=1;floor<=4;floor++){
@@ -35,8 +36,8 @@ export function sealEnvelope(data,addBox){
         addBox(`${floor}층 외피 보강 ${key} ${a} ${lo}`,bounds,wall,'wall',floor);
       };
       for(const [a,b] of merged){
-        if(floor===1&&axis==='y'&&c===-7&&a<46.2&&b>43.8){
-          put(a,Math.min(b,43.65));put(Math.max(a,46.35),b);put(Math.max(a,43.65),Math.min(b,46.35),2.35);
+        if(floor===1&&axis==='y'&&c===-7&&a<LOBBY_OPEN.right&&b>LOBBY_OPEN.left){
+          put(a,Math.min(b,LOBBY_OPEN.left-.15));put(Math.max(a,LOBBY_OPEN.right+.15),b);put(Math.max(a,LOBBY_OPEN.left-.15),Math.min(b,LOBBY_OPEN.right+.15),LOBBY_OPEN.height);
         }else put(a,b);
       }
     }

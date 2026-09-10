@@ -1,11 +1,14 @@
 // Coordinates remain Blender's x/y horizontal, z vertical. Shared with Node tests.
 import {sealEnvelope} from './외피보강.mjs';
 import {addFourthFloorFinish,addLowerMainFloorFinish} from './사진참고마감.mjs';
-import {addElevator} from './엘리베이터.mjs';
-import {openMainWindows,openClassroomWindows} from './창문배치.mjs';
+import {addElevator,ELEVATOR_SPAN} from './엘리베이터.mjs';
+import {openMainWindows,openClassroomWindows,subtractBox} from './창문배치.mjs';
+import {applyGroundFloorPlan,LOBBY_OPEN} from './일층배치.mjs';
 import {outdoorBox,addPlaygroundDetails} from './운동장.mjs';
 import {addParking} from './주차장.mjs';
-export const PLAYER_RADIUS=.22, PLAYER_HEIGHT=1.7, EYE_HEIGHT=1.58;
+import {class64Interior} from './육학년사반.mjs';
+import {mainClassroomsInterior} from './본관교실.mjs';
+export const PLAYER_RADIUS=.28, PLAYER_HEIGHT=1.7, EYE_HEIGHT=1.58;
 const EPS=.0001, CELL=4;
 const intersect=(x,y,r,b)=>{
   const dx=x-Math.max(b[0],Math.min(x,b[3])),dy=y-Math.max(b[1],Math.min(y,b[4]));
@@ -23,7 +26,9 @@ function localBounds(f,u0,u1,v0,v1,z0,z1){
   const p=localPoint(f,u0,v0),q=localPoint(f,u1,v1);
   return [Math.min(p.x,q.x),Math.min(p.y,q.y),z0,Math.max(p.x,q.x),Math.max(p.y,q.y),z1];
 }
-export function buildWorld(data){
+export function buildWorld(data,{class64=true,mainClassrooms=true}={}){
+  data=applyGroundFloorPlan(data);
+  const {left:entranceLeft,right:entranceRight,height:entranceHeight}=LOBBY_OPEN;
   const boxes=[],surfaces=[],colliders=[],stairs=[];
   const roomById=new Map(data.rooms.map(r=>[r.id,r]));
   const addBox=(name,bounds,color,kind='wall',floor=0)=>{
@@ -41,16 +46,16 @@ export function buildWorld(data){
     const b=item.bounds;
     if(item.spaceId==='1F_MAIN_LOBBY'&&item.kind==='wall'&&b[1]<-6.9&&b[4]<-6.8){
       if(item.name.startsWith('Wall_')){
-        addBox('현관 출입문 왼쪽',[b[0],b[1],b[2],43.8,b[4],b[5]],item.color,'wall',1);
-        addBox('현관 출입문 오른쪽',[46.2,b[1],b[2],b[3],b[4],b[5]],item.color,'wall',1);
-        addBox('현관 출입문 위',[43.8,b[1],2.35,46.2,b[4],b[5]],item.color,'wall',1);
+        addBox('현관 출입문 왼쪽',[b[0],b[1],b[2],entranceLeft,b[4],b[5]],item.color,'wall',1);
+        addBox('현관 출입문 오른쪽',[entranceRight,b[1],b[2],b[3],b[4],b[5]],item.color,'wall',1);
+        addBox('현관 출입문 위',[entranceLeft,b[1],entranceHeight,entranceRight,b[4],b[5]],item.color,'wall',1);
       }
       continue;
     }
     // Facade band would otherwise cross the new doorway at ankle height.
     if(item.name==='1F_SouthBand'){
-      addBox(item.name+'왼쪽',[b[0],b[1],b[2],43.8,b[4],b[5]],item.color,'wall',1);
-      addBox(item.name+'오른쪽',[46.2,b[1],b[2],b[3],b[4],b[5]],item.color,'wall',1);continue;
+      addBox(item.name+'왼쪽',[b[0],b[1],b[2],entranceLeft,b[4],b[5]],item.color,'wall',1);
+      addBox(item.name+'오른쪽',[entranceRight,b[1],b[2],b[3],b[4],b[5]],item.color,'wall',1);continue;
     }
     boxes.push(item);
     if(item.kind==='wall'||item.collision||item.kind==='roof'||item.kind==='floor')colliders.push(item);
@@ -98,22 +103,32 @@ export function buildWorld(data){
   sealEnvelope(data,addBox);
   addFourthFloorFinish(data,addBox);
   addLowerMainFloorFinish(data,addBox);
+  // Remove former facade glazing/backing at the new lift front, then install it.
+  for(let floor=1;floor<=4;floor++){
+    const z=(floor-1)*data.floorHeight,cut=[ELEVATOR_SPAN[0],2.74,z,ELEVATOR_SPAN[1],3.26,z+3.15];
+    const replacements=new Map(boxes.map(b=>[b,subtractBox(b,cut)]));
+    for(const list of [boxes,colliders]){const next=list.flatMap(b=>replacements.get(b)??[b]);list.splice(0,list.length,...next);}
+  }
   addElevator(data,addBox);
   openMainWindows(data,boxes,colliders);
   openClassroomWindows(data,boxes,colliders,addBox);
   addPlaygroundDetails(addBox);
   addParking(addBox);
   // Entrance access ramp from courtyard to ground-floor lobby.
-  const ramp={bounds:[43.8,-9,-.65,46.2,-7,0],height:(x,y)=>(y+7)*.3,name:'본관 출입 경사로'};
+  const ramp={bounds:[entranceLeft,-9,-.65,entranceRight,-7,0],height:(x,y)=>(y+7)*.3,name:'본관 출입 경사로'};
   surfaces.push(ramp);
   for(let i=0;i<20;i++){
     const y0=-9+i*.1,y1=y0+.1,z=ramp.height(45,y1);
-    addBox('현관 접근 '+i,[43.8,y0,z-.15,46.2,y1,z],[.65,.68,.65],'step');
+    addBox('현관 접근 '+i,[entranceLeft,y0,z-.15,entranceRight,y1,z],[.65,.68,.65],'step');
   }
-  addBox('현관 경사로 왼쪽 난간',[43.7,-8.5,-.6,43.8,-7,1],[.43,.5,.53]);
-  addBox('현관 경사로 오른쪽 난간',[46.2,-8.5,-.6,46.3,-7,1],[.43,.5,.53]);
+  addBox('현관 경사로 왼쪽 난간',[entranceLeft-.1,-8.5,-.6,entranceLeft,-7,1],[.43,.5,.53]);
+  addBox('현관 경사로 오른쪽 난간',[entranceRight,-8.5,-.6,entranceRight+.1,-7,1],[.43,.5,.53]);
   // Playground's low rostrum and walls are solid, too.
   for(const b of boxes)if(b.name==='SPACE_EXT_ROSTRUM')colliders.push(b);
+  const classroom64=class64?class64Interior(data):null;
+  if(classroom64){boxes.push(...classroom64.boxes);colliders.push(...classroom64.colliders);}
+  const classroomsMain=mainClassrooms?mainClassroomsInterior(data):{rooms:[],boxes:[],colliders:[]};
+  boxes.push(...classroomsMain.boxes);colliders.push(...classroomsMain.colliders);
   const grid=(items)=>{
     const map=new Map();
     for(const item of items){const b=item.bounds;for(let x=Math.floor((b[0]-.5)/CELL);x<=Math.floor((b[3]+.5)/CELL);x++)for(let y=Math.floor((b[1]-.5)/CELL);y<=Math.floor((b[4]+.5)/CELL);y++){
@@ -154,5 +169,22 @@ export function buildWorld(data){
     const found=data.rooms.find(r=>parseInt(r.floor)===floor&&['classroom','special_room','entrance'].includes(r.type)&&p.x>r.bounds[0]&&p.x<r.bounds[1]&&p.y>r.bounds[2]&&p.y<r.bounds[3]);
     return {floor,room:found};
   }
-  return {boxes,colliders,surfaces,stairs,move,candidate,blocked,support,roomAt,spawn:{x:20,y:1.5,z:0}};
+  function floorBelow(x,y,z){
+    let best=-Infinity;
+    for(const s of query(floorGrid,x,y)){
+      const b=s.bounds;if(x<b[0]-EPS||x>b[3]+EPS||y<b[1]-EPS||y>b[4]+EPS)continue;
+      const h=s.height(x,y);if(h<=z+.025&&h>best)best=h;
+    }
+    // Solid furniture/slabs can support a landing; never drop through their tops.
+    for(const s of query(wallsGrid,x,y)){
+      const b=s.bounds;if(b[5]<=z+.025&&b[5]>best&&intersect(x,y,PLAYER_RADIUS,b))best=b[5];
+    }
+    return best;
+  }
+  function moveAir(p,dx,dy){
+    if(!blocked(p.x+dx,p.y+dy,p.z))return {...p,x:p.x+dx,y:p.y+dy};
+    let q={...p};if(!blocked(q.x+dx,q.y,q.z))q.x+=dx;
+    if(!blocked(q.x,q.y+dy,q.z))q.y+=dy;return q;
+  }
+  return {data,boxes,colliders,surfaces,stairs,classroom64,classroomsMain,move,candidate,blocked,support,floorBelow,moveAir,roomAt,spawn:{x:20,y:1.5,z:0}};
 }

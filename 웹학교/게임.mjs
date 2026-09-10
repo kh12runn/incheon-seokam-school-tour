@@ -1,10 +1,16 @@
 import * as THREE from './외부도구/three.module.js';
 import {buildWorld,EYE_HEIGHT,localPoint} from './이동물리.mjs';
-import {createPhotoTour} from './실사보기.mjs';
 import {floorDestination} from './층별이동.mjs';
 import {surfaceKind,finishMaterial,softEnvironment} from './현실재질.mjs';
 import {ELEVATOR,nearElevator,elevatorDestination} from './엘리베이터.mjs';
 import {shoeCabinets} from './사진참고마감.mjs';
+import {createStudent,CHARACTER_NAMES,RUN_SPEED} from './학생캐릭터.mjs';
+import {createCharacterPicker} from './캐릭터선택.mjs';
+import {createCameraCollision,thirdPersonDesired} from './삼인칭카메라.mjs';
+import {createJumpMotion} from './점프물리.mjs';
+import {CLASS64_ID,CLASS64_SPAWN} from './육학년사반.mjs';
+import {class64Details} from './육학년사반표현.mjs';
+import {mainClassroomDetails} from './본관교실표현.mjs';
 const $=id=>document.getElementById(id);
 const canvas=$('화면'),panel=$('시작안내'),status=$('상태'),where=$('현재위치');
 let renderer;
@@ -23,18 +29,33 @@ sun.shadow.bias=-.00008;sun.shadow.normalBias=.025;
 const camera=new THREE.PerspectiveCamera(76,1,.045,500);camera.rotation.order='YXZ';
 let data,world,position,mode='overview',locked=false,dragMode=false,yaw=-Math.PI/2,pitch=0;
 let velocity={x:0,y:0},smoothZ=EYE_HEIGHT,last=performance.now(),elapsed=0,ready=false;
-let orbit={yaw:.75,pitch:.83,distance:185},drag=null,selectedFloor=0;
+let orbit={yaw:.75,pitch:.83,distance:185},drag=null;
 // Explicit user preference: always rotate immediately, independent of OS settings.
 let autoOrbit=true,orbitResumeAt=0,elevatorBusy=false;
+let selectedCharacter=null;
+let jumpMotion;
+const greeting=document.createElement('div');greeting.id='인사말';greeting.textContent='안녕~ 👋';greeting.hidden=true;greeting.setAttribute('role','status');document.body.append(greeting);
+let characterChosenThisVisit=false;
+try{const saved=localStorage.getItem('석암학교-캐릭터');if(CHARACTER_NAMES[saved])selectedCharacter=saved;}catch{}
+let avatar=createStudent(selectedCharacter??'boy');scene.add(avatar.root);avatar.root.visible=false;avatar.snapHeading(Math.PI/2);
+let resolveCamera,followDistance=2.9,cameraDistance=2.9,cameraReset=true,cameraBlocked=false,pickerFallback=false,pickerResume=false;
 const keys=new Set(),visitedRooms=new Set(),visitedFloors=new Set(),visuals=[],labels=[];
 const markerGroup=new THREE.Group();scene.add(markerGroup);
 const upConversion=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),-Math.PI/2);
 const convert=p=>new THREE.Vector3(p.x,p.z,-p.y);
 function notice(text){status.textContent=text;}
-const photoTour=createPhotoTour({onClose:entry=>{
-  if(entry?.position){const p=entry.position;position=world.candidate(p.x,p.y,p.z)??position;smoothZ=position.z+EYE_HEIGHT;}
-  clearInput();pausePanel();notice('해당 촬영 위치 근처의 3D로 돌아왔습니다. 걷기 계속하기를 누르세요.');
-}});
+function updateCharacterLabel(){$('캐릭터상태').textContent=mode==='walk'&&characterChosenThisVisit?CHARACTER_NAMES[selectedCharacter]+'과 함께, 다음 교실로 가볼까요?':'탐험 시작 후 남학생 / 여학생을 선택하세요';}
+const characterPicker=createCharacterPicker({initial:selectedCharacter??'boy',onChoose(variant){
+  if(avatar.variant!==variant){scene.remove(avatar.root);avatar.dispose();avatar=createStudent(variant);scene.add(avatar.root);avatar.snapHeading(Math.PI+yaw);}
+  selectedCharacter=variant;characterChosenThisVisit=true;try{localStorage.setItem('석암학교-캐릭터',variant);}catch{}
+  updateCharacterLabel();cameraReset=true;startWalk(pickerFallback);
+},onClose(){if(pickerResume)startWalk(true);else pausePanel();}});
+function openCharacterPicker(fallback=false){
+  if(!ready||characterPicker.isOpen())return;
+  $('게임메뉴').close();
+  pickerFallback=fallback;pickerResume=isPlaying();clearInput();dragMode=false;if(document.pointerLockElement)document.exitPointerLock();pausePanel();characterPicker.open();
+}
+updateCharacterLabel();
 function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
 addEventListener('resize',resize);resize();
 function textTexture(text,background=false){
@@ -49,9 +70,14 @@ function textTexture(text,background=false){
   const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;return {tex,ratio:c.width/c.height};
 }
 function buildVisuals(){
+  const roomDetails=class64Details();scene.add(roomDetails);visuals.push({mesh:roomDetails,floor:4,ceiling:false});
+  for(const config of world.classroomsMain.rooms){
+    const mesh=mainClassroomDetails(config);scene.add(mesh);
+    visuals.push({mesh,floor:parseInt(config.room.floor),interiorRoom:config.roomId,center:convert(config.spawn),ceiling:false});
+  }
   const groups=new Map(),geometry=new THREE.BoxGeometry(1,1,1);
   for(const b of world.boxes){
-    const groupKey=b.color.join(',')+'|'+b.floor+'|'+(b.kind==='ceiling'?'ceiling':'normal')+'|'+surfaceKind(b);
+    const groupKey=b.color.join(',')+'|'+b.floor+'|'+(b.kind==='ceiling'?'ceiling':'normal')+'|'+surfaceKind(b)+'|'+(b.interiorRoom??'');
     if(!groups.has(groupKey))groups.set(groupKey,[]);groups.get(groupKey).push(b);
   }
   const matrix=new THREE.Matrix4(),quaternion=new THREE.Quaternion();
@@ -63,7 +89,8 @@ function buildVisuals(){
       mesh.setMatrixAt(i,matrix);
     });
     mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();scene.add(mesh);
-    visuals.push({mesh,floor:items[0].floor,ceiling:items[0].kind==='ceiling'});
+    const interiorRoom=items[0].interiorRoom,config=world.classroomsMain.rooms.find(r=>r.roomId===interiorRoom);
+    visuals.push({mesh,floor:items[0].floor,ceiling:items[0].kind==='ceiling',interiorRoom,center:config?convert(config.spawn):null});
   }
   const roomById=new Map(data.rooms.map(r=>[r.id,r]));
   {
@@ -80,7 +107,7 @@ function buildVisuals(){
   for(let floor=1;floor<=4;floor++){
     const {tex}=textTexture(`엘리베이터  ${floor}층\n앞에서 E · 층 선택`,true);
     const sign=new THREE.Mesh(new THREE.PlaneGeometry(2.45,.5),new THREE.MeshBasicMaterial({map:tex}));
-    sign.position.set(101.5,(floor-1)*data.floorHeight+2.69,-2.78);scene.add(sign);
+    sign.position.set(ELEVATOR.x,(floor-1)*data.floorHeight+2.69,-2.78);scene.add(sign);
     labels.push({mesh:sign,floor,name:'엘리베이터 안내'});
   }
   for(const label of data.labels){
@@ -110,28 +137,57 @@ function buildVisuals(){
   }
 }
 function overviewCamera(dt){
-  if(autoOrbit&&!selectedFloor&&!drag&&!document.hidden&&performance.now()>orbitResumeAt)orbit.yaw+=dt*.12;
-  const center=new THREE.Vector3(44,selectedFloor?(selectedFloor-1)*3.4:4,27);
+  if(camera.fov!==76){camera.fov=76;camera.updateProjectionMatrix();}
+  if(autoOrbit&&!$('게임메뉴').open&&!drag&&!document.hidden&&performance.now()>orbitResumeAt)orbit.yaw+=dt*.12;
+  const center=new THREE.Vector3(44,4,27);
   const distance=orbit.distance*Math.max(1,1/Math.max(.45,camera.aspect));
   camera.position.copy(center).add(new THREE.Vector3(Math.sin(orbit.yaw)*Math.cos(orbit.pitch),Math.sin(orbit.pitch),Math.cos(orbit.yaw)*Math.cos(orbit.pitch)).multiplyScalar(distance));
   camera.lookAt(center);
 }
-function updateOrbitButton(){
-  $('항공회전').textContent=autoOrbit?'항공뷰 회전 멈춤':'항공뷰 자동 회전';
-  $('항공회전').setAttribute('aria-pressed',String(autoOrbit));
-}
 function cameraWalk(dt){
   smoothZ=THREE.MathUtils.lerp(smoothZ,position.z+EYE_HEIGHT,1-Math.exp(-dt*18));
-  const moving=Math.hypot(velocity.x,velocity.y)>.2;
-  const bob=$('흔들림').checked&&moving&&isPlaying()?Math.sin(elapsed*12)*.018:0;
-  camera.position.set(position.x,smoothZ+bob,-position.y);camera.rotation.set(pitch,yaw,0,'YXZ');
+  const target={x:position.x,y:position.y,z:smoothZ-EYE_HEIGHT+1.12};
+  const desired=thirdPersonDesired(target,yaw,pitch,followDistance),safe=resolveCamera(target,desired);
+  // Snap inward on collision; only ease outward, so smoothing never crosses a wall.
+  cameraDistance=cameraReset||safe.distance<cameraDistance?safe.distance:THREE.MathUtils.lerp(cameraDistance,safe.distance,1-Math.exp(-dt*6));cameraReset=false;cameraBlocked=safe.blocked;
+  const length=Math.hypot(desired.x-target.x,desired.y-target.y,desired.z-target.z),t=cameraDistance/Math.max(length,.001);
+  const cam={x:target.x+(desired.x-target.x)*t,y:target.y+(desired.y-target.y)*t,z:target.z+(desired.z-target.z)*t};
+  if(camera.fov!==68){camera.fov=68;camera.updateProjectionMatrix();}
+  camera.position.copy(convert(cam));camera.lookAt(convert(target));
 }
-function isPlaying(){return mode==='walk'&&(locked||dragMode)&&!document.hidden&&!photoTour.isActive()&&!elevatorBusy&&!$('승강기창').open;}
-function clearInput(){keys.clear();velocity={x:0,y:0};drag=null;}
-function pausePanel(){panel.hidden=mode==='walk'&&(locked||dragMode);$('조준점').hidden=!isPlaying();}
+function isPlaying(){return mode==='walk'&&(locked||dragMode)&&!document.hidden&&!$('게임메뉴').open&&!characterPicker.isOpen()&&!elevatorBusy&&!$('승강기창').open;}
+function clearInput(){keys.clear();velocity={x:0,y:0};drag=null;avatar.cancelWave();greeting.hidden=true;}
+function greet(){
+  if(!isPlaying()||jumpMotion.getState().airborne||avatar.getState().waving)return;
+  clearInput();avatar.wave(yaw);notice('안녕~! · Z 인사 · Space 점프');
+  if('speechSynthesis' in window){
+    const line=new SpeechSynthesisUtterance('안녕!');line.lang='ko-KR';line.rate=1.03;line.pitch=1.2;
+    const voice=speechSynthesis.getVoices().find(v=>v.lang.startsWith('ko'));if(voice)line.voice=voice;
+    speechSynthesis.cancel();speechSynthesis.speak(line);
+  }
+}
+function pausePanel(){
+  const playing=mode==='walk'&&(locked||dragMode)&&!$('게임메뉴').open;
+  panel.hidden=playing||$('게임메뉴').open;document.body.dataset.mode=mode;document.body.dataset.playing=String(playing);
+  $('조준점').hidden=true;
+  const title=mode==='overview'?'탐험 시작하기':'탐험 계속하기';
+  $('걷기').textContent=title;$('시작').textContent=title+'  →';
+  $('안내표식').textContent=mode==='overview'?'나만의 학교 모험':'탐험 일시정지';
+  $('안내제목').innerHTML=mode==='overview'?'익숙한 학교,<br>새로운 모험.':'잠깐 쉬어갈까요?';
+  updateCharacterLabel();
+}
+function openMenu(){
+  if(!ready||characterPicker.isOpen()||$('승강기창').open||elevatorBusy||$('게임메뉴').open)return;
+  dragMode=false;clearInput();if(document.pointerLockElement)document.exitPointerLock();
+  $('게임메뉴').showModal();pausePanel();notice('탐험 메뉴 · 이동할 층을 선택하거나 탐험을 계속하세요.');
+}
+$('메뉴').addEventListener('click',openMenu);
+$('메뉴닫기').addEventListener('click',()=>$('게임메뉴').close());
+$('게임메뉴').addEventListener('close',pausePanel);
 async function startWalk(fallback=false){
-  if(!ready)return;mode='walk';selectedFloor=0;$('층보기').value='0';dragMode=fallback;clearInput();
-  camera.rotation.order='YXZ';smoothZ=position.z+EYE_HEIGHT;cameraWalk(.1);
+  if(ready&&!characterChosenThisVisit){openCharacterPicker(fallback);return;}
+  if(!ready)return;$('게임메뉴').close();mode='walk';dragMode=fallback;clearInput();
+  cameraReset=true;camera.rotation.order='YXZ';smoothZ=position.z+EYE_HEIGHT;cameraWalk(.1);
   if(fallback){pausePanel();notice('드래그 시점 모드 · 화면을 드래그해 둘러보세요.');canvas.focus();return;}
   try{
     canvas.focus();
@@ -146,11 +202,11 @@ function lockFallback(){
   notice('이 브라우저에서는 드래그 시점 사용 · WASD 이동 / 화면 드래그로 둘러보기 / ESC 정지');
 }
 function overview(){
-  mode='overview';dragMode=false;clearInput();if(document.pointerLockElement)document.exitPointerLock();
-  selectedFloor=0;$('층보기').value='0';orbit={yaw:.75,pitch:.83,distance:150};orbitResumeAt=0;
-  panel.hidden=false;$('조준점').hidden=true;updateOrbitButton();notice('학교 전체 항공뷰 · 드래그로 회전 / 휠로 확대 · 학교 탐험 시작하기');
+  $('게임메뉴').close();mode='overview';dragMode=false;clearInput();if(document.pointerLockElement)document.exitPointerLock();
+  orbit={yaw:.75,pitch:.83,distance:150};orbitResumeAt=0;
+  pausePanel();notice('학교 전체 항공뷰 · 드래그로 회전 / 휠로 확대 · 학교 탐험 시작하기');
 }
-function reset(){position={...world.spawn};yaw=-Math.PI/2;pitch=0;smoothZ=position.z+EYE_HEIGHT;clearInput();notice('1층 본관 복도 출발점으로 돌아왔습니다.');}
+function reset(){position={...world.spawn};jumpMotion.reset();yaw=-Math.PI/2;pitch=0;smoothZ=position.z+EYE_HEIGHT;cameraReset=true;avatar.snapHeading(Math.PI+yaw);clearInput();notice('1층 본관 복도 출발점으로 돌아왔습니다.');}
 function openElevator(){
   if(!ready||mode!=='walk'||elevatorBusy||!nearElevator(position,data.floorHeight))return;
   clearInput();dragMode=false;if(document.pointerLockElement)document.exitPointerLock();pausePanel();
@@ -165,17 +221,13 @@ for(const button of document.querySelectorAll('[data-elevator-floor]'))button.ad
   if(!valid){notice('승강기 도착 위치를 확인하지 못했습니다.');return;}
   elevatorBusy=true;clearInput();$('승강기창').close();$('승강기전환').hidden=false;
   try{
-    await new Promise(resolve=>setTimeout(resolve,700));position=valid;yaw=Math.PI;pitch=0;smoothZ=p.z+EYE_HEIGHT;
+    await new Promise(resolve=>setTimeout(resolve,700));position=valid;jumpMotion.reset();yaw=Math.PI;pitch=0;smoothZ=p.z+EYE_HEIGHT;
   }finally{elevatorBusy=false;$('승강기전환').hidden=true;await startWalk(true);notice(button.dataset.elevatorFloor+'층 엘리베이터 앞에 도착했습니다.');}
 });
-$('걷기').addEventListener('click',()=>startWalk());$('시작').addEventListener('click',()=>startWalk());
+$('걷기').addEventListener('click',()=>mode==='overview'?openCharacterPicker():startWalk());$('시작').addEventListener('click',()=>mode==='overview'?openCharacterPicker():startWalk());
+$('육사이동').addEventListener('click',()=>{if(!ready)return;position={...CLASS64_SPAWN};jumpMotion.reset();yaw=Math.PI/2;pitch=0;avatar.snapHeading(Math.PI+yaw);startWalk(true);notice('6-4 교실 · 사진을 참고한 실내 · 책상/의자 충돌 적용');});
 $('드래그걷기').addEventListener('click',()=>startWalk(true));$('전체').addEventListener('click',overview);
-$('항공회전').addEventListener('click',()=>{
-  autoOrbit=!autoOrbit;orbitResumeAt=0;
-  if(mode!=='overview'||selectedFloor)overview();
-  updateOrbitButton();notice(autoOrbit?'학교 전체를 천천히 자동으로 둘러봅니다.':'자동 회전을 멈췄습니다. 드래그로 직접 둘러보세요.');
-});
-$('처음').addEventListener('click',()=>{if(ready)reset();});
+$('처음').addEventListener('click',()=>{if(ready){reset();startWalk(true);}});
 $('동층이동').addEventListener('change',async e=>{
   const value=e.target.value;e.target.value='';if(!ready||!value)return;
   const [building,floor]=value.split(':');
@@ -183,32 +235,27 @@ $('동층이동').addEventListener('change',async e=>{
   const p=destination.point,valid=world.candidate(p.x,p.y,p.z);
   if(!valid){notice('중앙현관 이동 위치를 확인하지 못했습니다.');return;}
   if(document.pointerLockElement)document.exitPointerLock();
-  position=valid;yaw=destination.yaw;pitch=0;
+  position=valid;jumpMotion.reset();yaw=destination.yaw;pitch=0;
   // Native select changes do not reliably grant pointer-lock permission.
   await startWalk(true);notice(destination.label+' · WASD 이동 / 드래그로 둘러보기');
 });
-$('실사보기').addEventListener('click',()=>{
-  if(!ready)return;clearInput();dragMode=false;mode='walk';
-  if(position.z<8)position=world.candidate(63.5,1.5,10.2)??position;
-  if(document.pointerLockElement)document.exitPointerLock();
-  pausePanel();photoTour.open(position);
-});
-$('층보기').addEventListener('change',e=>{const floor=Number(e.target.value);overview();selectedFloor=floor;e.target.value=String(floor);orbit.distance=150;});
 $('방이동').addEventListener('click',()=>{
   const room=data.rooms.find(r=>r.id===$('방선택').value);if(!room)return;
-  const b=room.bounds,p={x:(b[0]+b[1])/2,y:(b[2]+b[3])/2,z:b[4]};
+  const b=room.bounds,interior=world.classroomsMain.rooms.find(r=>r.roomId===room.id);
+  const p=room.id===CLASS64_ID?{...CLASS64_SPAWN}:interior?{...interior.spawn}:{x:(b[0]+b[1])/2,y:(b[2]+b[3])/2,z:b[4]};
   const valid=world.candidate(p.x,p.y,p.z);if(!valid){notice('해당 위치는 이동할 수 없습니다.');return;}
-  position=valid;yaw=room.building==='ANNEX'?-Math.PI/2:0;pitch=0;startWalk();
+  position=valid;jumpMotion.reset();yaw=interior||room.id===CLASS64_ID?Math.PI/2:room.building==='ANNEX'?-Math.PI/2:0;pitch=0;startWalk();
 });
 document.addEventListener('pointerlockchange',()=>{
   locked=document.pointerLockElement===canvas;clearInput();pausePanel();
-  if(locked)notice('WASD 이동 · 마우스 시점 · Shift 빠르게 · ESC 일시정지');
-  else if(mode==='walk'&&!dragMode)notice('일시정지 · 걷기 계속하기를 누르세요.');
+  if(!locked&&mode==='walk'&&!dragMode&&!characterPicker.isOpen()&&!$('승강기창').open&&!elevatorBusy)openMenu();
+  if(locked)notice('WASD 달리기 · Space 점프 · Z 안녕~ · 마우스 시점 · ESC 정지');
+  else if(mode==='walk'&&!dragMode)notice('일시정지 · 탐험 계속하기를 누르세요.');
 });
 document.addEventListener('pointerlockerror',lockFallback);
 document.addEventListener('mousemove',e=>{
   if(!locked)return;const sensitivity=Number($('감도').value)*.001;
-  yaw-=e.movementX*sensitivity;pitch=Math.max(-1.4,Math.min(1.4,pitch-e.movementY*sensitivity));
+  yaw-=e.movementX*sensitivity;pitch=Math.max(-.8,Math.min(.65,pitch-e.movementY*sensitivity));
 });
 canvas.addEventListener('pointerdown',e=>{
   if(locked)return;orbitResumeAt=performance.now()+6000;drag={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);canvas.focus();
@@ -216,44 +263,45 @@ canvas.addEventListener('pointerdown',e=>{
 canvas.addEventListener('pointermove',e=>{
   if(!drag||locked)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag={x:e.clientX,y:e.clientY};
   if(mode==='overview'){orbitResumeAt=performance.now()+6000;orbit.yaw-=dx*.006;orbit.pitch=Math.max(.1,Math.min(1.5,orbit.pitch+dy*.006));}
-  else if(dragMode){yaw-=dx*.004;pitch=Math.max(-1.4,Math.min(1.4,pitch-dy*.004));}
+  else if(dragMode){yaw-=dx*.004;pitch=Math.max(-.8,Math.min(.65,pitch-dy*.004));}
 });
 canvas.addEventListener('pointerup',()=>drag=null);canvas.addEventListener('pointercancel',()=>drag=null);
-canvas.addEventListener('wheel',e=>{if(mode==='overview'){orbitResumeAt=performance.now()+6000;orbit.distance=Math.max(18,Math.min(280,orbit.distance+e.deltaY*.09));e.preventDefault();}},{passive:false});
+canvas.addEventListener('wheel',e=>{if(mode==='overview'){orbitResumeAt=performance.now()+6000;orbit.distance=Math.max(18,Math.min(280,orbit.distance+e.deltaY*.09));e.preventDefault();}else if(isPlaying()){followDistance=Math.max(1.4,Math.min(4.8,followDistance+e.deltaY*.004));e.preventDefault();}},{passive:false});
 document.addEventListener('keydown',e=>{
-  if($('승강기창').open||elevatorBusy)return;
-  if(['INPUT','SELECT','TEXTAREA'].includes(e.target.tagName))return;
-  if(['KeyW','KeyA','KeyS','KeyD','ShiftLeft','ShiftRight'].includes(e.code)){keys.add(e.code);e.preventDefault();}
+  if($('게임메뉴').open||$('승강기창').open||characterPicker.isOpen()||elevatorBusy)return;
+  if(['INPUT','SELECT','TEXTAREA','BUTTON','SUMMARY'].includes(e.target.tagName)&&e.code!=='Escape')return;
+  if(isPlaying()&&['KeyW','KeyA','KeyS','KeyD'].includes(e.code)){keys.add(e.code);e.preventDefault();}
+  if(e.code==='Space'&&isPlaying()){
+    e.preventDefault();if(!e.repeat){avatar.cancelWave();jumpMotion.start(position);}
+  }
+  if(e.code==='KeyZ'&&isPlaying()){e.preventDefault();if(!e.repeat)greet();}
   if(e.code==='KeyV'&&!e.repeat)overview();
   if(e.code==='KeyR'&&!e.repeat&&ready)reset();
   if(e.code==='KeyE'&&!e.repeat)openElevator();
-  if(e.code==='Escape'){
-    dragMode=false;clearInput();
-    if(document.pointerLockElement)document.exitPointerLock();
-    pausePanel();
-  }
+  if(e.code==='Escape'&&!e.repeat){e.preventDefault();openMenu();}
 });
 document.addEventListener('keyup',e=>keys.delete(e.code));
 addEventListener('blur',clearInput);document.addEventListener('visibilitychange',clearInput);
 const map=$('지도'),mapCtx=map.getContext('2d');
 function updateHUD(){
   if(!world)return;
-  $('승강기호출').hidden=mode!=='walk'||photoTour.isActive()||!nearElevator(position,data.floorHeight);
-  const at=world.roomAt(position),floor=mode==='overview'?(selectedFloor||at.floor):at.floor;
+  $('승강기호출').hidden=!isPlaying()||!nearElevator(position,data.floorHeight);
+  const at=world.roomAt(position),floor=at.floor;
   const stair=world.stairs.find(s=>{const f=s.frame,dx=position.x-f.origin[0],dy=position.y-f.origin[1],u=dx*f.right[0]+dy*f.right[1],v=dx*f.inward[0]+dy*f.inward[1];return u>0&&u<f.width&&v>0&&v<f.depth;});
-  where.textContent=mode==='overview'?'학교 전체 · '+(selectedFloor?selectedFloor+'층 단면':'4개 층'):`${at.floor}층 · ${at.room?.name??(stair?'계단 이동 중':position.y<-8&&position.x<90?'운동장':'복도')}`;
+  where.textContent=mode==='overview'?'학교 전체 · 4개 층':`${at.floor}층 · ${at.room?.name??(stair?'계단 이동 중':position.y<-8&&position.x<90?'운동장':'복도')}`;
   if(isPlaying()){
     if(at.room?.type==='classroom')visitedRooms.add(at.room.id);
     if(Math.hypot(position.x-58,position.y-1.5)<1.5&&Math.abs(position.z-(at.floor-1)*3.4)<.2)visitedFloors.add(at.floor);
   }
   $('탐험').textContent=`교실 탐험 ${visitedRooms.size}/41 · 층별 표식 ${visitedFloors.size}/4`;
   for(const m of markerGroup.children)m.visible=!visitedFloors.has(m.userData.floor);
-  for(const v of visuals)v.mesh.visible=mode==='walk'||!selectedFloor||(v.floor===selectedFloor&&!v.ceiling);
+  $('탐험진행').value=visitedRooms.size;
+  for(const v of visuals)v.mesh.visible=!v.interiorRoom||(mode==='walk'&&v.floor===at.floor&&v.center.distanceTo(camera.position)<32);
   for(const l of labels){
     const distance=l.mesh.position.distanceTo(camera.position);
-    l.mesh.visible=mode==='walk'?(distance<24&&(!l.floor||l.floor===at.floor)&&!l.name.startsWith('Label_')):!!selectedFloor&&l.floor===selectedFloor;
+    l.mesh.visible=mode==='walk'?(distance<24&&(!l.floor||l.floor===at.floor)&&!l.name.startsWith('Label_')):false;
   }
-  mapCtx.fillStyle='#142633';mapCtx.fillRect(0,0,250,185);
+  mapCtx.fillStyle='#102529';mapCtx.fillRect(0,0,250,185);
   const sx=x=>28+x*1.9,sy=y=>28-y*1.9;
   for(const r of data.rooms){
     if(parseInt(r.floor)!==floor)continue;const b=r.bounds;
@@ -261,23 +309,36 @@ function updateHUD(){
     mapCtx.fillRect(sx(b[0]),sy(b[3]),(b[1]-b[0])*1.9,(b[3]-b[2])*1.9);
     mapCtx.strokeStyle='#172f3c';mapCtx.strokeRect(sx(b[0]),sy(b[3]),(b[1]-b[0])*1.9,(b[3]-b[2])*1.9);
   }
-  mapCtx.save();mapCtx.translate(sx(position.x),sy(position.y));mapCtx.rotate(-yaw);
+  mapCtx.save();mapCtx.translate(sx(position.x),sy(position.y));mapCtx.rotate(mode==='walk'?Math.PI-avatar.getState().heading:-yaw);
   mapCtx.fillStyle='#ffdc68';mapCtx.beginPath();mapCtx.moveTo(0,-7);mapCtx.lineTo(4,5);mapCtx.lineTo(-4,5);mapCtx.closePath();mapCtx.fill();mapCtx.restore();
   mapCtx.fillStyle='white';mapCtx.font='12px sans-serif';mapCtx.fillText(floor+'층 · 보라색은 계단',10,176);
 }
 function frame(now){
   requestAnimationFrame(frame);const wallDt=Math.min((now-last)/1000,1),dt=Math.min(wallDt,.05);last=now;elapsed+=dt;
   if(!ready)return;
-  if(photoTour.isActive())return;
+  if(characterPicker.isOpen())return;
+  const previous={...position};
   if(isPlaying()){
     let forward=Number(keys.has('KeyW'))-Number(keys.has('KeyS')),right=Number(keys.has('KeyD'))-Number(keys.has('KeyA'));
     const length=Math.hypot(forward,right);if(length){forward/=length;right/=length;}
-    const speed=keys.has('ShiftLeft')||keys.has('ShiftRight')?4.8:2.8;
+    const speed=RUN_SPEED;
     const dx=(-Math.sin(yaw)*forward+Math.cos(yaw)*right)*speed,dy=(Math.cos(yaw)*forward+Math.sin(yaw)*right)*speed;
     const a=1-Math.exp(-dt*14);velocity.x+=(dx-velocity.x)*a;velocity.y+=(dy-velocity.y)*a;
-    position=world.move(position,velocity.x*dt,velocity.y*dt);
+    if(length&&avatar.getState().waving)avatar.cancelWave();
+    position=jumpMotion.step(position,velocity.x*dt,velocity.y*dt,dt);
   }
   if(mode==='walk')cameraWalk(dt);else overviewCamera(wallDt);
+  avatar.root.visible=mode==='walk'&&cameraDistance>.32;
+  if(mode==='walk'){
+    const dx=position.x-previous.x,dy=position.y-previous.y,baseZ=position.z;
+    avatar.root.position.set(position.x,baseZ,-position.y);
+    const heading=avatar.getState().heading,c=Math.cos(heading),s=Math.sin(heading);
+    avatar.update(isPlaying()?dt:0,{distance:Math.hypot(dx,dy),dx,dy,time:elapsed,baseZ,...jumpMotion.getState(),
+      groundHeight:(x,z)=>{const h=world.support(position.x+c*x+s*z,position.y+s*x-c*z,position.z);return Number.isFinite(h)?h:position.z;}});
+    avatar.setOpacity(THREE.MathUtils.clamp((cameraDistance-.3)/.7,0,1));
+  }
+  greeting.hidden=mode!=='walk'||!avatar.getState().waving||!isPlaying();
+  if(!greeting.hidden){const p=new THREE.Vector3(position.x,position.z+1.95,-position.y).project(camera);greeting.hidden=p.z>1||p.z< -1;greeting.style.left=(p.x*.5+.5)*innerWidth+'px';greeting.style.top=(-p.y*.5+.5)*innerHeight+'px';}
   interiorLight.visible=mode==='walk'&&position.y>=0&&position.y<=3;
   interiorLight.position.copy(camera.position);interiorLight.position.y+=.65;
   markerGroup.children.forEach(m=>m.rotation.y+=dt);
@@ -287,7 +348,7 @@ function frame(now){
 requestAnimationFrame(frame);
 try{
   const response=await fetch(new URL('./학교구조.json',import.meta.url));if(!response.ok)throw new Error('학교 구조 파일 '+response.status);
-  data=await response.json();world=buildWorld(data);position={...world.spawn};buildVisuals();ready=true;
+  world=buildWorld(await response.json());data=world.data;position={...world.spawn};jumpMotion=createJumpMotion(world);resolveCamera=createCameraCollision([...world.colliders,...world.boxes.filter(b=>b.kind==='step')]);buildVisuals();ready=true;
   for(let floor=1;floor<=4;floor++){
     const group=document.createElement('optgroup');group.label=floor+'층';
     for(const r of data.rooms.filter(r=>parseInt(r.floor)===floor&&['classroom','special_room'].includes(r.type))){const option=document.createElement('option');option.value=r.id;option.textContent=r.name;group.append(option);}
@@ -297,9 +358,9 @@ try{
   $('불러오기').textContent='Blender 학교 모델 준비 완료';
   // Read-only state is useful for diagnostics. Test positioning is only enabled
   // on loopback with an explicit test URL; it is not a public wall-clipping key.
-  window.schoolTour={getState:()=>({ready,mode,locked,dragMode,position:{...position},yaw,pitch,overview:{autoOrbit,selectedFloor,orbit:{...orbit},camera:camera.position.toArray()},visitedRooms:visitedRooms.size,visitedFloors:visitedFloors.size,drawCalls:renderer.info.render.calls,photo:photoTour.getState()})};
+  window.schoolTour={getState:()=>({ready,mode,locked,dragMode,position:{...position},yaw,pitch,jump:jumpMotion.getState(),character:{...avatar.getState(),visible:avatar.root.visible,position:avatar.root.position.toArray()},thirdPerson:{distance:cameraDistance,requestedDistance:followDistance,blocked:cameraBlocked,camera:camera.position.toArray()},overview:{autoOrbit,orbit:{...orbit},camera:camera.position.toArray()},visitedRooms:visitedRooms.size,visitedFloors:visitedFloors.size,drawCalls:renderer.info.render.calls,menuOpen:$('게임메뉴').open})};
   if(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).has('test'))window.schoolTour.test={
-    world,data,setPosition(p){if(!world.candidate(p.x,p.y,p.z))throw new Error('Invalid test position');position={...p};smoothZ=p.z+EYE_HEIGHT;clearInput();},setYaw(y){yaw=y;},
+    world,data,setPosition(p){if(!world.candidate(p.x,p.y,p.z))throw new Error('Invalid test position');position={...p};jumpMotion.reset();smoothZ=p.z+EYE_HEIGHT;cameraReset=true;clearInput();},setYaw(y){yaw=y;},
     step(dx,dy){position=world.move(position,dx,dy);return {...position};}
   };
   // Always begin with the whole campus, including old ?photo=1 bookmarks.
