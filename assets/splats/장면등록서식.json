@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "templateOnly": true,
+  "id": null,
+  "name": null,
+  "spaceId": null,
+  "type": "supersplat",
+  "enabled": false,
+  "source": null,
+  "sourceSha256": null,
+  "sog": null,
+  "collision": null,
+  "collisionType": "mesh-glb",
+  "viewer": null,
+  "viewerVersion": null,
+  "returnLocation": null,
+  "splatTransform": {
+    "coordinateSystem": "viewer-y-up-right-handed-meters",
+    "position": [0, 0, 0],
+    "rotation": [0, 0, 0],
+    "rotationUnit": "radians",
+    "rotationOrder": "XYZ",
+    "scale": 1,
+    "alignmentStatus": "unverified",
+    "controlPoints": [],
+    "residualMeters": null
+  },
+  "review": {
+    "userApprovedSpace": false,
+    "privacyApproved": false,
+    "alignmentApproved": false,
+    "collisionApproved": false,
+    "performanceApproved": false,
+    "publishApproved": false
+  }
+}

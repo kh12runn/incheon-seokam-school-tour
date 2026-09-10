@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "enabled": false,
+  "status": "photo-finish-approved-splat-deferred",
+  "viewer": {
+    "package": "@playcanvas/supersplat-viewer",
+    "installedVersion": null,
+    "verifiedVersion": null
+  },
+  "scenes": [
+    {
+      "id": "4F_6-4_SPLAT_01",
+      "name": "6-4 교실 실사 심화",
+      "spaceId": "4F_6-4",
+      "type": "supersplat",
+      "status": "deferred-photo-finish-instead",
+      "enabled": false,
+      "source": null,
+      "sog": null,
+      "collision": null,
+      "viewer": null,
+      "viewerVersion": null,
+      "returnLocation": {
+        "spaceId": "4F_6-4",
+        "coordinateSystem": "blender-z-up-meters",
+        "position": {"x": 33.3, "y": -3.5, "z": 10.2},
+        "yaw": 1.5707963267948966,
+        "pitch": 0
+      },
+      "review": {
+        "userApprovedSpace": true,
+        "privacyApproved": false,
+        "alignmentApproved": false,
+        "collisionApproved": false,
+        "performanceApproved": false,
+        "publishApproved": false
+      }
+    }
+  ],
+  "spaceModes": [
+    {
+      "spaceId": "4F_6-4",
+      "displayMode": "mesh",
+      "plannedDisplayMode": "hybrid",
+      "features": {"mesh": true, "panorama": false, "splat": false},
+      "splatSceneIds": ["4F_6-4_SPLAT_01"]
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+# No scan, camera data, personal information or viewer bundle is published by default.
+**/*
+!**/
+!**/안내.md
+!/.gitignore
+!/장면목록.json
+!/장면등록서식.json

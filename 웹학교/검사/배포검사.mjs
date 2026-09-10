@@ -11,7 +11,17 @@ const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'school-deploy-test-')),out
 const packed=packRuntime(output);
 assert(!packed.files.some(p=>/사진보관|모델|미리보기|실사|검사/.test(p)),'Only current game runtime');
 assert(packed.files.includes('웹학교/교실별특징.mjs'));
-assert(packed.compressedTransferBytes<packed.sourceBytes*.3,'At least 70% transfer savings');
+// JPEG is already compressed and lazily loaded near 6-4. Keep the text compression
+// budget separate rather than claiming the new photographs shrink with Brotli.
+let textBytes=0,textTransfer=0;
+for(const file of packed.files.filter(file=>/\.(?:html|css|m?js|json|txt)$/.test(file))){
+  const target=path.join(output,file);textBytes+=fs.statSync(target).size;
+  textTransfer+=fs.statSync(fs.existsSync(target+'.br')?target+'.br':target).size;
+}
+assert(textTransfer<textBytes*.3,'At least 70% text transfer savings');
+const photoFiles=packed.files.filter(file=>/\.jpg$/.test(file));
+assert.equal(photoFiles.length,2,'Only the two 6-4 photo derivatives');
+assert(photoFiles.every(file=>file.startsWith('웹학교/사진마감/6-4 교실/')));
 const child=spawn(process.execPath,[fileURLToPath(new URL('관리도구/웹서버.mjs',root))],{env:{...process.env,PORT:String(port),SCHOOL_WEB_ROOT:output},stdio:['ignore','pipe','pipe']});
 try{
   await Promise.race([once(child.stdout,'data'),once(child,'exit').then(()=>{throw new Error('Server exited');}),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Startup timeout')),10000).unref())]);
@@ -20,7 +30,8 @@ try{
   for(const file of packed.files){
     const response=await get('/'+encodeURI(file),{headers:{'Accept-Encoding':'br'}});
     assert.equal(response.status,200,file);
-    assert.equal(await response.text(),fs.readFileSync(path.join(output,file),'utf8'),file+' compressed round trip');
+    assert.deepEqual(Buffer.from(await response.arrayBuffer()),fs.readFileSync(path.join(output,file)),file+' byte-exact round trip');
+    if(file.endsWith('.jpg'))assert.equal(response.headers.get('content-type'),'image/jpeg');
   }
   for(const encoding of ['br','gzip','br;q=0, gzip','br;q=0, gzip;q=0']){
     const response=await get('/'+encodeURI('웹학교/학교구조.json'),{headers:{'Accept-Encoding':encoding}});

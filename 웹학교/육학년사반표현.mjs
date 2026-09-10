@@ -1,4 +1,5 @@
 import * as THREE from './외부도구/three.module.js';
+import {createClass64PhotoFinish} from './육학년사반사진마감.mjs';
 export function class64Details(){
   const group=new THREE.Group();group.name='6-4 교실 전용 세부';
   function panel(w,h,x,y,z,rotation,draw){
@@ -32,5 +33,6 @@ export function class64Details(){
     for(let i=0;i<4;i++){const blade=new THREE.Mesh(new THREE.BoxGeometry(.36,.018,.12),white);blade.rotation.y=i*Math.PI/2;blade.position.set(Math.cos(i*Math.PI/2)*.19,0,Math.sin(i*Math.PI/2)*.19);fan.add(blade);}
     const ring=new THREE.Mesh(new THREE.TorusGeometry(.39,.007,5,48),white);ring.rotation.x=Math.PI/2;ring.position.y=-.045;fan.add(ring);
   }
+  const photos=createClass64PhotoFinish();group.add(photos.group);group.userData.photoFinish=photos;
   return group;
 }

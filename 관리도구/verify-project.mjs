@@ -29,6 +29,9 @@ for(const p of tracked) {
   const approvedPhoto=/^사진보관\/웹용\/4층\/(?:6-[1-7]_교실_앞_복도|6-7_교실_옆_계단_[1-2])\.jpg$/.test(p);
   assert(approvedPhoto||!/^(사진보관|참고자료|모델\/백업)\//.test(p),'Private file tracked: '+p);
   if(p.startsWith('촬영사진_넣는곳/')) assert(p.endsWith('/촬영안내.md'),'Raw intake tracked: '+p);
+  if(p.startsWith('assets/splats/')) assert(
+    /^(?:\.gitignore|장면목록\.json|장면등록서식\.json|(?:.+\/)?안내\.md)$/.test(p.slice('assets/splats/'.length)),
+    'Unreviewed splat asset tracked: '+p);
   assert(!/\.(insp|insv|mp4|pem|blend1)$/i.test(p),'Unexpected media/backup: '+p);
   assert(fs.statSync(path.join(root,p)).size<100*1024*1024,'GitHub file too large: '+p);
 }
@@ -42,9 +45,12 @@ for(const [,ref] of html.matchAll(/(?:href|src)="([^"]+)"/g)) {
   if(!/^(https?:|data:|#)/.test(ref)) assert(fs.existsSync(path.join(root,ref.split(/[?#]/)[0])),'Broken site link: '+ref);
 }
 const release=load('공간자료/release-check.json');
+const technicalDirectories=new Set(['assets','assets/splats']); // Explicit paths requested for the extension; capture folders stay Korean.
 function verifyDirs(dir){for(const ent of fs.readdirSync(dir,{withFileTypes:true})){
   if(!ent.isDirectory()||ent.name.startsWith('.'))continue;
-  assert(!/[A-Za-z]/.test(ent.name),'English directory: '+path.join(dir,ent.name));
+  const rel=path.relative(root,path.join(dir,ent.name)).split(path.sep).join('/');
+  if(rel==='모델/백업')continue; // Immutable snapshots mirror historical technical paths; not active capture folders.
+  assert(technicalDirectories.has(rel)||!/[A-Za-z]/.test(ent.name),'English directory: '+path.join(dir,ent.name));
   verifyDirs(path.join(dir,ent.name));
 }}
 verifyDirs(root);
