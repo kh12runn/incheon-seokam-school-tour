@@ -8,6 +8,7 @@ import {outdoorBox,addPlaygroundDetails} from './운동장.mjs';
 import {addParking} from './주차장.mjs';
 import {class64Interior} from './육학년사반.mjs';
 import {mainClassroomsInterior} from './본관교실.mjs';
+import {courtyardDecor} from './외관사진디자인.mjs';
 export const PLAYER_RADIUS=.28, PLAYER_HEIGHT=1.7, EYE_HEIGHT=1.58;
 const EPS=.0001, CELL=4;
 const intersect=(x,y,r,b)=>{
@@ -26,7 +27,7 @@ function localBounds(f,u0,u1,v0,v1,z0,z1){
   const p=localPoint(f,u0,v0),q=localPoint(f,u1,v1);
   return [Math.min(p.x,q.x),Math.min(p.y,q.y),z0,Math.max(p.x,q.x),Math.max(p.y,q.y),z1];
 }
-export function buildWorld(data,{class64=true,mainClassrooms=true}={}){
+export function buildWorld(data,{class64=true,mainClassrooms=true,exterior=true}={}){
   data=applyGroundFloorPlan(data);
   const {left:entranceLeft,right:entranceRight,height:entranceHeight}=LOBBY_OPEN;
   const boxes=[],surfaces=[],colliders=[],stairs=[];
@@ -114,6 +115,7 @@ export function buildWorld(data,{class64=true,mainClassrooms=true}={}){
   openClassroomWindows(data,boxes,colliders,addBox);
   addPlaygroundDetails(addBox);
   addParking(addBox);
+  if(exterior)for(const box of courtyardDecor()){boxes.push(box);if(box.collision)colliders.push(box);}
   // Entrance access ramp from courtyard to ground-floor lobby.
   const ramp={bounds:[entranceLeft,-9,-.65,entranceRight,-7,0],height:(x,y)=>(y+7)*.3,name:'본관 출입 경사로'};
   surfaces.push(ramp);

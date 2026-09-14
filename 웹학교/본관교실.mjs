@@ -1,6 +1,7 @@
 import {classroomReferenceInterior} from './교실기본배치.mjs';
 import {CLASSROOM_PROFILES} from './교실별특징.mjs';
 import {subtractBox} from './창문배치.mjs';
+import {applyClass66Details} from './육학년육반.mjs';
 const rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);
 const CLASS64_ID='4F_6-4';
 export function isMainClassroom(room){return room.building==='MAIN'&&room.type==='classroom';}
@@ -9,7 +10,7 @@ export function classroomFrame(room){
   const north=y0>=3,corridor=north?y0:y1;
   return {width,depth,north,z,point:(x,y,h=0)=>({x:x0+x*width/10,y:corridor+(north?-1:1)*y*depth/7,z:z+h})};
 }
-export function mainClassroomsInterior(data,{profiles=CLASSROOM_PROFILES}={}){
+export function mainClassroomsInterior(data,{profiles=CLASSROOM_PROFILES,photoOverrides=true}={}){
   const template=classroomReferenceInterior(data),rooms=[],boxes=[],colliders=[];
   for(const room of data.rooms.filter(r=>isMainClassroom(r)&&r.id!==CLASS64_ID)){
     const profile=profiles[room.id];
@@ -69,7 +70,8 @@ export function mainClassroomsInterior(data,{profiles=CLASSROOM_PROFILES}={}){
     const entry=frame.point(3.5,0);entry.y=1.5;
     const config={roomId:room.id,room,profile,frame,boxes:roomBoxes,colliders:roomColliders,desks:seats(template.desks),chairs:seats(template.chairs),spawn,entry,
       seatCount:24,seatCountIsApproximate:true,furnitureScale:scale,depth};
-    rooms.push(config);boxes.push(...roomBoxes);colliders.push(...roomColliders);
+    const detailed=photoOverrides?applyClass66Details(config):config;
+    rooms.push(detailed);boxes.push(...detailed.boxes);colliders.push(...detailed.colliders);
   }
   return {rooms,boxes,colliders};
 }

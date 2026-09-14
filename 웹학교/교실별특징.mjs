@@ -1,6 +1,7 @@
 // These are explicitly provisional identification themes, NOT observed school facts.
 // When photos arrive, edit only that room's profile and its room-specific override.
 // Never propagate a photographed classroom's distinguishing details to other rooms.
+import {CLASS66_PROFILE} from './육학년육반.mjs';
 const themes=[
   ['1F_3-1','햇살 정원','꽃','#d3ac59','#c4d1b5'],
   ['1F_3-2','파도 이야기','물결','#709fae','#bdd0d0'],
@@ -32,3 +33,4 @@ export const CLASSROOM_PROFILES=Object.fromEntries(themes.map(([roomId,theme,mot
   theme,motif,accent,lowerWall,boardLayout:index%3,lockerPattern:index%3,
   trayColor:accent,seatCountIsApproximate:true,
 }]));
+CLASSROOM_PROFILES[CLASS66_PROFILE.roomId]={...CLASS66_PROFILE};

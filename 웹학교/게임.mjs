@@ -11,6 +11,8 @@ import {createJumpMotion} from './점프물리.mjs';
 import {CLASS64_ID,CLASS64_SPAWN} from './육학년사반.mjs';
 import {class64Details} from './육학년사반표현.mjs';
 import {mainClassroomDetails} from './본관교실표현.mjs';
+import {exteriorRenderBox,exteriorSkins} from './외관사진디자인.mjs';
+import {faceMonitorsTowardBoard} from './모니터방향.mjs';
 const $=id=>document.getElementById(id);
 const canvas=$('화면'),panel=$('시작안내'),status=$('상태'),where=$('현재위치');
 let renderer;
@@ -78,16 +80,18 @@ function buildVisuals(){
     const mesh=mainClassroomDetails(config);scene.add(mesh);
     visuals.push({mesh,floor:parseInt(config.room.floor),interiorRoom:config.roomId,center:convert(config.spawn),ceiling:false});
   }
-  const groups=new Map(),geometry=new THREE.BoxGeometry(1,1,1);
-  for(const b of world.boxes){
-    const groupKey=b.color.join(',')+'|'+b.floor+'|'+(b.kind==='ceiling'?'ceiling':'normal')+'|'+surfaceKind(b)+'|'+(b.interiorRoom??'');
+  const groups=new Map(),geometry=new THREE.BoxGeometry(1,1,1),sphere=new THREE.SphereGeometry(.5,12,8);
+  const exteriorBoxes=[...faceMonitorsTowardBoard(world.boxes).map(exteriorRenderBox).filter(Boolean),...exteriorSkins(world.boxes,data)];
+  for(const b of exteriorBoxes){
+    const groupKey=b.color.join(',')+'|'+b.floor+'|'+(b.kind==='ceiling'?'ceiling':'normal')+'|'+surfaceKind(b)+'|'+(b.interiorRoom??'')+'|'+(b.shape??'box');
     if(!groups.has(groupKey))groups.set(groupKey,[]);groups.get(groupKey).push(b);
   }
   const matrix=new THREE.Matrix4(),quaternion=new THREE.Quaternion();
   for(const items of groups.values()){
-    const mesh=new THREE.InstancedMesh(geometry,finishMaterial(items[0]),items.length);
+    const mesh=new THREE.InstancedMesh(items[0].shape==='sphere'?sphere:geometry,finishMaterial(items[0]),items.length);
     mesh.castShadow=!['clear_glass','glass','lamp'].includes(surfaceKind(items[0]));mesh.receiveShadow=true;
     items.forEach((b,i)=>{const a=b.bounds;
+      quaternion.identity();if(b.rotation)quaternion.copy(upConversion).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(...b.rotation))).multiply(upConversion.clone().invert());
       matrix.compose(new THREE.Vector3((a[0]+a[3])/2,(a[2]+a[5])/2,-(a[1]+a[4])/2),quaternion,new THREE.Vector3(a[3]-a[0],a[5]-a[2],a[4]-a[1]));
       mesh.setMatrixAt(i,matrix);
     });

@@ -35,7 +35,7 @@ export function finishMaterial(b){
     material.color.set('#e5f3ee');material.transparent=true;material.opacity=.1;material.depthWrite=false;
     material.roughness=.08;material.envMapIntensity=.35;return material;
   }
-  if(!['wood','room_floor','terrazzo','paint','metal','soil','ground','chalk','asphalt'].includes(kind))return material;
+  if(!['wood','room_floor','terrazzo','paint','metal','soil','ground','chalk','asphalt','facade','foliage'].includes(kind))return material;
   material.onBeforeCompile=shader=>{
     shader.vertexShader='varying vec3 vSurfacePoint;\n'+shader.vertexShader;
     shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
@@ -48,7 +48,17 @@ export function finishMaterial(b){
       float grainHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
       float grainNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(grainHash(i),grainHash(i+vec2(1.,0.)),f.x),mix(grainHash(i+vec2(0.,1.)),grainHash(i+vec2(1.,1.)),f.x),f.y);}
       `+shader.fragmentShader;
-    const detail=kind==='room_floor'?`
+    const detail=kind==='facade'?`
+      float height=mod(vSurfacePoint.y+.001,3.4);
+      float band=step(.65,height)*(1.-step(1.0,height))+step(2.34,height)*(1.-step(2.63,height));
+      diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.196,.048,.024),clamp(band,0.,1.)*.86);
+      vec2 uv=vec2(vSurfacePoint.x+vSurfacePoint.z,vSurfacePoint.y);
+      vec2 tile=abs(fract(uv/vec2(.36,.18))-.5);
+      float seam=smoothstep(.46,.49,max(tile.x,tile.y));
+      diffuseColor.rgb*=.94+.055*grainNoise(uv*42.)+.04*seam;
+      diffuseColor.rgb*=.95+.05*grainNoise(uv*1.4);`
+      :kind==='foliage'?`diffuseColor.rgb*=.8+.3*grainNoise(vSurfacePoint.xz*12.);`
+      :kind==='room_floor'?`
       vec2 uv=vSurfacePoint.xz;
       float row=floor(uv.y/.18),offset=grainHash(vec2(row,1.))*1.2;
       vec2 board=vec2(fract((uv.x+offset)/1.2),fract(uv.y/.18));
@@ -59,7 +69,15 @@ export function finishMaterial(b){
       vec2 uv=vSurfacePoint.xz;
       float grains=grainNoise(uv*130.0);
       diffuseColor.rgb*=.82+.14*grainNoise(uv*.5)+.16*grains;`
-      :['soil','ground','chalk'].includes(kind)?`
+      :kind==='soil'?`
+      vec2 uv=vSurfacePoint.xz;
+      float broad=grainNoise(uv*.12),packed=grainNoise(uv*3.7),sand=grainNoise(uv*95.);
+      float fade=clamp(1.-length(fwidth(uv*95.))*.5,0.,1.);
+      diffuseColor.rgb*=.88+.075*broad+.075*packed;
+      diffuseColor.rgb*=mix(1.,.92+.16*sand,fade);
+      float wear=grainNoise(vec2(uv.x*.6,uv.y*2.));
+      diffuseColor.rgb*=.96+.06*wear;`
+      :['ground','chalk'].includes(kind)?`
       vec2 uv=vSurfacePoint.xz;
       float broad=grainNoise(uv*.16),soilVariation=grainNoise(uv*2.3),sand=grainNoise(uv*105.0);
       float detailFade=clamp(1.0-length(fwidth(uv*105.0))*.3,0.,1.);
