@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {buildWorld} from '../이동물리.mjs';
 import {LOBBY_OPEN} from '../일층배치.mjs';
+import {REAR_EXIT} from '../본관출입연결.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8'));
 const world=buildWorld(data);
 function hit(p,d,b){
@@ -24,14 +25,16 @@ for(const room of world.data.rooms.filter(r=>r.type!=='stair')){
     if(!world.candidate(x,y,z))continue;points++;
     for(const height of [1.58,3.08])for(const rise of [0,.15,.6,2])for(let a=0;a<36;a++){
       const p=[x,y,z+height],d=[Math.cos(a*Math.PI/18),Math.sin(a*Math.PI/18),rise];
-      // Only deliberate opening is the ground-floor courtyard entrance.
+      // Exclude only the two deliberately open ground-floor entrances.
       const t=(-7-y)/d[1],exitX=x+t*d[0],exitZ=p[2]+t*d[2];
       if(z===0&&t>0&&exitX>=LOBBY_OPEN.left-.15&&exitX<=LOBBY_OPEN.right+.15&&exitZ<LOBBY_OPEN.height)continue;
+      const rearT=(REAR_EXIT.y-y)/d[1],rearX=x+rearT*d[0],rearZ=p[2]+rearT*d[2];
+      if(z===0&&rearT>0&&rearX>=REAR_EXIT.left&&rearX<=REAR_EXIT.right&&rearZ>=0&&rearZ<REAR_EXIT.height)continue;
       rays++;
       if(!world.boxes.some(b=>hit(p,d,b.bounds)))leaks.push({room:room.id,p,d});
     }
   }
 }
-const report={ok:leaks.length===0,points,rays,leaks,scope:'Sampled rays at eye level and upper wall junction; intentional courtyard door excluded. Not an exhaustive mesh proof.'};
+const report={ok:leaks.length===0,points,rays,leaks,scope:'Sampled rays at eye level and upper wall junction; intentional courtyard and rear parking doors excluded. Not an exhaustive mesh proof.'};
 fs.writeFileSync(new URL('../../공간자료/웹틈새검사.json',import.meta.url),JSON.stringify(report,null,2)+'\n');
 console.log(JSON.stringify(report,null,2));assert.equal(leaks.length,0);

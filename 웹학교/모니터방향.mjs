@@ -1,4 +1,4 @@
-// Classroom teaching walls are at the lower X end (including north-side rooms).
+// Teaching walls normally face low X; the rotated 4-3 layout marks high X.
 // Move only each desktop display face to the chalkboard side of its casing.
 // Keep furniture positions, collision, frozen layouts and wall-mounted TVs intact.
 export function faceMonitorsTowardBoard(boxes){
@@ -10,7 +10,8 @@ export function faceMonitorsTowardBoard(boxes){
       :screen.name.replace('모니터 화면','컴퓨터 모니터');
     const casing=byName.get(casingName);if(!casing)return screen;
     // Idempotent: a screen already on the board side needs no change.
-    if(screen.bounds[3]<=casing.bounds[0])return screen;
+    const positive=screen.boardDirection===1;
+    if(positive?screen.bounds[0]>=casing.bounds[3]:screen.bounds[3]<=casing.bounds[0])return screen;
     const centerSum=casing.bounds[0]+casing.bounds[3],bounds=[...screen.bounds];
     bounds[0]=centerSum-screen.bounds[3];bounds[3]=centerSum-screen.bounds[0];
     return {...screen,bounds};

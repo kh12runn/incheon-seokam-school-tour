@@ -1,4 +1,5 @@
 import * as THREE from './외부도구/three.module.js';
+import {classroomTVPose} from './교실영상기기.mjs';
 // Code-native reinterpretation of the photographed displays. No faces, names,
 // class photograph, handwriting or other personal details are copied to assets.
 export function class66Details(config){
@@ -61,9 +62,12 @@ export function class66Details(config){
       broken.forEach((split,i)=>{const yy=(i-1)*25;if(split){c.fillRect(-62,yy,54,15);c.fillRect(8,yy,54,15);}else c.fillRect(-62,yy,124,15);});c.restore();
     }
   });
-  panel('개인사진 없는 교실 화면',1.22,.68,1.665,-6.528,2.25,Math.PI,(c,w,h)=>{
+  const tv=panel('개인사진 없는 교실 화면',1.22,.68,1.665,-6.528,2.25,Math.PI,(c,w,h)=>{
     c.fillStyle='#689bba';c.fillRect(0,0,w,h);c.fillStyle='#c5d9ce';c.fillRect(0,h*.7,w,h*.3);c.fillStyle='#f4eee0';c.textAlign='center';c.font='bold 84px "Malgun Gothic",sans-serif';c.fillText('6-6 교실',w/2,h*.47);
   });
+  const tvPose=classroomTVPose(config.room);
+  tv.position.set(tvPose.x+tvPose.normal[0]*.098,tvPose.z,-tvPose.y-tvPose.normal[1]*.098);
+  tv.rotation.y=Math.atan2(tvPose.normal[0],-tvPose.normal[1]);
   panel('창가 흰 시계',.38,.38,4.95,-6.69,2.62,Math.PI,(c,w,h)=>{
     c.fillStyle='#999d95';c.beginPath();c.arc(w/2,h/2,w*.49,0,Math.PI*2);c.fill();c.fillStyle='#efeee4';c.beginPath();c.arc(w/2,h/2,w*.46,0,Math.PI*2);c.fill();
     c.fillStyle='#52594f';c.textAlign='center';c.textBaseline='middle';c.font='95px sans-serif';

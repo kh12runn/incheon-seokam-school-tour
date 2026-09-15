@@ -29,7 +29,8 @@ for(const interior of after.classroomsMain.rooms){
   for(const seat of [...interior.desks,...interior.chairs])assert.ok(after.blocked(seat.x,seat.y,b[4]),room.id+' 가구 충돌');
   assert.ok(after.candidate(spawn.x,spawn.y,spawn.z),room.id+' 안전한 바로가기');
   let p={...entry};
-  const route=[spawn,frame.point(3.5,-4.37),frame.point(8.85,-4.37),frame.point(8.85,-2.34),frame.point(3.5,-2.34),spawn,entry];
+  const access=interior.entryWaypoints??[];
+  const route=[...access,spawn,frame.point(3.5,-4.37),frame.point(8.85,-4.37),frame.point(8.85,-2.34),frame.point(3.5,-2.34),spawn,...[...access].reverse(),entry];
   for(const q of route){
     p=after.move(p,q.x-p.x,q.y-p.y);
     assert.ok(Math.hypot(p.x-q.x,p.y-q.y)<.025,room.id+' 문·통로 막힘 '+JSON.stringify({p,q}));

@@ -64,8 +64,10 @@ export function classroomWindows(data){
 }
 export function openClassroomWindows(data,boxes,colliders,addBox){
   const windows=classroomWindows(data),replacements=new Map();
+  const privateRooms=new Set(data.rooms.filter(r=>r.type==='toilet').map(r=>r.id));
   for(const box of boxes){
     // Split only existing exterior walls/glazing where source classroom panes are.
+    if(privateRooms.has(box.spaceId))continue;
     if(box.name.includes('사진참고')||box.name.includes('엘리베이터'))continue;
     let parts=[box];
     for(const {cut} of windows)parts=parts.flatMap(p=>subtractBox(p,cut));

@@ -35,11 +35,14 @@ for(const stair of world.stairs){
 for(const room of data.rooms.filter(r=>r.type==='classroom')){
   const [x0,x1,y0,y1,z]=room.bounds;
   const isAnnex=room.building==='ANNEX';
+  const turned=world.classroomsMain.rooms.find(r=>r.roomId===room.id&&r.layoutRotation);
   const door=isAnnex?{x:101.5,y:y0+(y1-y0)*.35,z}:{x:x0+(x1-x0)*.35,y:1.5,z};
   let p={x:20,y:1.5,z};
   if(isAnnex){p=go(p,{x:101.5,y:1.5});p=go(p,door);p=go(p,{x:96,y:door.y});}
-  else {p=go(p,door);p=go(p,{x:door.x,y:(y0+y1)/2});}
-  assert.equal(world.roomAt(p).room?.id,room.id);p=go(p,door);
+  else {p=go(p,door);if(turned){for(const q of [...turned.entryWaypoints,turned.spawn])p=go(p,q);}else p=go(p,{x:door.x,y:(y0+y1)/2});}
+  assert.equal(world.roomAt(p).room?.id,room.id);
+  if(turned)for(const q of [...turned.entryWaypoints].reverse())p=go(p,q);
+  p=go(p,door);
 }
 checks.push({all41ClassroomDoorsReachable:true});
 let entrance={x:43.5,y:1.5,z:0};

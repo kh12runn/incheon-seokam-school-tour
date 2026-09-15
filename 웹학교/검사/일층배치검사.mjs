@@ -5,7 +5,12 @@ import {GROUND_PLAN,applyGroundFloorPlan,LOBBY_OPEN} from '../일층배치.mjs';
 import {ELEVATOR,elevatorDestination,nearElevator} from '../엘리베이터.mjs';
 const source=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),before=JSON.stringify(source);
 const world=buildWorld(source),data=world.data,changed=new Set([...GROUND_PLAN.map(r=>r.id),'1F_NUTRITION','1F_MAIN_LOBBY']);
-for(const room of source.rooms.filter(r=>!changed.has(r.id)))assert.deepEqual(data.rooms.find(r=>r.id===room.id),room,'Unrelated room changed '+room.id);
+const groundOnly=applyGroundFloorPlan(source);
+for(const room of source.rooms.filter(r=>!changed.has(r.id))){
+  assert.deepEqual(groundOnly.rooms.find(r=>r.id===room.id),room,'Ground-floor adapter changed unrelated room '+room.id);
+  // The separate restroom adapter intentionally splits all twelve original toilets.
+  if(room.type!=='toilet')assert.deepEqual(data.rooms.find(r=>r.id===room.id),room,'Unrelated room changed '+room.id);
+}
 assert.equal(data.rooms.filter(r=>r.type==='classroom').length,41);
 assert.equal(JSON.stringify(source),before,'Exported baseline mutated');
 assert.equal(applyGroundFloorPlan(data),data,'Correction not idempotent');
@@ -35,5 +40,5 @@ for(const f of [1,2,3,4]){
   assert(parts.length>10);assert(parts.every(b=>b.bounds[0]>76&&b.bounds[3]<81),'Old shaft remains');elevators.push({floor:f,landing:p});
 }
 for(const b of world.boxes)assert(b.bounds[3]>b.bounds[0]&&b.bounds[4]>b.bounds[1]&&b.bounds[5]>b.bounds[2],'Invalid geometry '+b.name);
-const report={ok:true,unchangedClassrooms:41,otherRoomsUnchanged:true,originalExportUnchanged:true,rooms:GROUND_PLAN,lobbyWidth:8,lobbyWalkSamples:lobbySamples,elevators};
+const report={ok:true,unchangedClassrooms:41,otherRoomsUnchangedExceptRestrooms:true,originalExportUnchanged:true,rooms:GROUND_PLAN,lobbyWidth:8,lobbyWalkSamples:lobbySamples,elevators};
 fs.writeFileSync(new URL('../../공간자료/일층배치검사.json',import.meta.url),JSON.stringify(report,null,2)+'\n');console.log(report);

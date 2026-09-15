@@ -31,6 +31,7 @@ sun.shadow.bias=-.00008;sun.shadow.normalBias=.025;
 const camera=new THREE.PerspectiveCamera(76,1,.045,500);camera.rotation.order='YXZ';
 let data,world,position,mode='overview',locked=false,dragMode=false,freeLook=false,yaw=-Math.PI/2,pitch=0;
 let freeLookPoint=null;
+let lookRequestSerial=0;
 let velocity={x:0,y:0},smoothZ=EYE_HEIGHT,last=performance.now(),elapsed=0,ready=false;
 let orbit={yaw:.75,pitch:.83,distance:185},drag=null;
 // Explicit user preference: always rotate immediately, independent of OS settings.
@@ -53,11 +54,11 @@ const characterPicker=createCharacterPicker({initial:selectedCharacter??'boy',on
   if(avatar.variant!==variant){scene.remove(avatar.root);avatar.dispose();avatar=createStudent(variant);scene.add(avatar.root);avatar.snapHeading(Math.PI+yaw);}
   selectedCharacter=variant;characterChosenThisVisit=true;try{localStorage.setItem('석암학교-캐릭터',variant);}catch{}
   updateCharacterLabel();cameraReset=true;startWalk(pickerFallback);
-},onClose(){if(pickerResume)startWalk(true);else pausePanel();}});
+},onClose(){if(pickerResume)startWalk();else pausePanel();}});
 function openCharacterPicker(fallback=false){
   if(!ready||characterPicker.isOpen())return;
   $('게임메뉴').close();
-  pickerFallback=fallback;pickerResume=isPlaying();clearInput();dragMode=false;freeLook=false;if(document.pointerLockElement)document.exitPointerLock();pausePanel();characterPicker.open();
+  pickerFallback=fallback;pickerResume=mode==='walk'&&characterChosenThisVisit;clearInput();dragMode=false;freeLook=false;if(document.pointerLockElement)document.exitPointerLock();pausePanel();characterPicker.open();
 }
 updateCharacterLabel();
 function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
@@ -100,6 +101,16 @@ function buildVisuals(){
     visuals.push({mesh,floor:items[0].floor,ceiling:items[0].kind==='ceiling',interiorRoom,center:config?convert(config.spawn):null});
   }
   const roomById=new Map(data.rooms.map(r=>[r.id,r]));
+  for(const item of [
+    {text:'뒤 야외주차장 출입구',x:35,y:2.78,z:2.96,width:2.5,floor:1},
+    {text:'계단 아래로 · 야외주차장 ↑',x:53.75,y:4.15,z:2.25,width:2.1,floor:1},
+    {text:'행정실 맞은편 계단 출입구',x:53.75,y:10.18,z:1.78,width:2.2,floor:1},
+    {text:'4층 내려가는 계단 ↓',x:52.5,y:2.85,z:16.4,width:3.6,floor:5},
+  ]){
+    const {tex}=textTexture(item.text,true);
+    const sign=new THREE.Mesh(new THREE.PlaneGeometry(item.width,.36),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));
+    sign.position.set(item.x,item.z,-item.y);scene.add(sign);labels.push({mesh:sign,floor:item.floor,name:'출입 연결 안내'});
+  }
   {
     const {tex}=textTexture('야외 주차장',true);
     const sign=new THREE.Mesh(new THREE.PlaneGeometry(2.6,.65),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));
@@ -129,7 +140,7 @@ function buildVisuals(){
   for(const stair of world.stairs){
     for(let floor=1;floor<=4;floor++){
       const room=data.rooms.find(r=>r.id===floor+'F_'+stair.id);
-      const text=room?.captureName??'계단';
+      const text=(room?.captureName??'계단')+(stair.roofAccess&&floor===4?' · 옥상 ↑':'');
       const {tex,ratio}=textTexture(`${floor}층  계단\n${text}`,true);
       const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,depthTest:true}));
       const p=localPoint(stair.frame,stair.frame.width/2,-.05,(floor-1)*3.4+2.45);
@@ -195,26 +206,39 @@ function dismissMenu(){
   else{$('게임메뉴').close();pausePanel();}
 }
 $('메뉴닫기').addEventListener('click',dismissMenu);
-// Only user dismissal resumes: programmatic close also serves floor/picker/overview transitions.
+// Close/cancel/X all recover look control, except during another active dialog
+// or an intentional transition to the overview. Native dialog focus is restored
+// before this close handler, so return keyboard focus to the canvas as well.
 $('게임메뉴').addEventListener('cancel',e=>{e.preventDefault();dismissMenu();});
-$('게임메뉴').addEventListener('close',pausePanel);
-async function startWalk(fallback=false){
-  if(ready&&!characterChosenThisVisit){openCharacterPicker(fallback);return;}
-  if(!ready)return;$('게임메뉴').close();mode='walk';dragMode=fallback;freeLook=!fallback;clearInput();
-  cameraReset=true;camera.rotation.order='YXZ';smoothZ=position.z+EYE_HEIGHT;cameraWalk(.1);
-  if(fallback){pausePanel();notice('드래그 시점 모드 · 화면을 드래그해 둘러보세요.');canvas.focus();return;}
+$('게임메뉴').addEventListener('close',()=>{
+  if(mode==='walk'&&!$('게임메뉴').open&&!characterPicker.isOpen()&&!$('승강기창').open&&!elevatorBusy){
+    if(!locked&&!freeLook)startWalk();
+    else canvas.focus({preventScroll:true});
+  }
   pausePanel();
+});
+async function startWalk(withoutPointerLock=false){
+  if(ready&&!characterChosenThisVisit){openCharacterPicker(withoutPointerLock);return;}
+  if(!ready||characterPicker.isOpen()||$('승강기창').open||elevatorBusy)return;
+  $('게임메뉴').close();mode='walk';dragMode=false;freeLook=true;clearInput();
+  const request=++lookRequestSerial;
+  cameraReset=true;camera.rotation.order='YXZ';smoothZ=position.z+EYE_HEIGHT;cameraWalk(.1);
+  pausePanel();
+  canvas.focus({preventScroll:true});
+  notice('WASD 달리기 · 마우스를 움직여 둘러보기 · ESC 메뉴');
+  if(withoutPointerLock||document.pointerLockElement===canvas)return;
   try{
-    canvas.focus();
     await canvas.requestPointerLock();
   }catch(error){
-    lockFallback();
+    if(request===lookRequestSerial)lockFallback();
   }
 }
 function lockFallback(){
   if(mode!=='walk'||locked||dragMode||$('게임메뉴').open||characterPicker.isOpen()||$('승강기창').open||elevatorBusy)return;
-  freeLook=true;clearInput();pausePanel();canvas.focus();
-  notice('마우스를 움직여 둘러보기 · 화면을 한 번 클릭하면 마우스 잠금 재시도 · ESC 메뉴');
+  // Free look is already live while a lock request is pending. A late rejection
+  // must not clear movement or require a click to resume.
+  freeLook=true;pausePanel();canvas.focus({preventScroll:true});
+  notice('마우스를 움직여 둘러보기 · 클릭·드래그 없이 시점 이동 · ESC 메뉴');
 }
 function overview(){
   $('게임메뉴').close();mode='overview';dragMode=false;freeLook=false;clearInput();if(document.pointerLockElement)document.exitPointerLock();
@@ -229,7 +253,7 @@ function openElevator(){
 }
 $('승강기호출').addEventListener('click',openElevator);
 $('승강기닫기').addEventListener('click',()=>$('승강기창').close());
-$('승강기창').addEventListener('close',()=>{if(!elevatorBusy)startWalk(true);});
+$('승강기창').addEventListener('close',()=>{if(!elevatorBusy)startWalk();});
 for(const button of document.querySelectorAll('[data-elevator-floor]'))button.addEventListener('click',async()=>{
   if(elevatorBusy)return;
   const p=elevatorDestination(Number(button.dataset.elevatorFloor),data.floorHeight),valid=p&&world.candidate(p.x,p.y,p.z);
@@ -237,12 +261,12 @@ for(const button of document.querySelectorAll('[data-elevator-floor]'))button.ad
   elevatorBusy=true;clearInput();$('승강기창').close();$('승강기전환').hidden=false;
   try{
     await new Promise(resolve=>setTimeout(resolve,700));position=valid;jumpMotion.reset();yaw=Math.PI;pitch=0;smoothZ=p.z+EYE_HEIGHT;
-  }finally{elevatorBusy=false;$('승강기전환').hidden=true;await startWalk(true);notice(button.dataset.elevatorFloor+'층 엘리베이터 앞에 도착했습니다.');}
+  }finally{elevatorBusy=false;$('승강기전환').hidden=true;await startWalk();notice(button.dataset.elevatorFloor+'층 엘리베이터 앞에 도착했습니다.');}
 });
 $('걷기').addEventListener('click',()=>mode==='overview'?openCharacterPicker():startWalk());$('시작').addEventListener('click',()=>mode==='overview'?openCharacterPicker():startWalk());
-$('육사이동').addEventListener('click',()=>{if(!ready)return;position={...CLASS64_SPAWN};jumpMotion.reset();yaw=Math.PI/2;pitch=0;avatar.snapHeading(Math.PI+yaw);startWalk(true);notice('6-4 교실 · 사진을 참고한 실내 · 책상/의자 충돌 적용');});
+$('육사이동').addEventListener('click',()=>{if(!ready)return;position={...CLASS64_SPAWN};jumpMotion.reset();yaw=Math.PI/2;pitch=0;avatar.snapHeading(Math.PI+yaw);startWalk();notice('6-4 교실 · 사진을 참고한 실내 · 책상/의자 충돌 적용');});
 $('드래그걷기').addEventListener('click',()=>startWalk(true));$('전체').addEventListener('click',overview);
-$('처음').addEventListener('click',()=>{if(ready){reset();startWalk(true);}});
+$('처음').addEventListener('click',()=>{if(ready){reset();startWalk();}});
 $('동층이동').addEventListener('change',async e=>{
   const value=e.target.value;e.target.value='';if(!ready||!value)return;
   const [building,floor]=value.split(':');
@@ -251,15 +275,15 @@ $('동층이동').addEventListener('change',async e=>{
   if(!valid){notice('중앙현관 이동 위치를 확인하지 못했습니다.');return;}
   if(document.pointerLockElement)document.exitPointerLock();
   position=valid;jumpMotion.reset();yaw=destination.yaw;pitch=0;
-  // Native select changes do not reliably grant pointer-lock permission.
-  await startWalk(true);notice(destination.label+' · WASD 이동 / 드래그로 둘러보기');
+  // Free look starts immediately, even without native select user activation.
+  await startWalk();notice(destination.label+' · WASD 이동 / 마우스로 둘러보기');
 });
 $('방이동').addEventListener('click',()=>{
   const room=data.rooms.find(r=>r.id===$('방선택').value);if(!room)return;
   const b=room.bounds,interior=world.classroomsMain.rooms.find(r=>r.roomId===room.id);
   const p=room.id===CLASS64_ID?{...CLASS64_SPAWN}:interior?{...interior.spawn}:{x:(b[0]+b[1])/2,y:(b[2]+b[3])/2,z:b[4]};
   const valid=world.candidate(p.x,p.y,p.z);if(!valid){notice('해당 위치는 이동할 수 없습니다.');return;}
-  position=valid;jumpMotion.reset();yaw=interior||room.id===CLASS64_ID?Math.PI/2:room.building==='ANNEX'?-Math.PI/2:0;pitch=0;startWalk();
+  position=valid;jumpMotion.reset();yaw=interior?.layoutRotation===Math.PI?-Math.PI/2:interior||room.id===CLASS64_ID?Math.PI/2:room.building==='ANNEX'?-Math.PI/2:0;pitch=0;startWalk();
 });
 document.addEventListener('pointerlockchange',()=>{
   locked=document.pointerLockElement===canvas;
@@ -276,26 +300,29 @@ function lookAround(dx,dy){
   yaw-=dx*sensitivity;pitch=Math.max(-.8,Math.min(.65,pitch-dy*sensitivity));
 }
 document.addEventListener('mousemove',e=>{
-  if(!locked||!isPlaying())return;lookAround(e.movementX,e.movementY);
+  if(!isPlaying())return;
+  if(locked){lookAround(e.movementX,e.movementY);return;}
+  if(freeLook){
+    const previous=freeLookPoint;freeLookPoint={x:e.clientX,y:e.clientY};
+    // Listen on document, not just canvas: menu-close focus and HUD overlays
+    // must not create dead areas or make a held mouse button necessary.
+    const dx=previous?e.clientX-previous.x:e.movementX;
+    const dy=previous?e.clientY-previous.y:e.movementY;
+    lookAround(Math.max(-120,Math.min(120,dx||0)),Math.max(-120,Math.min(120,dy||0)));
+  }
 });
 canvas.addEventListener('pointerdown',e=>{
   if(freeLook&&isPlaying()){startWalk();return;}
   if(locked)return;orbitResumeAt=performance.now()+6000;drag={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);canvas.focus();
 });
 canvas.addEventListener('pointermove',e=>{
-  // Esc is not a user-activation gesture in every browser. Keep mouse look usable
-  // without holding a button when re-locking is denied; a click can restore lock.
-  if(freeLook&&!locked&&isPlaying()&&e.pointerType==='mouse'){
-    const previous=freeLookPoint;freeLookPoint={x:e.clientX,y:e.clientY};
-    if(previous)lookAround(e.clientX-previous.x,e.clientY-previous.y);
-    return;
-  }
+  // Mouse exploration is handled once by document mousemove, never by drag.
+  if(mode==='walk')return;
   if(!drag||locked)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag={x:e.clientX,y:e.clientY};
   if(mode==='overview'){orbitResumeAt=performance.now()+6000;orbit.yaw-=dx*.006;orbit.pitch=Math.max(.1,Math.min(1.5,orbit.pitch+dy*.006));}
-  else if(dragMode){yaw-=dx*.004;pitch=Math.max(-.8,Math.min(.65,pitch-dy*.004));}
 });
 canvas.addEventListener('pointerup',()=>drag=null);canvas.addEventListener('pointercancel',()=>drag=null);
-canvas.addEventListener('pointerleave',()=>freeLookPoint=null);
+document.addEventListener('mouseleave',()=>freeLookPoint=null);
 canvas.addEventListener('wheel',e=>{if(mode==='overview'){orbitResumeAt=performance.now()+6000;orbit.distance=Math.max(18,Math.min(280,orbit.distance+e.deltaY*.09));e.preventDefault();}else if(isPlaying()){followDistance=Math.max(1.4,Math.min(4.8,followDistance+e.deltaY*.004));e.preventDefault();}},{passive:false});
 document.addEventListener('keydown',e=>{
   if(e.code==='Escape'&&$('게임메뉴').open){e.preventDefault();if(!e.repeat)dismissMenu();return;}
@@ -319,7 +346,7 @@ function updateHUD(){
   $('승강기호출').hidden=!isPlaying()||!nearElevator(position,data.floorHeight);
   const at=world.roomAt(position),floor=at.floor;
   const stair=world.stairs.find(s=>{const f=s.frame,dx=position.x-f.origin[0],dy=position.y-f.origin[1],u=dx*f.right[0]+dy*f.right[1],v=dx*f.inward[0]+dy*f.inward[1];return u>0&&u<f.width&&v>0&&v<f.depth;});
-  where.textContent=mode==='overview'?'학교 전체 · 4개 층':`${at.floor}층 · ${at.room?.name??(stair?'계단 이동 중':position.y<-8&&position.x<90?'운동장':'복도')}`;
+  where.textContent=mode==='overview'?'학교 전체 · 4개 층':at.rooftop?'본관 옥상':`${at.floor}층 · ${at.room?.name??(stair?'계단 이동 중':position.y>3&&position.z<.1?'뒤 야외주차장':position.y<-8&&position.x<90?'운동장':'복도')}`;
   if(isPlaying()){
     if(at.room?.type==='classroom')visitedRooms.add(at.room.id);
     if(Math.hypot(position.x-58,position.y-1.5)<1.5&&Math.abs(position.z-(at.floor-1)*3.4)<.2)visitedFloors.add(at.floor);
@@ -335,14 +362,14 @@ function updateHUD(){
   mapCtx.fillStyle='#102529';mapCtx.fillRect(0,0,250,185);
   const sx=x=>28+x*1.9,sy=y=>28-y*1.9;
   for(const r of data.rooms){
-    if(parseInt(r.floor)!==floor)continue;const b=r.bounds;
+    if(parseInt(r.floor)!==(at.rooftop?4:floor)||at.rooftop&&r.building==='ANNEX')continue;const b=r.bounds;
     mapCtx.fillStyle=r.type==='stair'?'#bca1ff':r.type==='corridor'?'#91a6b4':visitedRooms.has(r.id)?'#57c79f':'#4d7184';
     mapCtx.fillRect(sx(b[0]),sy(b[3]),(b[1]-b[0])*1.9,(b[3]-b[2])*1.9);
     mapCtx.strokeStyle='#172f3c';mapCtx.strokeRect(sx(b[0]),sy(b[3]),(b[1]-b[0])*1.9,(b[3]-b[2])*1.9);
   }
   mapCtx.save();mapCtx.translate(sx(position.x),sy(position.y));mapCtx.rotate(mode==='walk'?Math.PI-avatar.getState().heading:-yaw);
   mapCtx.fillStyle='#ffdc68';mapCtx.beginPath();mapCtx.moveTo(0,-7);mapCtx.lineTo(4,5);mapCtx.lineTo(-4,5);mapCtx.closePath();mapCtx.fill();mapCtx.restore();
-  mapCtx.fillStyle='white';mapCtx.font='12px sans-serif';mapCtx.fillText(floor+'층 · 보라색은 계단',10,176);
+  mapCtx.fillStyle='white';mapCtx.font='12px sans-serif';mapCtx.fillText(at.rooftop?'본관 옥상 · 중앙계단으로 내려가기':floor+'층 · 보라색은 계단',10,176);
 }
 function frame(now){
   requestAnimationFrame(frame);const wallDt=Math.min((now-last)/1000,1),dt=Math.min(wallDt,.05);last=now;elapsed+=dt;

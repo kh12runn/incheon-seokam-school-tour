@@ -4,6 +4,7 @@ import * as THREE from './외부도구/three.module.js';
 // World-space grain avoids stretching a single image across a 100 m corridor.
 export function surfaceKind(b){
   if(b.material)return b.material;
+  if(b.name==='본관 옥상 안전 유리')return 'clear_glass';
   if(b.name.startsWith('주차장 아스팔트'))return 'asphalt';
   if(b.name.startsWith('주차장 주차선'))return 'chalk';
   if(b.name.startsWith('주차장 자동차 유리'))return 'glass';
@@ -27,7 +28,7 @@ export function finishMaterial(b){
   const kind=surfaceKind(b),color=new THREE.Color(...b.color);
   if(kind==='original')return new THREE.MeshLambertMaterial({color});
   color.convertSRGBToLinear();
-  const material=new THREE.MeshStandardMaterial({color,roughness:kind==='terrazzo'?.27:kind==='wood'?.48:kind==='metal'?.3:.88,
+  const material=new THREE.MeshStandardMaterial({color,roughness:kind==='ceramic'?.22:kind.startsWith('restroom_')?.4:kind==='terrazzo'?.27:kind==='wood'?.48:kind==='metal'?.3:.88,
     metalness:kind==='metal'?.72:0,envMapIntensity:kind==='metal'?.8:.28});
   if(kind==='lamp'){material.emissive.set('#fff4dc');material.emissiveIntensity=1.2;}
   if(kind==='glass'){material.roughness=.2;material.envMapIntensity=.65;}
@@ -35,7 +36,7 @@ export function finishMaterial(b){
     material.color.set('#e5f3ee');material.transparent=true;material.opacity=.1;material.depthWrite=false;
     material.roughness=.08;material.envMapIntensity=.35;return material;
   }
-  if(!['wood','room_floor','terrazzo','paint','metal','soil','ground','chalk','asphalt','facade','foliage'].includes(kind))return material;
+  if(!['wood','room_floor','rubber_mat','restroom_floor','restroom_wall','terrazzo','paint','metal','soil','ground','chalk','asphalt','facade','foliage'].includes(kind))return material;
   material.onBeforeCompile=shader=>{
     shader.vertexShader='varying vec3 vSurfacePoint;\n'+shader.vertexShader;
     shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
@@ -65,6 +66,17 @@ export function finishMaterial(b){
       float seam=step(.006,board.x)*step(.013,board.y);
       float grain=grainNoise(vec2(uv.x*4.,uv.y*180.));
       diffuseColor.rgb*=mix(.85,1.,seam)*(.95+.09*grain)*(.96+.06*grainHash(vec2(floor((uv.x+offset)/1.2),row)));`
+      :kind.startsWith('restroom_')?`
+      vec2 uv=${kind==='restroom_floor'?'vSurfacePoint.xz':'vec2(vSurfacePoint.x+vSurfacePoint.z,vSurfacePoint.y)'};
+      vec2 tile=abs(fract(uv/.30)-.5);
+      float seam=smoothstep(.476,.496,max(tile.x,tile.y));
+      diffuseColor.rgb*=mix(.985,.70,seam)*(.98+.035*grainNoise(uv*60.));`
+      :kind==='rubber_mat'?`
+      vec2 uv=vSurfacePoint.xz;
+      vec2 dots=fract(uv/.035)-.5;
+      float bump=1.-smoothstep(.20,.34,length(dots));
+      float fade=clamp(1.-length(fwidth(uv/.035)),0.,1.);
+      diffuseColor.rgb*=mix(1.,.91+.12*bump,fade)*(.97+.05*grainNoise(uv*9.));`
       :kind==='asphalt'?`
       vec2 uv=vSurfacePoint.xz;
       float grains=grainNoise(uv*130.0);

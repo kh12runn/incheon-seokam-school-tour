@@ -8,7 +8,7 @@ export function addLowerMainFloorFinish(data,addBox){
 }
 function addMainFloorFinish(data,addBox,floor){
   const z=(floor-1)*data.floorHeight,wood=[.48,.32,.19],blue=[.46,.63,.67],white=[.78,.78,.73];
-  const endX=floor===4?70:103;
+  const endX=103;
   const box=(name,b,color,kind='finish')=>addBox(`${floor}층 사진참고 `+name,b,color,kind,floor);
   box('복도 바닥',[0,0,z+.001,endX,3,z+.009],[.47,.48,.44]);
   box('교실쪽 노란선',[0,.16,z+.010,endX,.23,z+.014],[.93,.75,.13]);
@@ -28,9 +28,20 @@ function addMainFloorFinish(data,addBox,floor){
     for(const h of [.94,1.73,2.67])box('창가 알루미늄 가로틀 '+x+' '+h,[x-.03,2.91,z+h,b+.03,2.96,z+h+.045],[.76,.78,.77]);
     for(const u of [x-.03,b])box('창가 알루미늄 세로틀 '+u,[u,2.91,z+.94,u+.035,2.96,z+2.715],[.76,.78,.77]);
   }
+  // Finish actual north partitions (including the right-hand research rooms),
+  // following their existing door gaps rather than painting a wall over a door.
+  for(const wall of data.boxes.filter(b=>b.floor===floor&&b.kind==='wall'&&
+    b.bounds[1]>=2.8&&b.bounds[4]<=3.2&&b.bounds[0]>=0&&b.bounds[3]<=103&&
+    /^(Wall_|Lintel_|[1-4]F_NorthSill)/.test(b.name))){
+    const b=wall.bounds;
+    for(const [lo,hi,color] of [[0,.86,blue],[.86,3.13,white]]){
+      const bottom=Math.max(b[2],z+lo),top=Math.min(b[5],z+hi);
+      if(top>bottom)box('북측 '+wall.name+' '+lo,[b[0],2.85,bottom,b[3],2.875,top],color);
+    }
+  }
   // Only south-facing MAIN rooms: never repaint the ANNEX or cover the lobby.
-  for(const room of data.rooms.filter(r=>r.floor===floor+'F'&&r.building==='MAIN'&&
-    (floor===4?r.name.match(/^6-[1-7] /):['classroom','special_room'].includes(r.type)&&r.bounds[3]===0&&r.bounds[0]>=0))){
+  for(const room of data.rooms.filter(r=>r.floor===floor+'F'&&r.building!=='ANNEX'&&
+    ['classroom','special_room'].includes(r.type)&&r.bounds[3]===0&&r.bounds[0]>=0)){
     const [x0,x1]=room.bounds,door=x0+(x1-x0)*.35,left=door-.68,right=door+.68;
     for(const [a,b] of [[x0,left-.06],[right+.06,x1]]){
       box(room.name+' 하부벽',[a,.105,z,b,.135,z+.86],blue);

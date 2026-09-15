@@ -21,7 +21,7 @@ function motif(ctx,type,x,y,size,color){
 }
 export function mainClassroomDetails(config){
   if(config.roomId==='4F_6-6'&&config.photoDetails)return class66Details(config);
-  const {room,profile,frame}=config,group=new THREE.Group();group.name=room.name+' 개별 게시판';
+  const {room,profile}=config,frame=config.architecturalFrame??config.frame,group=new THREE.Group();group.name=room.name+' 개별 게시판';
   const className=room.name.replace(' 교실',''),floor=room.bounds[4];
   function panel(w,h,x,y,z,angle,draw){
     const c=document.createElement('canvas');c.width=1024;c.height=Math.round(1024*h/w);const ctx=c.getContext('2d');draw(ctx,c.width,c.height);
@@ -63,5 +63,8 @@ export function mainClassroomDetails(config){
     matrix.compose(new THREE.Vector3(p.x,p.z,-p.y),q,new THREE.Vector3(1,1,1));latch.setMatrixAt(row*8+col,matrix);
   }
   latch.instanceMatrix.needsUpdate=true;group.add(latch);
+  if(config.layoutRotation===Math.PI){
+    group.rotation.y=Math.PI;group.position.set(room.bounds[0]+room.bounds[1],0,-room.bounds[2]-room.bounds[3]);
+  }
   return group;
 }

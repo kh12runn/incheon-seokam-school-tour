@@ -21,6 +21,9 @@ assert.ok(game.includes("$('메뉴닫기').addEventListener('click',dismissMenu)
 assert.ok(game.includes("addEventListener('cancel',e=>{e.preventDefault();dismissMenu();})"),'기본 Esc 닫기도 재개');
 assert.ok(game.includes("if(mode==='walk')startWalk();"),'탐험 중 메뉴 닫기는 일반 마우스 시점 재개');
 assert.ok(game.includes("e.preventDefault();if(!e.repeat)dismissMenu();return;"),'Esc 반복 입력과 기본 닫기 중복 방지');
-assert.ok(game.includes("addEventListener('close',pausePanel)"),'프로그램 내부 닫기는 자동 재개하지 않음');
+assert.ok(game.includes("if(!locked&&!freeLook)startWalk();"),'메뉴를 직접 닫아도 자동 시점 복구');
+assert.ok(!game.includes('dragMode=fallback'),'메뉴 재개에서 드래그 모드 금지');
+assert.ok(!game.includes('else if(dragMode)'),'탐험 시점에 마우스 버튼을 요구하지 않음');
+assert.ok(game.includes("addEventListener('mousemove',e=>"),'잠금 없는 마우스 시점도 문서 전체에서 처리');
 assert.ok(game.includes('locked||dragMode||freeLook'),'잠금 거절 시 버튼 없는 마우스 시점 지원');
 console.log({ok:true,removedControls:4,floorDestinations:8,allSelectorsPresent:true});
