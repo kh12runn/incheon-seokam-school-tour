@@ -13,14 +13,16 @@ import {class64Details} from './육학년사반표현.mjs';
 import {mainClassroomDetails} from './본관교실표현.mjs';
 import {exteriorRenderBox,exteriorSkins} from './외관사진디자인.mjs';
 import {faceMonitorsTowardBoard} from './모니터방향.mjs';
+import {createTouchControls,prefersTouch} from './모바일조작.mjs';
 const $=id=>document.getElementById(id);
 const canvas=$('화면'),panel=$('시작안내'),status=$('상태'),where=$('현재위치');
-let renderer;
-try{renderer=new THREE.WebGLRenderer({canvas,antialias:true,powerPreference:'high-performance'});}
+let renderer,touchControls;
+const mobileGraphics=prefersTouch();
+try{renderer=new THREE.WebGLRenderer({canvas,antialias:!mobileGraphics,powerPreference:'high-performance'});}
 catch(error){$('불러오기').textContent='3D 그래픽을 시작할 수 없습니다.';status.textContent='Chrome 또는 Edge에서 하드웨어 가속을 켜고 다시 열어주세요.';throw error;}
-renderer.setPixelRatio(Math.min(devicePixelRatio,1.6));renderer.outputColorSpace=THREE.SRGBColorSpace;
+renderer.setPixelRatio(Math.min(devicePixelRatio,mobileGraphics?1.25:1.6));renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
-renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.shadowMap.enabled=!mobileGraphics;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 const scene=new THREE.Scene();scene.background=new THREE.Color('#bdd7e5');scene.fog=new THREE.Fog('#bdd7e5',190,350);
 scene.add(new THREE.HemisphereLight(0xe4edfa,0xb4ac91,1.35));
 scene.environment=softEnvironment(renderer);
@@ -49,6 +51,7 @@ const markerGroup=new THREE.Group();scene.add(markerGroup);
 const upConversion=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),-Math.PI/2);
 const convert=p=>new THREE.Vector3(p.x,p.z,-p.y);
 function notice(text){status.textContent=text;}
+const movementHint=()=>touchControls?.isActive()?'왼쪽 조이스틱 이동 · 오른쪽 드래그 시점 · 점프·인사 버튼':'WASD 달리기 · 마우스를 움직여 둘러보기 · ESC 메뉴';
 function updateCharacterLabel(){$('캐릭터상태').textContent=mode==='walk'&&characterChosenThisVisit?CHARACTER_NAMES[selectedCharacter]+'과 함께, 다음 교실로 가볼까요?':'탐험 시작 후 남학생 / 여학생을 선택하세요';}
 const characterPicker=createCharacterPicker({initial:selectedCharacter??'boy',onChoose(variant){
   if(avatar.variant!==variant){scene.remove(avatar.root);avatar.dispose();avatar=createStudent(variant);scene.add(avatar.root);avatar.snapHeading(Math.PI+yaw);}
@@ -174,10 +177,11 @@ function cameraWalk(dt){
   camera.position.copy(convert(cam));camera.lookAt(convert(target));
 }
 function isPlaying(){return mode==='walk'&&(locked||dragMode||freeLook)&&!document.hidden&&!$('게임메뉴').open&&!characterPicker.isOpen()&&!elevatorBusy&&!$('승강기창').open;}
-function clearInput(){keys.clear();velocity={x:0,y:0};drag=null;freeLookPoint=null;avatar.cancelWave();greeting.hidden=true;}
+function clearInput(){keys.clear();velocity={x:0,y:0};drag=null;freeLookPoint=null;touchControls?.reset();avatar.cancelWave();greeting.hidden=true;}
+function jump(){if(isPlaying()){avatar.cancelWave();jumpMotion.start(position);}}
 function greet(){
   if(!isPlaying()||jumpMotion.getState().airborne||avatar.getState().waving)return;
-  clearInput();avatar.wave(yaw);notice('안녕~! · Z 인사 · Space 점프');
+  clearInput();avatar.wave(yaw);notice(touchControls?.isActive()?'안녕~! · 오른쪽 아래 버튼으로 점프와 인사':'안녕~! · Z 인사 · Space 점프');
   if('speechSynthesis' in window){
     const line=new SpeechSynthesisUtterance('안녕!');line.lang='ko-KR';line.rate=1.03;line.pitch=1.2;
     const voice=speechSynthesis.getVoices().find(v=>v.lang.startsWith('ko'));if(voice)line.voice=voice;
@@ -193,6 +197,7 @@ function pausePanel(){
   $('안내표식').textContent=mode==='overview'?'나만의 학교 모험':'탐험 일시정지';
   $('안내제목').innerHTML=mode==='overview'?'익숙한 학교,<br>새로운 모험.':'잠깐 쉬어갈까요?';
   updateCharacterLabel();
+  touchControls?.sync();
 }
 function openMenu(){
   if(!ready||characterPicker.isOpen()||$('승강기창').open||elevatorBusy||$('게임메뉴').open)return;
@@ -225,8 +230,8 @@ async function startWalk(withoutPointerLock=false){
   cameraReset=true;camera.rotation.order='YXZ';smoothZ=position.z+EYE_HEIGHT;cameraWalk(.1);
   pausePanel();
   canvas.focus({preventScroll:true});
-  notice('WASD 달리기 · 마우스를 움직여 둘러보기 · ESC 메뉴');
-  if(withoutPointerLock||document.pointerLockElement===canvas)return;
+  notice(movementHint());
+  if(touchControls?.isActive()||withoutPointerLock||document.pointerLockElement===canvas)return;
   try{
     await canvas.requestPointerLock();
   }catch(error){
@@ -238,12 +243,12 @@ function lockFallback(){
   // Free look is already live while a lock request is pending. A late rejection
   // must not clear movement or require a click to resume.
   freeLook=true;pausePanel();canvas.focus({preventScroll:true});
-  notice('마우스를 움직여 둘러보기 · 클릭·드래그 없이 시점 이동 · ESC 메뉴');
+  notice(touchControls?.isActive()?movementHint():'마우스를 움직여 둘러보기 · 클릭·드래그 없이 시점 이동 · ESC 메뉴');
 }
 function overview(){
   $('게임메뉴').close();mode='overview';dragMode=false;freeLook=false;clearInput();if(document.pointerLockElement)document.exitPointerLock();
   orbit={yaw:.75,pitch:.83,distance:150};orbitResumeAt=0;
-  pausePanel();notice('학교 전체 항공뷰 · 드래그로 회전 / 휠로 확대 · 학교 탐험 시작하기');
+  pausePanel();notice(touchControls?.isActive()?'학교 전체 항공뷰 · 한 손가락 회전 / 두 손가락 확대 · 탐험 시작하기':'학교 전체 항공뷰 · 드래그로 회전 / 휠로 확대 · 학교 탐험 시작하기');
 }
 function reset(){position={...world.spawn};jumpMotion.reset();yaw=-Math.PI/2;pitch=0;smoothZ=position.z+EYE_HEIGHT;cameraReset=true;avatar.snapHeading(Math.PI+yaw);clearInput();notice('1층 본관 복도 출발점으로 돌아왔습니다.');}
 function openElevator(){
@@ -276,7 +281,7 @@ $('동층이동').addEventListener('change',async e=>{
   if(document.pointerLockElement)document.exitPointerLock();
   position=valid;jumpMotion.reset();yaw=destination.yaw;pitch=0;
   // Free look starts immediately, even without native select user activation.
-  await startWalk();notice(destination.label+' · WASD 이동 / 마우스로 둘러보기');
+  await startWalk();notice(destination.label+' · '+movementHint());
 });
 $('방이동').addEventListener('click',()=>{
   const room=data.rooms.find(r=>r.id===$('방선택').value);if(!room)return;
@@ -287,6 +292,7 @@ $('방이동').addEventListener('click',()=>{
 });
 document.addEventListener('pointerlockchange',()=>{
   locked=document.pointerLockElement===canvas;
+  if(locked&&touchControls?.isActive()){freeLook=true;document.exitPointerLock();return;}
   if(locked&&(mode!=='walk'||$('게임메뉴').open||characterPicker.isOpen()||$('승강기창').open||elevatorBusy)){document.exitPointerLock();return;}
   if(locked){freeLook=false;dragMode=false;}
   clearInput();pausePanel();
@@ -300,7 +306,7 @@ function lookAround(dx,dy){
   yaw-=dx*sensitivity;pitch=Math.max(-.8,Math.min(.65,pitch-dy*sensitivity));
 }
 document.addEventListener('mousemove',e=>{
-  if(!isPlaying())return;
+  if(touchControls?.isActive()||!isPlaying())return;
   if(locked){lookAround(e.movementX,e.movementY);return;}
   if(freeLook){
     const previous=freeLookPoint;freeLookPoint={x:e.clientX,y:e.clientY};
@@ -312,10 +318,12 @@ document.addEventListener('mousemove',e=>{
   }
 });
 canvas.addEventListener('pointerdown',e=>{
+  if(e.pointerType!=='mouse'||touchControls?.isActive())return;
   if(freeLook&&isPlaying()){startWalk();return;}
   if(locked)return;orbitResumeAt=performance.now()+6000;drag={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);canvas.focus();
 });
 canvas.addEventListener('pointermove',e=>{
+  if(e.pointerType!=='mouse'||touchControls?.isActive())return;
   // Mouse exploration is handled once by document mousemove, never by drag.
   if(mode==='walk')return;
   if(!drag||locked)return;const dx=e.clientX-drag.x,dy=e.clientY-drag.y;drag={x:e.clientX,y:e.clientY};
@@ -330,7 +338,7 @@ document.addEventListener('keydown',e=>{
   if(['INPUT','SELECT','TEXTAREA','BUTTON','SUMMARY'].includes(e.target.tagName)&&e.code!=='Escape')return;
   if(isPlaying()&&['KeyW','KeyA','KeyS','KeyD'].includes(e.code)){keys.add(e.code);e.preventDefault();}
   if(e.code==='Space'&&isPlaying()){
-    e.preventDefault();if(!e.repeat){avatar.cancelWave();jumpMotion.start(position);}
+    e.preventDefault();if(!e.repeat)jump();
   }
   if(e.code==='KeyZ'&&isPlaying()){e.preventDefault();if(!e.repeat)greet();}
   if(e.code==='KeyV'&&!e.repeat)overview();
@@ -340,6 +348,17 @@ document.addEventListener('keydown',e=>{
 });
 document.addEventListener('keyup',e=>keys.delete(e.code));
 addEventListener('blur',clearInput);document.addEventListener('visibilitychange',clearInput);
+touchControls=createTouchControls({canvas,canPlay:isPlaying,getMode:()=>mode,
+  onLook:(dx,dy)=>lookAround(dx*2,dy*2),
+  onOrbit:(dx,dy)=>{orbitResumeAt=performance.now()+6000;orbit.yaw-=dx*.006;orbit.pitch=Math.max(.1,Math.min(1.5,orbit.pitch+dy*.006));},
+  onZoom:ratio=>{orbitResumeAt=performance.now()+6000;orbit.distance=Math.max(18,Math.min(280,orbit.distance*ratio));},
+  onJump:jump,onGreet:greet,onStop:()=>{velocity={x:0,y:0};},
+  onModeChange:active=>{
+    freeLookPoint=null;
+    if(active&&document.pointerLockElement===canvas){freeLook=true;document.exitPointerLock();}
+    renderer.setPixelRatio(Math.min(devicePixelRatio,active?1.25:1.6));renderer.shadowMap.enabled=!active;resize();
+  }
+});
 const map=$('지도'),mapCtx=map.getContext('2d');
 function updateHUD(){
   if(!world)return;
@@ -378,7 +397,8 @@ function frame(now){
   if(mode==='walk'&&position.z>9.8&&Math.hypot(position.x-35,position.y+3.5)<14)class64PhotoFinish.load();
   const previous={...position};
   if(isPlaying()){
-    let forward=Number(keys.has('KeyW'))-Number(keys.has('KeyS')),right=Number(keys.has('KeyD'))-Number(keys.has('KeyA'));
+    const touchMove=touchControls.getMovement();
+    let forward=Number(keys.has('KeyW'))-Number(keys.has('KeyS'))+touchMove.forward,right=Number(keys.has('KeyD'))-Number(keys.has('KeyA'))+touchMove.right;
     const length=Math.hypot(forward,right);if(length){forward/=length;right/=length;}
     const speed=RUN_SPEED;
     const dx=(-Math.sin(yaw)*forward+Math.cos(yaw)*right)*speed,dy=(Math.cos(yaw)*forward+Math.sin(yaw)*right)*speed;
@@ -417,7 +437,7 @@ try{
   $('불러오기').textContent='Blender 학교 모델 준비 완료';
   // Read-only state is useful for diagnostics. Test positioning is only enabled
   // on loopback with an explicit test URL; it is not a public wall-clipping key.
-  window.schoolTour={getState:()=>({ready,mode,locked,dragMode,freeLook,position:{...position},yaw,pitch,photoFinish:class64PhotoFinish.getState(),jump:jumpMotion.getState(),character:{...avatar.getState(),visible:avatar.root.visible,position:avatar.root.position.toArray()},thirdPerson:{distance:cameraDistance,requestedDistance:followDistance,blocked:cameraBlocked,camera:camera.position.toArray()},overview:{autoOrbit,orbit:{...orbit},camera:camera.position.toArray()},visitedRooms:visitedRooms.size,visitedFloors:visitedFloors.size,drawCalls:renderer.info.render.calls,menuOpen:$('게임메뉴').open})};
+  window.schoolTour={getState:()=>({ready,mode,locked,dragMode,freeLook,touch:touchControls.getState(),graphics:{pixelRatio:renderer.getPixelRatio(),shadows:renderer.shadowMap.enabled},position:{...position},yaw,pitch,photoFinish:class64PhotoFinish.getState(),jump:jumpMotion.getState(),character:{...avatar.getState(),visible:avatar.root.visible,position:avatar.root.position.toArray()},thirdPerson:{distance:cameraDistance,requestedDistance:followDistance,blocked:cameraBlocked,camera:camera.position.toArray()},overview:{autoOrbit,orbit:{...orbit},camera:camera.position.toArray()},visitedRooms:visitedRooms.size,visitedFloors:visitedFloors.size,drawCalls:renderer.info.render.calls,menuOpen:$('게임메뉴').open})};
   if(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).has('test'))window.schoolTour.test={
     world,data,setPosition(p){if(!world.candidate(p.x,p.y,p.z))throw new Error('Invalid test position');position={...p};jumpMotion.reset();smoothZ=p.z+EYE_HEIGHT;cameraReset=true;clearInput();},setYaw(y){yaw=y;},
     step(dx,dy){position=world.move(position,dx,dy);return {...position};}

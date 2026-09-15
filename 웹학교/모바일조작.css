@@ -1,0 +1,43 @@
+html,body{overscroll-behavior:none}
+#터치조작{position:fixed;inset:0;z-index:6;pointer-events:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+#이동패드{position:absolute;left:max(24px,env(safe-area-inset-left));bottom:calc(28px + env(safe-area-inset-bottom));width:138px;height:138px;padding:0;border-radius:50%;border:2px solid #e8f4ed70;background:radial-gradient(circle,#122c3855 45%,#122c3899);box-shadow:0 4px 20px #0003;pointer-events:auto;touch-action:none;display:grid;place-items:center;transform:none}
+#이동패드::before{content:'↑';position:absolute;top:5px;font-size:17px;color:#fff9}
+#조이스틱손잡이{display:block;width:58px;height:58px;border:2px solid #edf8edb0;border-radius:50%;background:#c9e7dd77;box-shadow:0 3px 12px #071e2940;pointer-events:none}
+#이동패드.누르는중{border-color:#adebbf;background:#234d496b}
+.이동설명{position:absolute;bottom:-21px;left:0;width:100%;color:#fff;font-size:11px;text-shadow:0 2px 4px #000;pointer-events:none}
+.터치동작{position:absolute;right:max(24px,env(safe-area-inset-right));bottom:calc(30px + env(safe-area-inset-bottom));display:flex;align-items:flex-end;gap:16px;pointer-events:none}
+.터치동작 button{pointer-events:auto;touch-action:none;border:2px solid #edf8ed8c;border-radius:50%;padding:0;box-shadow:0 4px 20px #0004;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;font-weight:800;text-shadow:0 1px 3px #0008;background:#153c47aa}
+.터치동작 button span{font-size:22px;line-height:1}.터치동작 button small{font-size:11px}
+#터치점프{width:72px;height:72px;background:#315849c9;border-color:#adebbfc9}#터치인사{width:54px;height:54px}
+.시점설명{position:absolute;right:26px;bottom:calc(129px + env(safe-area-inset-bottom));font-size:11px;color:#f0f7f1bb;text-shadow:0 2px 5px #000;pointer-events:none}
+.터치설명{display:none}
+body[data-touch=true]{user-select:none;-webkit-user-select:none}
+body[data-touch=true] .터치설명{display:block}body[data-touch=true] .PC설명,body[data-touch=true] #조작힌트,body[data-touch=true] #드래그걷기,body[data-touch=true] kbd{display:none}
+body[data-touch=true] .게임헤더{top:calc(12px + env(safe-area-inset-top));left:max(14px,env(safe-area-inset-left));right:max(14px,env(safe-area-inset-right))}
+body[data-touch=true] .학교표식{pointer-events:none}body[data-touch=true] .학교표식 strong{font-size:13px}body[data-touch=true] .학교표식 .작은제목{font-size:8px}
+body[data-touch=true] .메뉴버튼{min-height:44px;min-width:74px}
+body[data-touch=true] .위치표시{top:calc(68px + env(safe-area-inset-top));max-width:85%;font-size:11px;padding:6px 12px}
+body[data-touch=true][data-playing=true] #지도상자{top:calc(107px + env(safe-area-inset-top));bottom:auto;left:max(12px,env(safe-area-inset-left));right:auto;width:110px;border-radius:10px;opacity:.85}
+body[data-touch=true][data-playing=true] #지도상자 .지도제목,body[data-touch=true][data-playing=true] #탐험{display:none}
+body[data-touch=true][data-playing=false] #지도상자{display:none}
+body[data-touch=true][data-playing=true] footer{display:none}
+body[data-touch=true] footer{bottom:calc(12px + env(safe-area-inset-bottom))}
+body[data-touch=true] #승강기호출{z-index:7;bottom:calc(185px + env(safe-area-inset-bottom));min-height:48px;max-width:85vw;white-space:nowrap}
+body[data-touch=true] dialog{touch-action:pan-y;max-height:calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom))}
+body[data-touch=true] dialog button,body[data-touch=true] dialog select,body[data-touch=true] dialog summary{min-height:44px}
+body[data-touch=true] .닫기{min-width:44px}
+.터치설정{display:flex!important;align-items:center;gap:10px;min-height:44px}.터치설정 input{width:20px;height:20px}
+@media(max-width:360px){
+  #이동패드{left:max(16px,env(safe-area-inset-left));width:116px;height:116px}#조이스틱손잡이{width:50px;height:50px}
+  .터치동작{right:max(16px,env(safe-area-inset-right));gap:12px}#터치점프{width:64px;height:64px}#터치인사{width:50px;height:50px}
+}
+@media(max-height:520px){
+  body[data-touch=true] .위치표시{top:calc(18px + env(safe-area-inset-top));max-width:38%}
+  body[data-touch=true][data-playing=true] #지도상자{top:calc(68px + env(safe-area-inset-top));width:96px}
+  #이동패드{width:116px;height:116px;bottom:calc(24px + env(safe-area-inset-bottom))}#조이스틱손잡이{width:50px;height:50px}
+  #터치점프{width:64px;height:64px}.터치동작{bottom:calc(22px + env(safe-area-inset-bottom))}
+  .시점설명{bottom:calc(108px + env(safe-area-inset-bottom))}
+  body[data-touch=true] #승강기호출{bottom:calc(100px + env(safe-area-inset-bottom))}
+  body[data-touch=true] #캐릭터창 canvas{height:115px}body[data-touch=true] #캐릭터창{padding:12px 18px}
+  body[data-touch=true] #시작안내{top:86px;max-height:calc(100dvh - 130px - env(safe-area-inset-top))}
+}

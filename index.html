@@ -1,14 +1,15 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="./웹학교/캐릭터.css">
   <link rel="stylesheet" href="./웹학교/게임화면.css">
+  <link rel="stylesheet" href="./웹학교/모바일조작.css">
   <title>석암초등학교 · 우리 학교 탐험</title>
 </head>
 <body data-mode="overview" data-playing="false">
-  <canvas id="화면" tabindex="0" aria-label="마우스와 WASD로 탐험하는 학교 3D 화면"></canvas>
+  <canvas id="화면" tabindex="0" aria-label="키보드·마우스 또는 터치 조이스틱으로 탐험하는 학교 3D 화면"></canvas>
   <div class="화면음영" aria-hidden="true"></div>
   <header class="게임헤더">
     <div class="학교표식"><span class="학교문장" aria-hidden="true">석암</span><div><span class="작은제목">우리 학교 탐험</span><strong>석암초등학교</strong></div></div>
@@ -37,10 +38,12 @@
       <button id="육사이동" class="교실추천" disabled><span>사진으로 꾸민 교실</span>6학년 4반 <span aria-hidden="true">↗</span></button>
     </section>
     <details class="메뉴구역"><summary>조작 방법 · 설정</summary>
-      <div class="조작목록"><span><kbd>W A S D</kbd> 달리기</span><span><kbd>Space</kbd> 점프</span><span><kbd>Z</kbd> 인사</span><span><kbd>E</kbd> 엘리베이터</span><span>마우스 · 시점 회전</span><span>휠 · 시점 거리</span></div>
-      <label class="감도설정" for="감도">마우스 감도 <input id="감도" type="range" min="0.5" max="4" step="0.1" value="1.8"></label>
+      <div class="조작목록 PC설명"><span><kbd>W A S D</kbd> 달리기</span><span><kbd>Space</kbd> 점프</span><span><kbd>Z</kbd> 인사</span><span><kbd>E</kbd> 엘리베이터</span><span>마우스 · 시점 회전</span><span>휠 · 시점 거리</span></div>
+      <p class="터치설명">왼쪽 조이스틱: 달리기<br>오른쪽 화면 드래그: 시점 회전<br>점프·인사: 오른쪽 아래 버튼<br>항공뷰: 한 손가락 회전 · 두 손가락 확대/축소<br>엘리베이터 앞에서는 ‘엘리베이터 타기’를 누르세요.</p>
+      <label class="터치설정"><input id="터치조작사용" type="checkbox"> 터치 조작 사용</label>
+      <label class="감도설정" for="감도">시점 감도 <input id="감도" type="range" min="0.5" max="4" step="0.1" value="1.8"></label>
       <button id="드래그걷기" disabled>마우스 잠금 없이 탐험</button>
-      <p>마우스 잠금 없이도 클릭하거나 드래그할 필요 없이 마우스를 움직여 둘러볼 수 있습니다. 키보드와 마우스 사용을 권장합니다.</p>
+      <p class="PC설명">마우스 잠금 없이도 클릭하거나 드래그할 필요 없이 마우스를 움직여 둘러볼 수 있습니다.</p>
     </details>
     <div class="메뉴하단"><button id="처음" disabled>출발점으로 이동</button><button id="전체" disabled>시작 화면으로</button></div>
   </dialog>
@@ -61,8 +64,13 @@
   </aside>
   <div class="위치표시"><span class="위치점" aria-hidden="true"></span><span id="현재위치">학교 전체</span></div>
   <aside id="조작힌트" aria-label="조작 키 안내"><span><kbd>W A S D</kbd> 달리기</span><span><kbd>Space</kbd> 점프</span><span><kbd>Z</kbd> 인사</span><span><kbd>Esc</kbd> 메뉴</span></aside>
+  <div id="터치조작" aria-label="모바일 탐험 조작" hidden>
+    <button id="이동패드" aria-label="이동 조이스틱: 원하는 방향으로 밀어 달리기" disabled><span id="조이스틱손잡이" aria-hidden="true"></span><span class="이동설명" aria-hidden="true">이동</span></button>
+    <span class="시점설명" aria-hidden="true">오른쪽 화면을 밀어 둘러보기</span>
+    <div class="터치동작"><button id="터치인사" aria-label="손 흔들어 인사하기" disabled><span aria-hidden="true">👋</span><small>인사</small></button><button id="터치점프" aria-label="점프하기" disabled><span aria-hidden="true">↑</span><small>점프</small></button></div>
+  </div>
   <footer><span id="상태" role="status">구조 불러오는 중…</span></footer>
-  <script type="module" src="./웹학교/게임.mjs?v=20260915-화장실2"></script>
+  <script type="module" src="./웹학교/게임.mjs?v=20260915-모바일1"></script>
   <noscript>학교를 보려면 브라우저에서 자바스크립트를 허용하세요.</noscript>
 </body>
 </html>
