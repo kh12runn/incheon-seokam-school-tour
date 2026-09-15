@@ -20,5 +20,17 @@
   "mobileRealtimeShadows": false,
   "realDevicePerformanceMeasured": false,
   "physicalSafariTested": false,
-  "published": false
+  "published": true,
+  "codeCommit": "19d748f431d357f5647763534f5de8012243c4fd",
+  "url": "https://school-tour-production.up.railway.app/",
+  "deploymentId": "0ba13ff4-e70a-47e3-93dd-b3f35b4d1efd",
+  "deploymentStatus": "SUCCESS",
+  "publicMobileChecks": ["항공뷰 핀치", "이동·시점·점프 동시 입력", "정지·인사", "취소·메뉴 복귀", "가로 전환·조작", "별관 4층 선택"],
+  "publicPageErrors": [],
+  "publicTestHooksAbsent": true,
+  "matchedPublicAssetHashes": ["index.html", "웹학교/게임.mjs", "웹학교/모바일조작.mjs", "웹학교/모바일조작.css"],
+  "healthStatus": 200,
+  "privateModelStatus": 403,
+  "privateCaptureFolderStatus": 403,
+  "contentEncoding": "br"
 }
