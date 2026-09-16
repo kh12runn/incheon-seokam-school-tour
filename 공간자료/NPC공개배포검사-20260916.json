@@ -1,0 +1,33 @@
+{
+  "verifiedDate": "2026-09-16",
+  "url": "https://school-tour-production.up.railway.app/",
+  "codeCommit": "12ed141809cbef7ac3ce8392df72ab949fee5b4c",
+  "railwayDeployment": "c4458040-fa57-43ec-8000-5e0d3a43ccfe",
+  "deploymentStatus": "SUCCESS",
+  "appearanceVersion": "approved-skin-wrap-v6",
+  "healthStatus": 200,
+  "runtimeFilesCompared": 52,
+  "sha256Matches": 52,
+  "mismatches": [],
+  "lobbyNPCVisible": true,
+  "officeNPCVisible": true,
+  "bothPortraitTexturesReady": true,
+  "publicTestHooksExposed": false,
+  "privatePathsStatus": 403,
+  "mobile": {
+    "viewport": [390, 844],
+    "touchSupported": true,
+    "controlsVisible": true,
+    "approvedNPCAppearanceLoaded": true,
+    "runtimeErrors": []
+  },
+  "localChecks": {
+    "eyeCoverageRaySamples": 180,
+    "eyeCoverageMisses": 0,
+    "patrolSamples": 20000,
+    "bothGreetings": true,
+    "menuResume": true,
+    "bodyCollision": true,
+    "runtimeErrors": []
+  }
+}
