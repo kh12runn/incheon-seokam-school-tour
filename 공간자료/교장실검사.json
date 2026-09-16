@@ -1,0 +1,43 @@
+{
+  "date": "2026-09-16",
+  "scope": "2F_PRINCIPAL",
+  "status": "local-only",
+  "committed": false,
+  "deployed": false,
+  "reference": "https://tours.clearpano.com/zeqFg5bi",
+  "sourceBlenderSha256": "7a3acf92fb3146b8a50f239f933fb4415984db1540d752f9c9bc04be78176bd7",
+  "geometry": {
+    "majorFurniture": 16,
+    "patrolSamples": 20000,
+    "routeSegmentsVisited": 12,
+    "doorRoundTrip": true,
+    "windowCollision": true,
+    "otherRoomsPreserved": true
+  },
+  "desktop": {
+    "lazyFace": true,
+    "faceLoaded": true,
+    "patrolMoved": 0.30545599999998846,
+    "menuPause": true,
+    "closeResume": true,
+    "playerYield": true,
+    "npcSpacingAfterApproach": 0.6073218862254706,
+    "otherFloorHidden": true,
+    "errors": []
+  },
+  "mobileChromiumEmulation": {
+    "viewport": [390, 844],
+    "lazyFace": true,
+    "faceLoaded": true,
+    "patrolMoved": 0.30599999999999694,
+    "menuPause": true,
+    "closeResume": true,
+    "playerYield": true,
+    "npcSpacingAfterApproach": 0.6563457090175291,
+    "otherFloorHidden": true,
+    "errors": [],
+    "multitouchRegression": ["pinch", "joystick+look+jump", "stop", "greet", "cancel", "menu", "landscape", "elevator"]
+  },
+  "nodeRegressionPassed": ["교장실검사", "본관교실검사", "이동검사", "화장실검사", "모바일입력검사", "점프검사", "외관사진디자인검사", "게임화면검사", "배포검사"],
+  "limitations": ["not-a-measured-scan", "side-and-back-face-approximated", "actual-mobile-hardware-not-tested", "no-live-deployment"]
+}

@@ -14,6 +14,8 @@ import {mainClassroomDetails} from './본관교실표현.mjs';
 import {exteriorRenderBox,exteriorSkins} from './외관사진디자인.mjs';
 import {faceMonitorsTowardBoard} from './모니터방향.mjs';
 import {createTouchControls,prefersTouch} from './모바일조작.mjs';
+import {PRINCIPAL_ID,createPrincipalPatrol} from './교장실배치.mjs';
+import {createPrincipalOffice,createPrincipalNPC} from './교장실표현.mjs';
 const $=id=>document.getElementById(id);
 const canvas=$('화면'),panel=$('시작안내'),status=$('상태'),where=$('현재위치');
 let renderer,touchControls;
@@ -41,6 +43,7 @@ let autoOrbit=true,orbitResumeAt=0,elevatorBusy=false;
 let selectedCharacter=null;
 let jumpMotion;
 let class64PhotoFinish;
+let principalPatrol,principalNPC;
 const greeting=document.createElement('div');greeting.id='인사말';greeting.textContent='안녕~ 👋';greeting.hidden=true;greeting.setAttribute('role','status');document.body.append(greeting);
 let characterChosenThisVisit=false;
 try{const saved=localStorage.getItem('석암학교-캐릭터');if(CHARACTER_NAMES[saved])selectedCharacter=saved;}catch{}
@@ -78,6 +81,8 @@ function textTexture(text,background=false){
   const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;return {tex,ratio:c.width/c.height};
 }
 function buildVisuals(){
+  const office=createPrincipalOffice();scene.add(office);visuals.push({mesh:office,floor:2,interiorRoom:PRINCIPAL_ID,center:convert(world.principalOffice.spawn),ceiling:false});
+  principalPatrol=createPrincipalPatrol(world);
   const roomDetails=class64Details();scene.add(roomDetails);visuals.push({mesh:roomDetails,floor:4,ceiling:false});
   class64PhotoFinish=roomDetails.userData.photoFinish;
   for(const config of world.classroomsMain.rooms){
@@ -286,9 +291,9 @@ $('동층이동').addEventListener('change',async e=>{
 $('방이동').addEventListener('click',()=>{
   const room=data.rooms.find(r=>r.id===$('방선택').value);if(!room)return;
   const b=room.bounds,interior=world.classroomsMain.rooms.find(r=>r.roomId===room.id);
-  const p=room.id===CLASS64_ID?{...CLASS64_SPAWN}:interior?{...interior.spawn}:{x:(b[0]+b[1])/2,y:(b[2]+b[3])/2,z:b[4]};
+  const p=room.id===PRINCIPAL_ID?{...world.principalOffice.spawn}:room.id===CLASS64_ID?{...CLASS64_SPAWN}:interior?{...interior.spawn}:{x:(b[0]+b[1])/2,y:(b[2]+b[3])/2,z:b[4]};
   const valid=world.candidate(p.x,p.y,p.z);if(!valid){notice('해당 위치는 이동할 수 없습니다.');return;}
-  position=valid;jumpMotion.reset();yaw=interior?.layoutRotation===Math.PI?-Math.PI/2:interior||room.id===CLASS64_ID?Math.PI/2:room.building==='ANNEX'?-Math.PI/2:0;pitch=0;startWalk();
+  position=valid;jumpMotion.reset();yaw=room.id===PRINCIPAL_ID?Math.PI:interior?.layoutRotation===Math.PI?-Math.PI/2:interior||room.id===CLASS64_ID?Math.PI/2:room.building==='ANNEX'?-Math.PI/2:0;pitch=0;startWalk();
 });
 document.addEventListener('pointerlockchange',()=>{
   locked=document.pointerLockElement===canvas;
@@ -405,7 +410,16 @@ function frame(now){
     const a=1-Math.exp(-dt*14);velocity.x+=(dx-velocity.x)*a;velocity.y+=(dy-velocity.y)*a;
     if(length&&avatar.getState().waving)avatar.cancelWave();
     position=jumpMotion.step(position,velocity.x*dt,velocity.y*dt,dt);
+    if(principalNPC?.root.visible){
+      const npc=principalPatrol.getState().position;
+      if(Math.abs(position.z-npc.z)<1.8&&Math.hypot(position.x-npc.x,position.y-npc.y)<.55&&Math.hypot(position.x-npc.x,position.y-npc.y)<Math.hypot(previous.x-npc.x,previous.y-npc.y)){
+        position.x=previous.x;position.y=previous.y;
+      }
+    }
   }
+  const officeNearby=mode==='walk'&&Math.abs(position.z-3.4)<1.8&&Math.hypot(position.x-33.5,position.y+3.5)<22;
+  if(officeNearby&&!principalNPC){principalNPC=createPrincipalNPC();scene.add(principalNPC.root);}
+  if(principalNPC){principalNPC.root.visible=officeNearby;const npcState=principalPatrol.update(dt,position,!officeNearby||!isPlaying()||document.hidden);principalNPC.update(dt,npcState);}
   if(mode==='walk')cameraWalk(dt);else overviewCamera(wallDt);
   avatar.root.visible=mode==='walk'&&cameraDistance>.32;
   if(mode==='walk'){
@@ -438,6 +452,7 @@ try{
   // Read-only state is useful for diagnostics. Test positioning is only enabled
   // on loopback with an explicit test URL; it is not a public wall-clipping key.
   window.schoolTour={getState:()=>({ready,mode,locked,dragMode,freeLook,touch:touchControls.getState(),graphics:{pixelRatio:renderer.getPixelRatio(),shadows:renderer.shadowMap.enabled},position:{...position},yaw,pitch,photoFinish:class64PhotoFinish.getState(),jump:jumpMotion.getState(),character:{...avatar.getState(),visible:avatar.root.visible,position:avatar.root.position.toArray()},thirdPerson:{distance:cameraDistance,requestedDistance:followDistance,blocked:cameraBlocked,camera:camera.position.toArray()},overview:{autoOrbit,orbit:{...orbit},camera:camera.position.toArray()},visitedRooms:visitedRooms.size,visitedFloors:visitedFloors.size,drawCalls:renderer.info.render.calls,menuOpen:$('게임메뉴').open})};
+  window.schoolTour.getPrincipalState=()=>({...principalPatrol.getState(),...(principalNPC?.getState()??{faceTexture:'not-requested'}),visible:principalNPC?.root.visible??false});
   if(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).has('test'))window.schoolTour.test={
     world,data,setPosition(p){if(!world.candidate(p.x,p.y,p.z))throw new Error('Invalid test position');position={...p};jumpMotion.reset();smoothZ=p.z+EYE_HEIGHT;cameraReset=true;clearInput();},setYaw(y){yaw=y;},
     step(dx,dy){position=world.move(position,dx,dy);return {...position};}

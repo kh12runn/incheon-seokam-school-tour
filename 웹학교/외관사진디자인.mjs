@@ -42,7 +42,8 @@ export function exteriorSkins(boxes,data){
     add('창 중앙 샷시 '+pane.name,b,[.66,.63,.55],'metal',pane.floor);
     // Existing special-room backing remains solid; an exterior-only glass face
     // depicts its source window. Real classroom openings remain transparent.
-    if(room.type!=='classroom')add('특별실 외부 창면 '+pane.name,base,[.29,.37,.36],'glass',pane.floor);
+    const opened=boxes.some(b=>b.name==='교실창 투명유리 '+pane.name);
+    if(room.type!=='classroom'&&!opened)add('특별실 외부 창면 '+pane.name,base,[.29,.37,.36],'glass',pane.floor);
   }
   return result;
 }
