@@ -6,7 +6,9 @@ export async function verifyPrincipalRoom(page){
     const lazy=await page.evaluate(()=>!performance.getEntriesByType('resource').some(r=>decodeURIComponent(r.name).includes('교장선생님-얼굴')));assert(lazy,'항공뷰에서 얼굴 다운로드 안 함');
     await page.locator('#시작').click();await page.locator('#캐릭터확인').click();
     await page.evaluate(()=>document.getElementById('메뉴').click());await page.locator('#방선택').selectOption('2F_PRINCIPAL');await page.locator('#방이동').click();
-    await page.waitForFunction(()=>schoolTour.getPrincipalState().faceTexture==='ready');
+    await page.waitForFunction(()=>schoolTour.getPrincipalState().faceVersion==='portrait-continuous-v5'&&schoolTour.getPrincipalState().faceTexture==='ready');
+    assert(await page.evaluate(()=>schoolTour.getPrincipalState().headScale===.82),'성인 비율의 사진 기반 입체 얼굴');
+    assert(await page.evaluate(()=>schoolTour.getPrincipalState().appearanceVersion==='approved-skin-wrap-v6'),'승인된 얼굴·목 피부 연결');
     const entry=await page.evaluate(()=>schoolTour.getState());assert(entry.position.x===32.45&&entry.position.z===3.4,'교장실 안전한 입구 이동');
     await page.waitForFunction(()=>schoolTour.getPrincipalState().distance>.30);
     const moving=await page.evaluate(()=>schoolTour.getPrincipalState());assert(moving.visible,'NPC 표시');

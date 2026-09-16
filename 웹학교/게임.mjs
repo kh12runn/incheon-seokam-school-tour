@@ -16,6 +16,8 @@ import {faceMonitorsTowardBoard} from './모니터방향.mjs';
 import {createTouchControls,prefersTouch} from './모바일조작.mjs';
 import {PRINCIPAL_ID,createPrincipalPatrol} from './교장실배치.mjs';
 import {createPrincipalOffice,createPrincipalNPC} from './교장실표현.mjs';
+import {createRunnerPrincipalNPC} from './마라토너교장선생님.mjs';
+import {PRINCIPAL_GREETING,LOBBY_PRINCIPAL_POSITION,createLobbyPrincipalState,principalCanGreet,blocksPrincipal} from './교장선생님인사.mjs';
 const $=id=>document.getElementById(id);
 const canvas=$('화면'),panel=$('시작안내'),status=$('상태'),where=$('현재위치');
 let renderer,touchControls;
@@ -44,6 +46,22 @@ let selectedCharacter=null;
 let jumpMotion;
 let class64PhotoFinish;
 let principalPatrol,principalNPC;
+let lobbyPrincipalNPC;
+const lobbyPrincipalState=createLobbyPrincipalState();
+const principalBubbles=['교장실','중앙현관'].map(name=>{
+  const element=document.createElement('div');element.id=name+'교장말풍선';element.className='교장말풍선';element.textContent=PRINCIPAL_GREETING;element.hidden=true;element.setAttribute('role','status');document.body.append(element);return element;
+});
+const bubblePoint=new THREE.Vector3();
+function updatePrincipalBubble(element,npc,npcPosition){
+  element.hidden=true;
+  if(!npc?.root.visible||!principalCanGreet(position,npcPosition,{active:isPlaying()&&!document.hidden,colliders:world.colliders}))return;
+  bubblePoint.set(npcPosition.x,npcPosition.z+2.12,-npcPosition.y).project(camera);
+  if(bubblePoint.z< -1||bubblePoint.z>1||Math.abs(bubblePoint.x)>.97||Math.abs(bubblePoint.y)>.97)return;
+  element.hidden=false;
+  const margin=Math.min(159,innerWidth/2);
+  element.style.left=Math.max(margin,Math.min(innerWidth-margin,(bubblePoint.x*.5+.5)*innerWidth))+'px';
+  element.style.top=Math.max(100,(-bubblePoint.y*.5+.5)*innerHeight)+'px';
+}
 const greeting=document.createElement('div');greeting.id='인사말';greeting.textContent='안녕~ 👋';greeting.hidden=true;greeting.setAttribute('role','status');document.body.append(greeting);
 let characterChosenThisVisit=false;
 try{const saved=localStorage.getItem('석암학교-캐릭터');if(CHARACTER_NAMES[saved])selectedCharacter=saved;}catch{}
@@ -410,9 +428,8 @@ function frame(now){
     const a=1-Math.exp(-dt*14);velocity.x+=(dx-velocity.x)*a;velocity.y+=(dy-velocity.y)*a;
     if(length&&avatar.getState().waving)avatar.cancelWave();
     position=jumpMotion.step(position,velocity.x*dt,velocity.y*dt,dt);
-    if(principalNPC?.root.visible){
-      const npc=principalPatrol.getState().position;
-      if(Math.abs(position.z-npc.z)<1.8&&Math.hypot(position.x-npc.x,position.y-npc.y)<.55&&Math.hypot(position.x-npc.x,position.y-npc.y)<Math.hypot(previous.x-npc.x,previous.y-npc.y)){
+    for(const npc of [principalPatrol.getState().position,LOBBY_PRINCIPAL_POSITION]){
+      if(blocksPrincipal(previous,position,npc)){
         position.x=previous.x;position.y=previous.y;
       }
     }
@@ -420,7 +437,12 @@ function frame(now){
   const officeNearby=mode==='walk'&&Math.abs(position.z-3.4)<1.8&&Math.hypot(position.x-33.5,position.y+3.5)<22;
   if(officeNearby&&!principalNPC){principalNPC=createPrincipalNPC();scene.add(principalNPC.root);}
   if(principalNPC){principalNPC.root.visible=officeNearby;const npcState=principalPatrol.update(dt,position,!officeNearby||!isPlaying()||document.hidden);principalNPC.update(dt,npcState);}
+  const lobbyNearby=mode==='walk'&&Math.abs(position.z)<1.8&&Math.hypot(position.x-47,position.y+2.8)<22;
+  if(lobbyNearby&&!lobbyPrincipalNPC){lobbyPrincipalNPC=createRunnerPrincipalNPC();scene.add(lobbyPrincipalNPC.root);}
+  if(lobbyPrincipalNPC){lobbyPrincipalNPC.root.visible=lobbyNearby;const npcState=lobbyPrincipalState.update(dt,position,!lobbyNearby||!isPlaying()||document.hidden);lobbyPrincipalNPC.update(isPlaying()&&!document.hidden?dt:0,npcState);}
   if(mode==='walk')cameraWalk(dt);else overviewCamera(wallDt);
+  updatePrincipalBubble(principalBubbles[0],principalNPC,principalPatrol.getState().position);
+  updatePrincipalBubble(principalBubbles[1],lobbyPrincipalNPC,LOBBY_PRINCIPAL_POSITION);
   avatar.root.visible=mode==='walk'&&cameraDistance>.32;
   if(mode==='walk'){
     const dx=position.x-previous.x,dy=position.y-previous.y,baseZ=position.z;
@@ -453,6 +475,7 @@ try{
   // on loopback with an explicit test URL; it is not a public wall-clipping key.
   window.schoolTour={getState:()=>({ready,mode,locked,dragMode,freeLook,touch:touchControls.getState(),graphics:{pixelRatio:renderer.getPixelRatio(),shadows:renderer.shadowMap.enabled},position:{...position},yaw,pitch,photoFinish:class64PhotoFinish.getState(),jump:jumpMotion.getState(),character:{...avatar.getState(),visible:avatar.root.visible,position:avatar.root.position.toArray()},thirdPerson:{distance:cameraDistance,requestedDistance:followDistance,blocked:cameraBlocked,camera:camera.position.toArray()},overview:{autoOrbit,orbit:{...orbit},camera:camera.position.toArray()},visitedRooms:visitedRooms.size,visitedFloors:visitedFloors.size,drawCalls:renderer.info.render.calls,menuOpen:$('게임메뉴').open})};
   window.schoolTour.getPrincipalState=()=>({...principalPatrol.getState(),...(principalNPC?.getState()??{faceTexture:'not-requested'}),visible:principalNPC?.root.visible??false});
+  window.schoolTour.getLobbyPrincipalState=()=>({...lobbyPrincipalState.getState(),...(lobbyPrincipalNPC?.getState()??{}),visible:lobbyPrincipalNPC?.root.visible??false});
   if(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).has('test'))window.schoolTour.test={
     world,data,setPosition(p){if(!world.candidate(p.x,p.y,p.z))throw new Error('Invalid test position');position={...p};jumpMotion.reset();smoothZ=p.z+EYE_HEIGHT;cameraReset=true;clearInput();},setYaw(y){yaw=y;},
     step(dx,dy){position=world.move(position,dx,dy);return {...position};}

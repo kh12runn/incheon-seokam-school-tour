@@ -1,5 +1,7 @@
 import * as THREE from './외부도구/three.module.js';
 import {OFFICE_FURNITURE,OFFICE_ORIGIN} from './교장실배치.mjs';
+import {createPrincipalFace,PRINCIPAL_FACE_VERSION,PRINCIPAL_HEAD_SCALE,PRINCIPAL_SKIN_COLOR,getPrincipalFaceState} from './교장선생님얼굴.mjs';
+import {applyApprovedPrincipalAppearance,PRINCIPAL_APPEARANCE_VERSION} from './교장선생님피부마감.mjs';
 const boxGeometry=new THREE.BoxGeometry(1,1,1),ballGeometry=new THREE.SphereGeometry(1,16,12),rodGeometry=new THREE.CylinderGeometry(1,1,1,10),roundedCache=new Map();
 const metal=new THREE.MeshStandardMaterial({color:'#a7acad',metalness:.82,roughness:.28});
 function paint(color,roughness=.68,extra={}){return new THREE.MeshStandardMaterial({color,roughness,...extra});}
@@ -154,50 +156,46 @@ export function createPrincipalOffice(){
 
 export function createPrincipalNPC(){
   const root=new THREE.Group();root.name='교장선생님 NPC';
-  const navy=paint('#263347',.85),navyDark=paint('#192639',.9),shirt=paint('#ecece5'),skin=paint('#d5a486',.84),shoe=paint('#24282b',.4);
+  const smoothBodySphere=new THREE.SphereGeometry(1,32,24);
+  const ball=(p,m,x,y,z,w,h,d)=>mesh(p,smoothBodySphere,m,x,y,z,w,h,d);
+  const navy=paint('#263347',.85),navyDark=paint('#192639',.9),shirt=paint('#ecece5'),skin=paint(PRINCIPAL_SKIN_COLOR,.84),shoe=paint('#24282b',.4);
   const weave=canvasMap((c,w,h)=>{c.fillStyle='#b7c0cc';c.fillRect(0,0,w,h);for(let i=0;i<w;i+=3){c.fillStyle='#68778e50';c.fillRect(i,0,1,h);c.fillStyle='#eef0f02b';c.fillRect(0,i,w,1);}},128,128);weave.wrapS=weave.wrapT=THREE.RepeatWrapping;weave.repeat.set(7,7);navy.map=weave;navyDark.map=weave;
   const body=new THREE.Group();body.position.y=.93;root.add(body);
-  mesh(body,new THREE.CylinderGeometry(.225,.174,.55,16),navy,0,.295,0,1,1,.62);
+  const torsoProfile=[[.02,.164],[.16,.171],[.35,.183],[.46,.193],[.51,.190],[.545,.158],[.568,.105],[.59,.046]];
+  const torsoRadius=y=>{let i=1;while(i<torsoProfile.length-1&&y>torsoProfile[i][0])i++;const a=torsoProfile[i-1],b=torsoProfile[i],p=torsoProfile[Math.max(0,i-2)],n=torsoProfile[Math.min(torsoProfile.length-1,i+1)],d=b[0]-a[0],t=THREE.MathUtils.clamp((y-a[0])/d,0,1),m0=(b[1]-p[1])/(b[0]-p[0]),m1=(n[1]-a[1])/(n[0]-a[0]);return (2*t**3-3*t*t+1)*a[1]+(t**3-2*t*t+t)*d*m0+(-2*t**3+3*t*t)*b[1]+(t**3-t*t)*d*m1;};
+  const torso=mesh(body,new THREE.LatheGeometry(Array.from({length:65},(_,i)=>{const y=.02+.57*i/64;return new THREE.Vector2(torsoRadius(y),y);}),48),navy,0,0,0,1,1,.69);torso.name='목에서 어깨로 내려오는 정장 몸통';
   ball(body,navy,0,.065,0,.183,.14,.116);
   // White shirt opening and shaped overlapping navy lapels.
-  function polygon(parent,points,material){const s=new THREE.Shape();points.forEach(([x,y],i)=>i?s.lineTo(x,y):s.moveTo(x,y));s.closePath();return mesh(parent,new THREE.ShapeGeometry(s),material,0,0,.149);}
-  polygon(body,[[-.105,.58],[.105,.58],[.035,.23],[-.035,.23]],shirt);
-  for(const s of [-1,1])polygon(body,[[s*.105,.58],[s*.177,.53],[s*.115,.39],[s*.143,.355],[s*.027,.22]],navyDark);
+  function polygon(parent,points,material,z=.140){
+    const s=new THREE.Shape();points.forEach(([x,y],i)=>i?s.lineTo(x,y):s.moveTo(x,y));s.closePath();
+    const original=new THREE.ShapeGeometry(s),g=original.toNonIndexed(),p=g.attributes.position,positions=[],uv=[],normals=[];
+    function triangle(a,b,c,n){if(n){const ab=a.map((v,i)=>(v+b[i])/2),bc=b.map((v,i)=>(v+c[i])/2),ca=c.map((v,i)=>(v+a[i])/2);triangle(a,ab,ca,n-1);triangle(ab,b,bc,n-1);triangle(ca,bc,c,n-1);triangle(ab,bc,ca,n-1);return;}
+      for(const [x,y]of[a,b,c]){const r=torsoRadius(y),front=Math.sqrt(Math.max(.00002,r*r-x*x)),dr=(torsoRadius(y+.0005)-torsoRadius(y-.0005))/.001,n=new THREE.Vector3(.69*x/front,-.69*r*dr/front,1).normalize();positions.push(x,y,front*.69+.004+z-.140);uv.push(x,y);normals.push(n.x,n.y,n.z);}}
+    for(let i=0;i<p.count;i+=3)triangle([p.getX(i),p.getY(i)],[p.getX(i+1),p.getY(i+1)],[p.getX(i+2),p.getY(i+2)],3);
+    original.dispose();g.dispose();const shaped=new THREE.BufferGeometry();shaped.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));shaped.setAttribute('uv',new THREE.Float32BufferAttribute(uv,2));shaped.setAttribute('normal',new THREE.Float32BufferAttribute(normals,3));return mesh(parent,shaped,material,0,0,0);
+  }
+  polygon(body,[[-.066,.582],[.066,.582],[.039,.47],[.022,.275],[-.022,.275],[-.039,.47]],shirt);
+  for(const s of [-1,1]){
+    polygon(body,[[s*.066,.58],[s*.158,.53],[s*.103,.40],[s*.122,.369],[s*.020,.24]],navyDark,.144);
+    polygon(body,[[s*.040,.589],[s*.067,.56],[s*.033,.501],[s*.005,.557]],shirt,.150);
+  }
   const tie=paint('#404f66',.77);tie.map=canvasMap((c,w,h)=>{c.fillStyle='#36465c';c.fillRect(0,0,w,h);for(let i=0;i<18;i++)for(let j=0;j<7;j++){c.strokeStyle='#bead85';c.beginPath();c.ellipse(j*150+i%2*70,i*31,16,10,.6,0,Math.PI*2);c.stroke();}},512,512);
-  polygon(body,[[0,.56],[.037,.49],[.020,.25],[0,.22],[-.021,.25],[-.033,.49]],tie);
+  polygon(body,[[-.016,.564],[.016,.564],[.021,.54],[0,.514],[-.021,.54]],tie,.154);
+  polygon(body,[[-.010,.528],[.010,.528],[.018,.30],[0,.277],[-.018,.30]],tie,.153);
   for(const y of [.20,.31])ball(body,navyDark,.04,y,.141,.011,.011,.004);
   cube(body,navyDark,-.145,.425,.132,.083,.011,.012);
-  mesh(body,new THREE.CylinderGeometry(.047,.052,.105,14),skin,0,.616,0);
-  const head=new THREE.Group();head.position.set(0,.64,.002);body.add(head);
-  // Volumetric head. Frontal UV projection preserves the supplied portrait's features;
-  // side/back skull and hair are an approximation, not a facial scan.
-  const headMap=new THREE.TextureLoader().load(new URL('./사진마감/교장실/교장선생님-얼굴.png',import.meta.url).href,()=>{faceState='ready';},undefined,()=>{faceState='failed';});headMap.colorSpace=THREE.SRGBColorSpace;
-  let faceState='loading';
-  const positions=[],uvs=[],indices=[],rows=32,cols=40;
-  const widths=[[0,.015],[.04,.073],[.09,.110],[.16,.128],[.23,.123],[.28,.104],[.325,.008]];
-  const widthAt=h=>{let i=1;while(i<widths.length-1&&h>widths[i][0])i++;const a=widths[i-1],b=widths[i],t=(h-a[0])/(b[0]-a[0]);return a[1]+(b[1]-a[1])*t;};
-  for(let j=0;j<=rows;j++)for(let i=0;i<=cols;i++){
-    const h=j/rows*.325,a=-Math.PI/2+i/cols*Math.PI,x=widthAt(h)*Math.sin(a);
-    let z=.095*Math.cos(a)*Math.pow(Math.sin(Math.PI*j/rows),.35);
-    const nose=Math.exp(-((x/.027)**2)-(((h-.127)/.045)**2))*.037;
-    z+=nose;positions.push(x,h,z);uvs.push(.5+x/.128*.335,.039+h/.325*.947);
-  }
-  for(let j=0;j<rows;j++)for(let i=0;i<cols;i++){const a=j*(cols+1)+i,b=a+cols+1;indices.push(a,a+1,b,a+1,b+1,b);}
-  const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));geo.setAttribute('uv',new THREE.Float32BufferAttribute(uvs,2));geo.setIndex(indices);geo.computeVertexNormals();
-  const face=mesh(head,geo,paint('#ffffff',.88,{map:headMap,side:THREE.DoubleSide}),0,0,.017);face.name='사진 참고 입체 얼굴';
-  ball(head,skin,0,.157,-.021,.115,.154,.097);
-  const hair=paint('#292825',.96);ball(head,hair,0,.215,-.047,.12,.112,.093);
-  for(const s of [-1,1])ball(head,skin,s*.12,.132,-.005,.017,.038,.016);
-  for(let i=0;i<15;i++){const a=-1.25+i*.175;const curl=ball(head,i%5===0?paint('#5a5750'):hair,Math.sin(a)*.085,.29+Math.cos(a)*.01,-.012,.025,.029,.055);curl.rotation.z=-.35;}
+  const collar=mesh(body,new THREE.CylinderGeometry(.045,.054,.027,32,1,true),shirt,0,.578,-.007,1,1,.91);collar.material=shirt.clone();collar.material.side=THREE.DoubleSide;
+  const head=new THREE.Group();head.position.set(0,.64,.002);head.scale.setScalar(PRINCIPAL_HEAD_SCALE);body.add(head);
+  head.add(createPrincipalFace());
   const arms=[],legs=[];
   for(const s of [-1,1]){
-    const arm=new THREE.Group();arm.position.set(s*.218,.51,0);arm.rotation.z=s*.07;body.add(arm);arms.push(arm);
-    ball(arm,navy,0,-.025,0,.074,.077,.073);mesh(arm,new THREE.CylinderGeometry(.071,.054,.245,14),navy,0,-.14,0);
+    const arm=new THREE.Group();arm.position.set(s*.184,.51,0);arm.rotation.z=s*.055;body.add(arm);arms.push(arm);
+    ball(arm,navy,0,-.025,0,.062,.074,.063);mesh(arm,new THREE.CylinderGeometry(.060,.049,.245,24),navy,0,-.14,0);
     const elbow=new THREE.Group();elbow.position.y=-.265;arm.add(elbow);arm.userData.elbow=elbow;
-    ball(elbow,navy,0,0,0,.055,.059,.055);mesh(elbow,new THREE.CylinderGeometry(.055,.044,.224,14),navy,0,-.106,.006);cube(elbow,shirt,0,-.224,.008,.082,.043,.08);
-    ball(elbow,skin,0,-.283,.014,.044,.067,.034);
-    for(let k=0;k<4;k++)ball(elbow,skin,-.028+k*.018,-.328,.022,.010,.034,.012);
-    ball(elbow,skin,-s*.046,-.278,.025,.013,.031,.016);
+    ball(elbow,navy,0,0,0,.050,.056,.050);mesh(elbow,new THREE.CylinderGeometry(.050,.039,.224,24),navy,0,-.106,.006);cube(elbow,shirt,0,-.224,.008,.071,.025,.07);
+    ball(elbow,skin,0,-.273,.014,.036,.048,.027);
+    for(let k=0;k<4;k++)ball(elbow,skin,-.023+k*.015,-.309,.022,.008,.028,.010);
+    ball(elbow,skin,-s*.036,-.274,.025,.011,.026,.013);
     const leg=new THREE.Group();leg.position.set(s*.095,.93,0);root.add(leg);legs.push(leg);
     mesh(leg,new THREE.CylinderGeometry(.093,.072,.43,12),navyDark,0,-.21,0,1,1,.95);
     const knee=new THREE.Group();knee.position.y=-.42;leg.add(knee);leg.userData.knee=knee;
@@ -217,5 +215,6 @@ export function createPrincipalNPC(){
     arms.forEach((arm,i)=>{const q=p+i*Math.PI;arm.rotation.x=-Math.sin(q)*.25*stride;arm.userData.elbow.rotation.x=-.16-Math.max(0,Math.sin(q))*.10*stride;});
     head.rotation.y=state.yielding?Math.sin(breath*.7)*.045:Math.sin(breath*.5)*.055;head.rotation.x=Math.sin(breath*.8)*.015;
   }
-  return {root,update,getState:()=>({faceTexture:faceState,height:1.895,photoInspired:true})};
+  applyApprovedPrincipalAppearance(root);
+  return {root,update,getState:()=>({faceTexture:getPrincipalFaceState(),faceVersion:PRINCIPAL_FACE_VERSION,appearanceVersion:PRINCIPAL_APPEARANCE_VERSION,height:1.84,headScale:PRINCIPAL_HEAD_SCALE,photoInspired:true})};
 }
