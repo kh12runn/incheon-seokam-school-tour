@@ -1,9 +1,29 @@
 {
   "date": "2026-09-16",
   "scope": "2F_PRINCIPAL",
-  "status": "local-only",
-  "committed": false,
-  "deployed": false,
+  "status": "deployed-and-verified",
+  "committed": true,
+  "deployed": true,
+  "codeCommit": "a7ed7b30d5731573d88fc1533f1b7341b5105cf4",
+  "deploymentId": "2da42bec-6741-4783-bfd8-53119f3efd88",
+  "deploymentStatus": "SUCCESS",
+  "publicUrl": "https://school-tour-production.up.railway.app/",
+  "publicVerification": {
+    "assetHashesMatched": 7,
+    "healthStatus": 200,
+    "privatePathsStatus": 403,
+    "testHooksExposed": false,
+    "desktopAndMobileEmulation": {
+      "automaticOverviewRotation": true,
+      "principalRoomEntry": true,
+      "faceTextureLoaded": true,
+      "faceLazyLoading": true,
+      "npcPatrolMoved": true,
+      "menuPausesNPC": true,
+      "closeRestoresLook": true,
+      "pageErrors": []
+    }
+  },
   "reference": "https://tours.clearpano.com/zeqFg5bi",
   "sourceBlenderSha256": "7a3acf92fb3146b8a50f239f933fb4415984db1540d752f9c9bc04be78176bd7",
   "geometry": {
@@ -39,5 +59,5 @@
     "multitouchRegression": ["pinch", "joystick+look+jump", "stop", "greet", "cancel", "menu", "landscape", "elevator"]
   },
   "nodeRegressionPassed": ["교장실검사", "본관교실검사", "이동검사", "화장실검사", "모바일입력검사", "점프검사", "외관사진디자인검사", "게임화면검사", "배포검사"],
-  "limitations": ["not-a-measured-scan", "side-and-back-face-approximated", "actual-mobile-hardware-not-tested", "no-live-deployment"]
+  "limitations": ["not-a-measured-scan", "side-and-back-face-approximated", "actual-mobile-hardware-not-tested"]
 }
