@@ -2,6 +2,8 @@ FROM node:22-alpine AS build
 WORKDIR /app
 COPY ["관리도구/웹서버.mjs", "관리도구/웹서버.mjs"]
 COPY ["관리도구/배포최적화.mjs", "관리도구/배포최적화.mjs"]
+COPY ["관리도구/관리자", "관리도구/관리자"]
+COPY ["관리자", "관리자"]
 COPY index.html ./
 COPY ["웹학교", "웹학교"]
 RUN node 관리도구/배포최적화.mjs /runtime

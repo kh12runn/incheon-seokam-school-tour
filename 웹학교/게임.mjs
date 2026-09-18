@@ -11,6 +11,9 @@ import {createJumpMotion} from './점프물리.mjs';
 import {CLASS64_ID,CLASS64_SPAWN} from './육학년사반.mjs';
 import {class64Details} from './육학년사반표현.mjs';
 import {mainClassroomDetails} from './본관교실표현.mjs';
+import {class21Details,computerEntranceDetails} from './이학년일반표현.mjs';
+import {classroomSigns} from './교실팻말표현.mjs';
+import {getApprovedAssets} from './승인사진자료.mjs';
 import {exteriorRenderBox,exteriorSkins} from './외관사진디자인.mjs';
 import {faceMonitorsTowardBoard} from './모니터방향.mjs';
 import {createTouchControls,prefersTouch} from './모바일조작.mjs';
@@ -103,6 +106,11 @@ function buildVisuals(){
   principalPatrol=createPrincipalPatrol(world);
   const roomDetails=class64Details();scene.add(roomDetails);visuals.push({mesh:roomDetails,floor:4,ceiling:false});
   class64PhotoFinish=roomDetails.userData.photoFinish;
+  if(world.classroom21){
+    const config=world.classroom21,mesh=class21Details(config);scene.add(mesh);
+    visuals.push({mesh,floor:4,interiorRoom:config.roomId,center:convert(config.spawn),ceiling:false});
+  }
+  const computerEntrance=computerEntranceDetails();scene.add(computerEntrance);visuals.push({mesh:computerEntrance,floor:4,ceiling:false});
   for(const config of world.classroomsMain.rooms){
     const mesh=mainClassroomDetails(config);scene.add(mesh);
     visuals.push({mesh,floor:parseInt(config.room.floor),interiorRoom:config.roomId,center:convert(config.spawn),ceiling:false});
@@ -123,7 +131,7 @@ function buildVisuals(){
       mesh.setMatrixAt(i,matrix);
     });
     mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();scene.add(mesh);
-    const interiorRoom=items[0].interiorRoom,config=world.classroomsMain.rooms.find(r=>r.roomId===interiorRoom);
+    const interiorRoom=items[0].interiorRoom,config=world.classroomInteriors.find(r=>r.roomId===interiorRoom);
     visuals.push({mesh,floor:items[0].floor,ceiling:items[0].kind==='ceiling',interiorRoom,center:config?convert(config.spawn):null});
   }
   const roomById=new Map(data.rooms.map(r=>[r.id,r]));
@@ -155,6 +163,7 @@ function buildVisuals(){
     labels.push({mesh:sign,floor,name:'엘리베이터 안내'});
   }
   for(const label of data.labels){
+    if(roomById.get(label.spaceId)?.type==='classroom'&&label.name.startsWith('Sign_'))continue;
     if(roomById.get(label.spaceId)?.type==='stair'||label.name.includes('Heading'))continue;
     if(label.spaceId==='1F_MAIN_LOBBY'&&label.name.startsWith('Sign_')){} // interior entrance sign stays
     const {tex}=textTexture(label.text);
@@ -163,6 +172,7 @@ function buildVisuals(){
     plane.quaternion.copy(upConversion).multiply(new THREE.Quaternion(...label.quaternion));
     scene.add(plane);labels.push({mesh:plane,floor:label.floor,name:label.name});
   }
+  for(const sign of classroomSigns(data)){scene.add(sign.mesh);labels.push(sign);}
   for(const stair of world.stairs){
     for(let floor=1;floor<=4;floor++){
       const room=data.rooms.find(r=>r.id===floor+'F_'+stair.id);
@@ -308,7 +318,7 @@ $('동층이동').addEventListener('change',async e=>{
 });
 $('방이동').addEventListener('click',()=>{
   const room=data.rooms.find(r=>r.id===$('방선택').value);if(!room)return;
-  const b=room.bounds,interior=world.classroomsMain.rooms.find(r=>r.roomId===room.id);
+  const b=room.bounds,interior=world.classroomInteriors.find(r=>r.roomId===room.id);
   const p=room.id===PRINCIPAL_ID?{...world.principalOffice.spawn}:room.id===CLASS64_ID?{...CLASS64_SPAWN}:interior?{...interior.spawn}:{x:(b[0]+b[1])/2,y:(b[2]+b[3])/2,z:b[4]};
   const valid=world.candidate(p.x,p.y,p.z);if(!valid){notice('해당 위치는 이동할 수 없습니다.');return;}
   position=valid;jumpMotion.reset();yaw=room.id===PRINCIPAL_ID?Math.PI:interior?.layoutRotation===Math.PI?-Math.PI/2:interior||room.id===CLASS64_ID?Math.PI/2:room.building==='ANNEX'?-Math.PI/2:0;pitch=0;startWalk();
@@ -475,6 +485,7 @@ try{
   // on loopback with an explicit test URL; it is not a public wall-clipping key.
   window.schoolTour={getState:()=>({ready,mode,locked,dragMode,freeLook,touch:touchControls.getState(),graphics:{pixelRatio:renderer.getPixelRatio(),shadows:renderer.shadowMap.enabled},position:{...position},yaw,pitch,photoFinish:class64PhotoFinish.getState(),jump:jumpMotion.getState(),character:{...avatar.getState(),visible:avatar.root.visible,position:avatar.root.position.toArray()},thirdPerson:{distance:cameraDistance,requestedDistance:followDistance,blocked:cameraBlocked,camera:camera.position.toArray()},overview:{autoOrbit,orbit:{...orbit},camera:camera.position.toArray()},visitedRooms:visitedRooms.size,visitedFloors:visitedFloors.size,drawCalls:renderer.info.render.calls,menuOpen:$('게임메뉴').open})};
   window.schoolTour.getPrincipalState=()=>({...principalPatrol.getState(),...(principalNPC?.getState()??{faceTexture:'not-requested'}),visible:principalNPC?.root.visible??false});
+  window.schoolTour.getApprovedAssets=getApprovedAssets;
   window.schoolTour.getLobbyPrincipalState=()=>({...lobbyPrincipalState.getState(),...(lobbyPrincipalNPC?.getState()??{}),visible:lobbyPrincipalNPC?.root.visible??false});
   if(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).has('test'))window.schoolTour.test={
     world,data,setPosition(p){if(!world.candidate(p.x,p.y,p.z))throw new Error('Invalid test position');position={...p};jumpMotion.reset();smoothZ=p.z+EYE_HEIGHT;cameraReset=true;clearInput();},setYaw(y){yaw=y;},

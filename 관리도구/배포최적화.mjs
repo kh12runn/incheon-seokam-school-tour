@@ -3,6 +3,7 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {brotliCompressSync,gzipSync,constants} from 'node:zlib';
 const sourceRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+export const serverFiles=['관리도구/웹서버.mjs','관리도구/관리자/API.mjs','관리도구/관리자/저장소.mjs','관리도구/관리자/이미지검사.mjs'];
 // Follow only files reachable by the current game. Source photos and authoring assets stay local.
 export function runtimeFiles(){
   const files=new Set(),queue=['index.html','웹학교/외부도구/저작권.txt'];
@@ -20,7 +21,7 @@ export function runtimeFiles(){
     if(rel.endsWith('.css'))for(const m of source.matchAll(/url\(\s*['"]?([^'")]+)['"]?\s*\)/g))refs.push(m[1]);
     for(const ref of refs){
       if(/^(?:data:|https?:|#)/.test(ref))continue;
-      const clean=ref.split(/[?#]/)[0];queue.push(path.posix.normalize(path.posix.join(path.posix.dirname(rel),clean)));
+      const clean=ref.split(/[?#]/)[0];queue.push(clean==='/'?'index.html':path.posix.normalize(clean.startsWith('/')?clean.slice(1):path.posix.join(path.posix.dirname(rel),clean)));
     }
   }
   return [...files].sort();
@@ -30,7 +31,7 @@ export function packRuntime(output){
   if(output===sourceRoot||fs.existsSync(output))throw new Error('Build output must be a new directory: '+output);
   fs.mkdirSync(output,{recursive:true});
   const files=runtimeFiles(),sizes={sourceBytes:0,runtimeBytes:0,compressedTransferBytes:0,sidecarBytes:0};
-  for(const rel of [...files,'관리도구/웹서버.mjs']){
+  for(const rel of [...files,...serverFiles]){
     let bytes=fs.readFileSync(path.join(sourceRoot,rel));
     if(files.includes(rel))sizes.sourceBytes+=bytes.length;
     if(rel.endsWith('.json'))bytes=Buffer.from(JSON.stringify(JSON.parse(bytes)));

@@ -22,11 +22,15 @@ assert(textTransfer<textBytes*.3,'At least 70% text transfer savings');
 const photoFiles=packed.files.filter(file=>/\.jpg$/.test(file));
 assert.equal(photoFiles.length,2,'Only the two 6-4 photo derivatives');
 assert(photoFiles.every(file=>file.startsWith('웹학교/사진마감/6-4 교실/')));
-const child=spawn(process.execPath,[fileURLToPath(new URL('관리도구/웹서버.mjs',root))],{env:{...process.env,PORT:String(port),SCHOOL_WEB_ROOT:output},stdio:['ignore','pipe','pipe']});
+const child=spawn(process.execPath,[path.join(output,'관리도구/웹서버.mjs')],{env:{...process.env,PORT:String(port),SCHOOL_WEB_ROOT:output},stdio:['ignore','pipe','pipe']});
 try{
   await Promise.race([once(child.stdout,'data'),once(child,'exit').then(()=>{throw new Error('Server exited');}),new Promise((_,reject)=>setTimeout(()=>reject(new Error('Startup timeout')),10000).unref())]);
   const get=(p,options)=>fetch('http://127.0.0.1:'+port+p,options);
   assert.equal((await get('/healthz')).status,200);
+  assert.equal((await get('/admin')).status,200);
+  assert.equal((await get('/api/admin/structure')).status,401);
+  assert.equal((await get('/관리도구/관리자/API.mjs')).status,403);
+  assert.equal((await get('/school-assets/catalog.json')).status,403);
   for(const file of packed.files){
     const response=await get('/'+encodeURI(file),{headers:{'Accept-Encoding':'br'}});
     assert.equal(response.status,200,file);

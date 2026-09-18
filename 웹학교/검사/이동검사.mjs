@@ -38,7 +38,7 @@ for(const room of data.rooms.filter(r=>r.type==='classroom')){
   const turned=world.classroomsMain.rooms.find(r=>r.roomId===room.id&&r.layoutRotation);
   const door=isAnnex?{x:101.5,y:y0+(y1-y0)*.35,z}:{x:x0+(x1-x0)*.35,y:1.5,z};
   let p={x:20,y:1.5,z};
-  if(isAnnex){p=go(p,{x:101.5,y:1.5});p=go(p,door);p=go(p,{x:96,y:door.y});}
+  if(isAnnex){p=go(p,{x:101.5,y:1.5});p=go(p,door);const interior=world.classroomInteriors.find(r=>r.roomId===room.id);if(interior?.aisleRoute){for(const q of [...interior.aisleRoute,...[...interior.aisleRoute].reverse()])p=go(p,q);}else p=go(p,{x:96,y:door.y});}
   else {p=go(p,door);if(turned){for(const q of [...turned.entryWaypoints,turned.spawn])p=go(p,q);}else p=go(p,{x:door.x,y:(y0+y1)/2});}
   assert.equal(world.roomAt(p).room?.id,room.id);
   if(turned)for(const q of [...turned.entryWaypoints].reverse())p=go(p,q);

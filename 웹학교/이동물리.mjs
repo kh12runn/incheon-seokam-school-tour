@@ -10,6 +10,7 @@ import {outdoorBox,addPlaygroundDetails} from './운동장.mjs';
 import {addParking} from './주차장.mjs';
 import {class64Interior} from './육학년사반.mjs';
 import {mainClassroomsInterior} from './본관교실.mjs';
+import {class21Interior,computerEntranceFinish} from './이학년일반.mjs';
 import {courtyardDecor} from './외관사진디자인.mjs';
 import {classroomDevices} from './교실영상기기.mjs';
 import {addAnnexCorridorFinish} from './별관복도마감.mjs';
@@ -32,7 +33,7 @@ function localBounds(f,u0,u1,v0,v1,z0,z1){
   const p=localPoint(f,u0,v0),q=localPoint(f,u1,v1);
   return [Math.min(p.x,q.x),Math.min(p.y,q.y),z0,Math.max(p.x,q.x),Math.max(p.y,q.y),z1];
 }
-export function buildWorld(data,{class64=true,mainClassrooms=true,exterior=true,annexFinish=true,restrooms=true,principalOffice=true}={}){
+export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,exterior=true,annexFinish=true,restrooms=true,principalOffice=true}={}){
   data=applyGroundFloorPlan(data);
   if(restrooms)data=applyRestroomPlan(data);
   const {left:entranceLeft,right:entranceRight,height:entranceHeight}=LOBBY_OPEN;
@@ -86,13 +87,15 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,exterior=true,
     for(let level=0;level<levels;level++){
       const z=level*FH+(roofAccess&&level===4?.11:0),rise=FH+(roofAccess&&level===3?.11:0);
       const entry=addFlatBox(shaft+' 입구 '+level,b(0,W,0,L,z-.16,z),[.7,.73,.72],level+1);
-      if(roofAccess&&level===4)entry.stepSurface=true;
+      // The player's radius reaches the slab before its centre leaves the ramp.
+      // Allow the reachable lip, not the whole slab or the enclosing walls.
+      entry.stepSurface=true;
       if(level===levels-1){
         addBox(shaft+' 최상층 막음',b(.08,W/2-.1,L-.04,L+.06,z,z+1.1),[.53,.6,.64],'wall',level+1);
         continue;
       }
       const landing=addFlatBox(shaft+' 중간참 '+level,b(0,W,T,D,z+rise/2-.16,z+rise/2),[.7,.73,.72],level+1);
-      if(roofAccess&&level===3)landing.stepSurface=true;
+      landing.stepSurface=true;
       for(const lane of [0,1]){
         const u0=lane?W/2+.1:.08,u1=lane?W-.08:W/2-.1;
         const bounds=b(u0,u1,L,T,z,z+rise);
@@ -125,6 +128,7 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,exterior=true,
   openClassroomWindows(data,boxes,colliders,addBox);
   if(principalOffice)openPrincipalWindows(data,boxes,colliders,addBox);
   if(annexFinish)addAnnexCorridorFinish(data,boxes,colliders,addBox);
+  if(annexFinish)computerEntranceFinish(addBox);
   openRearExit(boxes,colliders,surfaces,addBox);
   openStairRearExit(boxes,colliders,surfaces,addBox);
   addMainRooftop(data,boxes,surfaces,addBox);
@@ -146,6 +150,9 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,exterior=true,
   if(classroom64){boxes.push(...classroom64.boxes);colliders.push(...classroom64.colliders);}
   const classroomsMain=mainClassrooms?mainClassroomsInterior(data):{rooms:[],boxes:[],colliders:[]};
   boxes.push(...classroomsMain.boxes);colliders.push(...classroomsMain.colliders);
+  const classroom21=class21?class21Interior(data):null;
+  if(classroom21){boxes.push(...classroom21.boxes);colliders.push(...classroom21.colliders);}
+  const classroomInteriors=[...classroomsMain.rooms,...(classroom21?[classroom21]:[])];
   const equipped=classroomDevices(boxes,data.rooms);boxes.splice(0,boxes.length,...equipped);
   for(const tv of boxes.filter(b=>b.cornerTV&&!b.name.endsWith('벽걸이 화면'))){
     const b=tv.bounds,cx=(b[0]+b[3])/2,cy=(b[1]+b[4])/2,half=(b[3]-b[0]+b[4]-b[1])*Math.SQRT1_2/2;
@@ -211,5 +218,5 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,exterior=true,
     let q={...p};if(!blocked(q.x+dx,q.y,q.z))q.x+=dx;
     if(!blocked(q.x,q.y+dy,q.z))q.y+=dy;return q;
   }
-  return {data,boxes,colliders,surfaces,stairs,classroom64,classroomsMain,principalOffice:office,move,candidate,blocked,support,floorBelow,moveAir,roomAt,spawn:{x:20,y:1.5,z:0}};
+  return {data,boxes,colliders,surfaces,stairs,classroom64,classroom21,classroomsMain,classroomInteriors,principalOffice:office,move,candidate,blocked,support,floorBelow,moveAir,roomAt,spawn:{x:20,y:1.5,z:0}};
 }
