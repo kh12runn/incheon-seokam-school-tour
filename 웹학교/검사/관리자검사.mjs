@@ -47,7 +47,7 @@ export class FakeGithub {
   catalog(){const files=this.trees.get(this.commits.get(this.head).tree.sha);return files[CATALOG]?JSON.parse(this.blobs.get(files[CATALOG])):{rooms:{}};}
 }
 const token=()=>randomBytes(24).toString('hex');
-const env={ADMIN_PASSWORD:token(),OWNER_APPROVAL_PASSWORD:token(),SESSION_SECRET:token(),GITHUB_TOKEN:token(),GITHUB_OWNER:'test-owner',GITHUB_REPO:'test-repo',GITHUB_BRANCH:'photo-assets',MAX_UPLOAD_MB:'1'};
+const env={ADMIN_PASSWORD:token(),SESSION_SECRET:token(),GITHUB_TOKEN:token(),GITHUB_OWNER:'test-owner',GITHUB_REPO:'test-repo',GITHUB_BRANCH:'photo-assets',MAX_UPLOAD_MB:'1'};
 const gh=new FakeGithub(),store=new GithubStore(env,gh.fetch.bind(gh));let time=Date.now();
 const handler=createAdminAPI({root,env,store,now:()=>time});
 const server=http.createServer(async(req,res)=>{
@@ -58,7 +58,7 @@ const server=http.createServer(async(req,res)=>{
   res.setHeader('Content-Type',rel.endsWith('.mjs')?'text/javascript':rel.endsWith('.css')?'text/css':'text/html');res.end(fs.readFileSync(path.join(root,rel)));
 });
 await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const origin=`http://127.0.0.1:${server.address().port}`;
-if(process.argv.includes('--serve')){console.log(JSON.stringify({origin,adminPassword:env.ADMIN_PASSWORD,ownerPassword:env.OWNER_APPROVAL_PASSWORD}));}
+if(process.argv.includes('--serve')){console.log(JSON.stringify({origin,adminPassword:env.ADMIN_PASSWORD}));}
 else{
   let cookie='',csrf='';const results=[];
   async function req(route,body,extra={}){
@@ -71,23 +71,26 @@ else{
   }
   try{
     assert.equal((await req('/api/admin/structure')).status,401);
+    for(const route of ['approve','status','rooms'])assert.equal((await req('/api/admin/'+route,{})).status,401);
     assert.equal((await upload()).status,401);results.push('unauthenticated blocked');
     assert.equal((await req('/api/admin/login',{password:'wrong'})).status,401);
     assert.equal((await req('/api/admin/login',{password:env.ADMIN_PASSWORD},{headers:{Origin:'https://evil.invalid'}})).status,403);
     const login=await req('/api/admin/login',{password:env.ADMIN_PASSWORD});assert.equal(login.status,200);cookie=login.response.headers.get('set-cookie').split(';')[0];csrf=login.data.csrf;
     assert(login.response.headers.get('set-cookie').includes('HttpOnly'));assert(login.response.headers.get('set-cookie').includes('SameSite=Strict'));
     assert(!JSON.stringify(login.data).includes(env.ADMIN_PASSWORD));results.push('login + secure session + CSRF');
+    for(const route of ['approve','status','rooms'])assert.equal((await req('/api/admin/'+route,{}, {headers:{'X-CSRF-Token':'bad'}})).status,403);
     const structure=await req('/api/admin/structure');assert.equal(structure.status,200);assert.deepEqual(structure.data.buildings[1].floors,[1,2,3,4]);assert(structure.data.rooms.some(r=>r.roomId==='4F_2-1'));
     assert.equal((await upload('same.png',png,'image/png',{'X-CSRF-Token':'bad'})).status,403);
     assert.equal((await upload('../bad.png')).status,400);assert.equal((await upload('bad.svg',Buffer.from('<svg/>'),'image/svg+xml')).status,415);
     assert.equal((await upload('bad.jpg',png,'image/jpeg')).status,415);assert.equal((await upload('large.png',Buffer.alloc(1024*1024+1))).status,413);results.push('path, extension, MIME, magic, size validation');
     const first=await upload();assert.equal(first.status,201);const firstId=first.data.id;
-    assert.equal((await req('/api/admin/approve',{roomId:'4F_2-1'})).status,403);
+    assert.equal((await req('/api/admin/approve',{roomId:'4F_2-1'})).status,400);
     const pending=await req('/api/admin/pending');assert.equal(pending.data.rooms.length,1);assert.equal(pending.data.rooms[0].status,'pending');
     assert.equal((await req('/api/rooms/4F_2-1/assets')).data.assets.length,0);
     assert.equal((await fetch(origin+'/api/rooms/4F_2-1/assets/'+firstId)).status,404);results.push('atomic photo + manifest + pending; private before approval');
-    assert.equal((await req('/api/admin/owner-login',{password:'wrong'})).status,401);
-    assert.equal((await req('/api/admin/owner-login',{password:env.OWNER_APPROVAL_PASSWORD})).status,200);
+    assert.equal((await req('/api/admin/owner-login',{password:'unused'})).status,404);
+    time+=31*60000; // Approval remains available after the former owner elevation expired.
+    assert.equal((await req('/api/admin/session')).data.authenticated,true);
     let r=gh.catalog().rooms['4F_2-1'];const revision=r.revision;
     assert.equal((await req('/api/admin/approve',{roomId:r.roomId,revision,privacyConfirmed:false})).status,400);
     gh.conflict=true;
@@ -97,7 +100,7 @@ else{
     const multi=await Promise.all([upload(),upload()]);assert(multi.some(r=>r.status===201));assert(multi.every(r=>[201,429].includes(r.status)));
     assert.equal((await upload()).status,201);r=gh.catalog().rooms['4F_2-1'];assert.equal(new Set(r.images.map(i=>i.file)).size,r.images.length);assert.equal((await req('/api/rooms/4F_2-1/assets')).data.assets.length,1);
     assert.equal((await req('/api/admin/approve',{roomId:r.roomId,revision,privacyConfirmed:true})).status,409);
-    const count=r.images.length;gh.failBlob=true;assert.equal((await upload()).status,503);assert.equal(gh.catalog().rooms['4F_2-1'].images.length,count);assert.equal((await upload()).status,201);results.push('owner approval, stale revision, CAS retry, duplicate filenames, bounded concurrency, partial failure recovery');
+    const count=r.images.length;gh.failBlob=true;assert.equal((await upload()).status,503);assert.equal(gh.catalog().rooms['4F_2-1'].images.length,count);assert.equal((await upload()).status,201);results.push('single-password approval without owner configuration, stale revision, CAS retry, duplicate filenames, bounded concurrency, partial failure recovery');
     r=gh.catalog().rooms['4F_2-1'];assert.equal((await req('/api/admin/approve',{roomId:r.roomId,revision:r.revision,privacyConfirmed:true})).status,200);
     r=gh.catalog().rooms['4F_2-1'];assert.equal((await req('/api/admin/status',{roomId:r.roomId,revision:r.revision,status:'in_progress'})).status,200);
     r=gh.catalog().rooms['4F_2-1'];assert.equal((await req('/api/admin/status',{roomId:r.roomId,revision:r.revision,status:'completed'})).status,200);
@@ -106,7 +109,9 @@ else{
     assert.equal((await req('/api/admin/rooms',{action:'archive',roomId:rename.data.room.roomId,revision:rename.data.room.revision})).status,200);
     gh.private=false;assert.equal((await upload()).status,503);gh.private=true;results.push('workflow + room management + public repository refused');
     assert.equal((await req('/api/admin/logout',{})).status,200);assert.equal((await req('/api/admin/structure')).status,401);
+    for(const route of ['approve','status','rooms'])assert.equal((await req('/api/admin/'+route,{})).status,401);
     const again=await req('/api/admin/login',{password:env.ADMIN_PASSWORD});cookie=again.response.headers.get('set-cookie').split(';')[0];time+=4*60*60*1000+1;assert.equal((await req('/api/admin/structure')).status,401);
+    assert.equal((await req('/api/admin/approve',{})).status,401);
     for(let i=0;i<11;i++)await req('/api/admin/login',{password:'wrong'});assert.equal((await req('/api/admin/login',{password:'wrong'})).status,429);results.push('logout + expiration + brute-force rate limit');
     const prodHandler=createAdminAPI({root,env:{...env,NODE_ENV:'production',ADMIN_ORIGIN:'https://school.example'},store});
     const prod=http.createServer((req,res)=>prodHandler(req,res));await new Promise(resolve=>prod.listen(0,'127.0.0.1',resolve));

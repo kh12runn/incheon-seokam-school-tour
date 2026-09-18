@@ -41,9 +41,9 @@ export function createAdminAPI({root,env=process.env,store=new GithubStore(env),
     const raw=(req.headers.cookie??'').split(';').map(x=>x.trim()).find(x=>x.startsWith(cookieName+'='))?.slice(cookieName.length+1);
     if(!raw||raw.length>180)return null;const [id,sig]=raw.split('.');
     if(!sig||!equal(sig,signature(id)))return null;
-    const s=sessions.get(id);if(!s||s.expires<=now()){sessions.delete(id);return null;}return {...s,id,owner:s.ownerUntil>now()};
+    const s=sessions.get(id);if(!s||s.expires<=now()){sessions.delete(id);return null;}return {...s,id};
   }
-  function requireSession(req,owner=false){const s=session(req);if(!s)throw new ApiError(401,'관리자 로그인이 필요합니다.');if(owner&&!s.owner)throw new ApiError(403,'소유자 인증이 필요합니다.');return s;}
+  function requireSession(req){const s=session(req);if(!s)throw new ApiError(401,'관리자 로그인이 필요합니다.');return s;}
   function origin(req){
     const expected=env.ADMIN_ORIGIN||(production?'':`http://${req.headers.host}`);
     if(!expected||req.headers.origin!==expected||req.headers['sec-fetch-site']==='cross-site')throw new ApiError(403,'같은 사이트에서 다시 요청해주세요.');
@@ -62,7 +62,7 @@ export function createAdminAPI({root,env=process.env,store=new GithubStore(env),
       const ip=req.socket.remoteAddress??'unknown';rate('all:'+ip,600);if(req.method==='POST')rate('write-global',120);
       if(req.method==='POST')origin(req);
       if(route==='/api/admin/session'&&req.method==='GET'){
-        const s=session(req);send(res,200,{configured:!!configured(),authenticated:!!s,owner:!!s?.owner,csrf:s?.csrf??null,maxUploadBytes:maxUpload,expires:s?.expires??null});return true;
+        const s=session(req);send(res,200,{configured:!!configured(),authenticated:!!s,csrf:s?.csrf??null,maxUploadBytes:maxUpload,expires:s?.expires??null});return true;
       }
       if(route==='/api/admin/login'&&req.method==='POST'){
         rate('login-global',20,15*60000);rate('login:'+ip,10,15*60000);
@@ -71,7 +71,7 @@ export function createAdminAPI({root,env=process.env,store=new GithubStore(env),
         for(const [id,s] of sessions)if(s.expires<=now())sessions.delete(id);
         if(sessions.size>=200)throw new ApiError(429,'접속 중인 관리자가 많습니다. 잠시 후 다시 시도해주세요.');
         const old=session(req);if(old)sessions.delete(old.id);
-        const id=randomBytes(32).toString('hex'),s={csrf:randomBytes(24).toString('hex'),expires:now()+sessionTTL,ownerUntil:0};sessions.set(id,s);cookie(res,id,Math.floor(sessionTTL/1000));send(res,200,{authenticated:true,csrf:s.csrf,owner:false});return true;
+        const id=randomBytes(32).toString('hex'),s={csrf:randomBytes(24).toString('hex'),expires:now()+sessionTTL};sessions.set(id,s);cookie(res,id,Math.floor(sessionTTL/1000));send(res,200,{authenticated:true,csrf:s.csrf});return true;
       }
       const publicMatch=route.match(/^\/api\/rooms\/([A-Za-z0-9_-]+)\/assets(?:\/([a-f0-9-]+))?$/);
       if(publicMatch&&req.method==='GET'){
@@ -85,12 +85,6 @@ export function createAdminAPI({root,env=process.env,store=new GithubStore(env),
       const s=requireSession(req);
       if(req.method!=='GET'&&(!req.headers['x-csrf-token']||!equal(req.headers['x-csrf-token'],s.csrf)))throw new ApiError(403,'보안 토큰이 만료되었습니다. 새로 로그인해주세요.');
       if(route==='/api/admin/logout'&&req.method==='POST'){sessions.delete(s.id);cookie(res);send(res,200,{ok:true});return true;}
-      if(route==='/api/admin/owner-login'&&req.method==='POST'){
-        rate('owner-global',10,15*60000);const body=await jsonBody(req);
-        if(env.OWNER_APPROVAL_PASSWORD?.length<12||!env.OWNER_APPROVAL_PASSWORD||equal(env.ADMIN_PASSWORD,env.OWNER_APPROVAL_PASSWORD))throw new ApiError(503,'업로드 비밀번호와 다른 소유자 비밀번호(12자 이상)를 설정해주세요.');
-        if(typeof body.password!=='string'||!equal(body.password,env.OWNER_APPROVAL_PASSWORD))throw new ApiError(401,'소유자 비밀번호가 올바르지 않습니다.');
-        sessions.get(s.id).ownerUntil=now()+30*60000;send(res,200,{owner:true});return true;
-      }
       if(['/api/admin/structure','/api/admin/pending'].includes(route)&&req.method==='GET'){
         const snap=await store.snapshot();let list=rooms(snap.catalog).map(r=>({...r,status:r.status??'unshot',images:(r.images??[]).map(i=>({...i,previewUrl:`/api/admin/rooms/${r.roomId}/images/${i.id}`})),existingImplementation:['4F_6-4','4F_6-6','4F_2-1'].includes(r.roomId)||r.name==='교장실'}));
         if(route.endsWith('/pending'))list=list.filter(r=>r.status==='pending');
@@ -124,21 +118,21 @@ export function createAdminAPI({root,env=process.env,store=new GithubStore(env),
         return true;
       }
       if(route==='/api/admin/approve'&&req.method==='POST'){
-        requireSession(req,true);const body=await jsonBody(req);
+        const body=await jsonBody(req);
         if(body.privacyConfirmed!==true)throw new ApiError(400,'인물·개인정보 확인에 동의해주세요.');
         const result=await store.mutate(catalog=>{
           const r=roomFor(catalog,body.roomId);if(body.revision!==r.revision)throw new ApiError(409,'사진 목록이 바뀌었습니다. 새로 확인한 후 승인해주세요.');
           if(!(r.images??[]).some(i=>i.approval==='pending'))throw new ApiError(409,'승인 대기 사진이 없습니다.');
           const approvedAt=new Date(now()).toISOString(),next={...r,status:'approved',approvedAt,revision:randomUUID(),images:r.images.map(i=>i.approval==='pending'?{...i,approval:'approved',approvedAt}:i)};
-          return changed(catalog,next,`소유자 승인: ${r.roomName}`);
+          return changed(catalog,next,`관리자 승인: ${r.roomName}`);
         });send(res,200,result);return true;
       }
       if(route==='/api/admin/status'&&req.method==='POST'){
-        requireSession(req,true);const body=await jsonBody(req);if(!['in_progress','completed','approved'].includes(body.status))throw new ApiError(400,'잘못된 상태입니다.');
+        const body=await jsonBody(req);if(!['in_progress','completed','approved'].includes(body.status))throw new ApiError(400,'잘못된 상태입니다.');
         const result=await store.mutate(catalog=>{const r=roomFor(catalog,body.roomId);if(r.status==='pending'||!r.approvedAt||body.revision!==r.revision)throw new ApiError(409,'승인된 최신 사진 목록에서만 변경할 수 있습니다.');return changed(catalog,{...r,status:body.status,revision:randomUUID()},`구현 상태 변경: ${r.roomName}`);});send(res,200,result);return true;
       }
       if(route==='/api/admin/rooms'&&req.method==='POST'){
-        const body=await jsonBody(req);if(body.action!=='add')requireSession(req,true);
+        const body=await jsonBody(req);
         const result=await store.mutate(catalog=>{
           if(body.action==='add'){
             const name=cleanName(body.name);if(!['MAIN','ANNEX'].includes(body.building)||!Number.isInteger(body.floor)||body.floor<1||body.floor>(body.building==='MAIN'?5:4))throw new ApiError(400,'건물과 층을 확인해주세요.');

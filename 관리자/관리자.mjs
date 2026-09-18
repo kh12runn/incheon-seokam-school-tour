@@ -6,9 +6,9 @@ function el(tag,text,className){const node=document.createElement(tag);if(text!=
 function button(text,fn){const b=el('button',text);b.type='button';b.addEventListener('click',()=>Promise.resolve().then(fn).catch(e=>notice(e.message,true)));return b;}
 async function api(route,body){
   const response=await fetch('/api/admin/'+route,{method:body?'POST':'GET',headers:body?{'Content-Type':'application/json','X-CSRF-Token':auth.csrf??''}:{},...(body?{body:JSON.stringify(body)}:{})});
-  const result=await response.json();if(!response.ok){if(response.status===401&&route!=='login'&&route!=='owner-login'){auth={};showAuth();}throw new Error(result.error??'요청에 실패했습니다.');}return result;
+  const result=await response.json();if(!response.ok){if(response.status===401&&route!=='login'){auth={};showAuth();}throw new Error(result.error??'요청에 실패했습니다.');}return result;
 }
-function showAuth(){$('로그인구역').hidden=!!auth.authenticated;$('관리구역').hidden=!auth.authenticated;$('계정').hidden=!auth.authenticated;$('소유자열기').textContent=auth.owner?'소유자 인증됨':'소유자 인증';}
+function showAuth(){$('로그인구역').hidden=!!auth.authenticated;$('관리구역').hidden=!auth.authenticated;$('계정').hidden=!auth.authenticated;}
 async function load(){structure=await api('structure');render();}
 function clearSelection(){for(const item of selection)if(item.preview)URL.revokeObjectURL(item.preview);selection=[];renderSelection();}
 function chooseRoom(r){if(busy)return;clearSelection();roomId=r.roomId;building=r.building;floor=parseInt(r.floor);$('개인정보확인').checked=false;render();$('선택공간').scrollIntoView({behavior:'smooth',block:'start'});}
@@ -25,9 +25,9 @@ function render(){
   $('공간제목').textContent=r.roomName;$('공간상태').textContent=`${labels[r.status]} · 사진 ${r.images?.length??0}장${r.uploadedAt?' · 최근 업로드 '+new Date(r.uploadedAt).toLocaleString('ko-KR'):''}`;
   $('용량안내').textContent=`파일당 최대 ${(auth.maxUploadBytes??20*1024*1024)/1024/1024}MB / 한 번에 최대 30장 · 서버에서 순서대로 저장`;
   $('저장사진').replaceChildren(...(r.images??[]).map(i=>{const card=el('div',undefined,'photo'),a=el('a');a.href=i.previewUrl;a.target='_blank';a.rel='noopener';const img=el('img');img.src=i.previewUrl;img.loading='lazy';img.alt=i.originalName;a.append(img);card.append(a,el('p',i.originalName),el('p',`${i.type==='panorama-candidate'?'360 후보':'일반 사진'} · ${i.approval==='approved'?'승인됨':'승인 대기'}`));return card;}));
-  $('이름수정').disabled=!auth.owner;$('실삭제').disabled=!auth.owner||!r.custom||!!r.images?.length;
-  $('승인').disabled=!auth.owner||!(r.images??[]).some(i=>i.approval==='pending');
-  for(const id of ['구현중','구현완료'])$(id).disabled=!auth.owner||!r.approvedAt||r.status==='pending';
+  $('이름수정').disabled=!auth.authenticated;$('실삭제').disabled=!auth.authenticated||!r.custom||!!r.images?.length;
+  $('승인').disabled=!auth.authenticated||!(r.images??[]).some(i=>i.approval==='pending');
+  for(const id of ['구현중','구현완료'])$(id).disabled=!auth.authenticated||!r.approvedAt||r.status==='pending';
 }
 function renderSelection(){
   $('선택사진').replaceChildren(...selection.map(item=>{
@@ -60,8 +60,6 @@ function uploadOne(item,target){return new Promise((resolve,reject)=>{
 });}
 $('로그인').addEventListener('submit',async e=>{e.preventDefault();const password=$('관리자암호').value;$('관리자암호').value='';try{await api('login',{password});auth=await api('session');showAuth();notice('로그인되었습니다.');await load();}catch(e){notice(e.message,true);}});
 $('로그아웃').onclick=async()=>{if(busy)return;try{await api('logout',{});auth={};roomId=null;clearSelection();showAuth();notice('로그아웃되었습니다.');}catch(e){notice(e.message,true);}};
-$('소유자열기').onclick=()=>$('소유자창').showModal();$('소유자닫기').onclick=()=>{$('소유자암호').value='';$('소유자창').close();};
-$('소유자폼').addEventListener('submit',async e=>{e.preventDefault();const password=$('소유자암호').value;$('소유자암호').value='';try{await api('owner-login',{password});auth=await api('session');$('소유자창').close();render();notice('소유자 승인 권한이 활성화되었습니다.');}catch(e){$('소유자창').close();notice(e.message,true);}});
 for(const node of document.querySelectorAll('[data-tab]'))node.onclick=()=>{if(busy)return;tab=node.dataset.tab;for(const b of document.querySelectorAll('[data-tab]'))b.setAttribute('aria-pressed',String(b===node));roomId=null;clearSelection();render();};
 $('사진선택').onclick=e=>{e.stopPropagation();$('파일선택').click();};$('드롭영역').onclick=()=>$('파일선택').click();$('드롭영역').onkeydown=e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('파일선택').click();}};
 $('파일선택').onchange=async e=>{await addFiles(e.target.files);e.target.value='';};
