@@ -10,7 +10,8 @@ export function runtimeFiles(){
   while(queue.length){
     const rel=queue.shift();if(files.has(rel))continue;
     if(rel.includes('..')||path.isAbsolute(rel))throw new Error('Unsafe runtime path '+rel);
-    const source=fs.readFileSync(path.join(sourceRoot,rel),'utf8');files.add(rel);
+    // Binary model/texture assets have no source references to scan.
+    const source=/\.(?:html|css|m?js)$/.test(rel)?fs.readFileSync(path.join(sourceRoot,rel),'utf8'):'';files.add(rel);
     const refs=[];
     if(rel.endsWith('.html'))for(const m of source.matchAll(/(?:src|href)="([^"]+)"/g))refs.push(m[1]);
     if(/\.m?js$/.test(rel)){

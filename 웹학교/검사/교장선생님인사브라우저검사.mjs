@@ -1,8 +1,8 @@
-export async function verifyPrincipalGreetings(page){
+export async function verifyPrincipalGreetings(page,baseURL='http://127.0.0.1:8080'){
   const assert=(v,m)=>{if(!v)throw Error(m);},errors=[];const onError=e=>errors.push(e.message);page.on('pageerror',onError);
   const bubble=name=>page.locator('#'+name+'교장말풍선');
   try{
-    await page.goto('http://127.0.0.1:8080/?test=1&greeting-check=1');
+    await page.goto(baseURL+'/?test=1&greeting-check=1');
     await page.waitForFunction(()=>window.schoolTour?.getState().ready);
     assert(!await bubble('중앙현관').isVisible(),'항공뷰 말풍선 숨김');
     await page.locator('#시작').click();await page.locator('#캐릭터확인').click();
@@ -24,7 +24,8 @@ export async function verifyPrincipalGreetings(page){
       throw Error('교장실 접근 위치 없음');
     });
     await bubble('교장실').waitFor({state:'visible'});assert(!await bubble('중앙현관').isVisible(),'2층에서 1층 인사 숨김');
-    assert(await page.evaluate(()=>schoolTour.getPrincipalState().appearanceVersion==='approved-skin-wrap-v6'),'교장실에도 승인된 피부 마감 적용');
+    await page.waitForFunction(()=>schoolTour.getOfficePrincipalStates().every(s=>s.modelStatus==='ready'));
+    assert(await page.evaluate(()=>schoolTour.getOfficePrincipalStates().length===2&&schoolTour.getOfficePrincipalStates().every(s=>s.height===1.84)),'교장실 두 승인 모델 로드 및 184cm 높이');
     assert(await bubble('교장실').textContent()==='행복하세요! 9월은 September!','두 NPC 동일한 인사');
     assert(errors.length===0,errors.join(';'));
     return {ok:true,runner,officeGreeting:true,lobbyGreeting:true,menuResume:true,otherFloorHidden:true,errors};

@@ -1,0 +1,83 @@
+{
+  "ok": true,
+  "pair": [
+    {
+      "id": "realistic",
+      "position": {
+        "x": 31.15,
+        "y": -1.9,
+        "z": 3.4
+      },
+      "height": 1.84,
+      "modelStatus": "ready",
+      "faceTexture": "ready",
+      "visible": true,
+      "moving": false,
+      "error": null
+    },
+    {
+      "id": "cute",
+      "position": {
+        "x": 31.15,
+        "y": -3.35,
+        "z": 3.4
+      },
+      "height": 1.84,
+      "modelStatus": "ready",
+      "faceTexture": "ready",
+      "visible": true,
+      "moving": false,
+      "error": null
+    }
+  ],
+  "modelRequests": 2,
+  "lazy": true,
+  "reentryCached": true,
+  "otherFloorHidden": true,
+  "errors": [],
+  "regression": {
+    "office": {
+      "ok": true,
+      "lazyModels": true,
+      "pair": [
+        {
+          "id": "realistic",
+          "position": {
+            "x": 31.15,
+            "y": -1.9,
+            "z": 3.4
+          },
+          "height": 1.84,
+          "modelStatus": "ready",
+          "faceTexture": "ready",
+          "visible": true,
+          "moving": false,
+          "error": null
+        },
+        {
+          "id": "cute",
+          "position": {
+            "x": 31.15,
+            "y": -3.35,
+            "z": 3.4
+          },
+          "height": 1.84,
+          "modelStatus": "ready",
+          "faceTexture": "ready",
+          "visible": true,
+          "moving": false,
+          "error": null
+        }
+      ],
+      "entry": true,
+      "menuPause": true,
+      "closeResume": true,
+      "npcSpacing": [
+        0.7291804729099312,
+        0.6100000060263966
+      ],
+      "otherFloorHidden": true,
+      "errors": []
+    }
+  }
+}

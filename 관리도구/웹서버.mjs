@@ -8,7 +8,7 @@ const root=path.resolve(process.env.SCHOOL_WEB_ROOT??path.join(path.dirname(file
 const manifest=path.join(root,'배포목록.json');
 const publicFiles=fs.existsSync(manifest)?new Set(JSON.parse(fs.readFileSync(manifest,'utf8'))):null;
 const deployed=process.env.PORT!==undefined,host=deployed?'0.0.0.0':'127.0.0.1';
-const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.txt':'text/plain; charset=utf-8','.blend':'application/octet-stream','.csv':'text/csv; charset=utf-8'};
+const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.glb':'model/gltf-binary','.txt':'text/plain; charset=utf-8','.blend':'application/octet-stream','.csv':'text/csv; charset=utf-8'};
 const adminAPI=createAdminAPI({root});
 const server=http.createServer(async(req,res)=>{
   try{

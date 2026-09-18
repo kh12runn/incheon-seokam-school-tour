@@ -9,7 +9,8 @@ import {packRuntime} from '../../관리도구/배포최적화.mjs';
 const root=new URL('../../',import.meta.url),port=18081;
 const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'school-deploy-test-')),output=path.join(temporary,'runtime');
 const packed=packRuntime(output);
-assert(!packed.files.some(p=>/사진보관|모델|미리보기|실사|검사/.test(p)),'Only current game runtime');
+assert(!packed.files.some(p=>/사진보관|미리보기|실사|검사/.test(p)||p.startsWith('모델/')),'Only current game runtime');
+assert.deepEqual(packed.files.filter(p=>p.endsWith('.glb')).sort(),['웹학교/캐릭터모델/교장선생님-귀여운.glb','웹학교/캐릭터모델/교장선생님-실물.glb'].sort(),'Only the two approved principal models');
 assert(packed.files.includes('웹학교/교실별특징.mjs'));
 // JPEG is already compressed and lazily loaded near 6-4. Keep the text compression
 // budget separate rather than claiming the new photographs shrink with Brotli.
@@ -36,6 +37,7 @@ try{
     assert.equal(response.status,200,file);
     assert.deepEqual(Buffer.from(await response.arrayBuffer()),fs.readFileSync(path.join(output,file)),file+' byte-exact round trip');
     if(file.endsWith('.jpg'))assert.equal(response.headers.get('content-type'),'image/jpeg');
+    if(file.endsWith('.glb'))assert.equal(response.headers.get('content-type'),'model/gltf-binary');
   }
   for(const encoding of ['br','gzip','br;q=0, gzip','br;q=0, gzip;q=0']){
     const response=await get('/'+encodeURI('웹학교/학교구조.json'),{headers:{'Accept-Encoding':encoding}});
