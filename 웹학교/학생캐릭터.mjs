@@ -2,6 +2,7 @@ import * as THREE from './외부도구/three.module.js';
 import {GLTFLoader} from './외부도구/GLTFLoader.js';
 import {RUN_SPEED} from './달리기모션.mjs';
 export {RUN_SPEED,gaitFoot} from './달리기모션.mjs';
+export const STUDENT_HEIGHT=1.4;
 
 export const CHARACTER_NAMES=Object.freeze({'boy-realistic':'남학생 · 실사풍','boy-cute':'남학생 · 귀여운형','girl-realistic':'여학생 · 실사풍','girl-cute':'여학생 · 귀여운형',boy:'남학생 · 귀여운형',girl:'여학생 · 귀여운형'});
 export const STUDENT_MODELS=Object.freeze({'boy-realistic':'남학생-실사풍.glb','boy-cute':'남학생-귀여운.glb','girl-realistic':'여학생-실사풍.glb','girl-cute':'여학생-귀여운.glb'});
@@ -69,6 +70,27 @@ function motionClip(source,asset,kind){
 }
 const matchers={idle:/idle|standing|(^|[^0-9])0([^0-9]|$)/i,run:/run_?02|running|^run$|(^|[^0-9])14([^0-9]|$)/i,jump:/jump|(^|[^0-9])13([^0-9]|$)/i,wave:/wave|hello|(^|[^0-9])28([^0-9]|$)/i};
 
+export function normalizeStudentModel(asset,idleClip){
+  asset.updateMatrixWorld(true);
+  const bindBounds=new THREE.Box3().setFromObject(asset),idleBounds=new THREE.Box3();
+  const measurementMixer=new THREE.AnimationMixer(asset),action=measurementMixer.clipAction(motionClip(idleClip,asset,'idle'));
+  action.play();
+  // Meshy retargeting stretches the standing pose beyond the original bind pose.
+  // Size the actual idle animation, keeping the complete breathing cycle grounded.
+  for(let i=0;i<=10;i++){
+    measurementMixer.setTime(idleClip.duration*i/10);asset.updateMatrixWorld(true);
+    asset.traverse(object=>{if(object.isSkinnedMesh)object.computeBoundingBox();});
+    idleBounds.union(new THREE.Box3().setFromObject(asset));
+  }
+  measurementMixer.stopAllAction();measurementMixer.uncacheRoot(asset);asset.updateMatrixWorld(true);
+  asset.traverse(object=>{if(object.isSkinnedMesh)object.computeBoundingBox();});
+  const height=idleBounds.max.y-idleBounds.min.y;
+  if(!(height>0&&Number.isFinite(height)))throw new Error('학생 모델 높이를 계산할 수 없습니다.');
+  const holder=new THREE.Group(),scale=STUDENT_HEIGHT/height;holder.add(asset);holder.scale.setScalar(scale);
+  holder.position.set(-(bindBounds.min.x+bindBounds.max.x)*.5*scale,-idleBounds.min.y*scale,-(bindBounds.min.z+bindBounds.max.z)*.5*scale);
+  return holder;
+}
+
 export function createStudent(requested='boy-cute',{lazy=false}={}){
   const variant=normalizeStudentVariant(requested);
   if(!STUDENT_MODELS[variant])throw new Error('Unknown character');
@@ -91,11 +113,10 @@ export function createStudent(requested='boy-cute',{lazy=false}={}){
     loading=(async()=>{
       try{
         const gltf=await template(variant);if(disposed)throw new Error('학생 캐릭터 로드가 취소되었습니다.');
-        asset=cloneRig(gltf.scene,materials);asset.updateMatrixWorld(true);
-        const bounds=new THREE.Box3().setFromObject(asset),height=bounds.max.y-bounds.min.y;
-        if(!(height>0&&Number.isFinite(height)))throw new Error('학생 모델 높이를 계산할 수 없습니다.');
-        const holder=new THREE.Group(),scale=1.65/height;holder.add(asset);holder.scale.setScalar(scale);
-        holder.position.set(-(bounds.min.x+bounds.max.x)*.5*scale,-bounds.min.y*scale,-(bounds.min.z+bounds.max.z)*.5*scale);root.add(holder);
+        asset=cloneRig(gltf.scene,materials);
+        const idleClip=gltf.animations.find(clip=>matchers.idle.test(clip.name));
+        if(!idleClip)throw new Error(CHARACTER_NAMES[variant]+'의 idle 동작이 없습니다.');
+        root.add(normalizeStudentModel(asset,idleClip));
         animationNames=gltf.animations.map(clip=>clip.name);mixer=new THREE.AnimationMixer(asset);
         for(const [kind,matcher] of Object.entries(matchers)){
           const clip=gltf.animations.find(clip=>matcher.test(clip.name));
@@ -122,7 +143,7 @@ export function createStudent(requested='boy-cute',{lazy=false}={}){
   const api={root,variant,ready,load,update,get modelStatus(){return status;},
     wave(targetHeading=heading){waveHeading=targetHeading;waveTime=actions.wave?.getClip().duration??2.6;},cancelWave(){waveTime=0;},
     snapHeading(value){heading=value;root.rotation.y=value;},setOpacity,
-    getState:()=>({variant,name:CHARACTER_NAMES[variant],heading,speed,blend,phase:currentAction?.time??0,motion,waving:waveTime>0,waveBlend:currentAnimation==='wave'?1:0,airBlend,opacity,footHeights:[0,0],arms:[],modelStatus:status,error,animationNames:[...animationNames],currentAnimation,height:1.65}),
+    getState:()=>({variant,name:CHARACTER_NAMES[variant],heading,speed,blend,phase:currentAction?.time??0,motion,waving:waveTime>0,waveBlend:currentAnimation==='wave'?1:0,airBlend,opacity,footHeights:[0,0],arms:[],modelStatus:status,error,animationNames:[...animationNames],currentAnimation,height:STUDENT_HEIGHT}),
     dispose(){disposed=true;mixer?.stopAllAction();if(asset)mixer?.uncacheRoot(asset);root.traverse(o=>{if(o.isSkinnedMesh)o.skeleton.dispose();});materials.forEach(m=>m.dispose());root.clear();if(status==='not-requested')rejectReady(new Error('학생 캐릭터가 닫혔습니다.'));}
   };
   if(!lazy)load();return api;

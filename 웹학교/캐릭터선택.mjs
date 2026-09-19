@@ -1,5 +1,5 @@
 import * as THREE from './외부도구/three.module.js';
-import {createStudent,CHARACTER_NAMES} from './학생캐릭터.mjs';
+import {createStudent,CHARACTER_NAMES,STUDENT_HEIGHT} from './학생캐릭터.mjs';
 const VARIANTS=['boy-realistic','boy-cute','girl-realistic','girl-cute'];
 export function createCharacterPicker({onChoose,onClose,onStarted,initial='boy'}){
   const dialog=document.createElement('dialog');dialog.id='캐릭터창';dialog.setAttribute('aria-labelledby','캐릭터제목');
@@ -38,7 +38,7 @@ export function createCharacterPicker({onChoose,onClose,onStarted,initial='boy'}
     if(!renderer){
       renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:false});renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;
       scene=new THREE.Scene();scene.background=new THREE.Color('#e5edec');scene.add(new THREE.HemisphereLight('#fff7ec','#869fac',2.4));const light=new THREE.DirectionalLight('#fff0dc',3);light.position.set(-2,4,4);scene.add(light);
-      camera=new THREE.PerspectiveCamera(37,1,.05,20);camera.position.set(0,1.03,3.3);camera.lookAt(0,.85,0);
+      camera=new THREE.PerspectiveCamera(37,1,.05,20);camera.position.set(0,STUDENT_HEIGHT*.62,STUDENT_HEIGHT*2);camera.lookAt(0,STUDENT_HEIGHT*.515,0);
       const pad=new THREE.Mesh(new THREE.CylinderGeometry(.48,.5,.055,40),new THREE.MeshStandardMaterial({color:'#a8c6c3',roughness:.9}));pad.position.set(0,-.04,0);scene.add(pad);
     }
     loadSelected();cancelAnimationFrame(frameId);last=performance.now();draw(last);

@@ -1,0 +1,278 @@
+{
+  "ok": true,
+  "cases": [
+    {
+      "label": "desktop",
+      "variant": "boy-realistic",
+      "state": {
+        "ready": true,
+        "mode": "walk",
+        "locked": true,
+        "dragMode": false,
+        "freeLook": false,
+        "touch": {
+          "active": false,
+          "visible": false,
+          "movement": {
+            "right": 0,
+            "forward": 0
+          },
+          "stickHeld": false,
+          "lookPointers": 0
+        },
+        "graphics": {
+          "pixelRatio": 1,
+          "shadows": true
+        },
+        "position": {
+          "x": 32.45,
+          "y": -2.6,
+          "z": 3.4
+        },
+        "yaw": 1.5707963267948966,
+        "pitch": 0,
+        "photoFinish": {
+          "status": "idle",
+          "loaded": 0,
+          "failed": 0,
+          "surfaces": 165,
+          "method": "photo-uv",
+          "roomId": "4F_6-4"
+        },
+        "jump": {
+          "airborne": false,
+          "verticalSpeed": 0,
+          "landing": 0
+        },
+        "character": {
+          "variant": "boy-realistic",
+          "name": "남학생 · 실사풍",
+          "heading": 0.53507620538464,
+          "speed": 2.1015237823421964e-21,
+          "blend": 1.7512698186184997e-21,
+          "phase": 3.4000999999999975,
+          "motion": "대기",
+          "waving": false,
+          "waveBlend": 0,
+          "airBlend": 8.558327946642614e-19,
+          "opacity": 1,
+          "footHeights": [
+            0,
+            0
+          ],
+          "arms": [],
+          "modelStatus": "ready",
+          "error": null,
+          "animationNames": [
+            "Idle",
+            "Run_02",
+            "Jump_Run",
+            "Big_Wave_Hello"
+          ],
+          "currentAnimation": "idle",
+          "height": 1.4,
+          "visible": true,
+          "position": [
+            32.45,
+            3.4,
+            2.6
+          ]
+        },
+        "thirdPerson": {
+          "distance": 2.9055808369412124,
+          "requestedDistance": 2.9,
+          "blocked": false,
+          "camera": [
+            35.25984602296087,
+            5.069471481838117,
+            2.42
+          ]
+        },
+        "overview": {
+          "autoOrbit": true,
+          "orbit": {
+            "yaw": 0.7552319999999999,
+            "pitch": 0.83,
+            "distance": 150
+          },
+          "camera": [
+            35.25984602296087,
+            5.069471481838117,
+            2.42
+          ]
+        },
+        "visitedRooms": 0,
+        "visitedFloors": 0,
+        "drawCalls": 320,
+        "menuOpen": false
+      },
+      "principals": [
+        {
+          "id": "realistic",
+          "position": {
+            "x": 31.15,
+            "y": -1.9,
+            "z": 3.4
+          },
+          "height": 1.84,
+          "modelStatus": "ready",
+          "faceTexture": "ready",
+          "visible": true,
+          "moving": false,
+          "error": null
+        },
+        {
+          "id": "cute",
+          "position": {
+            "x": 31.15,
+            "y": -3.35,
+            "z": 3.4
+          },
+          "height": 1.84,
+          "modelStatus": "ready",
+          "faceTexture": "ready",
+          "visible": true,
+          "moving": false,
+          "error": null
+        }
+      ]
+    },
+    {
+      "label": "mobile",
+      "variant": "girl-cute",
+      "state": {
+        "ready": true,
+        "mode": "walk",
+        "locked": false,
+        "dragMode": false,
+        "freeLook": true,
+        "touch": {
+          "active": true,
+          "visible": true,
+          "movement": {
+            "right": 0,
+            "forward": 0
+          },
+          "stickHeld": false,
+          "lookPointers": 0
+        },
+        "graphics": {
+          "pixelRatio": 1,
+          "shadows": false
+        },
+        "position": {
+          "x": 32.45,
+          "y": -2.6,
+          "z": 3.4
+        },
+        "yaw": 1.5707963267948966,
+        "pitch": 0,
+        "photoFinish": {
+          "status": "idle",
+          "loaded": 0,
+          "failed": 0,
+          "surfaces": 165,
+          "method": "photo-uv",
+          "roomId": "4F_6-4"
+        },
+        "jump": {
+          "airborne": false,
+          "verticalSpeed": 0,
+          "landing": 0
+        },
+        "character": {
+          "variant": "girl-cute",
+          "name": "여학생 · 귀여운형",
+          "heading": -0.3357235636761769,
+          "speed": 1.5957255641014331e-24,
+          "blend": 8.335269169949142e-25,
+          "phase": 3.666799999999997,
+          "motion": "대기",
+          "waving": false,
+          "waveBlend": 0,
+          "airBlend": 7.034840540582038e-21,
+          "opacity": 1,
+          "footHeights": [
+            0,
+            0
+          ],
+          "arms": [],
+          "modelStatus": "ready",
+          "error": null,
+          "animationNames": [
+            "Idle",
+            "Run_02",
+            "Jump_Run",
+            "Big_Wave_Hello"
+          ],
+          "currentAnimation": "idle",
+          "height": 1.4,
+          "visible": true,
+          "position": [
+            32.45,
+            3.4,
+            2.6
+          ]
+        },
+        "thirdPerson": {
+          "distance": 2.905580836941213,
+          "requestedDistance": 2.9,
+          "blocked": false,
+          "camera": [
+            35.25984602296087,
+            5.069471481838117,
+            2.42
+          ]
+        },
+        "overview": {
+          "autoOrbit": true,
+          "orbit": {
+            "yaw": 0.7631760000000001,
+            "pitch": 0.83,
+            "distance": 150
+          },
+          "camera": [
+            35.25984602296087,
+            5.069471481838117,
+            2.42
+          ]
+        },
+        "visitedRooms": 0,
+        "visitedFloors": 0,
+        "drawCalls": 294,
+        "menuOpen": false
+      },
+      "principals": [
+        {
+          "id": "realistic",
+          "position": {
+            "x": 31.15,
+            "y": -1.9,
+            "z": 3.4
+          },
+          "height": 1.84,
+          "modelStatus": "ready",
+          "faceTexture": "ready",
+          "visible": true,
+          "moving": false,
+          "error": null
+        },
+        {
+          "id": "cute",
+          "position": {
+            "x": 31.15,
+            "y": -3.35,
+            "z": 3.4
+          },
+          "height": 1.84,
+          "modelStatus": "ready",
+          "faceTexture": "ready",
+          "visible": true,
+          "moving": false,
+          "error": null
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

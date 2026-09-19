@@ -4,7 +4,7 @@ import {floorDestination} from './층별이동.mjs';
 import {surfaceKind,finishMaterial,softEnvironment} from './현실재질.mjs';
 import {ELEVATOR,nearElevator,elevatorDestination} from './엘리베이터.mjs';
 import {shoeCabinets} from './사진참고마감.mjs';
-import {createStudent,CHARACTER_NAMES,RUN_SPEED} from './학생캐릭터.mjs';
+import {createStudent,CHARACTER_NAMES,RUN_SPEED,STUDENT_HEIGHT} from './학생캐릭터.mjs';
 import {createCharacterPicker} from './캐릭터선택.mjs';
 import {createCameraCollision,thirdPersonDesired} from './삼인칭카메라.mjs';
 import {createJumpMotion} from './점프물리.mjs';
@@ -203,7 +203,7 @@ function overviewCamera(dt){
 }
 function cameraWalk(dt){
   smoothZ=THREE.MathUtils.lerp(smoothZ,position.z+EYE_HEIGHT,1-Math.exp(-dt*18));
-  const target={x:position.x,y:position.y,z:smoothZ-EYE_HEIGHT+1.12};
+  const target={x:position.x,y:position.y,z:smoothZ-EYE_HEIGHT+STUDENT_HEIGHT*.68};
   const desired=thirdPersonDesired(target,yaw,pitch,followDistance),safe=resolveCamera(target,desired);
   // Snap inward on collision; only ease outward, so smoothing never crosses a wall.
   cameraDistance=cameraReset||safe.distance<cameraDistance?safe.distance:THREE.MathUtils.lerp(cameraDistance,safe.distance,1-Math.exp(-dt*6));cameraReset=false;cameraBlocked=safe.blocked;
@@ -469,7 +469,7 @@ function frame(now){
     avatar.setOpacity(THREE.MathUtils.clamp((cameraDistance-.3)/.7,0,1));
   }
   greeting.hidden=mode!=='walk'||!avatar.getState().waving||!isPlaying();
-  if(!greeting.hidden){const p=new THREE.Vector3(position.x,position.z+1.95,-position.y).project(camera);greeting.hidden=p.z>1||p.z< -1;greeting.style.left=(p.x*.5+.5)*innerWidth+'px';greeting.style.top=(-p.y*.5+.5)*innerHeight+'px';}
+  if(!greeting.hidden){const p=new THREE.Vector3(position.x,position.z+STUDENT_HEIGHT+.3,-position.y).project(camera);greeting.hidden=p.z>1||p.z< -1;greeting.style.left=(p.x*.5+.5)*innerWidth+'px';greeting.style.top=(-p.y*.5+.5)*innerHeight+'px';}
   interiorLight.visible=mode==='walk'&&position.y>=0&&position.y<=3;
   interiorLight.position.copy(camera.position);interiorLight.position.y+=.65;
   markerGroup.children.forEach(m=>m.rotation.y+=dt);

@@ -4,6 +4,7 @@ import {buildWorld,localPoint} from '../이동물리.mjs';
 import {createCameraCollision,thirdPersonDesired,segmentBox} from '../삼인칭카메라.mjs';
 // Legacy procedural rig assertions retain gait/physics coverage; Meshy assets have a separate check.
 import {createStudent,gaitFoot,RUN_SPEED} from '../학생캐릭터-절차형.mjs';
+import {STUDENT_HEIGHT} from '../학생캐릭터.mjs';
 import {STRIDE,phaseAdvance} from '../달리기모션.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),world=buildWorld(data);
 const obstacles=[...world.colliders,...world.boxes.filter(b=>b.kind==='step')],resolve=createCameraCollision(obstacles);
@@ -19,7 +20,7 @@ let checked=0,retracted=0;
 for(const p of positions){
   assert(world.candidate(p.x,p.y,p.z));
   for(let a=0;a<16;a++)for(const pitch of [-.75,0,.6]){
-    const target={...p,z:p.z+1.12},desired=thirdPersonDesired(target,a*Math.PI/8,pitch,3.6),safe=resolve(target,desired);
+    const target={...p,z:p.z+STUDENT_HEIGHT*.68},desired=thirdPersonDesired(target,a*Math.PI/8,pitch,3.6),safe=resolve(target,desired);
     assert(Object.values(safe).every(v=>typeof v==='boolean'||Number.isFinite(v)));
     assert(safe.distance<=Math.hypot(desired.x-target.x,desired.y-target.y,desired.z-target.z)+1e-6);
     for(const b of obstacles)assert(!Number.isFinite(segmentBox(target,safe,b.bounds,.12)),'Camera crossed '+b.name+' at '+JSON.stringify(p));
