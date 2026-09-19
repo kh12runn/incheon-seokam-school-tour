@@ -1,0 +1,13 @@
+{
+  "headScale": 0.4,
+  "transition": [
+    -0.1,
+    0.04
+  ],
+  "vertices": 41327,
+  "changedVertices": 37385,
+  "beforeHeight": 1.9025940299034119,
+  "afterHeight": 1.3140341937541962,
+  "worldHeight": 1.84,
+  "headRatioUsingChin0075": 0.2666393345809008
+}

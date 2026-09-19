@@ -54,10 +54,11 @@ function cloneRig(source,materials){
   });
   return clone;
 }
-function motionClip(source,asset,kind){
+export function createStudentMotionClip(source,asset,kind,headScale=1){
   const clip=source.clone();
   // Keep the hips in place horizontally. Game physics alone owns jump height.
   for(const track of clip.tracks){
+    if(headScale!==1&&track.name==='Head.scale')for(let i=0;i<track.values.length;i++)track.values[i]*=headScale;
     if(!track.name.endsWith('.position'))continue;
     let node;
     try{node=THREE.PropertyBinding.findNode(asset,THREE.PropertyBinding.parseTrackName(track.name).nodeName);}catch{}
@@ -70,10 +71,11 @@ function motionClip(source,asset,kind){
 }
 const matchers={idle:/idle|standing|(^|[^0-9])0([^0-9]|$)/i,run:/run_?02|running|^run$|(^|[^0-9])14([^0-9]|$)/i,jump:/jump|(^|[^0-9])13([^0-9]|$)/i,wave:/wave|hello|(^|[^0-9])28([^0-9]|$)/i};
 
-export function normalizeStudentModel(asset,idleClip){
+export function normalizeStudentModel(asset,idleClip,headScale=1){
+  if(headScale!==1)asset.getObjectByName('Head').scale.multiplyScalar(headScale);
   asset.updateMatrixWorld(true);
   const bindBounds=new THREE.Box3().setFromObject(asset),idleBounds=new THREE.Box3();
-  const measurementMixer=new THREE.AnimationMixer(asset),action=measurementMixer.clipAction(motionClip(idleClip,asset,'idle'));
+  const measurementMixer=new THREE.AnimationMixer(asset),action=measurementMixer.clipAction(createStudentMotionClip(idleClip,asset,'idle',headScale));
   action.play();
   // Meshy retargeting stretches the standing pose beyond the original bind pose.
   // Size the actual idle animation, keeping the complete breathing cycle grounded.
@@ -94,6 +96,7 @@ export function normalizeStudentModel(asset,idleClip){
 export function createStudent(requested='boy-cute',{lazy=false}={}){
   const variant=normalizeStudentVariant(requested);
   if(!STUDENT_MODELS[variant])throw new Error('Unknown character');
+  const headScale=variant.endsWith('-cute')?.9:1;
   const root=new THREE.Group();root.name=CHARACTER_NAMES[variant];
   const materials=new Map(),actions={};
   let asset,mixer,currentAction,currentAnimation=null,status='not-requested',error=null,disposed=false,loading;
@@ -116,12 +119,12 @@ export function createStudent(requested='boy-cute',{lazy=false}={}){
         asset=cloneRig(gltf.scene,materials);
         const idleClip=gltf.animations.find(clip=>matchers.idle.test(clip.name));
         if(!idleClip)throw new Error(CHARACTER_NAMES[variant]+'의 idle 동작이 없습니다.');
-        root.add(normalizeStudentModel(asset,idleClip));
+        root.add(normalizeStudentModel(asset,idleClip,headScale));
         animationNames=gltf.animations.map(clip=>clip.name);mixer=new THREE.AnimationMixer(asset);
         for(const [kind,matcher] of Object.entries(matchers)){
           const clip=gltf.animations.find(clip=>matcher.test(clip.name));
           if(!clip)throw new Error(CHARACTER_NAMES[variant]+'의 '+kind+' 동작이 없습니다.');
-          const action=mixer.clipAction(motionClip(clip,asset,kind));actions[kind]=action;
+          const action=mixer.clipAction(createStudentMotionClip(clip,asset,kind,headScale));actions[kind]=action;
           if(kind==='wave'||kind==='jump'){action.setLoop(THREE.LoopOnce,1);action.clampWhenFinished=true;}
         }
         play('idle');mixer.update(0);setOpacity(opacity);status='ready';resolveReady(api);
@@ -143,7 +146,7 @@ export function createStudent(requested='boy-cute',{lazy=false}={}){
   const api={root,variant,ready,load,update,get modelStatus(){return status;},
     wave(targetHeading=heading){waveHeading=targetHeading;waveTime=actions.wave?.getClip().duration??2.6;},cancelWave(){waveTime=0;},
     snapHeading(value){heading=value;root.rotation.y=value;},setOpacity,
-    getState:()=>({variant,name:CHARACTER_NAMES[variant],heading,speed,blend,phase:currentAction?.time??0,motion,waving:waveTime>0,waveBlend:currentAnimation==='wave'?1:0,airBlend,opacity,footHeights:[0,0],arms:[],modelStatus:status,error,animationNames:[...animationNames],currentAnimation,height:STUDENT_HEIGHT}),
+    getState:()=>({variant,name:CHARACTER_NAMES[variant],heading,speed,blend,phase:currentAction?.time??0,motion,waving:waveTime>0,waveBlend:currentAnimation==='wave'?1:0,airBlend,opacity,footHeights:[0,0],arms:[],modelStatus:status,error,animationNames:[...animationNames],currentAnimation,height:STUDENT_HEIGHT,headScale}),
     dispose(){disposed=true;mixer?.stopAllAction();if(asset)mixer?.uncacheRoot(asset);root.traverse(o=>{if(o.isSkinnedMesh)o.skeleton.dispose();});materials.forEach(m=>m.dispose());root.clear();if(status==='not-requested')rejectReady(new Error('학생 캐릭터가 닫혔습니다.'));}
   };
   if(!lazy)load();return api;
