@@ -1,0 +1,129 @@
+{
+  "startedAt": "2026-09-19T01:45:45.789Z",
+  "url": "http://127.0.0.1:8085/?test=1",
+  "ok": true,
+  "desktop": [
+    {
+      "variant": "boy-realistic",
+      "ok": true,
+      "clips": [
+        "Idle",
+        "Run_02",
+        "Jump_Run",
+        "Big_Wave_Hello"
+      ],
+      "requests": [
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/남학생-귀여운.glb",
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/남학생-실사풍.glb",
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/남학생-실사풍.glb"
+      ]
+    },
+    {
+      "variant": "boy-cute",
+      "ok": true,
+      "clips": [
+        "Idle",
+        "Run_02",
+        "Jump_Run",
+        "Big_Wave_Hello"
+      ],
+      "requests": [
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/남학생-귀여운.glb",
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/남학생-귀여운.glb"
+      ]
+    },
+    {
+      "variant": "girl-realistic",
+      "ok": true,
+      "clips": [
+        "Idle",
+        "Run_02",
+        "Jump_Run",
+        "Big_Wave_Hello"
+      ],
+      "requests": [
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/남학생-귀여운.glb",
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/여학생-실사풍.glb",
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/여학생-실사풍.glb"
+      ]
+    },
+    {
+      "variant": "girl-cute",
+      "ok": true,
+      "clips": [
+        "Idle",
+        "Run_02",
+        "Jump_Run",
+        "Big_Wave_Hello"
+      ],
+      "requests": [
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/남학생-귀여운.glb",
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/여학생-귀여운.glb",
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/여학생-귀여운.glb"
+      ]
+    }
+  ],
+  "mobile": [
+    {
+      "variant": "boy-realistic",
+      "ok": true,
+      "clips": [
+        "Idle",
+        "Run_02",
+        "Jump_Run",
+        "Big_Wave_Hello"
+      ],
+      "requests": [
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/남학생-귀여운.glb",
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/남학생-실사풍.glb",
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/남학생-실사풍.glb"
+      ]
+    },
+    {
+      "variant": "boy-cute",
+      "ok": true,
+      "clips": [
+        "Idle",
+        "Run_02",
+        "Jump_Run",
+        "Big_Wave_Hello"
+      ],
+      "requests": [
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/남학생-귀여운.glb",
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/남학생-귀여운.glb"
+      ]
+    },
+    {
+      "variant": "girl-realistic",
+      "ok": true,
+      "clips": [
+        "Idle",
+        "Run_02",
+        "Jump_Run",
+        "Big_Wave_Hello"
+      ],
+      "requests": [
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/남학생-귀여운.glb",
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/여학생-실사풍.glb",
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/여학생-실사풍.glb"
+      ]
+    },
+    {
+      "variant": "girl-cute",
+      "ok": true,
+      "clips": [
+        "Idle",
+        "Run_02",
+        "Jump_Run",
+        "Big_Wave_Hello"
+      ],
+      "requests": [
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/남학생-귀여운.glb",
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/여학생-귀여운.glb",
+        "http://127.0.0.1:8085/웹학교/캐릭터모델/여학생-귀여운.glb"
+      ]
+    }
+  ],
+  "errors": [],
+  "finishedAt": "2026-09-19T01:51:30.601Z"
+}

@@ -37,6 +37,7 @@ near(size.y,1.84);near(bounds.min.y,0);near(bounds.min.x+bounds.max.x,0);near(bo
 near(size.x/size.y,3/8);near(size.z/size.y,.5/8);assert(mesh.castShadow&&mesh.receiveShadow);
 assert.throws(()=>normalizePrincipalModel(new THREE.Group(),1.84),/높이/);
 const runtime=runtimeFiles();
-assert.deepEqual(runtime.filter(p=>p.endsWith('.glb')).sort(),['웹학교/캐릭터모델/교장선생님-귀여운.glb','웹학교/캐릭터모델/교장선생님-실물.glb'].sort());
+const approvedModels=['교장선생님-귀여운','교장선생님-실물','남학생-실사풍','남학생-귀여운','여학생-실사풍','여학생-귀여운'].map(name=>'웹학교/캐릭터모델/'+name+'.glb');
+assert.deepEqual(runtime.filter(p=>p.endsWith('.glb')).sort(),approvedModels.sort());
 assert(!runtime.some(p=>p.startsWith('모델/')||p.startsWith('사진보관/')),'원본 제외');
-console.log({ok:true,characters:2,height:1.84,placement:true,normalization:true,embeddedTextures:true,packedModels:2});
+console.log({ok:true,characters:2,height:1.84,placement:true,normalization:true,embeddedTextures:true,packedModels:6});

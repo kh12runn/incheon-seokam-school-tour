@@ -1,7 +1,10 @@
 #캐릭터창{width:460px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 30px);overflow:auto;padding:22px;border:1px solid #809599;border-radius:18px;background:#f4f4ed;color:#19313b;box-shadow:0 24px 80px #0006}
 #캐릭터창::backdrop{background:#102c3aaa;backdrop-filter:blur(5px)}
 #캐릭터창 h2{font-size:21px;margin:0 0 5px}#캐릭터창 p{color:#5c747a;font-size:12px;margin:0 0 12px}
-#캐릭터창 canvas{display:block;width:100%;height:255px;border-radius:12px;background:#e5edec}
+#캐릭터창 canvas{display:block;width:100%;height:280px;border-radius:12px;background:#e5edec}
+#캐릭터창 #캐릭터미리보기상태{min-height:18px;margin:8px 0;color:#42646c}
+#캐릭터확인:disabled{opacity:.5;cursor:wait}
+#캐릭터다시시도{border:1px solid #809599;border-radius:8px;padding:6px 12px;background:#fff;color:#25474e}
 .캐릭터선택줄{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 16px}
 .캐릭터선택줄 button{background:#fff;color:#25474e;border:2px solid #d0dcd9;font-weight:700;padding:10px 5px;border-radius:10px}
 .캐릭터선택줄 button[aria-pressed=true]{border-color:#467f7e;background:#e3efea;box-shadow:0 0 0 2px #467f7e22}

@@ -2,7 +2,8 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {buildWorld,localPoint} from '../이동물리.mjs';
 import {createCameraCollision,thirdPersonDesired,segmentBox} from '../삼인칭카메라.mjs';
-import {createStudent,gaitFoot,RUN_SPEED} from '../학생캐릭터.mjs';
+// Legacy procedural rig assertions retain gait/physics coverage; Meshy assets have a separate check.
+import {createStudent,gaitFoot,RUN_SPEED} from '../학생캐릭터-절차형.mjs';
 import {STRIDE,phaseAdvance} from '../달리기모션.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),world=buildWorld(data);
 const obstacles=[...world.colliders,...world.boxes.filter(b=>b.kind==='step')],resolve=createCameraCollision(obstacles);

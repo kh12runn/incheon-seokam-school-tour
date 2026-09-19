@@ -69,7 +69,7 @@ function updatePrincipalBubble(element,npc,npcPosition){
 const greeting=document.createElement('div');greeting.id='인사말';greeting.textContent='안녕~ 👋';greeting.hidden=true;greeting.setAttribute('role','status');document.body.append(greeting);
 let characterChosenThisVisit=false;
 try{const saved=localStorage.getItem('석암학교-캐릭터');if(CHARACTER_NAMES[saved])selectedCharacter=saved;}catch{}
-let avatar=createStudent(selectedCharacter??'boy');scene.add(avatar.root);avatar.root.visible=false;avatar.snapHeading(Math.PI/2);
+let avatar=createStudent(selectedCharacter??'boy-cute',{lazy:true});scene.add(avatar.root);avatar.root.visible=false;avatar.snapHeading(Math.PI/2);
 let resolveCamera,followDistance=2.9,cameraDistance=2.9,cameraReset=true,cameraBlocked=false,pickerFallback=false,pickerResume=false;
 const keys=new Set(),visitedRooms=new Set(),visitedFloors=new Set(),visuals=[],labels=[];
 const markerGroup=new THREE.Group();scene.add(markerGroup);
@@ -78,11 +78,14 @@ const convert=p=>new THREE.Vector3(p.x,p.z,-p.y);
 function notice(text){status.textContent=text;}
 const movementHint=()=>touchControls?.isActive()?'왼쪽 조이스틱 이동 · 오른쪽 드래그 시점 · 점프·인사 버튼':'WASD 달리기 · 마우스를 움직여 둘러보기 · ESC 메뉴';
 function updateCharacterLabel(){$('캐릭터상태').textContent=mode==='walk'&&characterChosenThisVisit?CHARACTER_NAMES[selectedCharacter]+'과 함께, 다음 교실로 가볼까요?':'탐험 시작 후 남학생 / 여학생을 선택하세요';}
-const characterPicker=createCharacterPicker({initial:selectedCharacter??'boy',onChoose(variant){
-  if(avatar.variant!==variant){scene.remove(avatar.root);avatar.dispose();avatar=createStudent(variant);scene.add(avatar.root);avatar.snapHeading(Math.PI+yaw);}
+const characterPicker=createCharacterPicker({initial:selectedCharacter??'boy-cute',async onChoose(variant){
+  if(avatar.variant!==variant||avatar.modelStatus==='error'){
+    const next=createStudent(variant);try{await next.ready;}catch(error){next.dispose();throw error;}
+    scene.remove(avatar.root);avatar.dispose();avatar=next;scene.add(avatar.root);avatar.snapHeading(Math.PI+yaw);
+  }else await avatar.load();
   selectedCharacter=variant;characterChosenThisVisit=true;try{localStorage.setItem('석암학교-캐릭터',variant);}catch{}
-  updateCharacterLabel();cameraReset=true;startWalk(pickerFallback);
-},onClose(){if(pickerResume)startWalk();else pausePanel();}});
+  updateCharacterLabel();cameraReset=true;
+},onStarted(){startWalk(pickerFallback);},onClose(){if(pickerResume)startWalk();else pausePanel();}});
 function openCharacterPicker(fallback=false){
   if(!ready||characterPicker.isOpen())return;
   $('게임메뉴').close();
@@ -209,7 +212,7 @@ function cameraWalk(dt){
   if(camera.fov!==68){camera.fov=68;camera.updateProjectionMatrix();}
   camera.position.copy(convert(cam));camera.lookAt(convert(target));
 }
-function isPlaying(){return mode==='walk'&&(locked||dragMode||freeLook)&&!document.hidden&&!$('게임메뉴').open&&!characterPicker.isOpen()&&!elevatorBusy&&!$('승강기창').open;}
+function isPlaying(){return mode==='walk'&&avatar.modelStatus==='ready'&&(locked||dragMode||freeLook)&&!document.hidden&&!$('게임메뉴').open&&!characterPicker.isOpen()&&!elevatorBusy&&!$('승강기창').open;}
 function clearInput(){keys.clear();velocity={x:0,y:0};drag=null;freeLookPoint=null;touchControls?.reset();avatar.cancelWave();greeting.hidden=true;}
 function jump(){if(isPlaying()){avatar.cancelWave();jumpMotion.start(position);}}
 function greet(){

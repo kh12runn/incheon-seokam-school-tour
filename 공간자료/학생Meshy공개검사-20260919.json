@@ -1,0 +1,224 @@
+{
+  "startedAt": "2026-09-19T01:50:04.593Z",
+  "url": "https://school-tour-production.up.railway.app/",
+  "ok": true,
+  "models": [
+    {
+      "file": "남학생-실사풍.glb",
+      "bytes": 2897692,
+      "localBytes": 2897692,
+      "sha256": "206658672c5a14a4df0d5c21fde36ebff9f3e4870e3928756663af80f4080730",
+      "localSha256": "206658672c5a14a4df0d5c21fde36ebff9f3e4870e3928756663af80f4080730",
+      "contentType": "model/gltf-binary"
+    },
+    {
+      "file": "남학생-귀여운.glb",
+      "bytes": 2731372,
+      "localBytes": 2731372,
+      "sha256": "c7338480ce2bd48d1e0a6b060cf09c49885f15872bfef2f55fb02d7993cdb7b6",
+      "localSha256": "c7338480ce2bd48d1e0a6b060cf09c49885f15872bfef2f55fb02d7993cdb7b6",
+      "contentType": "model/gltf-binary"
+    },
+    {
+      "file": "여학생-실사풍.glb",
+      "bytes": 3135688,
+      "localBytes": 3135688,
+      "sha256": "e59c3a5397d9992f9aa65e1d47ac1617b51068d13ba2639c670c44e4bd1855c5",
+      "localSha256": "e59c3a5397d9992f9aa65e1d47ac1617b51068d13ba2639c670c44e4bd1855c5",
+      "contentType": "model/gltf-binary"
+    },
+    {
+      "file": "여학생-귀여운.glb",
+      "bytes": 3494800,
+      "localBytes": 3494800,
+      "sha256": "4bbf6c0d0c82f1f17a170448862e83dddfe75530bf37e28b3aa0ac318c0218ec",
+      "localSha256": "4bbf6c0d0c82f1f17a170448862e83dddfe75530bf37e28b3aa0ac318c0218ec",
+      "contentType": "model/gltf-binary"
+    }
+  ],
+  "errors": [],
+  "requests": [
+    "https://school-tour-production.up.railway.app/웹학교/캐릭터모델/남학생-귀여운.glb",
+    "https://school-tour-production.up.railway.app/웹학교/캐릭터모델/여학생-귀여운.glb",
+    "https://school-tour-production.up.railway.app/웹학교/캐릭터모델/교장선생님-실물.glb",
+    "https://school-tour-production.up.railway.app/웹학교/캐릭터모델/교장선생님-귀여운.glb"
+  ],
+  "health": {
+    "status": 200,
+    "body": "{\"ok\":true}"
+  },
+  "testHookAbsent": true,
+  "choices": [
+    "boy-realistic",
+    "boy-cute",
+    "girl-realistic",
+    "girl-cute"
+  ],
+  "student": {
+    "variant": "girl-cute",
+    "name": "여학생 · 귀여운형",
+    "heading": 1.5707963267948966,
+    "speed": 0,
+    "blend": 0,
+    "phase": 0.26660000000000217,
+    "motion": "대기",
+    "waving": false,
+    "waveBlend": 0,
+    "airBlend": 0,
+    "opacity": 1,
+    "footHeights": [
+      0,
+      0
+    ],
+    "arms": [],
+    "modelStatus": "ready",
+    "error": null,
+    "animationNames": [
+      "Idle",
+      "Run_02",
+      "Jump_Run",
+      "Big_Wave_Hello"
+    ],
+    "currentAnimation": "idle",
+    "height": 1.65,
+    "visible": true,
+    "position": [
+      20,
+      0,
+      -1.5
+    ]
+  },
+  "principals": [
+    {
+      "id": "realistic",
+      "position": {
+        "x": 31.15,
+        "y": -1.9,
+        "z": 3.4
+      },
+      "height": 1.84,
+      "modelStatus": "ready",
+      "faceTexture": "ready",
+      "visible": true,
+      "moving": false,
+      "error": null
+    },
+    {
+      "id": "cute",
+      "position": {
+        "x": 31.15,
+        "y": -3.35,
+        "z": 3.4
+      },
+      "height": 1.84,
+      "modelStatus": "ready",
+      "faceTexture": "ready",
+      "visible": true,
+      "moving": false,
+      "error": null
+    }
+  ],
+  "finalState": {
+    "ready": true,
+    "mode": "walk",
+    "locked": true,
+    "dragMode": false,
+    "freeLook": false,
+    "touch": {
+      "active": false,
+      "visible": false,
+      "movement": {
+        "right": 0,
+        "forward": 0
+      },
+      "stickHeld": false,
+      "lookPointers": 0
+    },
+    "graphics": {
+      "pixelRatio": 1,
+      "shadows": true
+    },
+    "position": {
+      "x": 32.45,
+      "y": -0.85,
+      "z": 3.4
+    },
+    "yaw": 3.141592653589793,
+    "pitch": 0,
+    "photoFinish": {
+      "status": "idle",
+      "loaded": 0,
+      "failed": 0,
+      "surfaces": 165,
+      "method": "photo-uv",
+      "roomId": "4F_6-4"
+    },
+    "jump": {
+      "airborne": false,
+      "verticalSpeed": 0,
+      "landing": 0
+    },
+    "character": {
+      "variant": "girl-cute",
+      "name": "여학생 · 귀여운형",
+      "heading": 1.5707963267948966,
+      "speed": 0,
+      "blend": 0,
+      "phase": 1.0632999999999577,
+      "motion": "대기",
+      "waving": false,
+      "waveBlend": 0,
+      "airBlend": 0,
+      "opacity": 1,
+      "footHeights": [
+        0,
+        0
+      ],
+      "arms": [],
+      "modelStatus": "ready",
+      "error": null,
+      "animationNames": [
+        "Idle",
+        "Run_02",
+        "Jump_Run",
+        "Big_Wave_Hello"
+      ],
+      "currentAnimation": "idle",
+      "height": 1.65,
+      "visible": true,
+      "position": [
+        32.45,
+        3.4,
+        0.85
+      ]
+    },
+    "thirdPerson": {
+      "distance": 2.905580836941213,
+      "requestedDistance": 2.9,
+      "blocked": false,
+      "camera": [
+        32.27,
+        5.237471481838117,
+        -1.9598460229608694
+      ]
+    },
+    "overview": {
+      "autoOrbit": true,
+      "orbit": {
+        "yaw": 0.3442679999999996,
+        "pitch": 0.83,
+        "distance": 150
+      },
+      "camera": [
+        32.27,
+        5.237471481838117,
+        -1.9598460229608694
+      ]
+    },
+    "visitedRooms": 0,
+    "visitedFloors": 0,
+    "drawCalls": 563,
+    "menuOpen": false
+  },
+  "finishedAt": "2026-09-19T01:51:35.751Z"
+}
