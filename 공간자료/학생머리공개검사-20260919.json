@@ -1,0 +1,27 @@
+{
+  "date": "2026-09-19T03:04:58.631Z",
+  "url": "https://school-tour-production.up.railway.app/",
+  "models": [
+    {
+      "file": "웹학교/캐릭터모델/남학생-실사풍.glb",
+      "bytes": 3265964,
+      "sha256": "d992a3a2014956a05435b32fca531377f62c74909faad4713accc298ab52ff25"
+    },
+    {
+      "file": "웹학교/캐릭터모델/남학생-귀여운.glb",
+      "bytes": 3103180,
+      "sha256": "d495e51d0b957e9fda39ce1da815dc2db24a9185c97a1162b8d964e5a3c90301"
+    },
+    {
+      "file": "웹학교/캐릭터모델/여학생-실사풍.glb",
+      "bytes": 3507148,
+      "sha256": "4de30a0f6d2a7008748e1d636cbd842e0415b6e757f76888ce259486b693f551"
+    },
+    {
+      "file": "웹학교/캐릭터모델/여학생-귀여운.glb",
+      "bytes": 3864920,
+      "sha256": "9b125af2f612be04d07cef62c53c14ab03cfbbbff2b9d32a2e830e040ed85137"
+    }
+  ],
+  "ok": true
+}

@@ -1,0 +1,414 @@
+{
+  "label": "after-v4",
+  "startedAt": "2026-09-19T03:02:14.709Z",
+  "views": [
+    {
+      "variant": "boy-realistic",
+      "view": "front",
+      "file": "boy-realistic-front.png",
+      "state": {
+        "variant": "boy-realistic",
+        "name": "남학생 · 실사풍",
+        "heading": 0,
+        "speed": 0,
+        "blend": 0,
+        "phase": 0,
+        "motion": "대기",
+        "waving": false,
+        "waveBlend": 0,
+        "airBlend": 0,
+        "opacity": 1,
+        "footHeights": [
+          0,
+          0
+        ],
+        "arms": [],
+        "modelStatus": "ready",
+        "error": null,
+        "animationNames": [
+          "Idle",
+          "Run_02",
+          "Jump_Run",
+          "Big_Wave_Hello"
+        ],
+        "currentAnimation": "idle",
+        "height": 1.65
+      }
+    },
+    {
+      "variant": "boy-realistic",
+      "view": "side",
+      "file": "boy-realistic-side.png",
+      "state": {
+        "variant": "boy-realistic",
+        "name": "남학생 · 실사풍",
+        "heading": 1.5707963267948966,
+        "speed": 0,
+        "blend": 0,
+        "phase": 0,
+        "motion": "대기",
+        "waving": false,
+        "waveBlend": 0,
+        "airBlend": 0,
+        "opacity": 1,
+        "footHeights": [
+          0,
+          0
+        ],
+        "arms": [],
+        "modelStatus": "ready",
+        "error": null,
+        "animationNames": [
+          "Idle",
+          "Run_02",
+          "Jump_Run",
+          "Big_Wave_Hello"
+        ],
+        "currentAnimation": "idle",
+        "height": 1.65
+      }
+    },
+    {
+      "variant": "boy-realistic",
+      "view": "back",
+      "file": "boy-realistic-back.png",
+      "state": {
+        "variant": "boy-realistic",
+        "name": "남학생 · 실사풍",
+        "heading": 3.141592653589793,
+        "speed": 0,
+        "blend": 0,
+        "phase": 0,
+        "motion": "대기",
+        "waving": false,
+        "waveBlend": 0,
+        "airBlend": 0,
+        "opacity": 1,
+        "footHeights": [
+          0,
+          0
+        ],
+        "arms": [],
+        "modelStatus": "ready",
+        "error": null,
+        "animationNames": [
+          "Idle",
+          "Run_02",
+          "Jump_Run",
+          "Big_Wave_Hello"
+        ],
+        "currentAnimation": "idle",
+        "height": 1.65
+      }
+    },
+    {
+      "variant": "boy-cute",
+      "view": "front",
+      "file": "boy-cute-front.png",
+      "state": {
+        "variant": "boy-cute",
+        "name": "남학생 · 귀여운형",
+        "heading": 0,
+        "speed": 0,
+        "blend": 0,
+        "phase": 0,
+        "motion": "대기",
+        "waving": false,
+        "waveBlend": 0,
+        "airBlend": 0,
+        "opacity": 1,
+        "footHeights": [
+          0,
+          0
+        ],
+        "arms": [],
+        "modelStatus": "ready",
+        "error": null,
+        "animationNames": [
+          "Idle",
+          "Run_02",
+          "Jump_Run",
+          "Big_Wave_Hello"
+        ],
+        "currentAnimation": "idle",
+        "height": 1.65
+      }
+    },
+    {
+      "variant": "boy-cute",
+      "view": "side",
+      "file": "boy-cute-side.png",
+      "state": {
+        "variant": "boy-cute",
+        "name": "남학생 · 귀여운형",
+        "heading": 1.5707963267948966,
+        "speed": 0,
+        "blend": 0,
+        "phase": 0,
+        "motion": "대기",
+        "waving": false,
+        "waveBlend": 0,
+        "airBlend": 0,
+        "opacity": 1,
+        "footHeights": [
+          0,
+          0
+        ],
+        "arms": [],
+        "modelStatus": "ready",
+        "error": null,
+        "animationNames": [
+          "Idle",
+          "Run_02",
+          "Jump_Run",
+          "Big_Wave_Hello"
+        ],
+        "currentAnimation": "idle",
+        "height": 1.65
+      }
+    },
+    {
+      "variant": "boy-cute",
+      "view": "back",
+      "file": "boy-cute-back.png",
+      "state": {
+        "variant": "boy-cute",
+        "name": "남학생 · 귀여운형",
+        "heading": 3.141592653589793,
+        "speed": 0,
+        "blend": 0,
+        "phase": 0,
+        "motion": "대기",
+        "waving": false,
+        "waveBlend": 0,
+        "airBlend": 0,
+        "opacity": 1,
+        "footHeights": [
+          0,
+          0
+        ],
+        "arms": [],
+        "modelStatus": "ready",
+        "error": null,
+        "animationNames": [
+          "Idle",
+          "Run_02",
+          "Jump_Run",
+          "Big_Wave_Hello"
+        ],
+        "currentAnimation": "idle",
+        "height": 1.65
+      }
+    },
+    {
+      "variant": "girl-realistic",
+      "view": "front",
+      "file": "girl-realistic-front.png",
+      "state": {
+        "variant": "girl-realistic",
+        "name": "여학생 · 실사풍",
+        "heading": 0,
+        "speed": 0,
+        "blend": 0,
+        "phase": 0,
+        "motion": "대기",
+        "waving": false,
+        "waveBlend": 0,
+        "airBlend": 0,
+        "opacity": 1,
+        "footHeights": [
+          0,
+          0
+        ],
+        "arms": [],
+        "modelStatus": "ready",
+        "error": null,
+        "animationNames": [
+          "Idle",
+          "Run_02",
+          "Jump_Run",
+          "Big_Wave_Hello"
+        ],
+        "currentAnimation": "idle",
+        "height": 1.65
+      }
+    },
+    {
+      "variant": "girl-realistic",
+      "view": "side",
+      "file": "girl-realistic-side.png",
+      "state": {
+        "variant": "girl-realistic",
+        "name": "여학생 · 실사풍",
+        "heading": 1.5707963267948966,
+        "speed": 0,
+        "blend": 0,
+        "phase": 0,
+        "motion": "대기",
+        "waving": false,
+        "waveBlend": 0,
+        "airBlend": 0,
+        "opacity": 1,
+        "footHeights": [
+          0,
+          0
+        ],
+        "arms": [],
+        "modelStatus": "ready",
+        "error": null,
+        "animationNames": [
+          "Idle",
+          "Run_02",
+          "Jump_Run",
+          "Big_Wave_Hello"
+        ],
+        "currentAnimation": "idle",
+        "height": 1.65
+      }
+    },
+    {
+      "variant": "girl-realistic",
+      "view": "back",
+      "file": "girl-realistic-back.png",
+      "state": {
+        "variant": "girl-realistic",
+        "name": "여학생 · 실사풍",
+        "heading": 3.141592653589793,
+        "speed": 0,
+        "blend": 0,
+        "phase": 0,
+        "motion": "대기",
+        "waving": false,
+        "waveBlend": 0,
+        "airBlend": 0,
+        "opacity": 1,
+        "footHeights": [
+          0,
+          0
+        ],
+        "arms": [],
+        "modelStatus": "ready",
+        "error": null,
+        "animationNames": [
+          "Idle",
+          "Run_02",
+          "Jump_Run",
+          "Big_Wave_Hello"
+        ],
+        "currentAnimation": "idle",
+        "height": 1.65
+      }
+    },
+    {
+      "variant": "girl-cute",
+      "view": "front",
+      "file": "girl-cute-front.png",
+      "state": {
+        "variant": "girl-cute",
+        "name": "여학생 · 귀여운형",
+        "heading": 0,
+        "speed": 0,
+        "blend": 0,
+        "phase": 0,
+        "motion": "대기",
+        "waving": false,
+        "waveBlend": 0,
+        "airBlend": 0,
+        "opacity": 1,
+        "footHeights": [
+          0,
+          0
+        ],
+        "arms": [],
+        "modelStatus": "ready",
+        "error": null,
+        "animationNames": [
+          "Idle",
+          "Run_02",
+          "Jump_Run",
+          "Big_Wave_Hello"
+        ],
+        "currentAnimation": "idle",
+        "height": 1.65
+      }
+    },
+    {
+      "variant": "girl-cute",
+      "view": "side",
+      "file": "girl-cute-side.png",
+      "state": {
+        "variant": "girl-cute",
+        "name": "여학생 · 귀여운형",
+        "heading": 1.5707963267948966,
+        "speed": 0,
+        "blend": 0,
+        "phase": 0,
+        "motion": "대기",
+        "waving": false,
+        "waveBlend": 0,
+        "airBlend": 0,
+        "opacity": 1,
+        "footHeights": [
+          0,
+          0
+        ],
+        "arms": [],
+        "modelStatus": "ready",
+        "error": null,
+        "animationNames": [
+          "Idle",
+          "Run_02",
+          "Jump_Run",
+          "Big_Wave_Hello"
+        ],
+        "currentAnimation": "idle",
+        "height": 1.65
+      }
+    },
+    {
+      "variant": "girl-cute",
+      "view": "back",
+      "file": "girl-cute-back.png",
+      "state": {
+        "variant": "girl-cute",
+        "name": "여학생 · 귀여운형",
+        "heading": 3.141592653589793,
+        "speed": 0,
+        "blend": 0,
+        "phase": 0,
+        "motion": "대기",
+        "waving": false,
+        "waveBlend": 0,
+        "airBlend": 0,
+        "opacity": 1,
+        "footHeights": [
+          0,
+          0
+        ],
+        "arms": [],
+        "modelStatus": "ready",
+        "error": null,
+        "animationNames": [
+          "Idle",
+          "Run_02",
+          "Jump_Run",
+          "Big_Wave_Hello"
+        ],
+        "currentAnimation": "idle",
+        "height": 1.65
+      }
+    },
+    {
+      "variant": "boy-realistic",
+      "view": "desktop-picker",
+      "file": "desktop-picker.png"
+    },
+    {
+      "variant": "girl-cute",
+      "view": "mobile-picker",
+      "file": "mobile-picker.png"
+    }
+  ],
+  "errors": [],
+  "ok": true
+}

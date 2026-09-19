@@ -1,0 +1,83 @@
+[
+  {
+    "id": "boy-realistic",
+    "hairTriangles": 11120,
+    "bodyTriangles": 19494,
+    "components": [
+      10699,
+      421
+    ],
+    "rgb": [
+      40,
+      31,
+      30
+    ],
+    "skins": 1,
+    "animations": [
+      "Idle",
+      "Run_02",
+      "Jump_Run",
+      "Big_Wave_Hello"
+    ]
+  },
+  {
+    "id": "boy-cute",
+    "hairTriangles": 11301,
+    "bodyTriangles": 19605,
+    "components": [
+      11301
+    ],
+    "rgb": [
+      28,
+      28,
+      28
+    ],
+    "skins": 1,
+    "animations": [
+      "Idle",
+      "Run_02",
+      "Jump_Run",
+      "Big_Wave_Hello"
+    ]
+  },
+  {
+    "id": "girl-realistic",
+    "hairTriangles": 9764,
+    "bodyTriangles": 21115,
+    "components": [
+      9764
+    ],
+    "rgb": [
+      24,
+      17,
+      17
+    ],
+    "skins": 1,
+    "animations": [
+      "Idle",
+      "Run_02",
+      "Jump_Run",
+      "Big_Wave_Hello"
+    ]
+  },
+  {
+    "id": "girl-cute",
+    "hairTriangles": 20811,
+    "bodyTriangles": 9955,
+    "components": [
+      20811
+    ],
+    "rgb": [
+      30,
+      22,
+      15
+    ],
+    "skins": 1,
+    "animations": [
+      "Idle",
+      "Run_02",
+      "Jump_Run",
+      "Big_Wave_Hello"
+    ]
+  }
+]
