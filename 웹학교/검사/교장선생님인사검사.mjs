@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import {buildWorld} from '../이동물리.mjs';
 import {PRINCIPAL_GREETING,LOBBY_PRINCIPAL_POSITION as npc,principalCanGreet,blocksPrincipal,createLobbyPrincipalState} from '../교장선생님인사.mjs';
 const world=buildWorld(JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')));
-assert.equal(PRINCIPAL_GREETING,'행복하세요! 9월은 September!');
+assert.equal(PRINCIPAL_GREETING,'행복하세요~ 영어 퀴즈에 도전해보세요!');
 assert(world.candidate(npc.x,npc.y,npc.z),'현관 NPC 지점은 비어 있음');
 assert.equal(world.roomAt(npc).room.id,'1F_MAIN_LOBBY');
 const player={x:45,y:-2.8,z:0};

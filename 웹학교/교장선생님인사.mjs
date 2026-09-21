@@ -1,5 +1,5 @@
 // World coordinates: x/y ground plane, z height. Shared with regression tests.
-export const PRINCIPAL_GREETING='행복하세요! 9월은 September!';
+export const PRINCIPAL_GREETING='행복하세요~ 영어 퀴즈에 도전해보세요!';
 export const LOBBY_PRINCIPAL_POSITION=Object.freeze({x:47,y:-2.8,z:0});
 export const GREETING_DISTANCE=2.8;
 

@@ -1,0 +1,30 @@
+import assert from 'node:assert/strict';
+import {MONTHS,createMonthQuestion,createMonthQuiz} from '../월영어퀴즈.mjs';
+let seed=91234;const random=()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296);
+const seen=new Set(),slots=new Set();let previous=0;
+for(let i=0;i<2400;i++){
+  const q=createMonthQuestion(random,previous);assert(q.month>=1&&q.month<=12);assert.notEqual(q.month,previous);
+  assert.equal(q.choices.length,4);assert.equal(new Set(q.choices).size,4);
+  assert(q.choices.every(word=>MONTHS.includes(word)));assert(q.choices.includes(MONTHS[q.month-1]));
+  assert.equal(q.prompt,`행복하세요~ ${q.month}월은 영어로 뭘까요?`);seen.add(q.month);slots.add(q.choices.indexOf(MONTHS[q.month-1]));previous=q.month;
+}
+assert.equal(seen.size,12);assert.equal(slots.size,4);
+const quiz=createMonthQuiz(random),npcs=[{id:'lobby',name:'중앙현관',position:{x:0,y:0,z:0}},{id:'office',name:'교장실',position:{x:0,y:0,z:3.4}}];
+const near={x:2,y:0,z:0},far={x:8,y:0,z:0};
+assert.equal(quiz.update(near,npcs,{active:false}),null);
+assert.equal(quiz.update(near,npcs,{colliders:[{bounds:[.5,-1,0,1,1,3]}]}),null);
+assert.equal(quiz.update({...near,z:7},npcs),null);assert.equal(quiz.update(far,npcs),null);
+const first=quiz.update(near,npcs);assert.equal(first.question.npcId,'lobby');assert.equal(first.open,true);
+assert.equal(quiz.update(near,npcs),null);
+const wrong=first.question.choices.findIndex(word=>word!==MONTHS[first.question.month-1]);
+let answer=quiz.answer(wrong);assert.equal(answer.message,'다시한번 생각해보세요');assert.equal(answer.solved,false);assert.deepEqual(answer.question,first.question);
+const right=first.question.choices.indexOf(MONTHS[first.question.month-1]);answer=quiz.answer(right);
+assert.equal(answer.message,'참 잘했어요~');assert.equal(answer.solved,true);assert.equal(answer.attempts,2);assert.deepEqual(quiz.answer(wrong),answer);
+quiz.dismiss();assert.equal(quiz.answer(right).open,false);assert.equal(quiz.update(near,npcs),null);
+assert.equal(quiz.update({x:3.1,y:0,z:0},npcs),null);assert.equal(quiz.update(near,npcs),null,'Boundary jitter does not rearm');
+quiz.update(far,npcs);const second=quiz.update(near,npcs);assert.notEqual(second.question.month,first.question.month);assert.equal(second.visit,2);
+quiz.dismiss();const upstairs=quiz.update({...near,z:3.4},npcs);assert.equal(upstairs.question.npcId,'office');
+const grouped=createMonthQuiz(random),pair=[{id:'real',position:{x:0,y:0,z:0}},{id:'cute',position:{x:0,y:1.5,z:0}}];
+grouped.update(near,pair);grouped.dismiss();assert.equal(grouped.update({x:1,y:1.5,z:0},pair),null,'Adjacent models do not cause popup loop');
+grouped.update(far,pair);assert.equal(grouped.update({x:1,y:1.5,z:0},pair).question.npcId,'cute');
+console.log({ok:true,randomQuestions:2400,months:seen.size,answerSlots:slots.size,wrongRetry:true,correctFeedback:true,wallAndFloorChecks:true,exitAndReenter:true,noPopupLoop:true});

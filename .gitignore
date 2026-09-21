@@ -22,6 +22,7 @@ node_modules/
 !/촬영사진_넣는곳/**/
 !/촬영사진_넣는곳/**/촬영안내.md
 /결과물/미리보기/3F-*.png
+/결과물/퀴즈검사/
 
 # Authoritative registry and Blender model must be included.
 !/공간자료/
