@@ -1,9 +1,17 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {buildWorld} from '../이동물리.mjs';
-import {PRINCIPAL_GREETING,LOBBY_PRINCIPAL_POSITION as npc,principalCanGreet,blocksPrincipal,createLobbyPrincipalState} from '../교장선생님인사.mjs';
+import {ENGLISH_MONTHS,ENGLISH_WEEKDAYS,PRINCIPAL_GREETING,LOBBY_PRINCIPAL_POSITION as npc,principalCanGreet,blocksPrincipal,createLobbyPrincipalState,principalGreetingLines,principalGreetingAt} from '../교장선생님인사.mjs';
 const world=buildWorld(JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')));
-assert.equal(PRINCIPAL_GREETING,'행복하세요! 9월은 September!');
+assert(PRINCIPAL_GREETING.length>0);
+for(let month=0;month<12;month++){
+  const lines=principalGreetingLines(new Date(2026,month,15));assert(lines.length>=8);assert(lines.some(line=>line.includes(ENGLISH_MONTHS[month])),'월 영어 '+month);
+}
+for(let day=0;day<7;day++){
+  const date=new Date(2026,8,20+day),lines=principalGreetingLines(date);assert(lines.some(line=>line.includes(ENGLISH_WEEKDAYS[date.getDay()])),'요일 영어 '+day);
+}
+const quizDate=new Date(2026,8,21);assert.notEqual(principalGreetingAt(quizDate,0),principalGreetingAt(quizDate,1));
+assert(principalGreetingLines(quizDate).some(line=>line.includes('퀴즈')),'월·요일 퀴즈 포함');
 assert(world.candidate(npc.x,npc.y,npc.z),'현관 NPC 지점은 비어 있음');
 assert.equal(world.roomAt(npc).room.id,'1F_MAIN_LOBBY');
 const player={x:45,y:-2.8,z:0};

@@ -2,12 +2,14 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import {createStudent,CHARACTER_NAMES,STUDENT_MODELS,normalizeStudentVariant} from '../학생캐릭터.mjs';
 
-const models=['남학생-실사풍','남학생-귀여운','여학생-실사풍','여학생-귀여운'];
-const variants=['boy-realistic','boy-cute','girl-realistic','girl-cute'];
-assert.deepEqual(Object.keys(STUDENT_MODELS).sort(),[...variants].sort(),'네 가지 모델만 제공');
+const models=['남학생-귀여운','여학생-귀여운'];
+const variants=['boy-cute','girl-cute'];
+assert.deepEqual(Object.keys(STUDENT_MODELS).sort(),[...variants].sort(),'두 귀여운 모델만 제공');
 assert.deepEqual(Object.values(STUDENT_MODELS).sort(),models.map(name=>name+'.glb').sort(),'모델 파일 연결');
 assert.equal(normalizeStudentVariant('boy'),'boy-cute','이전 남학생 선택 호환');
 assert.equal(normalizeStudentVariant('girl'),'girl-cute','이전 여학생 선택 호환');
+assert.equal(normalizeStudentVariant('boy-realistic'),'boy-cute','이전 실사 남학생 선택 호환');
+assert.equal(normalizeStudentVariant('girl-realistic'),'girl-cute','이전 실사 여학생 선택 호환');
 for(const variant of variants){
   assert(CHARACTER_NAMES[variant],variant+' 표시 이름');
   const student=createStudent(variant,{lazy:true});

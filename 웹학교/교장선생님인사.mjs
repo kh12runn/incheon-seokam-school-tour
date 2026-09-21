@@ -1,5 +1,25 @@
 // World coordinates: x/y ground plane, z height. Shared with regression tests.
-export const PRINCIPAL_GREETING='행복하세요! 9월은 September!';
+export const ENGLISH_MONTHS=Object.freeze(['January','February','March','April','May','June','July','August','September','October','November','December']);
+export const ENGLISH_WEEKDAYS=Object.freeze(['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday']);
+const KOREAN_WEEKDAYS=Object.freeze(['일','월','화','수','목','금','토']);
+export function principalGreetingLines(date=new Date()){
+  const month=date.getMonth(),day=date.getDay(),monthName=ENGLISH_MONTHS[month],dayName=ENGLISH_WEEKDAYS[day],dayKo=KOREAN_WEEKDAYS[day];
+  return [
+    '행복하세요! 오늘도 힘차게!',
+    `이번 달은 ${month+1}월, 영어로 ${monthName}!`,
+    `영어 퀴즈! ${month+1}월은 영어로 무엇일까요?`,
+    `월 퀴즈 정답은 ${monthName}!`,
+    `오늘은 ${dayKo}요일, 영어로 ${dayName}!`,
+    `요일 퀴즈! ${dayKo}요일은 영어로 무엇일까요?`,
+    `요일 퀴즈 정답은 ${dayName}!`,
+    '건강한 몸에 건강한 마음! 함께 걸어 볼까요?'
+  ];
+}
+export function principalGreetingAt(date=new Date(),cycle=0,offset=0){
+  const lines=principalGreetingLines(date),index=((Math.trunc(cycle)+offset)%lines.length+lines.length)%lines.length;
+  return lines[index];
+}
+export const PRINCIPAL_GREETING=principalGreetingAt();
 export const LOBBY_PRINCIPAL_POSITION=Object.freeze({x:47,y:-2.8,z:0});
 export const GREETING_DISTANCE=2.8;
 

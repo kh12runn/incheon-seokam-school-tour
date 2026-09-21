@@ -4,8 +4,7 @@ import {GLTFLoader} from './외부도구/GLTFLoader.js';
 // World coordinates use x/y for the floor and z for height.
 // The west-side display leaves the doorway and the furniture aisle open.
 export const OFFICE_CHARACTERS=Object.freeze([
-  {id:'realistic',label:'교장선생님 · 실물형',position:{x:31.15,y:-1.90,z:3.4},height:1.84,url:new URL('./캐릭터모델/교장선생님-실물.glb',import.meta.url)},
-  {id:'cute',label:'교장선생님 · 귀여운형',position:{x:31.15,y:-3.35,z:3.4},height:1.84,url:new URL('./캐릭터모델/교장선생님-귀여운.glb',import.meta.url)}
+  {id:'cute',label:'교장선생님',position:{x:31.15,y:-3.35,z:3.4},height:1.83,url:new URL('./캐릭터모델/교장선생님-귀여운.glb',import.meta.url)}
 ]);
 
 export function normalizePrincipalModel(asset,height){
@@ -39,22 +38,29 @@ export function createOfficePrincipalModels(){
     const label=nameplate(config.label);root.add(label.sprite);let status='not-requested',error=null;
     return {root,position:config.position,
       getState:()=>({id:config.id,position:{...config.position},height:config.height,modelStatus:status,faceTexture:status,visible:root.visible,moving:false,error}),
-      async load(){
+      async load(attempt=0){
         if(status==='ready')return;
         status='loading';error=null;label.setText(config.label+' · 불러오는 중');
         try{
-          const gltf=await loader.loadAsync(config.url.href);
+          const response=await fetch(config.url.href,{signal:AbortSignal.timeout(30000)});
+          if(!response.ok)throw new Error('모델 다운로드 HTTP '+response.status);
+          const gltf=await loader.parseAsync(await response.arrayBuffer(),new URL('.',config.url).href);
           root.add(normalizePrincipalModel(gltf.scene,config.height));status='ready';label.setText(config.label);
         }catch(reason){
-          status='error';error=String(reason?.message??reason);label.setText(config.label+' · 재입장하면 다시 불러옵니다');
+          status='error';error=String(reason?.message??reason);label.setText(config.label+(attempt<2?' · 다시 불러오는 중':' · 재입장하면 다시 불러옵니다'));
           console.warn(config.label+' 모델 로드 실패',reason);
         }
       }
     };
   });
   return {characters,load(){
-    // Decode the two texture sets in sequence to limit peak memory on phones.
-    if(!loading)loading=(async()=>{for(const character of characters)await character.load();})().finally(()=>{loading=null;});
+    if(!loading)loading=(async()=>{
+      for(let attempt=0;attempt<3;attempt++){
+        if(attempt)await new Promise(resolve=>setTimeout(resolve,2000));
+        for(const character of characters)await character.load(attempt);
+        if(characters.every(character=>character.getState().modelStatus==='ready'))break;
+      }
+    })().finally(()=>{loading=null;});
     return loading;
   }};
 }

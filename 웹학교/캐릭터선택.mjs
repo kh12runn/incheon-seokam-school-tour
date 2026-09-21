@@ -1,11 +1,11 @@
 import * as THREE from './외부도구/three.module.js';
-import {createStudent,CHARACTER_NAMES,STUDENT_HEIGHT} from './학생캐릭터.mjs';
-const VARIANTS=['boy-realistic','boy-cute','girl-realistic','girl-cute'];
+import {createStudent,CHARACTER_NAMES,STUDENT_HEIGHT,normalizeStudentVariant} from './학생캐릭터.mjs';
+const VARIANTS=['boy-cute','girl-cute'];
 export function createCharacterPicker({onChoose,onClose,onStarted,initial='boy'}){
   const dialog=document.createElement('dialog');dialog.id='캐릭터창';dialog.setAttribute('aria-labelledby','캐릭터제목');
-  dialog.innerHTML=`<h2 id="캐릭터제목">함께 탐험할 친구를 골라요</h2><p>실사풍과 귀여운 모습 중 마음에 드는 친구를 골라 보세요.</p><canvas aria-label="선택한 친구의 3D 달리기 미리보기"></canvas><p id="캐릭터미리보기상태" role="status" aria-live="polite"></p><button id="캐릭터다시시도" hidden>다시 불러오기</button><div class="캐릭터선택줄"><button data-character="boy-realistic" aria-pressed="false">남학생<span>실사풍</span></button><button data-character="boy-cute" aria-pressed="false">남학생<span>귀여운 모습</span></button><button data-character="girl-realistic" aria-pressed="false">여학생<span>실사풍</span></button><button data-character="girl-cute" aria-pressed="false">여학생<span>귀여운 모습</span></button></div><button class="primary" id="캐릭터확인" disabled>이 친구로 출발!</button><button id="캐릭터닫기">취소</button>`;
+  dialog.innerHTML=`<h2 id="캐릭터제목">함께 탐험할 친구를 골라요</h2><p>함께 학교를 탐험할 마음에 드는 친구를 골라 보세요.</p><canvas aria-label="선택한 친구의 3D 달리기 미리보기"></canvas><p id="캐릭터미리보기상태" role="status" aria-live="polite"></p><button id="캐릭터다시시도" hidden>다시 불러오기</button><div class="캐릭터선택줄"><button data-character="boy-cute" aria-pressed="false">남학생</button><button data-character="girl-cute" aria-pressed="false">여학생</button></div><button class="primary" id="캐릭터확인" disabled>이 친구로 출발!</button><button id="캐릭터닫기">취소</button>`;
   document.body.append(dialog);const canvas=dialog.querySelector('canvas'),status=dialog.querySelector('#캐릭터미리보기상태'),confirm=dialog.querySelector('#캐릭터확인'),retry=dialog.querySelector('#캐릭터다시시도');
-  let renderer,scene,camera,student=null,selected=VARIANTS.includes(initial)?initial:initial==='girl'?'girl-cute':'boy-cute',frameId=0,last=0,time=0,confirmed=false,requestId=0,ready=false;
+  let renderer,scene,camera,student=null,selected=VARIANTS.includes(normalizeStudentVariant(initial))?normalizeStudentVariant(initial):'boy-cute',frameId=0,last=0,time=0,confirmed=false,requestId=0,ready=false;
   const refresh=()=>dialog.querySelectorAll('[data-character]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.character===selected)));
   function clearStudent(){
     requestId++;ready=false;confirm.disabled=true;

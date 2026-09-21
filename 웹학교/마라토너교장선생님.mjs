@@ -1,8 +1,12 @@
 import * as THREE from './외부도구/three.module.js';
+import {GLTFLoader} from './외부도구/GLTFLoader.js';
 import {createPrincipalFace,PRINCIPAL_FACE_VERSION,PRINCIPAL_HEAD_SCALE,PRINCIPAL_SKIN_COLOR,getPrincipalFaceState} from './교장선생님얼굴.mjs';
 import {applyApprovedPrincipalAppearance,PRINCIPAL_APPEARANCE_VERSION} from './교장선생님피부마감.mjs';
 // Articulated runner with the same locally stored portrait as the office NPC.
 const sphere=new THREE.SphereGeometry(1,24,16),box=new THREE.BoxGeometry(1,1,1);
+const officeHeadURL=new URL('./캐릭터모델/교장선생님-머리.glb',import.meta.url),loader=new GLTFLoader();
+const OFFICE_SOURCE_MIN_Y=-.95166099,OFFICE_SOURCE_MAX_Y=1.00037324;
+export const RUNNER_PRINCIPAL_HEIGHT=1.83;
 const paint=(color,roughness=.7)=>new THREE.MeshStandardMaterial({color,roughness});
 function put(parent,geometry,material,position,scale=[1,1,1]){
   const o=new THREE.Mesh(geometry,material);o.position.set(...position);o.scale.set(...scale);o.castShadow=true;o.receiveShadow=true;parent.add(o);return o;
@@ -19,6 +23,7 @@ function label(p,value,pos,w,h){
 }
 export function createRunnerPrincipalNPC(){
   const root=new THREE.Group();root.name='중앙현관 마라토너 교장선생님';
+  root.userData.greetingHeight=2.12;
   const skin=paint(PRINCIPAL_SKIN_COLOR),blue=paint('#176f89'),coral=paint('#f18a68'),navy=paint('#21394e'),white=paint('#f0eee5'),sole=paint('#d8dedb'),black=paint('#151e26',.25),silver=paint('#b2bac2',.4);
   const body=new THREE.Group();body.position.y=.96;root.add(body);
   ball(body,skin,[0,.35,0],[.188,.23,.111]);
@@ -33,7 +38,7 @@ export function createRunnerPrincipalNPC(){
   label(body,'09',[0,.226,.130],.235,.13);
   put(body,new THREE.CylinderGeometry(.041,.062,.082,32),skin,[0,.491,-.006]);
   const head=new THREE.Group();head.position.y=.59;head.scale.setScalar(PRINCIPAL_HEAD_SCALE);body.add(head);
-  head.add(createPrincipalFace({sunglasses:true}));
+  const fallbackFace=createPrincipalFace({sunglasses:true});head.add(fallbackFace);
   // Hair now belongs to the continuous head; no separate intersecting hair blobs.
   // Sports sunglasses: connected frame, dark lenses and side arms.
   for(const s of [-1,1]){
@@ -47,6 +52,13 @@ export function createRunnerPrincipalNPC(){
   const brim=new THREE.Shape();brim.moveTo(-.128,.018);brim.quadraticCurveTo(-.174,.095,-.125,.172);brim.quadraticCurveTo(0,.241,.125,.172);brim.quadraticCurveTo(.174,.095,.128,.018);brim.quadraticCurveTo(0,.095,-.128,.018);
   const brimMesh=put(head,new THREE.ExtrudeGeometry(brim,{depth:.007,bevelEnabled:true,bevelThickness:.002,bevelSize:.003,bevelSegments:2,steps:1,curveSegments:16}),white,[0,.233,0]);brimMesh.rotation.x=Math.PI/2;brimMesh.name='선캡 햇빛 가리개';
   line(head,coral,[[-.126,.234,.173],[0,.232,.207],[.126,.234,.173]],.003);
+  let modelStatus='loading',modelError=null;
+  void loader.loadAsync(officeHeadURL.href).then(gltf=>{
+    const scale=RUNNER_PRINCIPAL_HEIGHT/(OFFICE_SOURCE_MAX_Y-OFFICE_SOURCE_MIN_Y);
+    gltf.scene.scale.setScalar(scale);gltf.scene.position.y=-OFFICE_SOURCE_MIN_Y*scale;
+    gltf.scene.traverse(object=>{if(object.isMesh){object.castShadow=true;object.receiveShadow=true;}});
+    root.add(gltf.scene);fallbackFace.visible=false;modelStatus='ready';
+  }).catch(reason=>{modelStatus='error';modelError=String(reason?.message??reason);console.warn('러닝복 교장선생님 얼굴 모델 로드 실패',reason);});
   ball(root,navy,[0,.965,0],[.176,.12,.11]);
   for(const s of [-1,1]){
     const leg=new THREE.Group();leg.position.set(s*.094,.94,0);root.add(leg);
@@ -88,5 +100,5 @@ export function createRunnerPrincipalNPC(){
     arms[0].rotation.x=-.07+Math.sin(t*.9)*.025;head.rotation.z=Math.sin(t*.75)*.012;
   }
   applyApprovedPrincipalAppearance(root,{runner:true});
-  return {root,update,getState:()=>({outfit:'running',accessories:['sunglasses','sun-visor','megaphone'],faceTexture:getPrincipalFaceState(),faceVersion:PRINCIPAL_FACE_VERSION,appearanceVersion:PRINCIPAL_APPEARANCE_VERSION,height:1.82,headScale:PRINCIPAL_HEAD_SCALE})};
+  return {root,update,getState:()=>({outfit:'running',accessories:['sunglasses','sun-visor','megaphone'],faceTexture:modelStatus,modelStatus,modelError,faceVersion:PRINCIPAL_FACE_VERSION,appearanceVersion:PRINCIPAL_APPEARANCE_VERSION,height:RUNNER_PRINCIPAL_HEIGHT,headScale:PRINCIPAL_HEAD_SCALE,sameFaceAsOffice:true,fallbackFaceTexture:getPrincipalFaceState()})};
 }

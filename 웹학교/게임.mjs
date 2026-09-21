@@ -21,7 +21,7 @@ import {PRINCIPAL_ID} from './교장실배치.mjs';
 import {createPrincipalOffice} from './교장실표현.mjs';
 import {OFFICE_CHARACTERS,createOfficePrincipalModels} from './교장실캐릭터.mjs';
 import {createRunnerPrincipalNPC} from './마라토너교장선생님.mjs';
-import {PRINCIPAL_GREETING,LOBBY_PRINCIPAL_POSITION,createLobbyPrincipalState,principalCanGreet,blocksPrincipal} from './교장선생님인사.mjs';
+import {PRINCIPAL_GREETING,LOBBY_PRINCIPAL_POSITION,createLobbyPrincipalState,principalCanGreet,blocksPrincipal,principalGreetingAt} from './교장선생님인사.mjs';
 const $=id=>document.getElementById(id);
 const canvas=$('화면'),panel=$('시작안내'),status=$('상태'),where=$('현재위치');
 let renderer,touchControls;
@@ -49,16 +49,17 @@ let autoOrbit=true,orbitResumeAt=0,elevatorBusy=false;
 let selectedCharacter=null;
 let jumpMotion;
 let class64PhotoFinish;
-let officePrincipals,principalNPC,cutePrincipalNPC,officeWasNearby=false;
+let officePrincipals,principalNPC,officeWasNearby=false;
 let lobbyPrincipalNPC;
 const lobbyPrincipalState=createLobbyPrincipalState();
-const principalBubbles=['교장실','중앙현관','교장실귀여운형'].map(name=>{
+const principalBubbles=['교장실','중앙현관'].map(name=>{
   const element=document.createElement('div');element.id=name+'교장말풍선';element.className='교장말풍선';element.textContent=PRINCIPAL_GREETING;element.hidden=true;element.setAttribute('role','status');document.body.append(element);return element;
 });
 const bubblePoint=new THREE.Vector3();
-function updatePrincipalBubble(element,npc,npcPosition){
+function updatePrincipalBubble(element,npc,npcPosition,offset=0){
   element.hidden=true;
   if(!npc?.root.visible||!principalCanGreet(position,npcPosition,{active:isPlaying()&&!document.hidden,colliders:world.colliders}))return;
+  element.textContent=principalGreetingAt(new Date(),Math.floor(elapsed/7),offset);
   bubblePoint.set(npcPosition.x,npcPosition.z+(npc.root.userData.greetingHeight??2.12),-npcPosition.y).project(camera);
   if(bubblePoint.z< -1||bubblePoint.z>1||Math.abs(bubblePoint.x)>.97||Math.abs(bubblePoint.y)>.97)return;
   element.hidden=false;
@@ -324,7 +325,7 @@ $('방이동').addEventListener('click',()=>{
   const b=room.bounds,interior=world.classroomInteriors.find(r=>r.roomId===room.id);
   const p=room.id===PRINCIPAL_ID?{...world.principalOffice.spawn}:room.id===CLASS64_ID?{...CLASS64_SPAWN}:interior?{...interior.spawn}:{x:(b[0]+b[1])/2,y:(b[2]+b[3])/2,z:b[4]};
   const valid=world.candidate(p.x,p.y,p.z);if(!valid){notice('해당 위치는 이동할 수 없습니다.');return;}
-  position=valid;jumpMotion.reset();yaw=room.id===PRINCIPAL_ID?Math.PI:interior?.layoutRotation===Math.PI?-Math.PI/2:interior||room.id===CLASS64_ID?Math.PI/2:room.building==='ANNEX'?-Math.PI/2:0;pitch=0;startWalk();
+  position=valid;jumpMotion.reset();yaw=room.id===PRINCIPAL_ID?Math.atan2(p.x-OFFICE_CHARACTERS[0].position.x,OFFICE_CHARACTERS[0].position.y-p.y):interior?.layoutRotation===Math.PI?-Math.PI/2:interior||room.id===CLASS64_ID?Math.PI/2:room.building==='ANNEX'?-Math.PI/2:0;pitch=0;startWalk();
 });
 document.addEventListener('pointerlockchange',()=>{
   locked=document.pointerLockElement===canvas;
@@ -448,7 +449,7 @@ function frame(now){
     }
   }
   const officeNearby=mode==='walk'&&Math.abs(position.z-3.4)<1.8&&Math.hypot(position.x-33.5,position.y+3.5)<22;
-  if(officeNearby&&!officePrincipals){officePrincipals=createOfficePrincipalModels();[principalNPC,cutePrincipalNPC]=officePrincipals.characters;scene.add(principalNPC.root,cutePrincipalNPC.root);}
+  if(officeNearby&&!officePrincipals){officePrincipals=createOfficePrincipalModels();[principalNPC]=officePrincipals.characters;scene.add(principalNPC.root);}
   if(officeNearby&&!officeWasNearby)void officePrincipals.load();
   officeWasNearby=officeNearby;
   for(const npc of officePrincipals?.characters??[])npc.root.visible=officeNearby;
@@ -456,8 +457,7 @@ function frame(now){
   if(lobbyNearby&&!lobbyPrincipalNPC){lobbyPrincipalNPC=createRunnerPrincipalNPC();scene.add(lobbyPrincipalNPC.root);}
   if(lobbyPrincipalNPC){lobbyPrincipalNPC.root.visible=lobbyNearby;const npcState=lobbyPrincipalState.update(dt,position,!lobbyNearby||!isPlaying()||document.hidden);lobbyPrincipalNPC.update(isPlaying()&&!document.hidden?dt:0,npcState);}
   if(mode==='walk')cameraWalk(dt);else overviewCamera(wallDt);
-  updatePrincipalBubble(principalBubbles[0],principalNPC,OFFICE_CHARACTERS[0].position);
-  updatePrincipalBubble(principalBubbles[2],cutePrincipalNPC,OFFICE_CHARACTERS[1].position);
+  updatePrincipalBubble(principalBubbles[0],principalNPC,OFFICE_CHARACTERS[0].position,1);
   updatePrincipalBubble(principalBubbles[1],lobbyPrincipalNPC,LOBBY_PRINCIPAL_POSITION);
   avatar.root.visible=mode==='walk'&&cameraDistance>.32;
   if(mode==='walk'){

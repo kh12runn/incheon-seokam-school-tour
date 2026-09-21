@@ -10,8 +10,8 @@ const root=new URL('../../',import.meta.url),port=18081;
 const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'school-deploy-test-')),output=path.join(temporary,'runtime');
 const packed=packRuntime(output);
 assert(!packed.files.some(p=>/사진보관|미리보기|검사/.test(p)||p.startsWith('모델/')||p==='웹학교/실사목록.json'||p.startsWith('웹학교/실사/')),'Only current game runtime');
-const approvedModels=['교장선생님-귀여운','교장선생님-실물','남학생-실사풍','남학생-귀여운','여학생-실사풍','여학생-귀여운'].map(name=>'웹학교/캐릭터모델/'+name+'.glb');
-assert.deepEqual(packed.files.filter(p=>p.endsWith('.glb')).sort(),approvedModels.sort(),'Only the two principal and four student models');
+const approvedModels=['교장선생님-귀여운','교장선생님-머리','남학생-귀여운','여학생-귀여운'].map(name=>'웹학교/캐릭터모델/'+name+'.glb');
+assert.deepEqual(packed.files.filter(p=>p.endsWith('.glb')).sort(),approvedModels.sort(),'Only the office principal, shared runner head, and two student models');
 assert(packed.files.includes('웹학교/교실별특징.mjs'));
 // JPEG is already compressed and lazily loaded near 6-4. Keep the text compression
 // budget separate rather than claiming the new photographs shrink with Brotli.

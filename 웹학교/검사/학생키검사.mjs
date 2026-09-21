@@ -23,9 +23,9 @@ for(const [id,file] of Object.entries(STUDENT_MODELS)){
     holder.traverse(object=>{if(object.isSkinnedMesh)object.computeBoundingBox();});
     const bounds=new THREE.Box3().setFromObject(holder);top=Math.max(top,bounds.max.y);foot=Math.min(foot,bounds.min.y);maxFoot=Math.max(maxFoot,bounds.min.y);
   }
-  assert(Math.abs(top-STUDENT_HEIGHT)<.005,id+' standing height must stay at 1.40m');
+  assert(Math.abs(top-STUDENT_HEIGHT)<.005,id+' standing height must stay at 1.50m');
   assert(foot>=-.005&&maxFoot<.025,id+' idle feet must stay near the floor');
-  assert(top/1.84<.77,id+' student must be visibly shorter than the principal');
+  assert(Math.abs(top/1.83-150/183)<.003,id+' student/principal height ratio must be 150/183');
   for(const source of gltf.animations){
     mixer.stopAllAction();mixer.clipAction(createStudentMotionClip(source,gltf.scene,source.name,headScale)).play();
     for(let i=0;i<=10;i++){mixer.setTime(source.duration*i/10);assert(gltf.scene.getObjectByName('Head').scale.toArray().every(v=>Math.abs(v-headScale)<1e-5),id+' '+source.name+' head scale persists');}

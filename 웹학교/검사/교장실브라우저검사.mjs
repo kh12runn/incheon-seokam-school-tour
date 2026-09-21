@@ -6,16 +6,16 @@ export async function verifyPrincipalRoom(page,baseURL='http://127.0.0.1:8080'){
     const lazy=await page.evaluate(()=>!performance.getEntriesByType('resource').some(r=>decodeURIComponent(r.name).includes('/캐릭터모델/')));assert(lazy,'항공뷰에서 GLB 다운로드 안 함');
     await page.locator('#시작').click();await page.locator('#캐릭터확인').click();
     await page.evaluate(()=>document.getElementById('메뉴').click());await page.locator('#방선택').selectOption('2F_PRINCIPAL');await page.locator('#방이동').click({noWaitAfter:true});
-    await page.waitForFunction(()=>schoolTour.getOfficePrincipalStates().length===2&&schoolTour.getOfficePrincipalStates().every(s=>s.modelStatus==='ready'));
+    await page.waitForFunction(()=>schoolTour.getOfficePrincipalStates().length===1&&schoolTour.getOfficePrincipalStates().every(s=>s.modelStatus==='ready'));
     const pair=await page.evaluate(()=>schoolTour.getOfficePrincipalStates());
-    assert(pair.map(s=>s.id).join(',')==='realistic,cute','실물형과 귀여운형');
-    assert(pair.every(s=>s.visible&&s.height===1.84&&!s.moving),'두 모델 표시·184cm·고정 배치');
+    assert(pair.map(s=>s.id).join(',')==='cute','교장선생님 한 명');
+    assert(pair.every(s=>s.visible&&s.height===1.83&&!s.moving),'한 모델 표시·183cm·고정 배치');
     const entry=await page.evaluate(()=>schoolTour.getState());assert(entry.position.x===32.45&&entry.position.z===3.4,'교장실 안전한 입구 이동');
     await page.evaluate(()=>document.getElementById('메뉴').click());const paused=await page.evaluate(()=>schoolTour.getOfficePrincipalStates().map(s=>s.position));
-    await page.waitForTimeout(400);assert(JSON.stringify(paused)===JSON.stringify(await page.evaluate(()=>schoolTour.getOfficePrincipalStates().map(s=>s.position))),'메뉴 중 두 모델 위치 유지');
+    await page.waitForTimeout(400);assert(JSON.stringify(paused)===JSON.stringify(await page.evaluate(()=>schoolTour.getOfficePrincipalStates().map(s=>s.position))),'메뉴 중 모델 위치 유지');
     await page.locator('#메뉴닫기').click();const resume=await page.evaluate(()=>schoolTour.getState());assert(resume.freeLook||resume.locked||resume.touch.active,'X 닫은 뒤 시점 복구');
     const spacing=[];
-    for(let index=0;index<2;index++){
+    for(let index=0;index<1;index++){
       const approach=await page.evaluate(index=>{
         const p=schoolTour.getOfficePrincipalStates()[index].position,w=schoolTour.test.world;
         for(const [dx,dy] of [[.85,0],[0,.85],[0,-.85],[-.85,0]]){
@@ -38,7 +38,7 @@ export async function verifyPrincipalRoom(page,baseURL='http://127.0.0.1:8080'){
       assert(distance>=.54&&distance<.75,'모델 '+index+' 앞으로 이동 후 충돌 경계에서 멈춤');spacing.push(distance);
     }
     await page.evaluate(()=>schoolTour.test.setPosition({x:20,y:1.5,z:0}));await page.waitForTimeout(150);
-    assert(await page.evaluate(()=>schoolTour.getOfficePrincipalStates().every(s=>!s.visible)),'다른 층 두 모델 숨김');assert(errors.length===0,'실행 오류 '+errors.join(';'));
+    assert(await page.evaluate(()=>schoolTour.getOfficePrincipalStates().every(s=>!s.visible)),'다른 층 모델 숨김');assert(errors.length===0,'실행 오류 '+errors.join(';'));
     return {ok:true,lazyModels:lazy,pair,entry:true,menuPause:true,closeResume:true,npcSpacing:spacing,otherFloorHidden:true,errors};
   }finally{page.off('pageerror',onError);}
 }

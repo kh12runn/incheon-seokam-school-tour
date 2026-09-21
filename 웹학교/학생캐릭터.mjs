@@ -2,17 +2,15 @@ import * as THREE from './외부도구/three.module.js';
 import {GLTFLoader} from './외부도구/GLTFLoader.js';
 import {RUN_SPEED} from './달리기모션.mjs';
 export {RUN_SPEED,gaitFoot} from './달리기모션.mjs';
-export const STUDENT_HEIGHT=1.4;
+export const STUDENT_HEIGHT=1.5;
 
-export const CHARACTER_NAMES=Object.freeze({'boy-realistic':'남학생 · 실사풍','boy-cute':'남학생 · 귀여운형','girl-realistic':'여학생 · 실사풍','girl-cute':'여학생 · 귀여운형',boy:'남학생 · 귀여운형',girl:'여학생 · 귀여운형'});
-export const STUDENT_MODELS=Object.freeze({'boy-realistic':'남학생-실사풍.glb','boy-cute':'남학생-귀여운.glb','girl-realistic':'여학생-실사풍.glb','girl-cute':'여학생-귀여운.glb'});
+export const CHARACTER_NAMES=Object.freeze({'boy-cute':'남학생','girl-cute':'여학생',boy:'남학생',girl:'여학생'});
+export const STUDENT_MODELS=Object.freeze({'boy-cute':'남학생-귀여운.glb','girl-cute':'여학생-귀여운.glb'});
 const MODEL_URLS=Object.freeze({
-  'boy-realistic':new URL('./캐릭터모델/남학생-실사풍.glb',import.meta.url),
   'boy-cute':new URL('./캐릭터모델/남학생-귀여운.glb',import.meta.url),
-  'girl-realistic':new URL('./캐릭터모델/여학생-실사풍.glb',import.meta.url),
   'girl-cute':new URL('./캐릭터모델/여학생-귀여운.glb',import.meta.url)
 });
-export const normalizeStudentVariant=id=>id==='boy'?'boy-cute':id==='girl'?'girl-cute':id;
+export const normalizeStudentVariant=id=>id==='boy'||id==='boy-realistic'?'boy-cute':id==='girl'||id==='girl-realistic'?'girl-cute':id;
 const loader=new GLTFLoader(),templates=new Map();
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function template(id){

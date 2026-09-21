@@ -32,7 +32,7 @@ export function principalOfficeLayout(data){
       bounds:[p.x-w/2,p.y-d/2,p.z,p.x+w/2,p.y+d/2,p.z+(f.type==='plant'?1.45:f.h)]};
   });
   colliders.push({name:'교장실 열린 문짝',spaceId:PRINCIPAL_ID,officeRoom:PRINCIPAL_ID,floor:2,kind:'furniture',collision:true,bounds:[31.82,-1.28,3.4,32.10,-.14,5.50]});
-  return {room,colliders,spawn:officePoint(2.45,.85),route:OFFICE_ROUTE.map(([u,v])=>officePoint(u,v))};
+  return {room,colliders,spawn:officePoint(2.45,2.6),route:OFFICE_ROUTE.map(([u,v])=>officePoint(u,v))};
 }
 
 // Deterministic room-bound controller shared by browser and Node regression tests.

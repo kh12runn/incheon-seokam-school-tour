@@ -8,9 +8,10 @@ export async function verifyPrincipalGreetings(page,baseURL='http://127.0.0.1:80
     await page.locator('#시작').click();await page.locator('#캐릭터확인').click();
     await page.evaluate(()=>{schoolTour.test.setPosition({x:45,y:-2.8,z:0});schoolTour.test.setYaw(-Math.PI/2);});
     await bubble('중앙현관').waitFor({state:'visible'});
-    assert(await bubble('중앙현관').textContent()==='행복하세요! 9월은 September!','정확한 문구');
     await page.waitForFunction(()=>schoolTour.getLobbyPrincipalState().faceTexture==='ready');
-    const runner=await page.evaluate(()=>schoolTour.getLobbyPrincipalState());assert(runner.accessories.length===3&&runner.faceTexture==='ready','러닝복·선글라스·선캡·메가폰, 사진 얼굴 로드');
+    const lobbyText=await bubble('중앙현관').textContent();assert(/영어|퀴즈|행복|건강/.test(lobbyText),'현관의 다양한 교육·응원 문구');
+    const runner=await page.evaluate(()=>schoolTour.getLobbyPrincipalState());assert(runner.accessories.length===3&&runner.faceTexture==='ready','러닝복·선글라스·선캡·메가폰, 교장실과 같은 얼굴 로드');
+    assert(runner.sameFaceAsOffice&&runner.height===1.83,'교장실과 같은 얼굴·183cm 기준');
     assert(runner.appearanceVersion==='approved-skin-wrap-v6','승인된 피부·검정 머리·감싸는 선글라스 적용');
     await page.evaluate(()=>document.getElementById('메뉴').click());assert(!await bubble('중앙현관').isVisible(),'메뉴에서 숨김');
     await page.locator('#메뉴닫기').click();await bubble('중앙현관').waitFor({state:'visible'});
@@ -25,8 +26,8 @@ export async function verifyPrincipalGreetings(page,baseURL='http://127.0.0.1:80
     });
     await bubble('교장실').waitFor({state:'visible'});assert(!await bubble('중앙현관').isVisible(),'2층에서 1층 인사 숨김');
     await page.waitForFunction(()=>schoolTour.getOfficePrincipalStates().every(s=>s.modelStatus==='ready'));
-    assert(await page.evaluate(()=>schoolTour.getOfficePrincipalStates().length===2&&schoolTour.getOfficePrincipalStates().every(s=>s.height===1.84)),'교장실 두 승인 모델 로드 및 184cm 높이');
-    assert(await bubble('교장실').textContent()==='행복하세요! 9월은 September!','두 NPC 동일한 인사');
+    assert(await page.evaluate(()=>schoolTour.getOfficePrincipalStates().length===1&&schoolTour.getOfficePrincipalStates().every(s=>s.height===1.83)),'교장실 귀여운 모델 로드 및 183cm 높이');
+    assert(/영어|퀴즈|행복|건강/.test(await bubble('교장실').textContent()),'교장실의 다양한 교육·응원 문구');
     assert(errors.length===0,errors.join(';'));
     return {ok:true,runner,officeGreeting:true,lobbyGreeting:true,menuResume:true,otherFloorHidden:true,errors};
   }finally{page.off('pageerror',onError);}
