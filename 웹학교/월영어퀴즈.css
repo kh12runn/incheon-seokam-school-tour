@@ -1,0 +1,15 @@
+#월퀴즈말풍선{position:fixed;z-index:8;width:290px;max-width:calc(100vw - 24px);box-sizing:border-box;padding:12px;background:#fffaf0;color:#263f49;border:2px solid #efb562;border-radius:18px;box-shadow:0 5px 20px #0003;text-align:center;font:700 14px/1.5 "Malgun Gothic",sans-serif;touch-action:manipulation}
+#월퀴즈말풍선[hidden]{display:none}
+#월퀴즈말풍선::after{content:"";position:absolute;left:calc(var(--tail-x,50%) - 7px);bottom:-9px;width:12px;height:12px;transform:rotate(45deg);background:#fffaf0;border-right:2px solid #efb562;border-bottom:2px solid #efb562;pointer-events:none}
+#월퀴즈문제{margin:0 0 8px;word-break:keep-all;font-size:15px;color:#263f49}
+#월퀴즈보기{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#월퀴즈보기 button{display:flex;align-items:center;gap:6px;min-height:44px;padding:7px;border:1px solid #d6c8a8;border-radius:9px;background:#fff;color:#263f49;font-size:13px;cursor:pointer}
+#월퀴즈보기 button span:first-child{font-size:11px;color:#77552b}
+#월퀴즈보기 button:focus-visible{outline:3px solid #548c75;outline-offset:1px}
+#월퀴즈보기 button[data-result=wrong]{background:#f7ddd8;opacity:.7}
+#월퀴즈보기 button[data-result=correct]{background:#d6efc7;border-color:#73a858;opacity:1}
+#월퀴즈보기 button:disabled{cursor:default}
+#월퀴즈결과{margin:7px 0 0;font-size:14px;color:#815129}
+#월퀴즈결과:empty{display:none}
+#월퀴즈결과[data-result=correct]{color:#39722d}
+#월퀴즈말풍선 small{display:block;margin-top:6px;font-size:10px;font-weight:400;color:#746b57}

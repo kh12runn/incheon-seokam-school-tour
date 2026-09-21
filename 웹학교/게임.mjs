@@ -22,6 +22,8 @@ import {createPrincipalOffice} from './교장실표현.mjs';
 import {OFFICE_CHARACTERS,createOfficePrincipalModels} from './교장실캐릭터.mjs';
 import {createRunnerPrincipalNPC} from './마라토너교장선생님.mjs';
 import {PRINCIPAL_GREETING,LOBBY_PRINCIPAL_POSITION,createLobbyPrincipalState,principalCanGreet,blocksPrincipal,principalGreetingAt} from './교장선생님인사.mjs';
+import {createMonthQuiz} from './월영어퀴즈.mjs';
+import {createMonthQuizBubble} from './월영어퀴즈화면.mjs';
 const $=id=>document.getElementById(id);
 const canvas=$('화면'),panel=$('시작안내'),status=$('상태'),where=$('현재위치');
 let renderer,touchControls;
@@ -51,6 +53,8 @@ let jumpMotion;
 let class64PhotoFinish;
 let officePrincipals,principalNPC,officeWasNearby=false;
 let lobbyPrincipalNPC;
+const monthQuiz=createMonthQuiz();
+let monthQuizUI;
 const lobbyPrincipalState=createLobbyPrincipalState();
 const principalBubbles=['교장실','중앙현관'].map(name=>{
   const element=document.createElement('div');element.id=name+'교장말풍선';element.className='교장말풍선';element.textContent=PRINCIPAL_GREETING;element.hidden=true;element.setAttribute('role','status');document.body.append(element);return element;
@@ -58,6 +62,7 @@ const principalBubbles=['교장실','중앙현관'].map(name=>{
 const bubblePoint=new THREE.Vector3();
 function updatePrincipalBubble(element,npc,npcPosition,offset=0){
   element.hidden=true;
+  if(monthQuiz.getState().open)return;
   if(!npc?.root.visible||!principalCanGreet(position,npcPosition,{active:isPlaying()&&!document.hidden,colliders:world.colliders}))return;
   element.textContent=principalGreetingAt(new Date(),Math.floor(elapsed/7),offset);
   bubblePoint.set(npcPosition.x,npcPosition.z+(npc.root.userData.greetingHeight??2.12),-npcPosition.y).project(camera);
@@ -93,6 +98,10 @@ function openCharacterPicker(fallback=false){
   pickerFallback=fallback;pickerResume=mode==='walk'&&characterChosenThisVisit;clearInput();dragMode=false;freeLook=false;if(document.pointerLockElement)document.exitPointerLock();pausePanel();characterPicker.open();
 }
 updateCharacterLabel();
+monthQuizUI=createMonthQuizBubble({
+  onAnswer:index=>monthQuiz.answer(index),
+  onAnswered(){canvas.focus({preventScroll:true});}
+});
 function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
 addEventListener('resize',resize);resize();
 function textTexture(text,background=false){
@@ -344,6 +353,7 @@ function lookAround(dx,dy){
 }
 document.addEventListener('mousemove',e=>{
   if(touchControls?.isActive()||!isPlaying())return;
+  if(!locked&&e.target.closest?.('#월퀴즈말풍선')){freeLookPoint=null;return;}
   if(locked){lookAround(e.movementX,e.movementY);return;}
   if(freeLook){
     const previous=freeLookPoint;freeLookPoint={x:e.clientX,y:e.clientY};
@@ -370,6 +380,10 @@ canvas.addEventListener('pointerup',()=>drag=null);canvas.addEventListener('poin
 document.addEventListener('mouseleave',()=>freeLookPoint=null);
 canvas.addEventListener('wheel',e=>{if(mode==='overview'){orbitResumeAt=performance.now()+6000;orbit.distance=Math.max(18,Math.min(280,orbit.distance+e.deltaY*.09));e.preventDefault();}else if(isPlaying()){followDistance=Math.max(1.4,Math.min(4.8,followDistance+e.deltaY*.004));e.preventDefault();}},{passive:false});
 document.addEventListener('keydown',e=>{
+  const quizKey=e.code.match(/^(?:Digit|Numpad)([1-4])$/);
+  if(quizKey&&isPlaying()&&monthQuizUI.isVisible()){
+    e.preventDefault();if(!e.repeat)monthQuizUI.answer(Number(quizKey[1])-1);return;
+  }
   if(e.code==='Escape'&&$('게임메뉴').open){e.preventDefault();if(!e.repeat)dismissMenu();return;}
   if($('게임메뉴').open||$('승강기창').open||characterPicker.isOpen()||elevatorBusy)return;
   if(['INPUT','SELECT','TEXTAREA','BUTTON','SUMMARY'].includes(e.target.tagName)&&e.code!=='Escape')return;
@@ -456,7 +470,23 @@ function frame(now){
   const lobbyNearby=mode==='walk'&&Math.abs(position.z)<1.8&&Math.hypot(position.x-47,position.y+2.8)<22;
   if(lobbyNearby&&!lobbyPrincipalNPC){lobbyPrincipalNPC=createRunnerPrincipalNPC();scene.add(lobbyPrincipalNPC.root);}
   if(lobbyPrincipalNPC){lobbyPrincipalNPC.root.visible=lobbyNearby;const npcState=lobbyPrincipalState.update(dt,position,!lobbyNearby||!isPlaying()||document.hidden);lobbyPrincipalNPC.update(isPlaying()&&!document.hidden?dt:0,npcState);}
+  const quizNPCs=[
+    ...OFFICE_CHARACTERS.map((config,index)=>({id:'office-'+config.id,name:config.label,position:config.position,available:officeNearby&&officePrincipals?.characters[index].getState().modelStatus==='ready'})),
+    {id:'lobby',name:'중앙현관 · 교장선생님',position:LOBBY_PRINCIPAL_POSITION,available:lobbyNearby}
+  ];
+  const newQuestion=monthQuiz.update(position,quizNPCs,{active:isPlaying()&&!jumpMotion.getState().airborne,colliders:world.colliders});
+  if(newQuestion)monthQuizUI.show(newQuestion);
   if(mode==='walk')cameraWalk(dt);else overviewCamera(wallDt);
+  const quizState=monthQuiz.getState(),quizNPC=quizNPCs.find(n=>n.id===quizState.question?.npcId);
+  if(quizState.open&&quizNPC){
+    if(Math.abs(position.z-quizNPC.position.z)>1.15||Math.hypot(position.x-quizNPC.position.x,position.y-quizNPC.position.y)>4.2||mode!=='walk'){
+      monthQuiz.dismiss();monthQuizUI.hide();
+    }else{
+      bubblePoint.set(quizNPC.position.x,quizNPC.position.z+2.12,-quizNPC.position.y).project(camera);
+      const visible=principalCanGreet(position,quizNPC.position,{active:isPlaying(),colliders:world.colliders})&&bubblePoint.z>=-1&&bubblePoint.z<=1&&Math.abs(bubblePoint.x)<1&&Math.abs(bubblePoint.y)<1;
+      monthQuizUI.anchor((bubblePoint.x*.5+.5)*innerWidth,(-bubblePoint.y*.5+.5)*innerHeight,visible);
+    }
+  }else monthQuizUI.hide();
   updatePrincipalBubble(principalBubbles[0],principalNPC,OFFICE_CHARACTERS[0].position,1);
   updatePrincipalBubble(principalBubbles[1],lobbyPrincipalNPC,LOBBY_PRINCIPAL_POSITION);
   avatar.root.visible=mode==='walk'&&cameraDistance>.32;
@@ -493,6 +523,7 @@ try{
   window.schoolTour.getPrincipalState=()=>principalNPC?.getState()??{position:{...OFFICE_CHARACTERS[0].position},modelStatus:'not-requested',faceTexture:'not-requested',visible:false};
   window.schoolTour.getOfficePrincipalStates=()=>officePrincipals?.characters.map(npc=>npc.getState())??OFFICE_CHARACTERS.map(config=>({id:config.id,position:{...config.position},height:config.height,modelStatus:'not-requested',visible:false}));
   window.schoolTour.getApprovedAssets=getApprovedAssets;
+  window.schoolTour.getMonthQuizState=()=>monthQuiz.getState();
   window.schoolTour.getLobbyPrincipalState=()=>({...lobbyPrincipalState.getState(),...(lobbyPrincipalNPC?.getState()??{}),visible:lobbyPrincipalNPC?.root.visible??false});
   if(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).has('test'))window.schoolTour.test={
     world,data,setPosition(p){if(!world.candidate(p.x,p.y,p.z))throw new Error('Invalid test position');position={...p};jumpMotion.reset();smoothZ=p.z+EYE_HEIGHT;cameraReset=true;clearInput();},setYaw(y){yaw=y;},
