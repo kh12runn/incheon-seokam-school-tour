@@ -60,8 +60,9 @@ export function createRunnerPrincipalNPC(){
     root.add(gltf.scene);fallbackFace.visible=false;modelStatus='ready';
   }).catch(reason=>{modelStatus='error';modelError=String(reason?.message??reason);console.warn('러닝복 교장선생님 얼굴 모델 로드 실패',reason);});
   ball(root,navy,[0,.965,0],[.176,.12,.11]);
+  const legs=[];
   for(const s of [-1,1]){
-    const leg=new THREE.Group();leg.position.set(s*.094,.94,0);root.add(leg);
+    const leg=new THREE.Group();leg.position.set(s*.094,.94,0);root.add(leg);legs.push(leg);
     put(leg,new THREE.CylinderGeometry(.089,.081,.225,18),navy,[0,-.106,0]);
     line(leg,coral,[[s*.081,-.015,.005],[s*.079,-.21,.005]],.007);
     ball(leg,skin,[0,-.295,.001],[.066,.145,.064]);
@@ -73,6 +74,15 @@ export function createRunnerPrincipalNPC(){
     ball(leg,blue,[0,-.859,.049],[.066,.048,.13]);
     ball(leg,coral,[0,-.860,.142],[.057,.035,.039]);
     for(let i=0;i<3;i++)line(leg,white,[[-.025,-.817,.045+i*.02],[.025,-.817,.045+i*.02]],.0025);
+    // Bend the calf/foot as a unit below the knee, retaining the approved outfit.
+    const shin=new THREE.Group();shin.position.y=-.415;
+    for(const part of [...leg.children]){
+      part.geometry.computeBoundingBox();
+      if(part.position.y<-.45||part.geometry.boundingBox.max.y<-.65){
+        leg.remove(part);part.position.y+=.415;shin.add(part);
+      }
+    }
+    leg.add(shin);leg.userData.shin=shin;
   }
   const arms=[];
   for(const s of [-1,1]){
@@ -93,11 +103,17 @@ export function createRunnerPrincipalNPC(){
   const inner=put(megaphone,new THREE.CircleGeometry(.085,32),navy,[0,.095,.134]);
   ball(megaphone,silver,[0,.095,.148],[.034,.034,.018]);
   ball(megaphone,coral,[0,.095,-.067],[.047,.047,.037]);
-  let t=0;
+  let t=0,walkBlend=0;
   function update(dt,state){
     t+=dt;root.position.set(state.position.x,state.position.z,-state.position.y);root.rotation.y=state.heading;
-    body.position.y=.96+Math.sin(t*1.8)*.003;
-    arms[0].rotation.x=-.07+Math.sin(t*.9)*.025;head.rotation.z=Math.sin(t*.75)*.012;
+    walkBlend+=((state.moving?1:0)-walkBlend)*(1-Math.exp(-dt*10));
+    const swing=Math.sin(state.phase??0)*.26*walkBlend;
+    legs[0].rotation.x=swing;legs[1].rotation.x=-swing;
+    legs[0].userData.shin.rotation.x=Math.max(0,-Math.cos(state.phase??0))*.35*walkBlend;
+    legs[1].userData.shin.rotation.x=Math.max(0,Math.cos(state.phase??0))*.35*walkBlend;
+    body.position.y=.96+Math.sin(t*1.8)*.003+Math.abs(Math.sin(state.phase??0))*.007*walkBlend;
+    arms[0].rotation.x=-.07-swing*.65+Math.sin(t*.9)*.025;holding.rotation.x=-.28+swing*.15;
+    head.rotation.z=Math.sin(t*.75)*.012;
   }
   applyApprovedPrincipalAppearance(root,{runner:true});
   return {root,update,getState:()=>({outfit:'running',accessories:['sunglasses','sun-visor','megaphone'],faceTexture:modelStatus,modelStatus,modelError,faceVersion:PRINCIPAL_FACE_VERSION,appearanceVersion:PRINCIPAL_APPEARANCE_VERSION,height:RUNNER_PRINCIPAL_HEIGHT,headScale:PRINCIPAL_HEAD_SCALE,sameFaceAsOffice:true,fallbackFaceTexture:getPrincipalFaceState()})};

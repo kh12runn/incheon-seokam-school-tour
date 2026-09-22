@@ -21,7 +21,8 @@ import {PRINCIPAL_ID} from './교장실배치.mjs';
 import {createPrincipalOffice} from './교장실표현.mjs';
 import {OFFICE_CHARACTERS,createOfficePrincipalModels} from './교장실캐릭터.mjs';
 import {createRunnerPrincipalNPC} from './마라토너교장선생님.mjs';
-import {PRINCIPAL_GREETING,LOBBY_PRINCIPAL_POSITION,createLobbyPrincipalState,principalCanGreet,blocksPrincipal,principalGreetingAt} from './교장선생님인사.mjs';
+import {PRINCIPAL_GREETING,LOBBY_PRINCIPAL_POSITION,principalCanGreet,blocksPrincipal,principalGreetingAt} from './교장선생님인사.mjs';
+import {createPrincipalWalk} from './교장선생님산책.mjs';
 import {createMonthQuiz} from './월영어퀴즈.mjs';
 import {createMonthQuizBubble} from './월영어퀴즈화면.mjs';
 const $=id=>document.getElementById(id);
@@ -55,7 +56,8 @@ let officePrincipals,principalNPC,officeWasNearby=false;
 let lobbyPrincipalNPC;
 const monthQuiz=createMonthQuiz();
 let monthQuizUI;
-const lobbyPrincipalState=createLobbyPrincipalState();
+let lobbyPrincipalState;
+const principalPositions=()=>[...(officePrincipals?.characters.map(n=>n.getState().position)??OFFICE_CHARACTERS.map(n=>n.position)),lobbyPrincipalState?.getState().position??LOBBY_PRINCIPAL_POSITION];
 const principalBubbles=['교장실','중앙현관'].map(name=>{
   const element=document.createElement('div');element.id=name+'교장말풍선';element.className='교장말풍선';element.textContent=PRINCIPAL_GREETING;element.hidden=true;element.setAttribute('role','status');document.body.append(element);return element;
 });
@@ -456,30 +458,33 @@ function frame(now){
     const a=1-Math.exp(-dt*14);velocity.x+=(dx-velocity.x)*a;velocity.y+=(dy-velocity.y)*a;
     if(length&&avatar.getState().waving)avatar.cancelWave();
     position=jumpMotion.step(position,velocity.x*dt,velocity.y*dt,dt);
-    for(const npc of [...OFFICE_CHARACTERS.map(character=>character.position),LOBBY_PRINCIPAL_POSITION]){
+    for(const npc of principalPositions()){
       if(blocksPrincipal(previous,position,npc)){
         position.x=previous.x;position.y=previous.y;
       }
     }
   }
   const officeNearby=mode==='walk'&&Math.abs(position.z-3.4)<1.8&&Math.hypot(position.x-33.5,position.y+3.5)<22;
-  if(officeNearby&&!officePrincipals){officePrincipals=createOfficePrincipalModels();[principalNPC]=officePrincipals.characters;scene.add(principalNPC.root);}
+  if(officeNearby&&!officePrincipals){officePrincipals=createOfficePrincipalModels(world);[principalNPC]=officePrincipals.characters;scene.add(principalNPC.root);}
   if(officeNearby&&!officeWasNearby)void officePrincipals.load();
   officeWasNearby=officeNearby;
-  for(const npc of officePrincipals?.characters??[])npc.root.visible=officeNearby;
+  for(const npc of officePrincipals?.characters??[]){
+    npc.root.visible=officeNearby;
+    npc.update(dt,position,{paused:!officeNearby||!isPlaying(),others:officePrincipals.characters.filter(n=>n!==npc).map(n=>n.getState().position)});
+  }
   const lobbyNearby=mode==='walk'&&Math.abs(position.z)<1.8&&Math.hypot(position.x-47,position.y+2.8)<22;
   if(lobbyNearby&&!lobbyPrincipalNPC){lobbyPrincipalNPC=createRunnerPrincipalNPC();scene.add(lobbyPrincipalNPC.root);}
-  if(lobbyPrincipalNPC){lobbyPrincipalNPC.root.visible=lobbyNearby;const npcState=lobbyPrincipalState.update(dt,position,!lobbyNearby||!isPlaying()||document.hidden);lobbyPrincipalNPC.update(isPlaying()&&!document.hidden?dt:0,npcState);}
+  if(lobbyPrincipalNPC){lobbyPrincipalNPC.root.visible=lobbyNearby;const npcState=lobbyPrincipalState.update(dt,position,{paused:!lobbyNearby||!isPlaying()||document.hidden});lobbyPrincipalNPC.update(isPlaying()&&!document.hidden?dt:0,npcState);}
   const quizNPCs=[
-    ...OFFICE_CHARACTERS.map((config,index)=>({id:'office-'+config.id,name:config.label,position:config.position,available:officeNearby&&officePrincipals?.characters[index].getState().modelStatus==='ready'})),
-    {id:'lobby',name:'중앙현관 · 교장선생님',position:LOBBY_PRINCIPAL_POSITION,available:lobbyNearby}
+    ...OFFICE_CHARACTERS.map((config,index)=>({id:'office-'+config.id,name:config.label,position:officePrincipals?.characters[index].getState().position??config.position,available:officeNearby&&officePrincipals?.characters[index].getState().modelStatus==='ready'})),
+    {id:'lobby',name:'중앙현관 · 교장선생님',position:lobbyPrincipalState.getState().position,available:lobbyNearby}
   ];
   const newQuestion=monthQuiz.update(position,quizNPCs,{active:isPlaying()&&!jumpMotion.getState().airborne,colliders:world.colliders});
   if(newQuestion)monthQuizUI.show(newQuestion);
   if(mode==='walk')cameraWalk(dt);else overviewCamera(wallDt);
   const quizState=monthQuiz.getState(),quizNPC=quizNPCs.find(n=>n.id===quizState.question?.npcId);
   if(quizState.open&&quizNPC){
-    if(Math.abs(position.z-quizNPC.position.z)>1.15||Math.hypot(position.x-quizNPC.position.x,position.y-quizNPC.position.y)>4.2||mode!=='walk'){
+    if(mode!=='walk'){
       monthQuiz.dismiss();monthQuizUI.hide();
     }else{
       bubblePoint.set(quizNPC.position.x,quizNPC.position.z+2.12,-quizNPC.position.y).project(camera);
@@ -487,8 +492,8 @@ function frame(now){
       monthQuizUI.anchor((bubblePoint.x*.5+.5)*innerWidth,(-bubblePoint.y*.5+.5)*innerHeight,visible);
     }
   }else monthQuizUI.hide();
-  updatePrincipalBubble(principalBubbles[0],principalNPC,OFFICE_CHARACTERS[0].position,1);
-  updatePrincipalBubble(principalBubbles[1],lobbyPrincipalNPC,LOBBY_PRINCIPAL_POSITION);
+  updatePrincipalBubble(principalBubbles[0],principalNPC,principalNPC?.getState().position,1);
+  updatePrincipalBubble(principalBubbles[1],lobbyPrincipalNPC,lobbyPrincipalState.getState().position);
   avatar.root.visible=mode==='walk'&&cameraDistance>.32;
   if(mode==='walk'){
     const dx=position.x-previous.x,dy=position.y-previous.y,baseZ=position.z;
@@ -509,7 +514,7 @@ function frame(now){
 requestAnimationFrame(frame);
 try{
   const response=await fetch(new URL('./학교구조.json',import.meta.url));if(!response.ok)throw new Error('학교 구조 파일 '+response.status);
-  world=buildWorld(await response.json());data=world.data;position={...world.spawn};jumpMotion=createJumpMotion(world);resolveCamera=createCameraCollision([...world.colliders,...world.boxes.filter(b=>b.kind==='step')]);buildVisuals();ready=true;
+  world=buildWorld(await response.json());data=world.data;position={...world.spawn};lobbyPrincipalState=createPrincipalWalk(world,'lobby');jumpMotion=createJumpMotion(world);resolveCamera=createCameraCollision([...world.colliders,...world.boxes.filter(b=>b.kind==='step')]);buildVisuals();ready=true;
   for(let floor=1;floor<=4;floor++){
     const group=document.createElement('optgroup');group.label=floor+'층';
     for(const r of data.rooms.filter(r=>parseInt(r.floor)===floor&&['classroom','special_room'].includes(r.type))){const option=document.createElement('option');option.value=r.id;option.textContent=r.name;group.append(option);}

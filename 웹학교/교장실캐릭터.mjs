@@ -1,5 +1,7 @@
 import * as THREE from './외부도구/three.module.js';
 import {GLTFLoader} from './외부도구/GLTFLoader.js';
+import {createPrincipalWalkRig} from './교장보행리그.mjs';
+import {createPrincipalWalk} from './교장선생님산책.mjs';
 
 // World coordinates use x/y for the floor and z for height.
 // The west-side display leaves the doorway and the furniture aisle open.
@@ -31,13 +33,19 @@ function nameplate(label){
   setText(label+' · 준비 중');return {sprite,setText};
 }
 
-export function createOfficePrincipalModels(){
+export function createOfficePrincipalModels(world){
   const loader=new GLTFLoader();let loading=null;
   const characters=OFFICE_CHARACTERS.map(config=>{
     const root=new THREE.Group();root.name=config.label;root.position.set(config.position.x,config.position.z,-config.position.y);root.rotation.y=Math.PI/2;root.userData.greetingHeight=2.48;
-    const label=nameplate(config.label);root.add(label.sprite);let status='not-requested',error=null;
-    return {root,position:config.position,
-      getState:()=>({id:config.id,position:{...config.position},height:config.height,modelStatus:status,faceTexture:status,visible:root.visible,moving:false,error}),
+    const label=nameplate(config.label);root.add(label.sprite);let status='not-requested',error=null,rig=null;
+    const walk=createPrincipalWalk(world,config.id);
+    return {root,
+      getState:()=>({...walk.getState(),id:config.id,height:config.height,modelStatus:status,faceTexture:status,visible:root.visible,animation:'procedural-skinned-walk',error}),
+      update(dt,player,options){
+        const state=walk.update(dt,player,{...options,paused:options.paused||status!=='ready'});
+        root.position.set(state.position.x,state.position.z,-state.position.y);root.rotation.y=state.heading;
+        rig?.update(options.paused?0:dt,state);return state;
+      },
       async load(attempt=0){
         if(status==='ready')return;
         status='loading';error=null;label.setText(config.label+' · 불러오는 중');
@@ -45,7 +53,8 @@ export function createOfficePrincipalModels(){
           const response=await fetch(config.url.href,{signal:AbortSignal.timeout(30000)});
           if(!response.ok)throw new Error('모델 다운로드 HTTP '+response.status);
           const gltf=await loader.parseAsync(await response.arrayBuffer(),new URL('.',config.url).href);
-          root.add(normalizePrincipalModel(gltf.scene,config.height));status='ready';label.setText(config.label);
+          rig=createPrincipalWalkRig(normalizePrincipalModel(gltf.scene,config.height));
+          root.add(rig.root);status='ready';label.setText(config.label);
         }catch(reason){
           status='error';error=String(reason?.message??reason);label.setText(config.label+(attempt<2?' · 다시 불러오는 중':' · 재입장하면 다시 불러옵니다'));
           console.warn(config.label+' 모델 로드 실패',reason);

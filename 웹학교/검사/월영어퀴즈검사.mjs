@@ -21,10 +21,19 @@ let answer=quiz.answer(wrong);assert.equal(answer.message,'다시한번 생각�
 const right=first.question.choices.indexOf(MONTHS[first.question.month-1]);answer=quiz.answer(right);
 assert.equal(answer.message,'참 잘했어요~');assert.equal(answer.solved,true);assert.equal(answer.attempts,2);assert.deepEqual(quiz.answer(wrong),answer);
 quiz.dismiss();assert.equal(quiz.answer(right).open,false);assert.equal(quiz.update(near,npcs),null);
-assert.equal(quiz.update({x:3.1,y:0,z:0},npcs),null);assert.equal(quiz.update(near,npcs),null,'Boundary jitter does not rearm');
+assert.equal(quiz.update({x:2.95,y:0,z:0},npcs),null);assert.equal(quiz.update(near,npcs),null,'Boundary jitter does not rearm');
 quiz.update(far,npcs);const second=quiz.update(near,npcs);assert.notEqual(second.question.month,first.question.month);assert.equal(second.visit,2);
 quiz.dismiss();const upstairs=quiz.update({...near,z:3.4},npcs);assert.equal(upstairs.question.npcId,'office');
 const grouped=createMonthQuiz(random),pair=[{id:'real',position:{x:0,y:0,z:0}},{id:'cute',position:{x:0,y:1.5,z:0}}];
 grouped.update(near,pair);grouped.dismiss();assert.equal(grouped.update({x:1,y:1.5,z:0},pair),null,'Adjacent models do not cause popup loop');
 grouped.update(far,pair);assert.equal(grouped.update({x:1,y:1.5,z:0},pair).question.npcId,'cute');
+// Real game does not call dismiss when walking away: update itself must reset.
+for(const solved of [false,true]){
+  const encounter=createMonthQuiz(random),first=encounter.update(near,npcs);
+  if(solved)encounter.answer(first.question.choices.indexOf(MONTHS[first.question.month-1]));
+  encounter.update({x:3.2,y:0,z:0},npcs);
+  assert.equal(encounter.getState().open,false);assert.equal(encounter.getState().question,null);
+  const again=encounter.update(near,npcs);assert.notEqual(again.question.month,first.question.month);
+  assert.equal(again.attempts,0);assert.equal(again.solved,false);
+}
 console.log({ok:true,randomQuestions:2400,months:seen.size,answerSlots:slots.size,wrongRetry:true,correctFeedback:true,wallAndFloorChecks:true,exitAndReenter:true,noPopupLoop:true});

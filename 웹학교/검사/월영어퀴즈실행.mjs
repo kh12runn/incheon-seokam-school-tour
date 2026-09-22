@@ -3,6 +3,7 @@
 import {pathToFileURL} from 'node:url';
 import fs from 'node:fs/promises';
 import {verifyMonthQuiz} from './월영어퀴즈브라우저검사.mjs';
+import {verifyPrincipalPatrol} from './교장산책브라우저검사.mjs';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE?pathToFileURL(process.env.PLAYWRIGHT_MODULE).href:'playwright');
 const browser=await chromium.launch({headless:true,...(process.env.QUIZ_BROWSER?{executablePath:process.env.QUIZ_BROWSER}:{}),args:['--enable-unsafe-swiftshader']});
 const base=process.env.QUIZ_BASE_URL??'http://127.0.0.1:8085';
@@ -34,6 +35,7 @@ try{
         await page.locator('#월퀴즈보기 button').first().tap();
         await page.waitForFunction(()=>schoolTour.getMonthQuizState().attempts===1&&schoolTour.getState().touch.active);
       }
+      if(!touch&&denyLock)console.log(JSON.stringify(await verifyPrincipalPatrol(page)));
     }catch(error){
       console.error(JSON.stringify({touch,error:String(error),state:await page.evaluate(()=>({game:window.schoolTour?.getState(),quiz:window.schoolTour?.getMonthQuizState(),text:document.body.innerText.slice(-2000)}))}));
       throw error;
