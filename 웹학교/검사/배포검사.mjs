@@ -9,6 +9,7 @@ import {packRuntime} from '../../관리도구/배포최적화.mjs';
 const root=new URL('../../',import.meta.url),port=18081;
 const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'school-deploy-test-')),output=path.join(temporary,'runtime');
 const packed=packRuntime(output);
+for(const rel of ['관리도구/관리자/사진변환.mjs','관리도구/관리자/이미지정책/policy.xml'])assert(fs.existsSync(path.join(output,rel)),'Phone converter runtime dependency: '+rel);
 assert(!packed.files.some(p=>/사진보관|미리보기|검사/.test(p)||p.startsWith('모델/')||p==='웹학교/실사목록.json'||p.startsWith('웹학교/실사/')),'Only current game runtime');
 const approvedModels=['교장선생님-귀여운','교장선생님-머리','남학생-귀여운','여학생-귀여운'].map(name=>'웹학교/캐릭터모델/'+name+'.glb');
 assert.deepEqual(packed.files.filter(p=>p.endsWith('.glb')).sort(),approvedModels.sort(),'Only the office principal, shared runner head, and two student models');
@@ -48,7 +49,7 @@ try{
   }
   const head=await get('/'+encodeURI('웹학교/게임.mjs'),{method:'HEAD',headers:{'Accept-Encoding':'br'}});
   assert.equal(head.status,200);assert.equal(await head.text(),'');assert.equal(head.headers.get('vary'),'Accept-Encoding');
-  for(const p of ['/.git/config','/.env.local','/Dockerfile','/배포목록.json','/관리도구/웹서버.mjs','/참고자료/배치도.pdf','/사진보관/원본/사진.insp','/모델/school_master.blend','/웹학교/검사/이동검사.mjs','/웹학교/실사목록.json','/사진보관/웹용/4층/6-1_교실_앞_복도.jpg']){
+  for(const p of ['/.git/config','/.env.local','/Dockerfile','/배포목록.json','/관리도구/웹서버.mjs','/관리도구/관리자/사진변환.mjs','/관리도구/관리자/이미지정책/policy.xml','/참고자료/배치도.pdf','/사진보관/원본/사진.insp','/모델/school_master.blend','/웹학교/검사/이동검사.mjs','/웹학교/실사목록.json','/사진보관/웹용/4층/6-1_교실_앞_복도.jpg']){
     assert.equal((await get('/'+encodeURI(p.replace(/^\//,'')))).status,403,p);
   }
   assert.equal((await get('/',{method:'POST'})).status,405);

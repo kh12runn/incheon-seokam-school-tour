@@ -5,7 +5,7 @@ import path from 'node:path';
 import {Readable} from 'node:stream';
 import {randomBytes,randomUUID,createHmac,createHash,timingSafeEqual} from 'node:crypto';
 import {GithubStore,ApiError} from './저장소.mjs';
-import {inspectImage} from './이미지검사.mjs';
+import {preparePhoto} from './사진변환.mjs';
 import {applyGroundFloorPlan} from '../../웹학교/일층배치.mjs';
 import {applyRestroomPlan} from '../../웹학교/화장실배치.mjs';
 const digest=s=>createHash('sha256').update(String(s)).digest();
@@ -99,23 +99,30 @@ export function createAdminAPI({root,env=process.env,store=new GithubStore(env),
         const roomId=url.searchParams.get('roomId');if(!idOK(roomId))throw new ApiError(400,'잘못된 공간입니다.');
         let name;try{name=cleanName(decodeURIComponent(req.headers['x-file-name']??''));}catch{throw new ApiError(400,'파일 이름을 확인해주세요.');}
         if(Number(req.headers['content-length'])>maxUpload)throw new ApiError(413,`파일당 최대 ${maxUpload/1024/1024}MB까지 업로드할 수 있습니다.`);
-        uploading=true;let dir;
+        uploading=true;let dir,uploadResponse;
         try{
           // One in-flight upload only; spool to ephemeral server disk, never the developer PC.
           dir=await fsp.mkdtemp(path.join(os.tmpdir(),'school-upload-'));const file=path.join(dir,'image');const handle=await fsp.open(file,'wx');let size=0;
           const timer=setTimeout(()=>req.destroy(),90000);timer.unref();
           try{for await(const chunk of req){size+=chunk.length;if(size>maxUpload)throw new ApiError(413,'이 파일은 업로드 가능한 최대 크기를 초과했습니다.');await handle.writeFile(chunk);}}finally{clearTimeout(timer);await handle.close();}
           if(!size)throw new ApiError(400,'빈 파일은 업로드할 수 없습니다.');
-          const bytes=await fsp.readFile(file),info=inspectImage(bytes,req.headers['content-type']?.split(';')[0],name),id=randomUUID(),uploadedAt=new Date(now()).toISOString();
+          const {bytes,info}=await preparePhoto(file,{name,mime:req.headers['content-type']?.split(';')[0],env,maxBytes:maxUpload}),id=randomUUID(),uploadedAt=new Date(now()).toISOString();
           const result=await store.mutate(catalog=>{
             const r=roomFor(catalog,roomId);if((r.images?.length??0)>=100)throw new ApiError(409,'공간당 최대 100장입니다. 관리자에게 문의해주세요.');
             const fileName=uploadedAt.replace(/[-:.TZ]/g,'')+'_'+id+'.'+info.extension;
-            const image={id,...info,originalName:name,file:folder(r)+'/'+fileName,size,uploadedAt,approval:'pending'};
+            const image={id,...info,originalName:name,file:folder(r)+'/'+fileName,size:bytes.length,originalSize:size,uploadedAt,approval:'pending'};
             const next={...r,status:'pending',revision:randomUUID(),uploadedAt,images:[...(r.images??[]),image]};
             return changed(catalog,next,`사진 업로드: ${r.roomName}`,[{path:image.file,content:bytes}]);
-          });send(res,201,{ok:true,id,status:'pending',commit:result.commit,message:'사진이 업로드되었습니다. 3D 구현 승인 대기 상태입니다.'});
-        }finally{uploading=false;if(dir){await fsp.rm(path.join(dir,'image'),{force:true});await fsp.rmdir(dir);}}
-        return true;
+          });uploadResponse={ok:true,id,status:'pending',commit:result.commit,message:'사진이 업로드되었습니다. 3D 구현 승인 대기 상태입니다.'};
+        }finally{
+          try{if(dir){
+            // This unique mkdtemp directory belongs to this upload only. Also
+            // clear native pixel-cache files left by a timed-out conversion.
+            for(const entry of await fsp.readdir(dir))await fsp.rm(path.join(dir,entry),{force:true});
+            await fsp.rmdir(dir);
+          }}finally{uploading=false;}
+        }
+        send(res,201,uploadResponse);return true;
       }
       if(route==='/api/admin/approve'&&req.method==='POST'){
         const body=await jsonBody(req);

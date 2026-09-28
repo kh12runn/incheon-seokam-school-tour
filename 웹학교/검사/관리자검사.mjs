@@ -7,8 +7,9 @@ import {randomBytes,createHash} from 'node:crypto';
 import {once} from 'node:events';
 import {createAdminAPI} from '../../관리도구/관리자/API.mjs';
 import {GithubStore,CATALOG} from '../../관리도구/관리자/저장소.mjs';
+import {fixture} from './휴대폰사진검사.mjs';
 const root=fileURLToPath(new URL('../../',import.meta.url));
-const png=Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aZioAAAAASUVORK5CYII=','base64');
+const png=await fixture('PNG');
 const hash=s=>createHash('sha1').update(s).digest('hex');
 // Contract-level fake GitHub: the real REST adapter runs against this endpoint
 // implementation, including immutable Git trees and non-fast-forward conflicts.
@@ -47,7 +48,7 @@ export class FakeGithub {
   catalog(){const files=this.trees.get(this.commits.get(this.head).tree.sha);return files[CATALOG]?JSON.parse(this.blobs.get(files[CATALOG])):{rooms:{}};}
 }
 const token=()=>randomBytes(24).toString('hex');
-const env={ADMIN_PASSWORD:token(),SESSION_SECRET:token(),GITHUB_TOKEN:token(),GITHUB_OWNER:'test-owner',GITHUB_REPO:'test-repo',GITHUB_BRANCH:'photo-assets',MAX_UPLOAD_MB:'1'};
+const env={ADMIN_PASSWORD:token(),SESSION_SECRET:token(),GITHUB_TOKEN:token(),GITHUB_OWNER:'test-owner',GITHUB_REPO:'test-repo',GITHUB_BRANCH:'photo-assets',MAX_UPLOAD_MB:'1',IMAGEMAGICK_BINARY:process.env.IMAGEMAGICK_BINARY};
 const gh=new FakeGithub(),store=new GithubStore(env,gh.fetch.bind(gh));let time=Date.now();
 const handler=createAdminAPI({root,env,store,now:()=>time});
 const server=http.createServer(async(req,res)=>{
@@ -82,7 +83,7 @@ else{
     const structure=await req('/api/admin/structure');assert.equal(structure.status,200);assert.deepEqual(structure.data.buildings[1].floors,[1,2,3,4]);assert(structure.data.rooms.some(r=>r.roomId==='4F_2-1'));
     assert.equal((await upload('same.png',png,'image/png',{'X-CSRF-Token':'bad'})).status,403);
     assert.equal((await upload('../bad.png')).status,400);assert.equal((await upload('bad.svg',Buffer.from('<svg/>'),'image/svg+xml')).status,415);
-    assert.equal((await upload('bad.jpg',png,'image/jpeg')).status,415);assert.equal((await upload('large.png',Buffer.alloc(1024*1024+1))).status,413);results.push('path, extension, MIME, magic, size validation');
+    assert.equal((await upload('bad.jpg',Buffer.from('<script>not a photo</script>'),'image/jpeg')).status,415);assert.equal((await upload('large.png',Buffer.alloc(1024*1024+1))).status,413);results.push('path, extension, MIME, magic, size validation');
     const first=await upload();assert.equal(first.status,201);const firstId=first.data.id;
     assert.equal((await req('/api/admin/approve',{roomId:'4F_2-1'})).status,400);
     const pending=await req('/api/admin/pending');assert.equal(pending.data.rooms.length,1);assert.equal(pending.data.rooms[0].status,'pending');
@@ -96,7 +97,9 @@ else{
     gh.conflict=true;
     assert.equal((await req('/api/admin/approve',{roomId:r.roomId,revision,privacyConfirmed:true})).status,200);
     assert.equal((await req('/api/rooms/4F_2-1/assets')).data.assets.length,1);
-    const approvedImage=await fetch(origin+'/api/rooms/4F_2-1/assets/'+firstId);assert.equal(approvedImage.status,200);assert.deepEqual(Buffer.from(await approvedImage.arrayBuffer()),png);
+    const approvedImage=await fetch(origin+'/api/rooms/4F_2-1/assets/'+firstId);assert.equal(approvedImage.status,200);assert.equal(approvedImage.headers.get('content-type'),'image/jpeg');assert.equal(Buffer.from(await approvedImage.arrayBuffer()).readUInt16BE(0),0xffd8);
+    for(const [name,bytes,mime] of [['iPhone.HEIC',await fixture('HEIC'),'image/heic'],['Galaxy.HEIF',await fixture('HEIC'),'application/octet-stream'],['renamed.jpg',png,'image/jpeg'],['blank.png',png,'']])assert.equal((await upload(name,bytes,mime)).status,201);
+    const phoneImages=gh.catalog().rooms['4F_2-1'].images;assert(phoneImages.every(i=>i.mime==='image/jpeg'&&i.file.endsWith('.jpg')&&i.normalized&&i.originalSize>0));results.push('mixed iPhone/Galaxy photos converted, correct manifest MIME/size, original names preserved');
     const multi=await Promise.all([upload(),upload()]);assert(multi.some(r=>r.status===201));assert(multi.every(r=>[201,429].includes(r.status)));
     assert.equal((await upload()).status,201);r=gh.catalog().rooms['4F_2-1'];assert.equal(new Set(r.images.map(i=>i.file)).size,r.images.length);assert.equal((await req('/api/rooms/4F_2-1/assets')).data.assets.length,1);
     assert.equal((await req('/api/admin/approve',{roomId:r.roomId,revision,privacyConfirmed:true})).status,409);

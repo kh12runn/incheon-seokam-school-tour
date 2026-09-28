@@ -42,19 +42,19 @@ async function addFiles(files){
   if(busy)return;notice('');for(const file of files){
     if(selection.length>=30){notice('한 번에 최대 30장을 선택할 수 있습니다.',true);break;}
     const item={file};selection.push(item);
-    if(!/\.(jpe?g|png|webp)$/i.test(file.name)||!['image/jpeg','image/png','image/webp'].includes(file.type)){item.invalid=true;item.message='지원하지 않는 파일 형식';}
+    if(!/\.(jpe?g|jfif|png|webp|heic|heif|avif)$/i.test(file.name)){item.invalid=true;item.message='사진만 지원합니다. 동영상·RAW·INSP는 제외해주세요.';}
     else if(file.size>(auth.maxUploadBytes??20*1024*1024)){item.invalid=true;item.message='최대 파일 크기 초과';}
     else try{
       // Decode one preview at a time and immediately release the original bitmap.
       const bitmap=await createImageBitmap(file,{resizeWidth:360,resizeQuality:'low'}),canvas=document.createElement('canvas');canvas.width=bitmap.width;canvas.height=bitmap.height;canvas.getContext('2d').drawImage(bitmap,0,0);bitmap.close();
       const thumb=await new Promise(resolve=>canvas.toBlob(resolve,'image/jpeg',.75));if(thumb)item.preview=URL.createObjectURL(thumb);
-    }catch{item.message='미리보기 불가 · 서버에서 파일을 확인합니다.';}
+    }catch{item.message='휴대폰 원본 · 업로드하면 서버에서 자동 변환합니다.';}
   }renderSelection();
 }
 function uploadOne(item,target){return new Promise((resolve,reject)=>{
   const xhr=new XMLHttpRequest();xhr.open('POST','/api/admin/upload?roomId='+encodeURIComponent(target));xhr.timeout=180000;
-  xhr.setRequestHeader('Content-Type',item.file.type);xhr.setRequestHeader('X-File-Name',encodeURIComponent(item.file.name));xhr.setRequestHeader('X-CSRF-Token',auth.csrf);
-  xhr.upload.onprogress=e=>{item.progress=e.lengthComputable?Math.round(e.loaded/e.total*100):0;item.message=item.progress===100?'서버에서 GitHub에 저장 중…':`전송 ${item.progress}%`;renderSelection();};
+  xhr.setRequestHeader('Content-Type',item.file.type||'application/octet-stream');xhr.setRequestHeader('X-File-Name',encodeURIComponent(item.file.name));xhr.setRequestHeader('X-CSRF-Token',auth.csrf);
+  xhr.upload.onprogress=e=>{item.progress=e.lengthComputable?Math.round(e.loaded/e.total*100):0;item.message=item.progress===100?'서버에서 사진 자동 변환 · GitHub 저장 중…':`전송 ${item.progress}%`;renderSelection();};
   xhr.onload=()=>{let result;try{result=JSON.parse(xhr.responseText);}catch{return reject(new Error('서버 응답을 확인해주세요.'));}xhr.status>=200&&xhr.status<300?resolve(result):reject(new Error(result.error??'저장 실패'));};
   xhr.onerror=()=>reject(new Error('네트워크 오류 · 목록을 새로고침해 저장 여부를 먼저 확인하세요.'));xhr.ontimeout=()=>reject(new Error('시간 초과 · 목록에서 저장 여부를 확인 후 재시도하세요.'));xhr.send(item.file);
 });}
