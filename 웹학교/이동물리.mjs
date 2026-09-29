@@ -15,6 +15,8 @@ import {courtyardDecor} from './외관사진디자인.mjs';
 import {classroomDevices} from './교실영상기기.mjs';
 import {addAnnexCorridorFinish} from './별관복도마감.mjs';
 import {openRearExit,openStairRearExit,addMainRooftop,ROOF_STAIR} from './본관출입연결.mjs';
+import {applyBasementPlan,openBasementGround,BASEMENT_STAIR,isBasementPosition} from './지하층배치.mjs';
+import {addGateTerrain} from './정문지형.mjs';
 export const PLAYER_RADIUS=.28, PLAYER_HEIGHT=1.7, EYE_HEIGHT=1.58;
 const EPS=.0001, CELL=4;
 const intersect=(x,y,r,b)=>{
@@ -33,9 +35,10 @@ function localBounds(f,u0,u1,v0,v1,z0,z1){
   const p=localPoint(f,u0,v0),q=localPoint(f,u1,v1);
   return [Math.min(p.x,q.x),Math.min(p.y,q.y),z0,Math.max(p.x,q.x),Math.max(p.y,q.y),z1];
 }
-export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,exterior=true,annexFinish=true,restrooms=true,principalOffice=true}={}){
+export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,exterior=true,annexFinish=true,restrooms=true,principalOffice=true,basement=true}={}){
   data=applyGroundFloorPlan(data);
   if(restrooms)data=applyRestroomPlan(data);
+  if(basement)data=applyBasementPlan(data);
   const {left:entranceLeft,right:entranceRight,height:entranceHeight}=LOBBY_OPEN;
   const boxes=[],surfaces=[],colliders=[],stairs=[];
   const roomById=new Map(data.rooms.map(r=>[r.id,r]));
@@ -66,25 +69,26 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
       addBox(item.name+'오른쪽',[entranceRight,b[1],b[2],b[3],b[4],b[5]],item.color,'wall',1);continue;
     }
     boxes.push(item);
-    if(item.kind==='wall'||item.collision||item.kind==='roof'||item.kind==='floor')colliders.push(item);
+    if(item.kind==='wall'||item.collision||item.kind==='roof'||item.kind==='floor'||item.basement&&item.kind==='ceiling')colliders.push(item);
     if(item.kind==='floor'||['SiteGround','SPACE_EXT_PLAYGROUND','SPACE_EXT_PLAY_AREA','SPACE_EXT_SCHOOL_GARDEN','SPACE_EXT_MEDITATION_GROVE'].includes(item.name))flat(b,b[5],item.name);
   }
   // Rebuild each of the four shafts with open floor holes and two real flights.
   for(const room of data.rooms.filter(r=>r.type==='stair'&&r.floor==='1F')){
     const frame=stairFrame(room),W=frame.width,D=frame.depth,L=1.2,T=D-L,FH=data.floorHeight;
     const shaft=room.id.replace(/^1F_/,''), stair={id:shaft,frame,L,T,height:FH,room};stairs.push(stair);
-    const roofAccess=shaft===ROOF_STAIR,levels=roofAccess?5:4,wallTop=roofAccess?4*FH+3:4*FH;
+    const roofAccess=shaft===ROOF_STAIR,basementAccess=basement&&shaft===BASEMENT_STAIR,levels=roofAccess?5:4,wallTop=roofAccess?4*FH+3:4*FH,wallBottom=basementAccess?-FH-.2:-.2;
     stair.roofAccess=roofAccess;
+    stair.basementAccess=basementAccess;
     const b=(u0,u1,v0,v1,z0,z1)=>localBounds(frame,u0,u1,v0,v1,z0,z1);
     // Full-height enclosure stops falling out or crossing into adjacent rooms.
-    addBox(shaft+' 왼벽',b(-.08,.08,0,D,-.2,wallTop),[.76,.79,.8]);
-    addBox(shaft+' 오른벽',b(W-.08,W+.08,0,D,-.2,wallTop),[.76,.79,.8]);
-    addBox(shaft+' 뒷벽',b(0,W,D-.08,D+.08,-.2,wallTop),[.76,.79,.8]);
+    addBox(shaft+' 왼벽',b(-.08,.08,0,D,wallBottom,wallTop),[.76,.79,.8]);
+    addBox(shaft+' 오른벽',b(W-.08,W+.08,0,D,wallBottom,wallTop),[.76,.79,.8]);
+    addBox(shaft+' 뒷벽',b(0,W,D-.08,D+.08,wallBottom,wallTop),[.76,.79,.8]);
     // Narrow spine, open around the far landing, keeps the two flights separate.
-    addBox(shaft+' 중앙벽',b(W/2-.1,W/2+.1,L,T,-.2,(levels-1)*FH+(roofAccess?1.2:1)),[.53,.6,.64]);
+    addBox(shaft+' 중앙벽',b(W/2-.1,W/2+.1,L,T,wallBottom,(levels-1)*FH+(roofAccess?1.2:1)),[.53,.6,.64]);
     addBox(shaft+' 지붕',b(0,W,0,D,wallTop-.1,wallTop+.1),[.69,.73,.75],'slab');
     if(roofAccess)addBox('옥상 계단 출입구 상부',b(0,W,-.08,.08,4*FH+2.6,wallTop),[.76,.79,.8],'wall',5);
-    for(let level=0;level<levels;level++){
+    for(let level=basementAccess?-1:0;level<levels;level++){
       const z=level*FH+(roofAccess&&level===4?.11:0),rise=FH+(roofAccess&&level===3?.11:0);
       const entry=addFlatBox(shaft+' 입구 '+level,b(0,W,0,L,z-.16,z),[.7,.73,.72],level+1);
       // The player's radius reaches the slab before its centre leaves the ramp.
@@ -132,9 +136,11 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
   openRearExit(boxes,colliders,surfaces,addBox);
   openStairRearExit(boxes,colliders,surfaces,addBox);
   addMainRooftop(data,boxes,surfaces,addBox);
+  if(basement)openBasementGround(boxes,colliders,surfaces,data.floorHeight);
   addPlaygroundDetails(addBox);
   addParking(addBox);
   if(exterior)for(const box of courtyardDecor()){boxes.push(box);if(box.collision)colliders.push(box);}
+  if(basement)addGateTerrain(boxes,colliders,surfaces,data.floorHeight);
   // Entrance access ramp from courtyard to ground-floor lobby.
   const ramp={bounds:[entranceLeft,-9,-.65,entranceRight,-7,0],height:(x,y)=>(y+7)*.3,name:'본관 출입 경사로'};
   surfaces.push(ramp);
@@ -197,6 +203,7 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
   }
   function roomAt(p){
     if(p.z>=4*data.floorHeight-.05)return {floor:5,room:null,rooftop:true};
+    if(basement&&isBasementPosition(p))return {floor:0,basement:true,room:data.rooms.find(r=>r.floor==='0F'&&r.type!=='stair'&&p.x>r.bounds[0]&&p.x<r.bounds[1]&&p.y>r.bounds[2]&&p.y<r.bounds[3])};
     const floor=Math.max(1,Math.min(4,Math.floor((p.z+.15)/data.floorHeight)+1));
     const found=data.rooms.find(r=>parseInt(r.floor)===floor&&['classroom','special_room','entrance','toilet'].includes(r.type)&&p.x>r.bounds[0]&&p.x<r.bounds[1]&&p.y>r.bounds[2]&&p.y<r.bounds[3]);
     return {floor,room:found};

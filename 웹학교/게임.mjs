@@ -25,6 +25,7 @@ import {PRINCIPAL_GREETING,LOBBY_PRINCIPAL_POSITION,principalCanGreet,blocksPrin
 import {createPrincipalWalk} from './교장선생님산책.mjs';
 import {createMonthQuiz} from './월영어퀴즈.mjs';
 import {createMonthQuizBubble} from './월영어퀴즈화면.mjs';
+import {createHallMirror,createGateTerrain} from './다목적실표현.mjs';
 const $=id=>document.getElementById(id);
 const canvas=$('화면'),panel=$('시작안내'),status=$('상태'),where=$('현재위치');
 let renderer,touchControls;
@@ -52,6 +53,7 @@ let autoOrbit=true,orbitResumeAt=0,elevatorBusy=false;
 let selectedCharacter=null;
 let jumpMotion;
 let class64PhotoFinish;
+let hallMirror;
 let officePrincipals,principalNPC,officeWasNearby=false;
 let lobbyPrincipalNPC;
 const monthQuiz=createMonthQuiz();
@@ -118,6 +120,7 @@ function textTexture(text,background=false){
   const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;return {tex,ratio:c.width/c.height};
 }
 function buildVisuals(){
+  hallMirror=createHallMirror(data.floorHeight,mobileGraphics);scene.add(hallMirror);scene.add(createGateTerrain(world.boxes));
   const office=createPrincipalOffice();scene.add(office);visuals.push({mesh:office,floor:2,interiorRoom:PRINCIPAL_ID,center:convert(world.principalOffice.spawn),ceiling:false});
   const roomDetails=class64Details();scene.add(roomDetails);visuals.push({mesh:roomDetails,floor:4,ceiling:false});
   class64PhotoFinish=roomDetails.userData.photoFinish;
@@ -133,6 +136,7 @@ function buildVisuals(){
   const groups=new Map(),geometry=new THREE.BoxGeometry(1,1,1),sphere=new THREE.SphereGeometry(.5,12,8);
   const exteriorBoxes=[...faceMonitorsTowardBoard(world.boxes).map(exteriorRenderBox).filter(Boolean),...exteriorSkins(world.boxes,data)];
   for(const b of exteriorBoxes){
+    if(b.shape==='terrain')continue;
     const groupKey=b.color.join(',')+'|'+b.floor+'|'+(b.kind==='ceiling'?'ceiling':'normal')+'|'+surfaceKind(b)+'|'+(b.interiorRoom??'')+'|'+(b.shape??'box');
     if(!groups.has(groupKey))groups.set(groupKey,[]);groups.get(groupKey).push(b);
   }
@@ -185,18 +189,18 @@ function buildVisuals(){
     const plane=new THREE.Mesh(new THREE.PlaneGeometry(Math.max(.1,label.width),Math.max(.1,label.height)),new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-1}));
     plane.position.set(label.position[0],label.position[2],-label.position[1]);
     plane.quaternion.copy(upConversion).multiply(new THREE.Quaternion(...label.quaternion));
-    scene.add(plane);labels.push({mesh:plane,floor:label.floor,name:label.name});
+    scene.add(plane);labels.push({mesh:plane,floor:label.floor,name:label.name,basement:!!label.basement});
   }
   for(const sign of classroomSigns(data)){scene.add(sign.mesh);labels.push(sign);}
   for(const stair of world.stairs){
-    for(let floor=1;floor<=4;floor++){
+    for(let floor=stair.basementAccess?0:1;floor<=4;floor++){
       const room=data.rooms.find(r=>r.id===floor+'F_'+stair.id);
-      const text=(room?.captureName??'계단')+(stair.roofAccess&&floor===4?' · 옥상 ↑':'');
-      const {tex,ratio}=textTexture(`${floor}층  계단\n${text}`,true);
+      const text=floor===0?'1층 3-4 교실 앞으로 ↑':(room?.captureName??'계단')+(stair.roofAccess&&floor===4?' · 옥상 ↑':'')+(stair.basementAccess&&floor===1?' · 지하 강당 ↓':'');
+      const {tex,ratio}=textTexture(`${floor===0?'지하 1층':floor+'층'}  계단\n${text}`,true);
       const sprite=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,depthTest:true}));
       const p=localPoint(stair.frame,stair.frame.width/2,-.05,(floor-1)*3.4+2.45);
       sprite.position.copy(convert(p));sprite.scale.set(Math.min(4.6,ratio*.64),.64,1);scene.add(sprite);
-      labels.push({mesh:sprite,floor,name:'계단 안내'});
+      labels.push({mesh:sprite,floor,name:'계단 안내',basement:floor===0});
     }
   }
   // Four simple exploration beacons; aesthetics can be replaced with real imagery.
@@ -418,7 +422,7 @@ function updateHUD(){
   $('승강기호출').hidden=!isPlaying()||!nearElevator(position,data.floorHeight);
   const at=world.roomAt(position),floor=at.floor;
   const stair=world.stairs.find(s=>{const f=s.frame,dx=position.x-f.origin[0],dy=position.y-f.origin[1],u=dx*f.right[0]+dy*f.right[1],v=dx*f.inward[0]+dy*f.inward[1];return u>0&&u<f.width&&v>0&&v<f.depth;});
-  where.textContent=mode==='overview'?'학교 전체 · 4개 층':at.rooftop?'본관 옥상':`${at.floor}층 · ${at.room?.name??(stair?'계단 이동 중':position.y>3&&position.z<.1?'뒤 야외주차장':position.y<-8&&position.x<90?'운동장':'복도')}`;
+  where.textContent=mode==='overview'?'학교 전체 · 지하 및 지상 4개 층':at.rooftop?'본관 옥상':`${at.basement?'지하 1층':at.floor+'층'} · ${at.room?.name??(stair?'계단 이동 중':position.y>3&&position.z<.1?'뒤 야외주차장':position.y<-8&&position.x<90?'운동장':'복도')}`;
   if(isPlaying()){
     if(at.room?.type==='classroom')visitedRooms.add(at.room.id);
     if(Math.hypot(position.x-58,position.y-1.5)<1.5&&Math.abs(position.z-(at.floor-1)*3.4)<.2)visitedFloors.add(at.floor);
@@ -429,19 +433,19 @@ function updateHUD(){
   for(const v of visuals)v.mesh.visible=!v.interiorRoom||(mode==='walk'&&v.floor===at.floor&&v.center.distanceTo(camera.position)<32);
   for(const l of labels){
     const distance=l.mesh.position.distanceTo(camera.position);
-    l.mesh.visible=mode==='walk'?(distance<24&&(!l.floor||l.floor===at.floor)&&!l.name.startsWith('Label_')):false;
+    l.mesh.visible=mode==='walk'?(distance<24&&(l.basement?at.basement:(!l.floor||l.floor===at.floor))&&!l.name.startsWith('Label_')):false;
   }
   mapCtx.fillStyle='#102529';mapCtx.fillRect(0,0,250,185);
-  const sx=x=>28+x*1.9,sy=y=>28-y*1.9;
+  const scale=at.basement?7:1.9,sx=x=>(at.basement?138:28)+x*scale,sy=y=>(at.basement?90:28)-y*scale;
   for(const r of data.rooms){
     if(parseInt(r.floor)!==(at.rooftop?4:floor)||at.rooftop&&r.building==='ANNEX')continue;const b=r.bounds;
     mapCtx.fillStyle=r.type==='stair'?'#bca1ff':r.type==='corridor'?'#91a6b4':visitedRooms.has(r.id)?'#57c79f':'#4d7184';
-    mapCtx.fillRect(sx(b[0]),sy(b[3]),(b[1]-b[0])*1.9,(b[3]-b[2])*1.9);
-    mapCtx.strokeStyle='#172f3c';mapCtx.strokeRect(sx(b[0]),sy(b[3]),(b[1]-b[0])*1.9,(b[3]-b[2])*1.9);
+    mapCtx.fillRect(sx(b[0]),sy(b[3]),(b[1]-b[0])*scale,(b[3]-b[2])*scale);
+    mapCtx.strokeStyle='#172f3c';mapCtx.strokeRect(sx(b[0]),sy(b[3]),(b[1]-b[0])*scale,(b[3]-b[2])*scale);
   }
   mapCtx.save();mapCtx.translate(sx(position.x),sy(position.y));mapCtx.rotate(mode==='walk'?Math.PI-avatar.getState().heading:-yaw);
   mapCtx.fillStyle='#ffdc68';mapCtx.beginPath();mapCtx.moveTo(0,-7);mapCtx.lineTo(4,5);mapCtx.lineTo(-4,5);mapCtx.closePath();mapCtx.fill();mapCtx.restore();
-  mapCtx.fillStyle='white';mapCtx.font='12px sans-serif';mapCtx.fillText(at.rooftop?'본관 옥상 · 중앙계단으로 내려가기':floor+'층 · 보라색은 계단',10,176);
+  mapCtx.fillStyle='white';mapCtx.font='12px sans-serif';mapCtx.fillText(at.rooftop?'본관 옥상 · 중앙계단으로 내려가기':at.basement?'지하 1층 · 3-4 옆 계단으로 올라가기':floor+'층 · 보라색은 계단',10,176);
 }
 function frame(now){
   requestAnimationFrame(frame);const wallDt=Math.min((now-last)/1000,1),dt=Math.min(wallDt,.05);last=now;elapsed+=dt;
@@ -505,8 +509,9 @@ function frame(now){
   }
   greeting.hidden=mode!=='walk'||!avatar.getState().waving||!isPlaying();
   if(!greeting.hidden){const p=new THREE.Vector3(position.x,position.z+STUDENT_HEIGHT+.3,-position.y).project(camera);greeting.hidden=p.z>1||p.z< -1;greeting.style.left=(p.x*.5+.5)*innerWidth+'px';greeting.style.top=(-p.y*.5+.5)*innerHeight+'px';}
-  interiorLight.visible=mode==='walk'&&position.y>=0&&position.y<=3;
+  interiorLight.visible=mode==='walk'&&(world.roomAt(position).basement||position.y>=0&&position.y<=3);
   interiorLight.position.copy(camera.position);interiorLight.position.y+=.65;
+  if(hallMirror)hallMirror.visible=mode==='walk'&&world.roomAt(position).room?.id==='B1_MAIN_HALL';
   markerGroup.children.forEach(m=>m.rotation.y+=dt);
   if(Math.floor(elapsed*10)!==Math.floor((elapsed-dt)*10))updateHUD();
   renderer.render(scene,camera);

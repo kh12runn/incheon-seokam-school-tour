@@ -2,6 +2,7 @@ import {classroomReferenceInterior} from './교실기본배치.mjs';
 import {CLASSROOM_PROFILES} from './교실별특징.mjs';
 import {subtractBox} from './창문배치.mjs';
 import {applyClass66Details} from './육학년육반.mjs';
+import {applyClass34Details} from './삼학년사반.mjs';
 import {reverseClassroom} from './교실방향.mjs';
 const rgb=hex=>[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);
 const CLASS64_ID='4F_6-4';
@@ -71,7 +72,7 @@ export function mainClassroomsInterior(data,{profiles=CLASSROOM_PROFILES,photoOv
     const entry=frame.point(3.5,0);entry.y=1.5;
     const config={roomId:room.id,room,profile,frame,boxes:roomBoxes,colliders:roomColliders,desks:seats(template.desks),chairs:seats(template.chairs),spawn,entry,
       seatCount:24,seatCountIsApproximate:true,furnitureScale:scale,depth};
-    const photoConfig=photoOverrides?applyClass66Details(config):config;
+    const photoConfig=photoOverrides?applyClass34Details(applyClass66Details(config)):config;
     const detailed=orientationOverrides?reverseClassroom(photoConfig):photoConfig;
     rooms.push(detailed);boxes.push(...detailed.boxes);colliders.push(...detailed.colliders);
   }

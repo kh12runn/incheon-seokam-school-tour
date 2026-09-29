@@ -8,7 +8,7 @@ const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta
 // Exercise the direction adapter on the unmodified reference, before device upgrades.
 world.boxes=[...class64Interior(data).boxes,...mainClassroomsInterior(data).boxes];
 const before=JSON.stringify(world.boxes),fixed=faceMonitorsTowardBoard(world.boxes),changed=fixed.filter((b,i)=>b!==world.boxes[i]);
-assert.equal(changed.length,26,'25 main classrooms plus the second monitor in class 6-6');
+assert.equal(changed.length,27,'25 main classrooms plus photo-specific second monitors in classes 6-6 and 3-4');
 assert.equal(JSON.stringify(world.boxes),before,'Source geometry and collider references preserved');
 const rooms=new Set();
 for(const screen of changed){

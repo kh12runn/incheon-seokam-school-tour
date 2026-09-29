@@ -14,6 +14,7 @@ assert(!packed.files.some(p=>/사진보관|미리보기|검사/.test(p)||p.start
 const approvedModels=['교장선생님-귀여운','교장선생님-머리','남학생-귀여운','여학생-귀여운'].map(name=>'웹학교/캐릭터모델/'+name+'.glb');
 assert.deepEqual(packed.files.filter(p=>p.endsWith('.glb')).sort(),approvedModels.sort(),'Only the office principal, shared runner head, and two student models');
 assert(packed.files.includes('웹학교/교실별특징.mjs'));
+for(const file of ['지하층배치.mjs','다목적실표현.mjs','정문지형.mjs','외부도구/Reflector.js','삼학년사반.mjs','삼학년사반표현.mjs'])assert(packed.files.includes('웹학교/'+file),'New school runtime included: '+file);
 for(const file of ['월영어퀴즈.mjs','월영어퀴즈화면.mjs','월영어퀴즈.css','교장선생님산책.mjs','교장보행리그.mjs'])assert(packed.files.includes('웹학교/'+file),'NPC asset included: '+file);
 // JPEG is already compressed and lazily loaded near 6-4. Keep the text compression
 // budget separate rather than claiming the new photographs shrink with Brotli.

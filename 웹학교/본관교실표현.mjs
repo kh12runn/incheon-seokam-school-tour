@@ -1,5 +1,6 @@
 import * as THREE from './외부도구/three.module.js';
 import {class66Details} from './육학년육반표현.mjs';
+import {class34Details} from './삼학년사반표현.mjs';
 // Original code-native bulletin artwork: no invented student names or copied photos.
 function motif(ctx,type,x,y,size,color){
   ctx.save();ctx.translate(x,y);ctx.fillStyle=color;ctx.strokeStyle=color;ctx.lineWidth=size*.09;
@@ -20,6 +21,7 @@ function motif(ctx,type,x,y,size,color){
   }ctx.restore();
 }
 export function mainClassroomDetails(config){
+  if(config.roomId==='1F_3-4'&&config.photoDetails)return class34Details(config);
   if(config.roomId==='4F_6-6'&&config.photoDetails)return class66Details(config);
   const {room,profile}=config,frame=config.architecturalFrame??config.frame,group=new THREE.Group();group.name=room.name+' 개별 게시판';
   const className=room.name.replace(' 교실',''),floor=room.bounds[4];

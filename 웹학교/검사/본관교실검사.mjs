@@ -17,7 +17,7 @@ const themes=new Set();
 for(const interior of after.classroomsMain.rooms){
   const {room,profile,frame,spawn,entry}=interior,b=room.bounds;
   assert.ok(isMainClassroom(room));assert.notEqual(room.id,'4F_6-4');
-  if(room.id==='4F_6-6'){assert.equal(profile.photoStatus,'reviewed');assert.equal(profile.photoCount,6);assert.ok(profile.observedFeatures.length>=6);}
+  if(['4F_6-6','1F_3-4'].includes(room.id)){assert.equal(profile.photoStatus,'reviewed');assert.equal(profile.photoCount,6);assert.ok(profile.observedFeatures.length>=6);}
   else {assert.equal(profile.photoStatus,'awaiting');assert.deepEqual(profile.observedFeatures,[]);}
   assert.ok(!themes.has(profile.theme),'개별 테마');themes.add(profile.theme);
   assert.equal(interior.desks.length,24);assert.equal(interior.chairs.length,24);
