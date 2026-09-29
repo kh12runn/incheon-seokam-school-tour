@@ -17,6 +17,10 @@ import {addAnnexCorridorFinish} from './별관복도마감.mjs';
 import {openRearExit,openStairRearExit,addMainRooftop,ROOF_STAIR} from './본관출입연결.mjs';
 import {applyBasementPlan,openBasementGround,BASEMENT_STAIR,isBasementPosition} from './지하층배치.mjs';
 import {addGateTerrain} from './정문지형.mjs';
+import {meetingRoomInterior} from './운영위원회회의실.mjs';
+import {audioRoomInterior} from './시청각실사진배치.mjs';
+import {finishCentralStair} from './중앙계단사진마감.mjs';
+import {broadcastRoomInterior} from './방송실사진배치.mjs';
 export const PLAYER_RADIUS=.28, PLAYER_HEIGHT=1.7, EYE_HEIGHT=1.58;
 const EPS=.0001, CELL=4;
 const intersect=(x,y,r,b)=>{
@@ -35,7 +39,7 @@ function localBounds(f,u0,u1,v0,v1,z0,z1){
   const p=localPoint(f,u0,v0),q=localPoint(f,u1,v1);
   return [Math.min(p.x,q.x),Math.min(p.y,q.y),z0,Math.max(p.x,q.x),Math.max(p.y,q.y),z1];
 }
-export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,exterior=true,annexFinish=true,restrooms=true,principalOffice=true,basement=true}={}){
+export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,exterior=true,annexFinish=true,restrooms=true,principalOffice=true,basement=true,audioPhotos=true,centralStairPhotos=true,broadcastPhotos=true}={}){
   data=applyGroundFloorPlan(data);
   if(restrooms)data=applyRestroomPlan(data);
   if(basement)data=applyBasementPlan(data);
@@ -136,6 +140,7 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
   openRearExit(boxes,colliders,surfaces,addBox);
   openStairRearExit(boxes,colliders,surfaces,addBox);
   addMainRooftop(data,boxes,surfaces,addBox);
+  const centralStairFinish=centralStairPhotos?finishCentralStair(boxes,colliders,stairs):null;
   if(basement)openBasementGround(boxes,colliders,surfaces,data.floorHeight);
   addPlaygroundDetails(addBox);
   addParking(addBox);
@@ -166,6 +171,11 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
   }
   const office=principalOffice?principalOfficeLayout(data):null;
   if(office)colliders.push(...office.colliders);
+  const meeting=meetingRoomInterior(data,boxes,colliders,addBox);
+  const audio=audioPhotos?audioRoomInterior(data,boxes,colliders,addBox,surfaces):null;
+  const broadcast=broadcastPhotos?broadcastRoomInterior(data,boxes,colliders,addBox):null;
+  const specialInteriors=[meeting,audio,broadcast].filter(Boolean);
+  for(const config of specialInteriors){boxes.push(...config.boxes);colliders.push(...config.colliders);}
   const grid=(items)=>{
     const map=new Map();
     for(const item of items){const b=item.bounds;for(let x=Math.floor((b[0]-.5)/CELL);x<=Math.floor((b[3]+.5)/CELL);x++)for(let y=Math.floor((b[1]-.5)/CELL);y<=Math.floor((b[4]+.5)/CELL);y++){
@@ -205,6 +215,8 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
     if(p.z>=4*data.floorHeight-.05)return {floor:5,room:null,rooftop:true};
     if(basement&&isBasementPosition(p))return {floor:0,basement:true,room:data.rooms.find(r=>r.floor==='0F'&&r.type!=='stair'&&p.x>r.bounds[0]&&p.x<r.bounds[1]&&p.y>r.bounds[2]&&p.y<r.bounds[3])};
     const floor=Math.max(1,Math.min(4,Math.floor((p.z+.15)/data.floorHeight)+1));
+    const entry=specialInteriors.find(r=>{const b=r.entryBounds;return b&&p.x>b[0]&&p.x<b[3]&&p.y>b[1]&&p.y<b[4]&&p.z>=b[2]-.05&&p.z<b[5];});
+    if(entry)return {floor,room:entry.room};
     const found=data.rooms.find(r=>parseInt(r.floor)===floor&&['classroom','special_room','entrance','toilet'].includes(r.type)&&p.x>r.bounds[0]&&p.x<r.bounds[1]&&p.y>r.bounds[2]&&p.y<r.bounds[3]);
     return {floor,room:found};
   }
@@ -225,5 +237,5 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
     let q={...p};if(!blocked(q.x+dx,q.y,q.z))q.x+=dx;
     if(!blocked(q.x,q.y+dy,q.z))q.y+=dy;return q;
   }
-  return {data,boxes,colliders,surfaces,stairs,classroom64,classroom21,classroomsMain,classroomInteriors,principalOffice:office,move,candidate,blocked,support,floorBelow,moveAir,roomAt,spawn:{x:20,y:1.5,z:0}};
+  return {data,boxes,colliders,surfaces,stairs,classroom64,classroom21,classroomsMain,classroomInteriors,specialInteriors,centralStairFinish,principalOffice:office,move,candidate,blocked,support,floorBelow,moveAir,roomAt,spawn:{x:20,y:1.5,z:0}};
 }

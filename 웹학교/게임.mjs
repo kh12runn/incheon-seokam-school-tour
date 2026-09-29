@@ -19,6 +19,12 @@ import {faceMonitorsTowardBoard} from './모니터방향.mjs';
 import {createTouchControls,prefersTouch} from './모바일조작.mjs';
 import {PRINCIPAL_ID} from './교장실배치.mjs';
 import {createPrincipalOffice} from './교장실표현.mjs';
+import {meetingRoomDetails} from './운영위원회회의실표현.mjs';
+import {audioRoomDetails} from './시청각실사진표현.mjs';
+import {AUDIO_ID} from './시청각실사진배치.mjs';
+import {centralStairDetails} from './중앙계단사진표현.mjs';
+import {broadcastRoomDetails} from './방송실사진표현.mjs';
+import {BROADCAST_ID} from './방송실사진배치.mjs';
 import {OFFICE_CHARACTERS,createOfficePrincipalModels} from './교장실캐릭터.mjs';
 import {createRunnerPrincipalNPC} from './마라토너교장선생님.mjs';
 import {PRINCIPAL_GREETING,LOBBY_PRINCIPAL_POSITION,principalCanGreet,blocksPrincipal,principalGreetingAt} from './교장선생님인사.mjs';
@@ -120,6 +126,11 @@ function textTexture(text,background=false){
   const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;return {tex,ratio:c.width/c.height};
 }
 function buildVisuals(){
+  if(world.centralStairFinish)scene.add(centralStairDetails(world.centralStairFinish));
+  for(const config of world.specialInteriors){
+    const mesh=config.roomId===AUDIO_ID?audioRoomDetails(config):config.roomId===BROADCAST_ID?broadcastRoomDetails(config):meetingRoomDetails(config);scene.add(mesh);
+    visuals.push({mesh,floor:2,interiorRoom:config.roomId,center:convert(config.spawn),ceiling:false});
+  }
   hallMirror=createHallMirror(data.floorHeight,mobileGraphics);scene.add(hallMirror);scene.add(createGateTerrain(world.boxes));
   const office=createPrincipalOffice();scene.add(office);visuals.push({mesh:office,floor:2,interiorRoom:PRINCIPAL_ID,center:convert(world.principalOffice.spawn),ceiling:false});
   const roomDetails=class64Details();scene.add(roomDetails);visuals.push({mesh:roomDetails,floor:4,ceiling:false});
@@ -150,7 +161,7 @@ function buildVisuals(){
       mesh.setMatrixAt(i,matrix);
     });
     mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();scene.add(mesh);
-    const interiorRoom=items[0].interiorRoom,config=world.classroomInteriors.find(r=>r.roomId===interiorRoom);
+    const interiorRoom=items[0].interiorRoom,config=[...world.classroomInteriors,...world.specialInteriors].find(r=>r.roomId===interiorRoom);
     visuals.push({mesh,floor:items[0].floor,ceiling:items[0].kind==='ceiling',interiorRoom,center:config?convert(config.spawn):null});
   }
   const roomById=new Map(data.rooms.map(r=>[r.id,r]));
@@ -181,7 +192,10 @@ function buildVisuals(){
     sign.position.set(ELEVATOR.x,(floor-1)*data.floorHeight+2.69,-2.78);scene.add(sign);
     labels.push({mesh:sign,floor,name:'엘리베이터 안내'});
   }
-  for(const label of data.labels){
+  for(let label of data.labels){
+    // The stair-side entrance now opens straight into the auditorium.
+    if(label.name==='Sign_2F_AUDIO_VISUAL')label={...label,position:[.14,1.5,5.98]};
+    if(label.name==='Label_2F_KOREAN_CLASS')label={...label,position:[-1.5,-3.5,3.425]};
     if(roomById.get(label.spaceId)?.type==='classroom'&&label.name.startsWith('Sign_'))continue;
     if(roomById.get(label.spaceId)?.type==='stair'||label.name.includes('Heading'))continue;
     if(label.spaceId==='1F_MAIN_LOBBY'&&label.name.startsWith('Sign_')){} // interior entrance sign stays
@@ -337,10 +351,10 @@ $('동층이동').addEventListener('change',async e=>{
 });
 $('방이동').addEventListener('click',()=>{
   const room=data.rooms.find(r=>r.id===$('방선택').value);if(!room)return;
-  const b=room.bounds,interior=world.classroomInteriors.find(r=>r.roomId===room.id);
-  const p=room.id===PRINCIPAL_ID?{...world.principalOffice.spawn}:room.id===CLASS64_ID?{...CLASS64_SPAWN}:interior?{...interior.spawn}:{x:(b[0]+b[1])/2,y:(b[2]+b[3])/2,z:b[4]};
+  const b=room.bounds,interior=world.classroomInteriors.find(r=>r.roomId===room.id),special=world.specialInteriors.find(r=>r.roomId===room.id);
+  const p=room.id===PRINCIPAL_ID?{...world.principalOffice.spawn}:room.id===CLASS64_ID?{...CLASS64_SPAWN}:interior?{...interior.spawn}:special?{...special.spawn}:{x:(b[0]+b[1])/2,y:(b[2]+b[3])/2,z:b[4]};
   const valid=world.candidate(p.x,p.y,p.z);if(!valid){notice('해당 위치는 이동할 수 없습니다.');return;}
-  position=valid;jumpMotion.reset();yaw=room.id===PRINCIPAL_ID?Math.atan2(p.x-OFFICE_CHARACTERS[0].position.x,OFFICE_CHARACTERS[0].position.y-p.y):interior?.layoutRotation===Math.PI?-Math.PI/2:interior||room.id===CLASS64_ID?Math.PI/2:room.building==='ANNEX'?-Math.PI/2:0;pitch=0;startWalk();
+  position=valid;jumpMotion.reset();yaw=room.id===PRINCIPAL_ID?Math.atan2(p.x-OFFICE_CHARACTERS[0].position.x,OFFICE_CHARACTERS[0].position.y-p.y):special?.entryYaw??(interior?.layoutRotation===Math.PI?-Math.PI/2:interior||room.id===CLASS64_ID?Math.PI/2:room.building==='ANNEX'?-Math.PI/2:0);pitch=0;startWalk();
 });
 document.addEventListener('pointerlockchange',()=>{
   locked=document.pointerLockElement===canvas;

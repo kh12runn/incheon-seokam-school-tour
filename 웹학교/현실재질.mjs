@@ -31,12 +31,13 @@ export function finishMaterial(b){
   const material=new THREE.MeshStandardMaterial({color,roughness:kind==='ceramic'?.22:kind.startsWith('restroom_')?.4:kind==='terrazzo'?.27:kind==='wood'?.48:kind==='metal'?.3:.88,
     metalness:kind==='metal'?.72:0,envMapIntensity:kind==='metal'?.8:.28});
   if(kind==='lamp'){material.emissive.set('#fff4dc');material.emissiveIntensity=1.2;}
+  if(kind==='meeting_table'){material.roughness=.14;material.envMapIntensity=.7;}
   if(kind==='glass'){material.roughness=.2;material.envMapIntensity=.65;}
   if(kind==='clear_glass'){
     material.color.set('#e5f3ee');material.transparent=true;material.opacity=.1;material.depthWrite=false;
     material.roughness=.08;material.envMapIntensity=.35;return material;
   }
-  if(!['wood','room_floor','rubber_mat','restroom_floor','restroom_wall','terrazzo','paint','metal','soil','ground','chalk','asphalt','facade','foliage'].includes(kind))return material;
+  if(!['acoustic_wood','carpet','wood','room_floor','rubber_mat','tactile_mat','restroom_floor','restroom_wall','terrazzo','paint','metal','soil','ground','chalk','asphalt','facade','foliage'].includes(kind))return material;
   material.onBeforeCompile=shader=>{
     shader.vertexShader='varying vec3 vSurfacePoint;\n'+shader.vertexShader;
     shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
@@ -49,7 +50,15 @@ export function finishMaterial(b){
       float grainHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
       float grainNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(grainHash(i),grainHash(i+vec2(1.,0.)),f.x),mix(grainHash(i+vec2(0.,1.)),grainHash(i+vec2(1.,1.)),f.x),f.y);}
       `+shader.fragmentShader;
-    const detail=kind==='facade'?`
+    const detail=kind==='acoustic_wood'?`
+      vec2 uv=vec2(vSurfacePoint.x+vSurfacePoint.z,vSurfacePoint.y);
+      float holes=1.-smoothstep(.10,.22,length(fract(uv/.024)-.5));
+      float grain=grainNoise(vec2(uv.x*43.,uv.y*2.));
+      diffuseColor.rgb*=(.94+.10*grain)*(1.-.28*holes);`
+      :kind==='carpet'?`
+      vec2 uv=vSurfacePoint.xz;
+      diffuseColor.rgb*=.88+.20*grainNoise(uv*170.);`
+      :kind==='facade'?`
       float height=mod(vSurfacePoint.y+.001,3.4);
       float band=step(.65,height)*(1.-step(1.0,height))+step(2.34,height)*(1.-step(2.63,height));
       diffuseColor.rgb=mix(diffuseColor.rgb,vec3(.196,.048,.024),clamp(band,0.,1.)*.86);
@@ -71,6 +80,12 @@ export function finishMaterial(b){
       vec2 tile=abs(fract(uv/.30)-.5);
       float seam=smoothstep(.476,.496,max(tile.x,tile.y));
       diffuseColor.rgb*=mix(.985,.70,seam)*(.98+.035*grainNoise(uv*60.));`
+      :kind==='tactile_mat'?`
+      vec2 uv=vSurfacePoint.xz/.06;
+      float r=length(fract(uv)-.5);
+      float bump=1.-smoothstep(.20,.28,r);
+      float rim=smoothstep(.21,.27,r)*(1.-smoothstep(.27,.34,r));
+      diffuseColor.rgb*=.87+.25*bump-.16*rim;`
       :kind==='rubber_mat'?`
       vec2 uv=vSurfacePoint.xz;
       vec2 dots=fract(uv/.035)-.5;
