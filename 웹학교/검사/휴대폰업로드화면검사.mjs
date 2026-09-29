@@ -23,8 +23,26 @@ try{
     await page.locator('#업로드').filter({hasText:'3장 업로드'}).waitFor();await page.locator('#업로드').click();
     await page.locator('#업로드결과').filter({hasText:'사진 3장이 업로드되었습니다.'}).waitFor({timeout:90000});
     assert.equal(await page.locator('#선택사진 .photo').count(),4);assert.equal(await page.locator('#선택사진').getByText('저장 완료 · 승인 대기',{exact:true}).count(),3);
+    await page.locator('#건물선택').getByRole('button',{name:'기타',exact:true}).click();
+    await page.locator('#기타위치구역').waitFor({state:'visible'});
+    assert.equal(await page.locator('#층선택').isVisible(),false);assert.equal(await page.locator('#경로').innerText(),'관리자 > 기타');
+    assert((await page.locator('#기타위치구역').innerText()).includes('촬영한 위치가 어디인지 설명해주세요'));
+    await page.locator('#파일선택').setInputFiles([files[0]]);await page.locator('#업로드').filter({hasText:'1장 업로드'}).waitFor();
+    let requests=0;page.on('request',req=>{if(req.url().includes('/api/admin/upload'))requests++;});
+    await page.locator('#업로드').click();await page.locator('#알림').filter({hasText:'촬영한 위치가 어디인지 설명해주세요'}).waitFor();assert.equal(requests,0);
+    const place='3학년 4반 앞 계단';await page.locator('#촬영위치설명').fill(place);await page.locator('#업로드').click();
+    await page.locator('#업로드결과').filter({hasText:'사진 1장이 업로드되었습니다.'}).waitFor({timeout:90000});
+    await page.locator('#저장사진 .location-note').filter({hasText:place}).first().waitFor();
+    await page.locator('#건물선택').getByRole('button',{name:'기타',exact:true}).click();
+    const second='별관쪽 운동장 <img src=x onerror=alert(1)>';
+    await page.locator('#촬영위치설명').fill(second);await page.locator('#파일선택').setInputFiles([files[2]]);
+    await page.locator('#업로드').filter({hasText:'1장 업로드'}).waitFor();await page.locator('#업로드').click();
+    await page.locator('#저장사진 .location-note').filter({hasText:second}).first().waitFor({timeout:90000});
+    assert.equal(await page.locator('#저장사진 .location-note img').count(),0,'Location description is text, never executable markup');
+    await page.reload();await page.locator('#건물선택').getByRole('button',{name:'기타',exact:true}).click();
+    await page.locator('#저장사진 .location-note').filter({hasText:place}).first().waitFor();await page.locator('#저장사진 .location-note').filter({hasText:second}).first().waitFor();
     assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),true);assert.deepEqual(errors,[]);
     await context.close();
   }
-  console.log(JSON.stringify({ok:true,checks:['desktop and mobile viewport','building/floor/room selection','mixed JPEG HEIC PNG upload','invalid file isolated','no horizontal overflow or page errors']}));
+  console.log(JSON.stringify({ok:true,checks:['desktop and mobile viewport','building/floor/room selection','mixed JPEG HEIC PNG upload','Other category and location prompt','required location before upload','distinct descriptions persist per photo after reload','location description XSS blocked','invalid file isolated','no horizontal overflow or page errors']}));
 }finally{await browser?.close();server.kill();}

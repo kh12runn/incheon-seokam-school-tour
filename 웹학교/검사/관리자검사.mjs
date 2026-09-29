@@ -66,8 +66,8 @@ else{
     const response=await fetch(origin+route,{method:body!==undefined?'POST':'GET',headers:{Origin:origin,...(cookie?{Cookie:cookie}:{}),...(body!==undefined?{'Content-Type':'application/json','X-CSRF-Token':csrf}:{}),...extra.headers},...(body!==undefined?{body:JSON.stringify(body)}:{})});
     const text=await response.text();return {response,status:response.status,data:text?JSON.parse(text):{}};
   }
-  async function upload(name='same.png',bytes=png,mime='image/png',extra={}){
-    const response=await fetch(origin+'/api/admin/upload?roomId=4F_2-1',{method:'POST',headers:{Origin:origin,Cookie:cookie,'X-CSRF-Token':csrf,'Content-Type':mime,'X-File-Name':encodeURIComponent(name),...extra},body:bytes});
+  async function upload(name='same.png',bytes=png,mime='image/png',extra={},target='4F_2-1'){
+    const response=await fetch(origin+'/api/admin/upload?roomId='+target,{method:'POST',headers:{Origin:origin,Cookie:cookie,'X-CSRF-Token':csrf,'Content-Type':mime,'X-File-Name':encodeURIComponent(name),...extra},body:bytes});
     return {status:response.status,data:await response.json()};
   }
   try{
@@ -111,6 +111,24 @@ else{
     const rename=await req('/api/admin/rooms',{action:'rename',roomId:add.data.room.roomId,revision:add.data.room.revision,name:'새 특별실'});assert.equal(rename.status,200);
     assert.equal((await req('/api/admin/rooms',{action:'archive',roomId:rename.data.room.roomId,revision:rename.data.room.revision})).status,200);
     gh.private=false;assert.equal((await upload()).status,503);gh.private=true;results.push('workflow + room management + public repository refused');
+    assert(structure.data.buildings.some(b=>b.id==='OTHER'&&b.name==='기타'&&b.floors.length===0));
+    assert(structure.data.rooms.some(r=>r.roomId==='OTHER_MISC'&&r.bounds===null));
+    const uploadOther=description=>upload('same.png',png,'image/png',{'X-Location-Description':encodeURIComponent(description)},'OTHER_MISC');
+    for(const text of ['', '   ', 'x'.repeat(301), '\u0000bad'])assert.equal((await uploadOther(text)).status,400);
+    assert.equal((await upload('same.png',png,'image/png',{'X-Location-Description':'%'},'OTHER_MISC')).status,400);
+    const places=['3학년 4반 앞 계단','별관쪽 운동장 <script>alert(1)</script>'];
+    for(const text of places)assert.equal((await uploadOther(text)).status,201);
+    let other=gh.catalog().rooms.OTHER_MISC;
+    assert.deepEqual(other.images.map(i=>i.locationDescription),places);assert(other.images.every(i=>i.file.startsWith('school-assets/uploads/기타/OTHER_MISC/')&&i.requiresLocationConfirmation));
+    const tree=gh.trees.get(gh.commits.get(gh.head).tree.sha),manifest=JSON.parse(gh.blobs.get(tree['school-assets/uploads/기타/OTHER_MISC/manifest.json']));
+    assert.deepEqual(manifest.images.map(i=>i.locationDescription),places);
+    assert((await req('/api/admin/pending')).data.rooms.some(r=>r.roomId==='OTHER_MISC'));
+    assert.equal((await req('/api/rooms/OTHER_MISC/assets')).data.assets.length,0,'Pending descriptions remain private');
+    assert.equal((await req('/api/admin/approve',{roomId:'OTHER_MISC',revision:other.revision,privacyConfirmed:true})).status,200);
+    const publicOther=(await req('/api/rooms/OTHER_MISC/assets')).data;
+    assert.deepEqual(publicOther.assets.map(i=>i.locationDescription),places);assert(publicOther.requiresLocationConfirmation&&publicOther.requiresManualMapping);assert.equal(publicOther.location.bounds,null);
+    await uploadOther('운동장 구령대 옆');assert.equal((await req('/api/rooms/OTHER_MISC/assets')).data.assets.length,2,'Later pending description not leaked');
+    results.push('Other folder, required bounded description, per-photo manifest, mixed locations preserved, pending privacy, approval, manual location confirmation');
     assert.equal((await req('/api/admin/logout',{})).status,200);assert.equal((await req('/api/admin/structure')).status,401);
     for(const route of ['approve','status','rooms'])assert.equal((await req('/api/admin/'+route,{})).status,401);
     const again=await req('/api/admin/login',{password:env.ADMIN_PASSWORD});cookie=again.response.headers.get('set-cookie').split(';')[0];time+=4*60*60*1000+1;assert.equal((await req('/api/admin/structure')).status,401);

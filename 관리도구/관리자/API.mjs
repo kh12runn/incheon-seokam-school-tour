@@ -25,6 +25,7 @@ export function createAdminAPI({root,env=process.env,store=new GithubStore(env),
   const data=applyRestroomPlan(applyGroundFloorPlan(JSON.parse(fs.readFileSync(path.join(root,'웹학교/학교구조.json'),'utf8'))));
   const base=data.rooms.filter(r=>['MAIN','ANNEX'].includes(r.building)&&/^[1-4]F$/.test(r.floor)).map(r=>({...r,roomId:r.id,roomName:r.name,custom:false}));
   base.push({id:'5F_MAIN_ROOF',roomId:'5F_MAIN_ROOF',name:'본관 옥상',roomName:'본관 옥상',floor:'5F',building:'MAIN',type:'outdoor',bounds:null,custom:false});
+  base.push({id:'OTHER_MISC',roomId:'OTHER_MISC',name:'기타',roomName:'기타',floor:null,building:'OTHER',type:'other',bounds:null,custom:false,requiresLocationConfirmation:true});
   const sessions=new Map(),rates=new Map(),production=env.NODE_ENV==='production',cookieName=production?'__Host-school_admin':'school_admin';
   const maxUpload=Math.min(25,Math.max(1,Number(env.MAX_UPLOAD_MB)||20))*1024*1024;
   let uploading=false;
@@ -50,9 +51,9 @@ export function createAdminAPI({root,env=process.env,store=new GithubStore(env),
   }
   function rooms(catalog){return [...base,...Object.values(catalog.rooms).filter(r=>r.custom)].map(r=>({...r,...catalog.rooms[r.roomId],id:r.roomId})).filter(r=>!r.archived);}
   function roomFor(catalog,id){if(!idOK(id))throw new ApiError(400,'잘못된 공간 ID입니다.');const r=rooms(catalog).find(r=>r.roomId===id);if(!r)throw new ApiError(404,'공간을 찾을 수 없습니다.');return r;}
-  const folder=r=>`school-assets/uploads/${r.building==='MAIN'?'본관':'별관'}/${parseInt(r.floor)}층/${r.roomId}`;
+  const folder=r=>r.building==='OTHER'?`school-assets/uploads/기타/${r.roomId}`:`school-assets/uploads/${r.building==='MAIN'?'본관':'별관'}/${parseInt(r.floor)}층/${r.roomId}`;
   const changed=(catalog,room,message,files=[])=>{catalog.rooms[room.roomId]=room;return {message,files:[...files,{path:folder(room)+'/manifest.json',content:JSON.stringify(room)}],value:{room}};};
-  const publicRoom=r=>({roomId:r.roomId,roomName:r.roomName,building:r.building,floor:r.floor,location:{bounds:r.bounds??null,coordinates:'Blender x/y horizontal, z up'},requiresManualMapping:true,hotspots:[],assets:(r.images??[]).filter(i=>i.approval==='approved').map(i=>({id:i.id,type:i.type,width:i.width,height:i.height,approvedAt:i.approvedAt,url:`/api/rooms/${r.roomId}/assets/${i.id}`}))});
+  const publicRoom=r=>({roomId:r.roomId,roomName:r.roomName,building:r.building,floor:r.floor,location:{bounds:r.bounds??null,coordinates:'Blender x/y horizontal, z up'},requiresManualMapping:true,...(r.building==='OTHER'?{requiresLocationConfirmation:true}:{}),hotspots:[],assets:(r.images??[]).filter(i=>i.approval==='approved').map(i=>({id:i.id,type:i.type,width:i.width,height:i.height,approvedAt:i.approvedAt,...(i.locationDescription?{locationDescription:i.locationDescription}:{}),url:`/api/rooms/${r.roomId}/assets/${i.id}`}))});
   return async function handle(req,res){
     const url=new URL(req.url,'http://localhost'),route=url.pathname;
     if(!route.startsWith('/api/'))return false;
@@ -88,7 +89,7 @@ export function createAdminAPI({root,env=process.env,store=new GithubStore(env),
       if(['/api/admin/structure','/api/admin/pending'].includes(route)&&req.method==='GET'){
         const snap=await store.snapshot();let list=rooms(snap.catalog).map(r=>({...r,status:r.status??'unshot',images:(r.images??[]).map(i=>({...i,previewUrl:`/api/admin/rooms/${r.roomId}/images/${i.id}`})),existingImplementation:['4F_6-4','4F_6-6','4F_2-1'].includes(r.roomId)||r.name==='교장실'}));
         if(route.endsWith('/pending'))list=list.filter(r=>r.status==='pending');
-        send(res,200,{rooms:list,buildings:[{id:'MAIN',name:'본관',floors:[1,2,3,4,5]},{id:'ANNEX',name:'별관',floors:[1,2,3,4]}]});return true;
+        send(res,200,{rooms:list,buildings:[{id:'MAIN',name:'본관',floors:[1,2,3,4,5]},{id:'ANNEX',name:'별관',floors:[1,2,3,4]},{id:'OTHER',name:'기타',floors:[]}]});return true;
       }
       const preview=route.match(/^\/api\/admin\/rooms\/([A-Za-z0-9_-]+)\/images\/([a-f0-9-]+)$/);
       if(preview&&req.method==='GET'){
@@ -97,6 +98,11 @@ export function createAdminAPI({root,env=process.env,store=new GithubStore(env),
       if(route==='/api/admin/upload'&&req.method==='POST'){
         rate('upload-global',60,60000);if(uploading)throw new ApiError(429,'다른 사진을 저장 중입니다. 잠시 후 다시 업로드해주세요.');
         const roomId=url.searchParams.get('roomId');if(!idOK(roomId))throw new ApiError(400,'잘못된 공간입니다.');
+        let locationDescription;
+        if(roomId==='OTHER_MISC'){
+          try{locationDescription=decodeURIComponent(req.headers['x-location-description']??'').normalize('NFC').trim();}catch{throw new ApiError(400,'촬영 위치 설명을 확인해주세요.');}
+          if(!locationDescription||locationDescription.length>300||/[\x00-\x08\x0b-\x1f\x7f]/.test(locationDescription))throw new ApiError(400,'촬영한 위치가 어디인지 설명해주세요. (1~300자)');
+        }
         let name;try{name=cleanName(decodeURIComponent(req.headers['x-file-name']??''));}catch{throw new ApiError(400,'파일 이름을 확인해주세요.');}
         if(Number(req.headers['content-length'])>maxUpload)throw new ApiError(413,`파일당 최대 ${maxUpload/1024/1024}MB까지 업로드할 수 있습니다.`);
         uploading=true;let dir,uploadResponse;
@@ -110,7 +116,7 @@ export function createAdminAPI({root,env=process.env,store=new GithubStore(env),
           const result=await store.mutate(catalog=>{
             const r=roomFor(catalog,roomId);if((r.images?.length??0)>=100)throw new ApiError(409,'공간당 최대 100장입니다. 관리자에게 문의해주세요.');
             const fileName=uploadedAt.replace(/[-:.TZ]/g,'')+'_'+id+'.'+info.extension;
-            const image={id,...info,originalName:name,file:folder(r)+'/'+fileName,size:bytes.length,originalSize:size,uploadedAt,approval:'pending'};
+            const image={id,...info,originalName:name,file:folder(r)+'/'+fileName,size:bytes.length,originalSize:size,uploadedAt,approval:'pending',...(locationDescription?{locationDescription,requiresLocationConfirmation:true}:{})};
             const next={...r,status:'pending',revision:randomUUID(),uploadedAt,images:[...(r.images??[]),image]};
             return changed(catalog,next,`사진 업로드: ${r.roomName}`,[{path:image.file,content:bytes}]);
           });uploadResponse={ok:true,id,status:'pending',commit:result.commit,message:'사진이 업로드되었습니다. 3D 구현 승인 대기 상태입니다.'};
@@ -147,6 +153,7 @@ export function createAdminAPI({root,env=process.env,store=new GithubStore(env),
             const id='custom_'+randomUUID().replaceAll('-','');return changed(catalog,{roomId:id,id,roomName:name,name,building:body.building,floor:body.floor+'F',type:'special_room',bounds:null,custom:true,status:'unshot',images:[],revision:randomUUID()},'사진 관리 공간 추가');
           }
           const r=roomFor(catalog,body.roomId);if(r.revision!==body.revision)throw new ApiError(409,'목록이 변경되었습니다.');
+          if(r.roomId==='OTHER_MISC')throw new ApiError(400,'기타 폴더의 이름과 위치는 고정입니다. 사진별 촬영 위치 설명을 입력해주세요.');
           if(body.action==='rename')return changed(catalog,{...r,roomName:cleanName(body.name),revision:randomUUID()},'사진 관리 공간 이름 변경');
           if(body.action==='archive'&&r.custom&&!r.images?.length)return changed(catalog,{...r,archived:true,revision:randomUUID()},'빈 추가 공간 보관');
           throw new ApiError(400,'기존 공간과 사진이 있는 공간은 삭제할 수 없습니다.');

@@ -11,21 +11,23 @@ async function api(route,body){
 function showAuth(){$('로그인구역').hidden=!!auth.authenticated;$('관리구역').hidden=!auth.authenticated;$('계정').hidden=!auth.authenticated;}
 async function load(){structure=await api('structure');render();}
 function clearSelection(){for(const item of selection)if(item.preview)URL.revokeObjectURL(item.preview);selection=[];renderSelection();}
-function chooseRoom(r){if(busy)return;clearSelection();roomId=r.roomId;building=r.building;floor=parseInt(r.floor);$('개인정보확인').checked=false;render();$('선택공간').scrollIntoView({behavior:'smooth',block:'start'});}
+function chooseRoom(r){if(busy)return;clearSelection();roomId=r.roomId;building=r.building;floor=r.building==='OTHER'?null:parseInt(r.floor);$('촬영위치설명').value='';$('개인정보확인').checked=false;render();$('선택공간').scrollIntoView({behavior:'smooth',block:'start'});}
 function render(){
-  showAuth();const r=structure.rooms.find(r=>r.roomId===roomId),bn=building==='MAIN'?'본관':'별관';
-  $('경로').textContent=`관리자 > ${bn} > ${floor}층${r?' > '+r.roomName:''}`;
-  $('건물선택').replaceChildren(...structure.buildings.map(b=>{const node=button(b.name,()=>{if(busy)return;building=b.id;floor=1;roomId=null;clearSelection();render();});node.setAttribute('aria-pressed',String(building===b.id));return node;}));
+  showAuth();const r=structure.rooms.find(r=>r.roomId===roomId),bn=structure.buildings.find(b=>b.id===building)?.name??'본관',other=building==='OTHER';
+  $('경로').textContent=other?'관리자 > 기타':`관리자 > ${bn} > ${floor}층${r?' > '+r.roomName:''}`;
+  $('건물선택').replaceChildren(...structure.buildings.map(b=>{const node=button(b.name,()=>{if(busy)return;building=b.id;floor=1;roomId=null;clearSelection();if(b.id==='OTHER'){chooseRoom(structure.rooms.find(r=>r.roomId==='OTHER_MISC'));return;}render();});node.setAttribute('aria-pressed',String(building===b.id));return node;}));
   $('층선택').replaceChildren(...(structure.buildings.find(b=>b.id===building)?.floors??[]).map(f=>{const node=button(f+'층',()=>{if(busy)return;floor=f;roomId=null;clearSelection();render();});node.setAttribute('aria-pressed',String(floor===f));return node;}));
-  const list=structure.rooms.filter(r=>tab==='upload'?r.building===building&&parseInt(r.floor)===floor:tab==='pending'?['pending','approved','in_progress'].includes(r.status):r.status==='completed'||r.existingImplementation&&r.status==='unshot');
-  $('목록제목').textContent=tab==='upload'?`${bn} ${floor}층`:tab==='pending'?'구현 대기 · 진행 중':'구현 완료';
-  $('공간목록').replaceChildren(...list.map(r=>{const b=button(r.roomName,()=>chooseRoom(r));b.append(el('span',r.existingImplementation&&r.status==='unshot'?'기존 모델 구현됨 · 새 사진 없음':labels[r.status],'badge '+r.status));if(tab!=='upload')b.append(el('small',`${r.building==='MAIN'?'본관':'별관'} ${parseInt(r.floor)}층`));return b;}));
+  $('층선택').hidden=other;$('실추가').hidden=other;
+  const list=structure.rooms.filter(r=>tab==='upload'?r.building===building&&(other||parseInt(r.floor)===floor):tab==='pending'?['pending','approved','in_progress'].includes(r.status):r.status==='completed'||r.existingImplementation&&r.status==='unshot');
+  $('목록제목').textContent=tab==='upload'?(other?'기타 · 촬영 위치 직접 설명':`${bn} ${floor}층`):tab==='pending'?'구현 대기 · 진행 중':'구현 완료';
+  $('공간목록').replaceChildren(...list.map(r=>{const b=button(r.roomName,()=>chooseRoom(r));b.append(el('span',r.existingImplementation&&r.status==='unshot'?'기존 모델 구현됨 · 새 사진 없음':labels[r.status],'badge '+r.status));if(tab!=='upload')b.append(el('small',r.building==='OTHER'?'기타 · 사진별 위치 설명 확인':`${r.building==='MAIN'?'본관':'별관'} ${parseInt(r.floor)}층`));return b;}));
   if(!list.length)$('공간목록').append(el('p','해당하는 공간이 없습니다.'));
   $('선택공간').hidden=!r;if(!r)return;
+  $('기타위치구역').hidden=r.building!=='OTHER';$('촬영위치설명').required=r.building==='OTHER';
   $('공간제목').textContent=r.roomName;$('공간상태').textContent=`${labels[r.status]} · 사진 ${r.images?.length??0}장${r.uploadedAt?' · 최근 업로드 '+new Date(r.uploadedAt).toLocaleString('ko-KR'):''}`;
   $('용량안내').textContent=`파일당 최대 ${(auth.maxUploadBytes??20*1024*1024)/1024/1024}MB / 한 번에 최대 30장 · 서버에서 순서대로 저장`;
-  $('저장사진').replaceChildren(...(r.images??[]).map(i=>{const card=el('div',undefined,'photo'),a=el('a');a.href=i.previewUrl;a.target='_blank';a.rel='noopener';const img=el('img');img.src=i.previewUrl;img.loading='lazy';img.alt=i.originalName;a.append(img);card.append(a,el('p',i.originalName),el('p',`${i.type==='panorama-candidate'?'360 후보':'일반 사진'} · ${i.approval==='approved'?'승인됨':'승인 대기'}`));return card;}));
-  $('이름수정').disabled=!auth.authenticated;$('실삭제').disabled=!auth.authenticated||!r.custom||!!r.images?.length;
+  $('저장사진').replaceChildren(...(r.images??[]).map(i=>{const card=el('div',undefined,'photo'),a=el('a');a.href=i.previewUrl;a.target='_blank';a.rel='noopener';const img=el('img');img.src=i.previewUrl;img.loading='lazy';img.alt=i.originalName;a.append(img);card.append(a,el('p',i.originalName),el('p',`${i.type==='panorama-candidate'?'360 후보':'일반 사진'} · ${i.approval==='approved'?'승인됨':'승인 대기'}`));if(i.locationDescription)card.append(el('p','촬영 위치: '+i.locationDescription,'location-note'));return card;}));
+  $('이름수정').disabled=!auth.authenticated||r.building==='OTHER';$('실삭제').disabled=!auth.authenticated||!r.custom||!!r.images?.length;
   $('승인').disabled=!auth.authenticated||!(r.images??[]).some(i=>i.approval==='pending');
   for(const id of ['구현중','구현완료'])$(id).disabled=!auth.authenticated||!r.approvedAt||r.status==='pending';
 }
@@ -51,9 +53,10 @@ async function addFiles(files){
     }catch{item.message='휴대폰 원본 · 업로드하면 서버에서 자동 변환합니다.';}
   }renderSelection();
 }
-function uploadOne(item,target){return new Promise((resolve,reject)=>{
+function uploadOne(item,target,locationDescription){return new Promise((resolve,reject)=>{
   const xhr=new XMLHttpRequest();xhr.open('POST','/api/admin/upload?roomId='+encodeURIComponent(target));xhr.timeout=180000;
   xhr.setRequestHeader('Content-Type',item.file.type||'application/octet-stream');xhr.setRequestHeader('X-File-Name',encodeURIComponent(item.file.name));xhr.setRequestHeader('X-CSRF-Token',auth.csrf);
+  if(locationDescription)xhr.setRequestHeader('X-Location-Description',encodeURIComponent(locationDescription));
   xhr.upload.onprogress=e=>{item.progress=e.lengthComputable?Math.round(e.loaded/e.total*100):0;item.message=item.progress===100?'서버에서 사진 자동 변환 · GitHub 저장 중…':`전송 ${item.progress}%`;renderSelection();};
   xhr.onload=()=>{let result;try{result=JSON.parse(xhr.responseText);}catch{return reject(new Error('서버 응답을 확인해주세요.'));}xhr.status>=200&&xhr.status<300?resolve(result):reject(new Error(result.error??'저장 실패'));};
   xhr.onerror=()=>reject(new Error('네트워크 오류 · 목록을 새로고침해 저장 여부를 먼저 확인하세요.'));xhr.ontimeout=()=>reject(new Error('시간 초과 · 목록에서 저장 여부를 확인 후 재시도하세요.'));xhr.send(item.file);
@@ -66,11 +69,13 @@ $('파일선택').onchange=async e=>{await addFiles(e.target.files);e.target.val
 for(const event of ['dragenter','dragover'])$('드롭영역').addEventListener(event,e=>{e.preventDefault();$('드롭영역').classList.add('hover');});
 $('드롭영역').ondragleave=()=>$('드롭영역').classList.remove('hover');$('드롭영역').ondrop=e=>{e.preventDefault();$('드롭영역').classList.remove('hover');addFiles(e.dataTransfer.files);};
 $('업로드').onclick=async()=>{
-  if(busy||!roomId)return;busy=true;const target=roomId;let success=0,failed=0;renderSelection();
-  try{for(const item of selection.filter(i=>!i.invalid&&!i.done)){try{await uploadOne(item,target);item.done=true;item.message='저장 완료 · 승인 대기';success++;}catch(e){item.message=e.message;failed++;}renderSelection();}
+  if(busy||!roomId)return;const target=roomId,description=target==='OTHER_MISC'?$('촬영위치설명').value.trim():'';
+  if(target==='OTHER_MISC'&&(!description||description.length>300)){notice('촬영한 위치가 어디인지 설명해주세요. (1~300자)',true);$('촬영위치설명').focus();return;}
+  busy=true;$('촬영위치설명').disabled=true;let success=0,failed=0;renderSelection();
+  try{for(const item of selection.filter(i=>!i.invalid&&!i.done)){try{await uploadOne(item,target,description);item.done=true;item.message='저장 완료 · 승인 대기';success++;}catch(e){item.message=e.message;failed++;}renderSelection();}
     $('업로드결과').textContent=`사진 ${success}장이 업로드되었습니다. 3D 구현 승인 대기 상태입니다.${failed?' 실패 '+failed+'장: 각 파일의 메시지를 확인해주세요.':''}`;
     await load();
-  }catch(e){notice(e.message,true);}finally{busy=false;renderSelection();}
+  }catch(e){notice(e.message,true);}finally{busy=false;$('촬영위치설명').disabled=false;renderSelection();}
 };
 $('실추가').onclick=async()=>{const name=prompt('추가할 공간의 한글 이름 (3D 구조는 변경하지 않습니다)');if(!name)return;try{const result=await api('rooms',{action:'add',name,building,floor});await load();chooseRoom(result.room);}catch(e){notice(e.message,true);}};
 $('이름수정').onclick=async()=>{const r=structure.rooms.find(r=>r.roomId===roomId),name=prompt('사진 관리용 이름 (기존 3D 명칭은 유지)',r.roomName);if(!name)return;try{await api('rooms',{action:'rename',roomId,name,revision:r.revision});await load();}catch(e){notice(e.message,true);}};
