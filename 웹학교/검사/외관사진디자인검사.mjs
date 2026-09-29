@@ -5,9 +5,11 @@ import {exteriorRenderBox,exteriorSkins,courtyardDecor} from '../외관사진디
 import {classroomWindows} from '../창문배치.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8'));
 const before=JSON.stringify(data),base=buildWorld(data,{exterior:false}),world=buildWorld(data);
-const decor=courtyardDecor(),original=world.boxes.filter(b=>!b.name.startsWith('사진야외 '));
-assert.deepEqual(original,base.boxes,'All existing boxes and classroom furniture preserved');
-assert.deepEqual(world.colliders.filter(b=>!b.name.startsWith('사진야외 ')),base.colliders);
+// Graded gate terrain adds footings only when exterior seating/trees are present.
+const isExterior=b=>b.name.startsWith('사진야외 ')||b.name.startsWith('정문 연결 기존 시설 기초 ');
+const decor=courtyardDecor(),original=world.boxes.filter(b=>!isExterior(b));
+assert(JSON.stringify(original)===JSON.stringify(base.boxes),'All existing boxes and classroom furniture preserved');
+assert(JSON.stringify(world.colliders.filter(b=>!isExterior(b)))===JSON.stringify(base.colliders),'Only outdoor decor and its footings add collision');
 assert.deepEqual(world.data.rooms,base.data.rooms);
 assert.equal(JSON.stringify(data),before,'Export remains immutable');
 const skins=exteriorSkins(world.boxes,world.data),overlays=skins.filter(b=>b.skinSource);
@@ -28,8 +30,15 @@ for(const b of decor.filter(b=>b.collision)){
 for(const p of [[20,-40,-.3],[45,-8,0],[30,15,-.6]])assert.equal(!!world.candidate(...p),!!base.candidate(...p),'Existing route changed');
 const trunk=decor.find(b=>b.name.includes('수목 줄기'));
 assert(!world.candidate((trunk.bounds[0]+trunk.bounds[3])/2,(trunk.bounds[1]+trunk.bounds[4])/2,-.6));
-assert.equal(exteriorRenderBox(base.boxes.find(b=>b.name==='SPACE_EXT_PLAYGROUND')).material,'soil');
+assert.equal(exteriorRenderBox(data.boxes.find(b=>b.name==='SPACE_EXT_PLAYGROUND')).material,'soil');
 assert.equal(base.boxes.filter(b=>b.name.startsWith('운동장 골대 가로대')).length,2);
 assert.equal(skins.filter(b=>b.name.includes('Window_1F_MAIN_LOBBY')).length,0);
 assert(base.boxes.filter(b=>b.interiorRoom).every(b=>exteriorRenderBox(b)===b));
+const canopy=decor.filter(b=>b.name.startsWith('사진야외 별관 앞 운동장 '));
+assert.equal(canopy.filter(b=>b.name.includes('곡면 차양')).length,120,'One complete canopy moved');
+assert.equal(canopy.filter(b=>b.name.includes('관람석')).length,3);
+assert(!decor.some(b=>b.name.startsWith('사진야외 운동장 서쪽 ')),'Old opposite-side canopy removed');
+assert(canopy.every(b=>b.bounds[0]>85&&b.bounds[3]<=89.05&&b.bounds[1]>=-66.05&&b.bounds[4]<=-24.95),'Canopy is on the annex side of the yard, including roof overhang');
+for(let y=-67;y<=-24;y+=.25)assert(world.candidate(90.5,y,-.6),'Walkable passage between canopy and annex at '+y);
+assert(!world.candidate(88.95,-66,-.6),'Moved canopy posts retain collision');
 console.log({ok:true,exteriorSkins:overlays.length,windowDetails:skins.length-overlays.length,outdoorDetails:decor.length,newSolidDetails:decor.filter(b=>b.collision).length,originalBoxes:original.length,existingCollidersPreserved:true,roomsPreserved:true,openEntrance:true});

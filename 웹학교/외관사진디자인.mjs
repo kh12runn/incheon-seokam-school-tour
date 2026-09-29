@@ -74,7 +74,8 @@ export function courtyardDecor(){
     add(name+' 차양 앞 테두리',map(start,back-3.57,2.67,end,back-3.48,2.78),steel,'metal');
   }
   canopy('본관 왼쪽',0,36,-9.4);canopy('본관 오른쪽',54,84,-9.4);
-  canopy('운동장 서쪽',-66,-25,-15,'y');
+  // Annex classroom facade starts at x=92. Keep a 3 m passage behind the canopy.
+  canopy('별관 앞 운동장',-66,-25,89,'y');
   // Repeated foliage is instanced; trunks and planter edges are solid.
   const trees=[];
   for(let x=2;x<=82;x+=8)if(x<38||x>52)trees.push([x,-9,1.1]);
