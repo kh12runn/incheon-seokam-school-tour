@@ -1,11 +1,14 @@
 import fs from 'node:fs';
+import path from 'node:path';
 import assert from 'node:assert/strict';
 import {pathToFileURL} from 'node:url';
 import {runtimeFiles} from '../../관리도구/배포최적화.mjs';
 const base=process.env.SCHOOL_TEST_URL??'https://school-tour-production.up.railway.app';
 assert.equal((await fetch(base+'/healthz')).status,200);
-const files=runtimeFiles();let next=0;
-await Promise.all(Array.from({length:4},async()=>{while(next<files.length){const file=files[next++],response=await fetch(base+'/'+encodeURI(file));assert.equal(response.status,200,file);let local=fs.readFileSync(new URL('../../'+file,import.meta.url));if(file.endsWith('.json'))local=Buffer.from(JSON.stringify(JSON.parse(local)));assert.deepEqual(Buffer.from(await response.arrayBuffer()),local,file+' deployed byte match');}}));
+const files=runtimeFiles(),releaseRoot=process.env.SCHOOL_RELEASE_ROOT;assert(releaseRoot,'Set SCHOOL_RELEASE_ROOT to the exact committed archive uploaded to Railway');let next=0;
+// git archive applies configured line endings; compare the uploaded artifact,
+// not a mixed-line-ending working tree or the normalized git object bytes.
+await Promise.all(Array.from({length:4},async()=>{while(next<files.length){const file=files[next++],response=await fetch(base+'/'+encodeURI(file));assert.equal(response.status,200,file);let local=fs.readFileSync(path.join(releaseRoot,file));if(file.endsWith('.json'))local=Buffer.from(JSON.stringify(JSON.parse(local)));assert.deepEqual(Buffer.from(await response.arrayBuffer()),local,file+' deployed byte match');}}));
 for(const file of ['/관리도구/관리자/API.mjs','/school-assets/catalog.json'])assert.equal((await fetch(base+encodeURI(file))).status,403);
 assert.equal((await fetch(base+'/api/admin/structure')).status,401);
 const {chromium}=await import(pathToFileURL(process.env.PLAYWRIGHT_MODULE).href),browser=await chromium.launch({headless:true,executablePath:process.env.QUIZ_BROWSER,args:['--enable-unsafe-swiftshader']});
