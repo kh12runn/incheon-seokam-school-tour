@@ -189,11 +189,6 @@ function buildVisuals(){
     const sign=new THREE.Mesh(new THREE.PlaneGeometry(item.width,.36),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));
     sign.position.set(item.x,item.z,-item.y);scene.add(sign);labels.push({mesh:sign,floor:item.floor,name:'출입 연결 안내'});
   }
-  {
-    const {tex}=textTexture('야외 주차장',true);
-    const sign=new THREE.Mesh(new THREE.PlaneGeometry(2.6,.65),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));
-    sign.position.set(PARKING.sign.x,PARKING.sign.z,-PARKING.sign.y);sign.rotation.y=Math.PI/2;scene.add(sign);labels.push({mesh:sign,floor:0,name:'주차장 안내'});
-  }
   for(const floor of [3,4])for(const cabinet of shoeCabinets(data,floor)){
     const {tex}=textTexture(cabinet.name,true);
     const sign=new THREE.Mesh(new THREE.PlaneGeometry(1.5,.12),new THREE.MeshBasicMaterial({map:tex}));
