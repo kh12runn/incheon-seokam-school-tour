@@ -20,6 +20,12 @@ import {createTouchControls,prefersTouch} from './모바일조작.mjs';
 import {PRINCIPAL_ID} from './교장실배치.mjs';
 import {createPrincipalOffice} from './교장실표현.mjs';
 import {meetingRoomDetails} from './운영위원회회의실표현.mjs';
+import {staffRoomDetails} from './교무실사진표현.mjs';
+import {STAFF_ID} from './교무실사진배치.mjs';
+import {NURSE_ID} from './보건실사진배치.mjs';
+import {nurseRoomDetails} from './보건실사진표현.mjs';
+import {officeConnectingDoor} from './교장실연결문표현.mjs';
+import {teacherChairDetails,classroomWindowSigns} from './교사자리와창팻말표현.mjs';
 import {audioRoomDetails} from './시청각실사진표현.mjs';
 import {AUDIO_ID} from './시청각실사진배치.mjs';
 import {centralStairDetails} from './중앙계단사진표현.mjs';
@@ -125,14 +131,17 @@ function textTexture(text,background=false){
   lines.forEach((s,i)=>ctx.fillText(s,c.width/2,44+i*68,c.width-12));
   const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;return {tex,ratio:c.width/c.height};
 }
+let connectingDoorVisual;
 function buildVisuals(){
+  scene.add(teacherChairDetails(world.teacherChairs));scene.add(classroomWindowSigns(world.data));
   if(world.centralStairFinish)scene.add(centralStairDetails(world.centralStairFinish));
   for(const config of world.specialInteriors){
-    const mesh=config.roomId===AUDIO_ID?audioRoomDetails(config):config.roomId===BROADCAST_ID?broadcastRoomDetails(config):meetingRoomDetails(config);scene.add(mesh);
-    visuals.push({mesh,floor:2,interiorRoom:config.roomId,center:convert(config.spawn),ceiling:false});
+    const mesh=config.roomId===NURSE_ID?nurseRoomDetails(config):config.roomId===STAFF_ID?staffRoomDetails(config):config.roomId===AUDIO_ID?audioRoomDetails(config):config.roomId===BROADCAST_ID?broadcastRoomDetails(config):meetingRoomDetails(config);scene.add(mesh);
+    visuals.push({mesh,floor:parseInt(config.room.floor,10),interiorRoom:config.roomId,center:convert(config.spawn),ceiling:false});
   }
   hallMirror=createHallMirror(data.floorHeight,mobileGraphics);scene.add(hallMirror);scene.add(createGateTerrain(world.boxes));
   const office=createPrincipalOffice();scene.add(office);visuals.push({mesh:office,floor:2,interiorRoom:PRINCIPAL_ID,center:convert(world.principalOffice.spawn),ceiling:false});
+  connectingDoorVisual=officeConnectingDoor(world.officeDoor);scene.add(connectingDoorVisual);
   const roomDetails=class64Details();scene.add(roomDetails);visuals.push({mesh:roomDetails,floor:4,ceiling:false});
   class64PhotoFinish=roomDetails.userData.photoFinish;
   if(world.classroom21){
@@ -162,7 +171,9 @@ function buildVisuals(){
     });
     mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();scene.add(mesh);
     const interiorRoom=items[0].interiorRoom,config=[...world.classroomInteriors,...world.specialInteriors].find(r=>r.roomId===interiorRoom);
-    visuals.push({mesh,floor:items[0].floor,ceiling:items[0].kind==='ceiling',interiorRoom,center:config?convert(config.spawn):null});
+    const roomBounds=data.rooms.find(r=>r.id===interiorRoom)?.bounds;
+    const center=config?convert(config.spawn):roomBounds?convert({x:(roomBounds[0]+roomBounds[1])/2,y:(roomBounds[2]+roomBounds[3])/2,z:roomBounds[4]}):null;
+    visuals.push({mesh,floor:items[0].floor,ceiling:items[0].kind==='ceiling',interiorRoom,center});
   }
   const roomById=new Map(data.rooms.map(r=>[r.id,r]));
   for(const item of [
@@ -465,6 +476,7 @@ function frame(now){
   requestAnimationFrame(frame);const wallDt=Math.min((now-last)/1000,1),dt=Math.min(wallDt,.05);last=now;elapsed+=dt;
   if(!ready)return;
   if(characterPicker.isOpen())return;
+  world.officeDoor.update(dt,position,isPlaying());connectingDoorVisual.userData.update();
   if(mode==='walk'&&position.z>9.8&&Math.hypot(position.x-35,position.y+3.5)<14)class64PhotoFinish.load();
   const previous={...position};
   if(isPlaying()){

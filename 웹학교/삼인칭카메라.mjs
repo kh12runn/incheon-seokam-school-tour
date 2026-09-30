@@ -10,7 +10,7 @@ export function segmentBox(start,end,bounds,padding=0){
 }
 export function createCameraCollision(boxes,radius=.16){
   const size=4,grid=new Map();
-  for(const box of boxes){const b=box.bounds;
+  for(const box of boxes){const b=box.spatialBounds??box.bounds;
     for(let x=Math.floor((b[0]-radius)/size);x<=Math.floor((b[3]+radius)/size);x++)for(let y=Math.floor((b[1]-radius)/size);y<=Math.floor((b[4]+radius)/size);y++){
       const key=x+','+y;if(!grid.has(key))grid.set(key,[]);grid.get(key).push(box);
     }

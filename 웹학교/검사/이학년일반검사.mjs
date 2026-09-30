@@ -8,7 +8,7 @@ assert.equal(room.roomId,'4F_2-1');assert.equal(room.photoCount,9);
 assert.equal(room.desks.length,20);assert.equal(room.chairs.length,20);assert(room.seatCountIsApproximate);
 assert(JSON.stringify(world.classroomsMain)===JSON.stringify(base.classroomsMain),'Main building classrooms unchanged');
 assert(JSON.stringify(world.classroom64)===JSON.stringify(base.classroom64),'6-4 unchanged');
-assert(JSON.stringify(world.boxes.filter(b=>b.interiorRoom!==room.roomId))===JSON.stringify(base.boxes),'No other room changed');
+assert(JSON.stringify(world.boxes.filter(b=>b.interiorRoom!==room.roomId))===JSON.stringify(base.boxes.filter(b=>b.interiorRoom!==room.roomId)),'No other room changed; independent teacher station excluded on both sides');
 for(const box of room.boxes){
   assert.equal(box.interiorRoom,room.roomId);assert.equal(box.floor,4);
   assert(box.bounds.every(Number.isFinite));for(let i=0;i<3;i++)assert(box.bounds[i+3]>box.bounds[i],box.name);

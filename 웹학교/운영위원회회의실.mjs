@@ -36,7 +36,7 @@ export function meetingRoomInterior(data,worldBoxes,worldColliders,addBox){
   for(let i=0;i<5;i++){chair(1.9,1.98+i*.77,-Math.PI/2,i*2);chair(4.16,1.98+i*.77,Math.PI/2,i*2+1);}
   chair(3.03,5.96,0,10);
   // West wall: pale wood full-height cupboards with paired doors and silver pulls.
-  for(let i=0;i<6;i++){
+  for(let i=0;i<5;i++){
     const v=1.18+i*.78;
     add('서쪽 수납장 '+i,[.14,v,.03,.68,v+.75,2.14],'#b9a17f','wood',true);
     for(let j=0;j<2;j++){

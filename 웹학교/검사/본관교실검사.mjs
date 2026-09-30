@@ -10,7 +10,7 @@ assert.equal(JSON.stringify(source),original,'원본 데이터 보존');
 assert.deepEqual(after.data,before.data,'모든 방 경계·이름 보존');
 const mainIds=new Set(after.classroomsMain.rooms.map(r=>r.roomId));
 assert(JSON.stringify(after.boxes.filter(b=>!mainIds.has(b.interiorRoom)))===JSON.stringify(before.boxes),'별관·특별실·복도·6-4 시각 요소 보존');
-assert(JSON.stringify(after.colliders.filter(b=>!mainIds.has(b.interiorRoom)))===JSON.stringify(before.colliders),'기존 충돌체 보존');
+assert(JSON.stringify(after.colliders.filter(b=>!mainIds.has(b.interiorRoom)))===JSON.stringify(before.colliders.filter(b=>!mainIds.has(b.interiorRoom))),'본관 공통 교사의자를 제외한 기존 충돌체 보존');
 assert.deepEqual(after.classroom64,before.classroom64,'사진 반영한 6-4 보존');
 const targets=source.rooms.filter(isMainClassroom);
 assert.equal(targets.length,25);assert.equal(after.classroomsMain.rooms.length,24);

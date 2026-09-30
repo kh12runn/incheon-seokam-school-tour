@@ -3,7 +3,8 @@ import fs from 'node:fs';
 import {buildWorld,localPoint} from '../이동물리.mjs';
 import {classroomDevices,classroomTVPose} from '../교실영상기기.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),world=buildWorld(data);
-const screens=world.boxes.filter(b=>b.name.endsWith('모니터 화면'));
+const mainIds=new Set(data.rooms.filter(r=>r.type==='classroom'&&r.building==='MAIN').map(r=>r.id));
+const screens=world.boxes.filter(b=>b.name.endsWith('모니터 화면')&&mainIds.has(b.spaceId));
 assert.equal(screens.length,50,'25 furnished classrooms, exactly two monitors each');
 for(const room of data.rooms.filter(r=>r.type==='classroom'&&r.building==='MAIN')){
   const own=screens.filter(b=>b.spaceId===room.id||b.interiorRoom===room.id);

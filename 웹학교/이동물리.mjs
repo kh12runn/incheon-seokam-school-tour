@@ -23,6 +23,10 @@ import {finishCentralStair} from './중앙계단사진마감.mjs';
 import {broadcastRoomInterior} from './방송실사진배치.mjs';
 import {addBroadcastControl} from './방송조정실배치.mjs';
 import {uploadedAnnexClassrooms} from './업로드교실배치.mjs';
+import {staffRoomInterior} from './교무실사진배치.mjs';
+import {nurseRoomInterior} from './보건실사진배치.mjs';
+import {connectPrincipalMeeting} from './교장실연결문.mjs';
+import {teacherOfficeChairs} from './교사자리와창팻말.mjs';
 export const PLAYER_RADIUS=.28, PLAYER_HEIGHT=1.7, EYE_HEIGHT=1.58;
 const EPS=.0001, CELL=4;
 const intersect=(x,y,r,b)=>{
@@ -179,11 +183,15 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
   const audio=audioPhotos?audioRoomInterior(data,boxes,colliders,addBox,surfaces):null;
   const broadcast=broadcastPhotos?broadcastRoomInterior(data,boxes,colliders,addBox):null;
   if(broadcastControl)addBroadcastControl(broadcast);
-  const specialInteriors=[meeting,audio,broadcast].filter(Boolean);
+  const staff=staffRoomInterior(data,boxes,colliders,addBox);
+  const nurse=nurseRoomInterior(data,boxes,colliders,addBox);
+  const specialInteriors=[meeting,audio,broadcast,staff,nurse].filter(Boolean);
   for(const config of specialInteriors){boxes.push(...config.boxes);colliders.push(...config.colliders);}
+  const officeDoor=connectPrincipalMeeting(boxes,colliders);
+  const teacherChairs=teacherOfficeChairs(data,boxes,colliders);
   const grid=(items)=>{
     const map=new Map();
-    for(const item of items){const b=item.bounds;for(let x=Math.floor((b[0]-.5)/CELL);x<=Math.floor((b[3]+.5)/CELL);x++)for(let y=Math.floor((b[1]-.5)/CELL);y<=Math.floor((b[4]+.5)/CELL);y++){
+    for(const item of items){const b=item.spatialBounds??item.bounds;for(let x=Math.floor((b[0]-.5)/CELL);x<=Math.floor((b[3]+.5)/CELL);x++)for(let y=Math.floor((b[1]-.5)/CELL);y<=Math.floor((b[4]+.5)/CELL);y++){
       const key=x+','+y;if(!map.has(key))map.set(key,[]);map.get(key).push(item);
     }}return map;
   };
@@ -242,5 +250,5 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
     let q={...p};if(!blocked(q.x+dx,q.y,q.z))q.x+=dx;
     if(!blocked(q.x,q.y+dy,q.z))q.y+=dy;return q;
   }
-  return {data,boxes,colliders,surfaces,stairs,classroom64,classroom21,classroomsMain,classroomInteriors,uploadedAnnex,specialInteriors,centralStairFinish,principalOffice:office,move,candidate,blocked,support,floorBelow,moveAir,roomAt,spawn:{x:20,y:1.5,z:0}};
+  return {data,boxes,colliders,surfaces,stairs,classroom64,classroom21,classroomsMain,classroomInteriors,uploadedAnnex,specialInteriors,officeDoor,teacherChairs,centralStairFinish,principalOffice:office,move,candidate,blocked,support,floorBelow,moveAir,roomAt,spawn:{x:20,y:1.5,z:0}};
 }

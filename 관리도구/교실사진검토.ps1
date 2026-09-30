@@ -1,10 +1,11 @@
-param([string]$OutputDirectory)
+param([string]$OutputDirectory,[string[]]$RoomIds)
 $ErrorActionPreference='Stop'
 Add-Type -AssemblyName System.Drawing
 $payload=gh api 'repos/kh12runn/incheon-seokam-school-photos/contents/school-assets/catalog.json?ref=main' | ConvertFrom-Json
 if($LASTEXITCODE -ne 0){throw 'Photo catalog unavailable'}
 $catalog=[Text.Encoding]::UTF8.GetString([Convert]::FromBase64String($payload.content)) | ConvertFrom-Json
 $ids=@('1F_3-1','1F_3-2','1F_3-3','3F_5-1','3F_5-2','4F_2-2','4F_2-3','4F_4-1','4F_4-2','4F_6-1','4F_6-2','4F_6-5','4F_6-7')
+if($RoomIds){$ids=$RoomIds}
 $root=New-Item -ItemType Directory -Path $OutputDirectory -Force
 foreach($id in $ids){
   $room=$catalog.rooms.$id

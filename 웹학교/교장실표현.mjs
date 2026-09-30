@@ -37,11 +37,14 @@ export function createPrincipalOffice(){
   },512,512);floorMat.map.wrapS=floorMat.map.wrapT=THREE.RepeatWrapping;floorMat.map.repeat.set(14,14);
   cube(group,floorMat,3.5,.011,3.5,6.78,.016,6.78);
   // Only inward-facing thin finishes: door and existing window openings remain usable.
-  cube(group,wall,.115,1.55,3.5,.025,3.1,6.78);cube(group,wall,6.885,1.55,3.5,.025,3.1,6.78);
+  cube(group,wall,.115,1.55,3.5,.025,3.1,6.78);
+  for(const [a,b] of [[.11,5.03],[6.30,6.89]])cube(group,wall,6.885,1.55,(a+b)/2,.025,3.1,b-a);
+  cube(group,wall,6.885,2.69,5.665,.025,.87,1.27);
   cube(group,wall,.98,1.55,.115,1.69,3.1,.025);cube(group,wall,4.98,1.55,.115,3.79,3.1,.025);
   cube(group,wall,2.45,2.70,.115,1.2,.85,.025);
   cube(group,wall,3.5,.43,6.88,6.78,.82,.025);cube(group,wall,3.5,2.82,6.88,6.78,.54,.025);
-  for(const x of [.14,6.86])cube(group,black,x,.075,3.5,.035,.15,6.72);
+  cube(group,black,.14,.075,3.5,.035,.15,6.72);
+  for(const [a,b] of [[.14,5.03],[6.30,6.86]])cube(group,black,6.86,.075,(a+b)/2,.035,.15,b-a);
   cube(group,black,3.5,.075,6.855,6.72,.15,.045);
   for(const [x,w] of [[.98,1.69],[4.98,3.79]])cube(group,black,x,.075,.14,w,.15,.035);
   const ceiling=paint('#e6e5df');ceiling.map=canvasMap((c,w,h)=>{c.fillStyle='#e5e4df';c.fillRect(0,0,w,h);for(let i=0;i<1800;i++){const x=(i*97%w),y=(i*193%h);c.fillStyle='#9c9b9250';c.fillRect(x,y,1+(i%3),1);}c.strokeStyle='#adada4';c.strokeRect(0,0,w,h);},256,256);ceiling.map.wrapS=ceiling.map.wrapT=THREE.RepeatWrapping;ceiling.map.repeat.set(12,12);
@@ -148,8 +151,7 @@ export function createPrincipalOffice(){
       for(let i=0;i<15;i++){const a=i*2.399,h=.93+i%5*.105;const leaf=ball(group,paint(i%2?'#48633b':'#65834a'),u+Math.sin(a)*.24,h,v+Math.cos(a)*.24,.075,.018,.22);leaf.rotation.set(.4*Math.sin(a),a,.22);rod(group,paint('#6b7852'),[u,h-.08,v],leaf.position.toArray(),.006);}
     }
   }
-  // Closed side door from the reference; decorative only, no invented accessible room.
-  cube(group,wood,6.85,1.06,5.59,.04,2.12,1.10);rod(group,metal,[6.80,.99,5.95],[6.80,.99,5.82],.018);
+  // The side door now connects to the meeting room; its live leaf is rendered separately.
   for(const [x,z] of [[1.6,3.4],[5.2,3.7]]){const l=new THREE.PointLight('#f1f2e8',7,8,2);l.position.set(x,2.77,z);group.add(l);}
   batchStatic(group);return group;
 }
