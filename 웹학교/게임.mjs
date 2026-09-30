@@ -15,6 +15,7 @@ import {class21Details,computerEntranceDetails} from './이학년일반표현.mj
 import {classroomSigns} from './교실팻말표현.mjs';
 import {getApprovedAssets} from './승인사진자료.mjs';
 import {exteriorRenderBox,exteriorSkins} from './외관사진디자인.mjs';
+import {PARKING} from './주차장.mjs';
 import {faceMonitorsTowardBoard} from './모니터방향.mjs';
 import {createTouchControls,prefersTouch} from './모바일조작.mjs';
 import {PRINCIPAL_ID} from './교장실배치.mjs';
@@ -179,8 +180,8 @@ function buildVisuals(){
   }
   const roomById=new Map(data.rooms.map(r=>[r.id,r]));
   for(const item of [
-    {text:'뒤 야외주차장 출입구',x:35,y:2.78,z:2.96,width:2.5,floor:1},
-    {text:'계단 아래로 · 야외주차장 ↑',x:53.75,y:4.15,z:2.25,width:2.1,floor:1},
+    {text:'본관 뒤 야외 출입구',x:35,y:2.78,z:2.96,width:2.5,floor:1},
+    {text:'계단 아래로 · 야외 출입구 ↑',x:53.75,y:4.15,z:2.25,width:2.1,floor:1},
     {text:'행정실 맞은편 계단 출입구',x:53.75,y:10.18,z:1.78,width:2.2,floor:1},
     {text:'4층 내려가는 계단 ↓',x:52.5,y:2.85,z:16.4,width:3.6,floor:5},
   ]){
@@ -191,7 +192,7 @@ function buildVisuals(){
   {
     const {tex}=textTexture('야외 주차장',true);
     const sign=new THREE.Mesh(new THREE.PlaneGeometry(2.6,.65),new THREE.MeshBasicMaterial({map:tex,side:THREE.DoubleSide}));
-    sign.position.set(10.25,1.3,-19.29);scene.add(sign);labels.push({mesh:sign,floor:0,name:'주차장 안내'});
+    sign.position.set(PARKING.sign.x,PARKING.sign.z,-PARKING.sign.y);sign.rotation.y=Math.PI/2;scene.add(sign);labels.push({mesh:sign,floor:0,name:'주차장 안내'});
   }
   for(const floor of [3,4])for(const cabinet of shoeCabinets(data,floor)){
     const {tex}=textTexture(cabinet.name,true);
@@ -449,7 +450,7 @@ function updateHUD(){
   $('승강기호출').hidden=!isPlaying()||!nearElevator(position,data.floorHeight);
   const at=world.roomAt(position),floor=at.floor;
   const stair=world.stairs.find(s=>{const f=s.frame,dx=position.x-f.origin[0],dy=position.y-f.origin[1],u=dx*f.right[0]+dy*f.right[1],v=dx*f.inward[0]+dy*f.inward[1];return u>0&&u<f.width&&v>0&&v<f.depth;});
-  where.textContent=mode==='overview'?'학교 전체 · 지하 및 지상 4개 층':at.rooftop?'본관 옥상':`${at.basement?'지하 1층':at.floor+'층'} · ${at.room?.name??(stair?'계단 이동 중':position.y>3&&position.z<.1?'뒤 야외주차장':position.y<-8&&position.x<90?'운동장':'복도')}`;
+  where.textContent=mode==='overview'?'학교 전체 · 지하 및 지상 4개 층':at.rooftop?'본관 옥상':`${at.basement?'지하 1층':at.floor+'층'} · ${at.room?.name??(stair?'계단 이동 중':position.x>=PARKING.bounds[0]&&position.x<=PARKING.bounds[3]&&position.y>=PARKING.bounds[1]&&position.y<=PARKING.bounds[4]&&position.z<.1?'운동장 왼쪽 주차장':position.y>3&&position.z<.1?'본관 뒤 야외':position.y<-8&&position.x<90?'운동장':'복도')}`;
   if(isPlaying()){
     if(at.room?.type==='classroom')visitedRooms.add(at.room.id);
     if(Math.hypot(position.x-58,position.y-1.5)<1.5&&Math.abs(position.z-(at.floor-1)*3.4)<.2)visitedFloors.add(at.floor);

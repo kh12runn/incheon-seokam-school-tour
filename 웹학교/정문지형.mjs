@@ -15,14 +15,21 @@ export function addGateTerrain(boxes,colliders,surfaces,floorHeight){
     const x0=xs[i],x1=xs[i+1],y0=ys[j],y1=ys[j+1],cap=x0>=-9.5&&y1<=-11?-.3:-.6;
     const heights=[[x0,y0],[x1,y0],[x1,y1],[x0,y1]].map(([x,y])=>gateGroundHeight(x,y,base,cap));
     const bounds=[x0,y0,base-.2,x1,y1,Math.max(...heights)],path=y0>=-16&&y1<=-7&&x1>HALL_EXIT.left-1;
-    boxes.push({name:`정문 경사지 ${i} ${j}`,bounds,heights,shape:'terrain',kind:'finish',floor:0,color:path?[.63,.63,.59]:[.61,.52,.41],material:path?'paint':'soil'});
+    boxes.push({name:`정문 경사지 ${i} ${j}`,bounds,heights,shape:'terrain',kind:'finish',floor:0,color:path?[.025,.43,.83]:[.61,.52,.41],material:path?'paint':'soil'});
     surfaces.push({name:`정문 경사지 ${i} ${j}`,bounds,height:(x,y)=>{
       const u=(x-x0)/(x1-x0),v=(y-y0)/(y1-y0),[a,b,c,d]=heights;
       return u>=v?a+u*(b-a)+v*(c-b):a+u*(c-d)+v*(d-a);
     }});
   }
   const add=(name,bounds,color=[.63,.63,.59],solid=true)=>{const b={name:'정문 연결 '+name,bounds,color,kind:'finish',floor:0,material:'paint'};boxes.push(b);if(solid)colliders.push(b);return b;};
-  const threshold=[HALL_EXIT.left,-7.25,base-.16,HALL_EXIT.right,-6.9,base];add('문턱 없는 바닥',threshold,undefined,false);surfaces.push({name:'정문 연결 문턱',bounds:threshold,height:()=>base});
+  const threshold=[HALL_EXIT.left,-7.25,base-.16,HALL_EXIT.right,-6.9,base];add('문턱 없는 바닥',threshold,[.025,.43,.83],false);surfaces.push({name:'정문 연결 문턱',bounds:threshold,height:()=>base});
+  // Photo ac3f6a9e: white ramp edge. Dimensions follow the existing estimated
+  // slope; the hall doorway and the uphill walking lane remain open.
+  for(let x=-2;x<26;x+=2){
+    const low=gateGroundHeight(x,-16,base,-.3),high=gateGroundHeight(x+2,-16,base,-.3);
+    const wall=add('사진 흰 경사로 옹벽 '+x,[x,-16.22,low-.15,x+2,-16.02,high+.85],[.9,.91,.88]);
+    wall.shape='terrain';wall.heights=[low+.85,high+.85,high+.85,low+.85];
+  }
   // Gate stands on the low, level forecourt directly outside the hall exit.
   for(const x of [HALL_EXIT.left-1.1,HALL_EXIT.right+.9])add('기둥',[x,-12.5,base,x+.3,-12.1,base+2.6],[.61,.63,.61]);
   // Exposed foundation seals the higher classroom block along the uphill path.

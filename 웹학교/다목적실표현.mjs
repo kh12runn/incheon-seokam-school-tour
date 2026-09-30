@@ -16,7 +16,7 @@ export function createGateTerrain(boxes){
   const root=new THREE.Group();root.name='정문에서 구령대 방향 오르막 지형';
   const groups=new Map();
   for(const b of boxes.filter(b=>b.shape==='terrain')){
-    const key=b.material;if(!groups.has(key))groups.set(key,{example:b,vertices:[]});
+    const key=b.material+'|'+b.color.join(',');if(!groups.has(key))groups.set(key,{example:b,vertices:[]});
     const a=b.bounds,h=b.heights,v=[[a[0],h[0],-a[1]],[a[3],h[1],-a[1]],[a[3],h[2],-a[4]],[a[0],h[3],-a[4]]];
     const vertices=groups.get(key).vertices;
     for(const index of [0,1,2,0,2,3])vertices.push(...v[index]);

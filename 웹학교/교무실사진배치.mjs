@@ -1,6 +1,6 @@
 import {openClassroomWindows} from './창문배치.mjs';
 export const STAFF_ID='2F_STAFF';
-export const STAFF_REFERENCE={revision:'5aa608bf-88e5-4431-bc72-2062c2719ed2',count:7,approximateDimensions:true,features:['회색·베이지 파티션 업무석','검정 모니터와 사무용 의자','긴 밝은 목재 회의탁자와 붉은 의자','벽면 흰 수납장과 냉장고','전자레인지·커피머신·정수기','녹색 콤비 블라인드','흰 화분과 문서 정리용품']};
+export const STAFF_REFERENCE={revision:'5aa608bf-88e5-4431-bc72-2062c2719ed2',count:12,additionalApprovedPhotoIds:['5db7f84c-3566-4d23-8d40-ac3254450fab','858c67e6-3afc-40cd-8c0c-abcf029ac3ce','d763d6d6-2979-4ccc-8c2f-297362f813ab','77933324-b06c-4d07-8ae2-e020dde2af34','95823877-1380-42be-bc2a-3e53e3cfbcac'],approximateDimensions:true,features:['회색·베이지 파티션 업무석','입구 기준 왼쪽 벽 업무석 2개와 듀얼 모니터','회전형 사무의자','긴 밝은 목재 회의탁자와 붉은 의자','벽면 흰 수납장과 냉장고','전자레인지·커피머신·정수기','녹색 콤비 블라인드','흰 화분과 문서 정리용품']};
 const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255);
 export function staffRoomInterior(data,worldBoxes,worldColliders,addBox){
   const room=data.rooms.find(r=>r.id===STAFF_ID);if(!room)return null;
@@ -15,8 +15,8 @@ export function staffRoomInterior(data,worldBoxes,worldColliders,addBox){
   for(let i=1;i<20;i++)add('바닥 줄눈 세로 '+i,[i*.64,.12,.011,i*.64+.008,6.88,.014],'#bfc2b7');
   for(let i=1;i<11;i++)add('바닥 줄눈 가로 '+i,[.12,i*.63,.011,12.88,i*.63+.008,.014],'#bfc2b7');
   for(const x of [.11,12.86])add('옆벽 걸레받이 '+x,[x,.11,.015,x+.025,6.89,.11],'#8e958b');
-  function chair(x,v,angle,red,index){
-    chairs.push({x:43+x,y:-v,z:3.4,angle,red});
+  function chair(x,v,angle,red,index,office=false){
+    chairs.push({x:43+x,y:-v,z:3.4,angle,red,office});
     colliders.push({name:'교무실 의자 충돌 '+index,spaceId:STAFF_ID,floor:2,kind:'furniture',bounds:[43+x-.29,-v-.29,3.4,43+x+.29,-v+.29,4.42]});
   }
   // Existing door at u=4.55 has a full-depth access lane; perimeter work areas
@@ -41,16 +41,21 @@ export function staffRoomInterior(data,worldBoxes,worldColliders,addBox){
   // face back into the room, as clarified by the owner and photos 6–7.
   for(let i=0;i<2;i++){
     const v=1.45+i*2.57;
-    add('왼쪽 끝 업무 책상 '+i,[11.15,v,.73,11.88,v+1.5,.78],'#c4b79d','wood',true);
+    add('왼쪽 끝 사무용 책상 '+i,[11.03,v,.73,12.03,v+1.6,.79],'#c4b79d','wood',true);
     add('왼쪽 끝 파티션 하부 '+i,[11.02,v,.03,11.10,v+1.5,1.10],'#a8b2b3','fabric',true);
     add('왼쪽 끝 파티션 상부 '+i,[11.02,v,1.10,11.10,v+1.5,1.49],'#b6ad97','fabric',true);
     add('왼쪽 끝 파티션 윗틀 '+i,[11.01,v,1.47,11.11,v+1.5,1.50],'#74827e','metal');
-    add('왼쪽 끝 검정 업무 모니터 '+i,[11.24,v+.30,.95,11.30,v+1.06,1.47],'#202a2b');
-    add('왼쪽 끝 모니터 지지대 '+i,[11.24,v+.64,.79,11.30,v+.69,1.02],'#354041','metal');
-    add('왼쪽 끝 키보드 '+i,[11.48,v+.31,.79,11.65,v+.92,.813],'#4d5755');
-    add('왼쪽 끝 책상 서랍장 '+i,[11.18,v+1.04,.02,11.84,v+1.45,.71],'#c5c7bc','paint',true);
-    for(const dv of [.08,1.38])add('왼쪽 끝 책상 다리 '+i+dv,[11.20,v+dv,.02,11.25,v+dv+.05,.73],'#788481','metal');
-    chair(12.40,v+.75,Math.PI/2,false,'왼쪽끝'+i);
+    for(let monitor=0;monitor<2;monitor++){
+      const mv=v+.10+monitor*.76;
+      add('왼쪽 끝 듀얼 모니터 '+i+' '+monitor,[11.17,mv,.98,11.23,mv+.68,1.48],'#202a2b');
+      add('왼쪽 끝 모니터 지지대 '+i+' '+monitor,[11.23,mv+.28,.79,11.28,mv+.48,.98],'#354041','metal');
+      add('왼쪽 끝 모니터 받침 '+i+' '+monitor,[11.17,mv+.20,.79,11.39,mv+.56,.82],'#354041','metal');
+    }
+    add('왼쪽 끝 키보드 '+i,[11.48,v+.38,.79,11.91,v+1.18,.816],'#4d5755');
+    add('왼쪽 끝 마우스 '+i,[11.58,v+1.22,.79,11.73,v+1.42,.82],'#394342');
+    add('왼쪽 끝 책상 서랍장 '+i,[11.76,v+.08,.03,11.98,v+.63,.72],'#c5c7bc','paint',true);
+    for(const dx of [11.06,11.99])for(const dv of [v+.08,v+1.45])add('왼쪽 끝 책상 다리 '+i+dx+dv,[dx,dv,.02,dx+.05,dv+.06,.73],'#788481','metal');
+    chair(12.40,v+.80,Math.PI/2,false,'왼쪽끝'+i,true);
   }
   // Pantry spans the west end, visible behind the conference table in the photos.
   for(let i=0;i<5;i++){
