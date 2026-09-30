@@ -17,9 +17,9 @@ try{
  await page.goto(base);await page.waitForFunction(()=>window.schoolTour?.getState().ready,null,{timeout:150000});
  assert.equal(await page.evaluate(()=>typeof schoolTour.test),'undefined');
  await page.locator('#시작').click();await page.locator('#캐릭터확인').click();
- for(const [room,x,z] of [['1F_INDIVIDUAL_4',99.1,0],['1F_INDIVIDUAL_5',99.1,0],['1F_NURSE',61.1,0],['2F_STAFF',47.55,3.4]]){
+ for(const [room,x,z] of [['1F_INDIVIDUAL_4',99.1,0],['1F_INDIVIDUAL_5',99.1,0],['1F_NURSE',61.1,0],['2F_STAFF',47.55,3.4],['3F_5-3',43.5,6.8],['3F_5-6',13.5,6.8],['3F_GRADE5_RESEARCH',46.1,6.8]]){
   await page.evaluate(()=>document.getElementById('메뉴').click());await page.locator('#방선택').selectOption(room);await page.locator('#방이동').click();
   const state=await page.evaluate(()=>schoolTour.getState());assert.equal(state.position.x,x);assert.equal(state.position.z,z);
  }
- assert.deepEqual(errors,[]);console.log(JSON.stringify({ok:true,base,publicFilesMatch:files.length,individualRoomTeleports:2,nurseTeleport:true,staffTeleport:true,mobileViewport:true,privatePathsBlocked:true,noPublicTestHook:true,pageErrors:errors}));
+ assert.deepEqual(errors,[]);console.log(JSON.stringify({ok:true,base,publicFilesMatch:files.length,individualRoomTeleports:2,grade5RoomTeleports:3,nurseTeleport:true,staffTeleport:true,mobileViewport:true,privatePathsBlocked:true,noPublicTestHook:true,pageErrors:errors}));
 }finally{await browser.close();}
