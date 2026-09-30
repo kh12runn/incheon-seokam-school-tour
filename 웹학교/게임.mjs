@@ -24,6 +24,8 @@ import {staffRoomDetails} from './교무실사진표현.mjs';
 import {STAFF_ID} from './교무실사진배치.mjs';
 import {NURSE_ID} from './보건실사진배치.mjs';
 import {nurseRoomDetails} from './보건실사진표현.mjs';
+import {INDIVIDUAL_REFERENCES} from './개별학습실사진배치.mjs';
+import {individualLearningDetails} from './개별학습실사진표현.mjs';
 import {officeConnectingDoor} from './교장실연결문표현.mjs';
 import {teacherChairDetails,classroomWindowSigns} from './교사자리와창팻말표현.mjs';
 import {audioRoomDetails} from './시청각실사진표현.mjs';
@@ -136,7 +138,7 @@ function buildVisuals(){
   scene.add(teacherChairDetails(world.teacherChairs));scene.add(classroomWindowSigns(world.data));
   if(world.centralStairFinish)scene.add(centralStairDetails(world.centralStairFinish));
   for(const config of world.specialInteriors){
-    const mesh=config.roomId===NURSE_ID?nurseRoomDetails(config):config.roomId===STAFF_ID?staffRoomDetails(config):config.roomId===AUDIO_ID?audioRoomDetails(config):config.roomId===BROADCAST_ID?broadcastRoomDetails(config):meetingRoomDetails(config);scene.add(mesh);
+    const mesh=INDIVIDUAL_REFERENCES[config.roomId]?individualLearningDetails(config):config.roomId===NURSE_ID?nurseRoomDetails(config):config.roomId===STAFF_ID?staffRoomDetails(config):config.roomId===AUDIO_ID?audioRoomDetails(config):config.roomId===BROADCAST_ID?broadcastRoomDetails(config):meetingRoomDetails(config);scene.add(mesh);
     visuals.push({mesh,floor:parseInt(config.room.floor,10),interiorRoom:config.roomId,center:convert(config.spawn),ceiling:false});
   }
   hallMirror=createHallMirror(data.floorHeight,mobileGraphics);scene.add(hallMirror);scene.add(createGateTerrain(world.boxes));

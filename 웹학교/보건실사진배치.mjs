@@ -72,13 +72,13 @@ export function nurseRoomInterior(data,worldBoxes,worldColliders,addBox){
   add('흰 유리 약품장',[.14,1.69,.02,1.18,2.39,2.30],'#e4e9e0','paint',true);
   add('흰 약품장 유리',[.16,1.673,.76,1.16,1.688,2.24],'#91b2a7','glass');
   for(let i=0;i<3;i++)for(let j=0;j<4;j++)add('흰 약품장 보관함 '+i+j,[.22+j*.23,1.66,.92+i*.39,.38+j*.23,1.672,1.16+i*.39],j%2?'#dee5d8':'#acc8bd');
-  add('흰 냉장고',[3.05,1.70,.01,3.67,2.37,2.00],'#e6e9e3','paint',true);
-  add('냉장고 냉동칸 경계',[3.04,1.685,1.32,3.68,1.704,1.35],'#556763');
+  add('흰 냉장고',[4.22,1.70,.01,4.84,2.37,2.00],'#e6e9e3','paint',true);
+  add('냉장고 냉동칸 경계',[4.21,1.685,1.32,4.85,1.704,1.35],'#556763');
   add('처치용 이동 서랍장',[4.98,2.76,.08,5.56,3.31,.82],'#dce4df','metal',true);
   for(let i=0;i<4;i++)add('처치 서랍 빨간 손잡이 '+i,[5.02,2.75,.23+i*.14,5.51,2.77,.255+i*.14],'#a85152');
   for(let i=0;i<3;i++)add('처치대 소독용기 '+i,[5.06+i*.13,2.84,.83,5.15+i*.13,2.95,1.05],'#dae7df');
-  add('공기청정기',[3.94,1.8,.02,4.36,2.2,.78],'#e6ebe5','paint',true);
-  for(let i=0;i<11;i++)add('공기청정기 흡입구 '+i,[3.965+i*.033,1.79,.10,3.977+i*.033,1.809,.57],'#7c8b87');
+  add('공기청정기',[2.75,1.8,.02,3.17,2.2,.78],'#e6ebe5','paint',true);
+  for(let i=0;i<11;i++)add('공기청정기 흡입구 '+i,[2.775+i*.033,1.79,.10,2.787+i*.033,1.809,.57],'#7c8b87');
   // Waiting area: small round glass table, coloured round stools, notice boards.
   add('유리 원탁 받침',[.65,.67,.02,.91,.93,.63],'#697e78','metal',true);
   add('유리 원탁',[.25,.28,.63,1.30,1.31,.67],'#82aaa0','glass',true,'sphere');
@@ -97,5 +97,10 @@ export function nurseRoomInterior(data,worldBoxes,worldColliders,addBox){
     for(const h of [.97,1.97,2.30])add('창가 흰 가로 창틀 '+start+h,[start,6.84,h,start+2.66,6.92,h+.035],'#dfe6df','metal');
   }
   for(const x of [1.5,4.5])for(const v of [1.2,4.4,6.2])add('천장 면조명 '+x+v,[x-.43,v-.2,3.02,x+.43,v+.2,3.07],'#f0f4e8','lamp');
-  return {roomId:NURSE_ID,room,boxes,colliders,arches,stools,beds,spawn:{x:61.1,y:-1.3,z:0},entryYaw:0,reference:NURSE_REFERENCE};
+  // Owner clarification: looking into the room from the corridor (-Y), right is
+  // west (-X). Reflect only the inner treatment/recovery zone, not the entrance.
+  for(const item of [...boxes,...colliders]){const b=item.bounds;if(b[1]+b[4]<=-5)item.bounds=[124-b[3],b[1],b[2],124-b[0],b[4],b[5]];}
+  for(const a of arches){const old=a.left;a.left=6-a.right;a.right=6-old;}
+  for(const b of beds)b.x=6-b.x;
+  return {roomId:NURSE_ID,room,boxes,colliders,arches,stools,beds,recoverySide:'right-from-entry',spawn:{x:61.1,y:-1.1,z:0},entryYaw:0,reference:NURSE_REFERENCE};
 }

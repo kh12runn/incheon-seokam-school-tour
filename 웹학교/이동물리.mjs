@@ -25,6 +25,7 @@ import {addBroadcastControl} from './방송조정실배치.mjs';
 import {uploadedAnnexClassrooms} from './업로드교실배치.mjs';
 import {staffRoomInterior} from './교무실사진배치.mjs';
 import {nurseRoomInterior} from './보건실사진배치.mjs';
+import {individualLearningRooms} from './개별학습실사진배치.mjs';
 import {connectPrincipalMeeting} from './교장실연결문.mjs';
 import {teacherOfficeChairs} from './교사자리와창팻말.mjs';
 export const PLAYER_RADIUS=.28, PLAYER_HEIGHT=1.7, EYE_HEIGHT=1.58;
@@ -185,7 +186,7 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
   if(broadcastControl)addBroadcastControl(broadcast);
   const staff=staffRoomInterior(data,boxes,colliders,addBox);
   const nurse=nurseRoomInterior(data,boxes,colliders,addBox);
-  const specialInteriors=[meeting,audio,broadcast,staff,nurse].filter(Boolean);
+  const specialInteriors=[meeting,audio,broadcast,staff,nurse,...individualLearningRooms(data,boxes,colliders,addBox)].filter(Boolean);
   for(const config of specialInteriors){boxes.push(...config.boxes);colliders.push(...config.colliders);}
   const officeDoor=connectPrincipalMeeting(boxes,colliders);
   const teacherChairs=teacherOfficeChairs(data,boxes,colliders);

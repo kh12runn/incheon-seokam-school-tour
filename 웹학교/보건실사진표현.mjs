@@ -17,8 +17,8 @@ export function nurseRoomDetails(config){
     const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;const m=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshStandardMaterial({map}));m.position.set(...pos);m.rotation.y=rotation;group.add(m);
   }
   board('건강하게 생활해요',1.65,1.3,[64.875,1.93,1.25],-Math.PI/2);
-  board('안정실',.66,.26,[63.9,2.9,3.69],Math.PI,'#81baac');
-  board('손 씻기 · 건강 안내',.77,1.4,[62.56,1.48,2.42],Math.PI);
+  board('안정실',.66,.26,[60.1,2.9,3.69],Math.PI,'#81baac');
+  board('손 씻기 · 건강 안내',.77,1.4,[61.44,1.48,2.42],Math.PI);
   const quiltCanvas=document.createElement('canvas');quiltCanvas.width=256;quiltCanvas.height=256;const qc=quiltCanvas.getContext('2d');qc.fillStyle='#e3e4dc';qc.fillRect(0,0,256,256);qc.strokeStyle='#617c7e';qc.lineWidth=7;
   for(let row=0;row<5;row++){qc.beginPath();for(let col=0;col<9;col++){const x=col*32,y=row*58+(col%2)*25;col?qc.lineTo(x,y):qc.moveTo(x,y);}qc.stroke();}
   const quiltMap=new THREE.CanvasTexture(quiltCanvas);quiltMap.colorSpace=THREE.SRGBColorSpace;const quiltMaterial=new THREE.MeshStandardMaterial({map:quiltMap,roughness:.94});

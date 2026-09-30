@@ -14,6 +14,7 @@ assert(!packed.files.some(p=>/사진보관|미리보기|검사/.test(p)||p.start
 const approvedModels=['교장선생님-귀여운','교장선생님-머리','남학생-귀여운','여학생-귀여운'].map(name=>'웹학교/캐릭터모델/'+name+'.glb');
 assert.deepEqual(packed.files.filter(p=>p.endsWith('.glb')).sort(),approvedModels.sort(),'Only the office principal, shared runner head, and two student models');
 assert(packed.files.includes('웹학교/교실별특징.mjs'));
+for(const file of ['개별학습실사진배치.mjs','개별학습실사진표현.mjs'])assert(packed.files.includes('웹학교/'+file),'Individual learning room runtime included: '+file);
 for(const file of ['보건실사진배치.mjs','보건실사진표현.mjs'])assert(packed.files.includes('웹학교/'+file),'Nurse room runtime included: '+file);
 for(const file of ['교무실사진배치.mjs','교무실사진표현.mjs','교장실연결문.mjs','교장실연결문표현.mjs','교사자리와창팻말.mjs','교사자리와창팻말표현.mjs'])assert(packed.files.includes('웹학교/'+file),'Staff office, door and classroom furnishings included: '+file);
 for(const file of ['업로드교실관찰.mjs','업로드교실배치.mjs','업로드교실표현.mjs'])assert(packed.files.includes('웹학교/'+file),'Uploaded classroom runtime included: '+file);
