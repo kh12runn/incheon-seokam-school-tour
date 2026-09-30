@@ -159,7 +159,7 @@ function buildVisuals(){
   const groups=new Map(),geometry=new THREE.BoxGeometry(1,1,1),sphere=new THREE.SphereGeometry(.5,12,8);
   const exteriorBoxes=[...faceMonitorsTowardBoard(world.boxes).map(exteriorRenderBox).filter(Boolean),...exteriorSkins(world.boxes,data)];
   for(const b of exteriorBoxes){
-    if(b.shape==='terrain')continue;
+    if(b.shape==='terrain'||b.renderInDetails)continue;
     const groupKey=b.color.join(',')+'|'+b.floor+'|'+(b.kind==='ceiling'?'ceiling':'normal')+'|'+surfaceKind(b)+'|'+(b.interiorRoom??'')+'|'+(b.shape??'box');
     if(!groups.has(groupKey))groups.set(groupKey,[]);groups.get(groupKey).push(b);
   }

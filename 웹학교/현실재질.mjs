@@ -31,7 +31,10 @@ export function finishMaterial(b){
   const material=new THREE.MeshStandardMaterial({color,roughness:kind==='ceramic'?.22:kind.startsWith('restroom_')?.4:kind==='terrazzo'?.27:kind==='wood'?.48:kind==='metal'?.3:.88,
     metalness:kind==='metal'?.72:0,envMapIntensity:kind==='metal'?.8:.28});
   if(kind==='lamp'){material.emissive.set('#fff4dc');material.emissiveIntensity=1.2;}
-  if(kind==='meeting_table'){material.roughness=.14;material.envMapIntensity=.7;}
+  if(kind==='meeting_table'||kind==='staff_table'){material.roughness=.14;material.envMapIntensity=.7;}
+  if(kind==='staff_floor'){material.roughness=.38;material.envMapIntensity=.45;}
+  if(kind==='staff_wall'||kind==='staff_ceiling'||kind==='staff_fabric')material.roughness=.94;
+  if(kind==='staff_ceiling'){material.emissive.set('#eeeee9');material.emissiveIntensity=.22;}
   if(kind==='control_wood'){material.roughness=.23;material.envMapIntensity=.55;}
   if(kind==='control_tile')material.roughness=.48;
   if(kind==='glass'){material.roughness=.2;material.envMapIntensity=.65;}
@@ -39,7 +42,7 @@ export function finishMaterial(b){
     material.color.set('#e5f3ee');material.transparent=true;material.opacity=.1;material.depthWrite=false;
     material.roughness=.08;material.envMapIntensity=.35;return material;
   }
-  if(!['control_wood','control_tile','acoustic_wood','carpet','wood','room_floor','rubber_mat','tactile_mat','restroom_floor','restroom_wall','terrazzo','paint','metal','soil','ground','chalk','asphalt','facade','foliage'].includes(kind))return material;
+  if(!['staff_floor','staff_wall','staff_ceiling','staff_fabric','staff_table','control_wood','control_tile','acoustic_wood','carpet','wood','room_floor','rubber_mat','tactile_mat','restroom_floor','restroom_wall','terrazzo','paint','metal','soil','ground','chalk','asphalt','facade','foliage'].includes(kind))return material;
   material.onBeforeCompile=shader=>{
     shader.vertexShader='varying vec3 vSurfacePoint;\n'+shader.vertexShader;
     shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
@@ -52,7 +55,31 @@ export function finishMaterial(b){
       float grainHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
       float grainNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(grainHash(i),grainHash(i+vec2(1.,0.)),f.x),mix(grainHash(i+vec2(0.,1.)),grainHash(i+vec2(1.,1.)),f.x),f.y);}
       `+shader.fragmentShader;
-    const detail=kind==='control_wood'?`
+    const detail=kind==='staff_floor'?`
+      vec2 uv=vSurfacePoint.xz-vec2(43.,0.);
+      vec2 tile=abs(fract(uv/.60)-.5);
+      float seam=smoothstep(.496-fwidth(uv.x/.60),.499,max(tile.x,tile.y));
+      float cloud=grainNoise(uv*9.+vec2(grainNoise(uv*3.)));
+      float streak=grainNoise(vec2(uv.x*38.+cloud*3.,uv.y*12.));
+      diffuseColor.rgb*=mix(.96+.055*cloud+.025*streak,.80,seam*.55);`
+      :kind==='staff_wall'?`
+      vec2 uv=vec2(vSurfacePoint.x+vSurfacePoint.z,vSurfacePoint.y);
+      float fade=clamp(1.-length(fwidth(uv*240.)),0.,1.);
+      diffuseColor.rgb*=mix(1.,.97+.05*grainNoise(uv*240.),fade);`
+      :kind==='staff_ceiling'?`
+      vec2 uv=vSurfacePoint.xz;
+      vec2 tile=abs(fract(uv/vec2(.60,.30))-.5);
+      float seam=smoothstep(.492,.5,max(tile.x,tile.y));
+      float fleck=smoothstep(.70,.84,grainNoise(uv*160.));
+      diffuseColor.rgb*=(1.-.065*seam)*(1.-.10*fleck);`
+      :kind==='staff_fabric'?`
+      vec2 uv=vec2(vSurfacePoint.x+vSurfacePoint.z,vSurfacePoint.y);
+      float fade=clamp(1.-length(fwidth(uv*210.))*.5,0.,1.);
+      diffuseColor.rgb*=mix(1.,.90+.15*grainNoise(uv*210.),fade);`
+      :kind==='staff_table'?`
+      vec2 uv=vSurfacePoint.xz;
+      diffuseColor.rgb*=.96+.055*grainNoise(vec2(uv.x*3.,uv.y*95.));`
+      :kind==='control_wood'?`
       vec2 uv=vSurfacePoint.xz;
       float grain=grainNoise(vec2(uv.x*135.+3.*grainNoise(uv*.7),uv.y*3.));
       diffuseColor.rgb*=.80+.27*grain;`

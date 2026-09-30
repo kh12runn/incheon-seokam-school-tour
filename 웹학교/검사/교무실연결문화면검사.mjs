@@ -17,7 +17,7 @@ try{
    if(content)scene.remove(content);content=new THREE.Group();scene.add(content);
    const ids=kind.startsWith('individual4')?['1F_INDIVIDUAL_4']:kind.startsWith('individual5')?['1F_INDIVIDUAL_5']:kind.startsWith('nurse')?['1F_NURSE']:kind.startsWith('staff')?['2F_STAFF']:kind.startsWith('door')?['2F_PRINCIPAL','2F_OPERATIONS_MEETING']:['4F_6-4'];
    const cube=new THREE.BoxGeometry(1,1,1),sphere=new THREE.SphereGeometry(.5,14,10);
-   for(const b of world.boxes.filter(b=>ids.includes(b.spaceId)||ids.some(id=>b.name.includes('Window_'+id)))){const a=b.bounds,m=new THREE.Mesh(b.shape==='sphere'?sphere:cube,finishMaterial(b));m.position.set((a[0]+a[3])/2,(a[2]+a[5])/2,-(a[1]+a[4])/2);m.scale.set(a[3]-a[0],a[5]-a[2],a[4]-a[1]);content.add(m);}
+   for(const b of world.boxes.filter(b=>!b.renderInDetails&&(ids.includes(b.spaceId)||ids.some(id=>b.name.includes('Window_'+id))))){const a=b.bounds,m=new THREE.Mesh(b.shape==='sphere'?sphere:cube,finishMaterial(b));m.position.set((a[0]+a[3])/2,(a[2]+a[5])/2,-(a[1]+a[4])/2);m.scale.set(a[3]-a[0],a[5]-a[2],a[4]-a[1]);content.add(m);}
    if(ids.includes('2F_STAFF'))content.add(staffRoomDetails(world.specialInteriors.find(r=>r.roomId==='2F_STAFF')));
    if(ids.includes('1F_NURSE'))content.add(nurseRoomDetails(world.specialInteriors.find(r=>r.roomId==='1F_NURSE')));
    if(kind.startsWith('individual'))content.add(individualLearningDetails(world.specialInteriors.find(r=>r.roomId===ids[0])));

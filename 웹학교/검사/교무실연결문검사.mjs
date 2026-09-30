@@ -3,11 +3,18 @@ import assert from 'node:assert/strict';
 import {buildWorld} from '../이동물리.mjs';
 import {exteriorClassSigns} from '../교사자리와창팻말.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url))),snapshot=JSON.stringify(data),w=buildWorld(data),staff=w.specialInteriors.find(r=>r.roomId==='2F_STAFF');
-assert.equal(JSON.stringify(data),snapshot);assert.equal(staff.reference.count,7);assert.equal(staff.chairs.filter(c=>c.red).length,8);
+assert.equal(JSON.stringify(data),snapshot);assert.equal(staff.reference.count,12);assert.equal(staff.chairs.filter(c=>c.red).length,8);
 assert.deepEqual(staff.workstations,{corridor:3,window:2,endWall:2});
 assert.equal(staff.boxes.filter(b=>/검정 업무 모니터 0 /.test(b.name)).length,3);
 assert.equal(staff.boxes.filter(b=>/검정 업무 모니터 1 /.test(b.name)).length,2);
-assert.equal(staff.boxes.filter(b=>/왼쪽 끝 업무 책상/.test(b.name)).length,2);
+assert.equal(staff.boxes.filter(b=>/왼쪽 끝 사무용 책상/.test(b.name)).length,2);
+assert.equal(staff.boxes.filter(b=>/왼쪽 끝 듀얼 모니터/.test(b.name)).length,4);
+assert.equal(staff.chairs.filter(c=>c.office).length,7);
+for(const material of ['staff_floor','staff_ceiling','staff_fabric'])assert(staff.boxes.some(b=>b.material===material),material);
+assert(w.boxes.filter(b=>b.spaceId==='2F_STAFF'&&/^(Wall_|Lintel_)/.test(b.name)).every(b=>b.material==='staff_wall'));
+for(const word of ['흡입 격자','키캡','책장 파일','바구니 세로살','하부장 은색 손잡이'])assert(staff.boxes.some(b=>b.name.includes(word)),word);
+assert.equal(staff.boxes.filter(b=>b.renderInDetails).length,4);
+for(const b of staff.boxes)assert(b.bounds.slice(0,3).every((v,i)=>Number.isFinite(v)&&b.bounds[i+3]>v),b.name);
 assert.equal(staff.chairs.filter(c=>!c.red).length,7);
 assert.equal(staff.chairs.filter(c=>!c.red&&c.angle===Math.PI/2).length,2);
 for(const word of ['흰 냉장고','전자레인지','커피머신','녹색 콤비','업무 파티션','긴 회의탁자'])assert(staff.boxes.some(b=>b.name.includes(word)),word);
@@ -25,4 +32,4 @@ const meeting=w.specialInteriors.find(r=>r.roomId==='2F_OPERATIONS_MEETING');ass
 assert.equal(w.teacherChairs.length,41);assert.equal(exteriorClassSigns(w.data).length,41);
 for(const c of w.teacherChairs){assert(w.blocked(c.x,c.y,c.z),c.roomId+' teacher chair solid');assert(w.data.rooms.some(r=>r.id===c.roomId&&r.type==='classroom'));}
 for(const p of exteriorClassSigns(w.data)){assert(/^\d-\d+$/.test(p.text));assert.equal(p.width,1.02);assert.equal(p.height,.36);}
-console.log({ok:true,staffPhotos:7,redConferenceChairs:8,staffAisles:true,connectingDoorRoundTrip:true,cupboardsReducedFrom6To5:true,teacherChairs:41,windowSigns:41});
+console.log({ok:true,staffPhotos:12,redConferenceChairs:8,photoFinishes:true,staffAisles:true,connectingDoorRoundTrip:true,cupboardsReducedFrom6To5:true,teacherChairs:41,windowSigns:41});

@@ -10,10 +10,13 @@ export function staffRoomInterior(data,worldBoxes,worldColliders,addBox){
     const [x,v,h,X,V,H]=b,item={name:'교무실 '+name,spaceId:STAFF_ID,interiorRoom:STAFF_ID,floor:2,kind:'detail',bounds:[43+x,-V,3.4+h,43+X,-v,3.4+H],color:rgb(color),material,...(shape?{shape}:{})};
     boxes.push(item);if(solid)colliders.push({...item,kind:'furniture'});return item;
   };
-  add('밝은 타일 바닥',[.11,.11,.001,12.89,6.89,.009],'#d0d2c9','terrazzo');
-  add('흰 천장',[.11,.11,3.10,12.89,6.89,3.12],'#e8e8e2').kind='ceiling';
-  for(let i=1;i<20;i++)add('바닥 줄눈 세로 '+i,[i*.64,.12,.011,i*.64+.008,6.88,.014],'#bfc2b7');
-  for(let i=1;i<11;i++)add('바닥 줄눈 가로 '+i,[.12,i*.63,.011,12.88,i*.63+.008,.014],'#bfc2b7');
+  // Refinish the existing cut walls, retaining every doorway and window opening.
+  for(let i=0;i<worldBoxes.length;i++){
+    const b=worldBoxes[i];
+    if(b.spaceId===STAFF_ID&&/^(Wall_|Lintel_)/.test(b.name))worldBoxes[i]={...b,color:rgb('#e3e5e2'),material:'staff_wall'};
+  }
+  add('밝은 타일 바닥',[.11,.11,.001,12.89,6.89,.009],'#e5e3da','staff_floor');
+  add('흰 천장',[.11,.11,3.10,12.89,6.89,3.12],'#eeeee9','staff_ceiling').kind='ceiling';
   for(const x of [.11,12.86])add('옆벽 걸레받이 '+x,[x,.11,.015,x+.025,6.89,.11],'#8e958b');
   function chair(x,v,angle,red,index,office=false){
     chairs.push({x:43+x,y:-v,z:3.4,angle,red,office});
@@ -31,11 +34,17 @@ export function staffRoomInterior(data,worldBoxes,worldColliders,addBox){
     add('파티션 윗틀 '+row+' '+i,[x,pv-.009,1.47,x+1.52,pv+.084,1.495],'#74827e','metal');
     colliders.push({name:'교무실 파티션 전체 충돌 '+row+' '+i,spaceId:STAFF_ID,floor:2,bounds:[43+x,-pv-.075,3.4,43+x+1.52,-pv,4.895]});
     const mv=row?v+.11:v+.52;
-    add('검정 업무 모니터 '+row+' '+i,[x+.26,mv,.95,x+1.02,mv+.055,1.47],'#202a2b','paint');
+    add('검정 업무 모니터 '+row+' '+i,[x+.08,mv,1.04,x+.70,mv+.055,1.46],'#202a2b','paint');
+    add('짝 업무 모니터 '+row+' '+i,[x+.73,mv,1.04,x+1.35,mv+.055,1.46],'#202a2b','paint');
+    for(const dx of [.08,.73]){
+      add('모니터 자산 스티커 '+row+i+dx,[x+dx+.06,mv-.002,1.421,x+dx+.18,mv+.057,1.443],'#d8dddb');
+      add('모니터 발판 '+row+i+dx,[x+dx+.18,mv-.055,.785,x+dx+.44,mv+.105,.809],'#363b39');
+      add('모니터 세로 지지대 '+row+i+dx,[x+dx+.28,mv,.80,x+dx+.32,mv+.04,1.09],'#363b39');
+    }
     add('모니터 지지대 '+row+' '+i,[x+.60,mv,.79,x+.65,mv+.045,1.03],'#354041','metal');
     add('키보드 '+row+' '+i,[x+.30,v+.28,.79,x+.91,v+.45,.813],'#4d5755');
     add('책상 서랍장 '+row+' '+i,[x+1.02,v+.12,.025,x+1.41,v+.69,.71],'#c5c7bc','paint',true);
-    chair(x+.72,row?6.60:.48,row?0:Math.PI,false,'업무'+row+i);
+    chair(x+.72,row?6.60:.48,row?0:Math.PI,false,'업무'+row+i,true);
   }
   // Entering from the corridor, left is the east end (+X). Two end desks
   // face back into the room, as clarified by the owner and photos 6–7.
@@ -51,7 +60,7 @@ export function staffRoomInterior(data,worldBoxes,worldColliders,addBox){
       add('왼쪽 끝 모니터 지지대 '+i+' '+monitor,[11.23,mv+.28,.79,11.28,mv+.48,.98],'#354041','metal');
       add('왼쪽 끝 모니터 받침 '+i+' '+monitor,[11.17,mv+.20,.79,11.39,mv+.56,.82],'#354041','metal');
     }
-    add('왼쪽 끝 키보드 '+i,[11.48,v+.38,.79,11.91,v+1.18,.816],'#4d5755');
+    add('왼쪽 끝 키보드 '+i,[11.65,v+.50,.79,11.83,v+1.08,.816],'#4d5755');
     add('왼쪽 끝 마우스 '+i,[11.58,v+1.22,.79,11.73,v+1.42,.82],'#394342');
     add('왼쪽 끝 책상 서랍장 '+i,[11.76,v+.08,.03,11.98,v+.63,.72],'#c5c7bc','paint',true);
     for(const dx of [11.06,11.99])for(const dv of [v+.08,v+1.45])add('왼쪽 끝 책상 다리 '+i+dx+dv,[dx,dv,.02,dx+.05,dv+.06,.73],'#788481','metal');
@@ -79,19 +88,32 @@ export function staffRoomInterior(data,worldBoxes,worldColliders,addBox){
   // Joining tables, generic stationery only (no staff names/documents copied).
   for(let i=0;i<2;i++){
     const x=6.1+i*1.9;
-    add('긴 회의탁자 '+i,[x,2.95,.73,x+1.88,4.10,.78],'#c9a481','meeting_table',true);
+    const table=add('긴 회의탁자 '+i,[x,2.95,.73,x+1.88,4.10,.78],'#cfb291','staff_table',true);
+    table.renderInDetails=true;
     for(const dx of [.10,1.70])for(const v of [3.06,3.94])add('회의탁자 철제다리 '+i+dx+v,[x+dx,v,.02,x+dx+.055,v+.055,.73],'#697774','metal');
     for(let j=0;j<4;j++){add('회의자료 묶음 '+i+j,[x+.18+j*.34,3.22,.783,x+.46+j*.34,3.65,.823+j*.005],['#c2d6d3','#ddc3ce','#efe9dc','#819398'][j]);}
   }
   for(let i=0;i<4;i++){chair(6.42+i*.96,2.70,Math.PI,true,'회의북'+i);chair(6.42+i*.96,4.36,0,true,'회의남'+i);}
-  add('노란 문서 바구니',[9.15,3.62,.81,9.74,4.00,1.01],'#d5b457');
+  add('노란 문서 바구니 바닥',[9.15,3.62,.81,9.74,4.00,.835],'#ddbd41');
+  for(const h of [.85,.92,.99]){
+    for(const v of [3.62,3.98])add('문서 바구니 가로살 '+h+v,[9.15,v,h,9.74,v+.02,h+.017],'#ddbd41');
+    for(const x of [9.15,9.72])add('문서 바구니 옆살 '+h+x,[x,3.62,h,x+.02,4,h+.017],'#ddbd41');
+  }
+  for(let i=0;i<12;i++)for(const v of [3.62,3.98])add('문서 바구니 세로살 '+i+v,[9.16+i*.05,v,.835,9.174+i*.05,v+.02,1.01],'#ddbd41');
   for(let i=0;i<5;i++)add('문서 정리판 '+i,[9.25+i*.09,3.69,1.01,9.285+i*.09,3.97,1.42],'#c8d1cf');
   for(const [x,v] of [[10.78,3.35],[10.78,5.98]]){
-    add('흰 원형 화분 '+v,[x-.22,v-.22,.01,x+.22,v+.22,.70],'#d7dfd7','ceramic',true,'sphere');
-    add('화분 줄기 '+v,[x-.025,v-.025,.55,x+.025,v+.025,1.60],'#7d7055','wood');
-    for(let i=0;i<6;i++)add('화분 잎 '+v+i,[x-.42+(i%2)*.18,v-.28,1.10+i*.11,x+.23+(i%2)*.18,v+.28,1.30+i*.11],'#5f7d58','foliage',false,'sphere');
+    const pot=add('흰 원형 화분 '+v,[x-.22,v-.22,.01,x+.22,v+.22,.70],'#e7e9e2','ceramic',true,'sphere');
+    pot.renderInDetails=true;
   }
-  for(let i=0;i<5;i++)for(let j=0;j<9;j++)add('녹색 콤비 블라인드 '+i+j,[.25+i*2.55,6.83,1.50+j*.125,2.53+i*2.55,6.855,1.58+j*.125],j%2?'#bdc2a4':'#929e70','fabric');
+  for(let i=0;i<5;i++){
+    const x=.165+i*2.6,bottom=1.68+(i%2)*.18;
+    add('블라인드 상단 레일 '+i,[x,6.79,2.77,x+2.27,6.89,2.82],'#747669','metal');
+    add('블라인드 하단 바 '+i,[x,6.80,bottom-.025,x+2.27,6.85,bottom],'#808969');
+    for(let j=0;bottom+j*.13<2.77;j++)add('녹색 콤비 블라인드 '+i+' '+j,[x,6.83,bottom+j*.13,x+2.27,6.855,Math.min(2.77,bottom+j*.13+.084)],'#9aa279','staff_fabric');
+    add('창 중앙 여닫이 프레임 '+i,[x+1.12,6.86,1.015,x+1.15,6.92,2.30],'#d3d9d4','metal');
+    add('창가 안전 봉 '+i,[x,6.72,1.20,x+2.27,6.755,1.235],'#aeb7b4','metal');
+    add('창틀 손잡이 '+i,[x+1.15,6.80,1.36,x+1.17,6.86,1.51],'#67716e','metal');
+  }
   // Corridor-side white frames, cut around the original entrance.
   for(const x of [1.2,2.6,6.1,8.3,10.5]){
     add('복도 반투명 창 '+x,[x,.115,1.14,x+1.25,.14,2.65],'#b4c5bd','glass');
@@ -100,6 +122,83 @@ export function staffRoomInterior(data,worldBoxes,worldColliders,addBox){
   }
   add('벽걸이 TV',[12.78,5.72,2.10,12.83,6.55,2.68],'#293635');
   for(const x of [2.7,6.5,10.4])for(const v of [1.95,5.03])add('직사각 천장 조명 '+x+v,[x-.59,v-.21,3.025,x+.59,v+.21,3.07],'#f0f3ea','lamp');
-  for(const x of [4.0,9.2]){add('천장 에어컨 '+x,[x-.5,3.0,2.96,x+.5,4.0,3.08],'#dedfd5');add('에어컨 흡입구 '+x,[x-.32,3.18,2.94,x+.32,3.82,2.958],'#78877a');}
+  for(const x of [4.0,9.2]){
+    add('천장 에어컨 '+x,[x-.5,3.0,2.96,x+.5,4.0,3.08],'#e5e6df');add('에어컨 흡입구 '+x,[x-.32,3.18,2.94,x+.32,3.82,2.958],'#888f86');
+    for(let i=0;i<14;i++){
+      add('에어컨 흡입 격자 세로 '+x+i,[x-.32+i*.047,3.18,2.925,x-.312+i*.047,3.82,2.94],'#d0d3ca');
+      add('에어컨 흡입 격자 가로 '+x+i,[x-.32,3.18+i*.047,2.925,x+.32,3.188+i*.047,2.94],'#d0d3ca');
+    }
+    for(const v of [3.03,3.92])add('에어컨 토출 루버 '+x+v,[x-.43,v,2.937,x+.43,v+.045,2.951],'#73796f');
+  }
+  // Photo-specific joinery and small objects; dimensions remain estimates.
+  for(const b of boxes){
+    if(b.material==='fabric')b.material='staff_fabric';
+    if(b.name.includes('파티션 하부'))b.color=rgb('#a9b7be');
+    if(/파티션 (상부|베이지)/.test(b.name))b.color=rgb('#c4beab');
+  }
+  for(const b of [...boxes].filter(b=>/파티션 하부/.test(b.name))){
+    const a=b.bounds,x=a[0]-43,X=a[3]-43,v=-a[4],V=-a[1];
+    add('파티션 하단 알루미늄 '+b.name,[x-.003,v-.006,.02,X+.003,V+.006,.15],'#818783','metal');
+    if(X-x>1)for(const dx of [x+(X-x)/2,X-.027])add('파티션 세로 이음 '+b.name+dx,[dx,v-.012,.15,dx+.018,V+.012,1.475],'#707672','metal');
+    else for(const dv of [v+(V-v)/2,V-.027])add('파티션 세로 이음 '+b.name+dv,[x-.01,dv,.15,X+.01,dv+.018,1.475],'#707672','metal');
+  }
+  for(const b of [...boxes].filter(b=>b.name.startsWith('교무실 키보드')||b.name.startsWith('교무실 왼쪽 끝 키보드'))){
+    const a=b.bounds,x=a[0]-43,X=a[3]-43,v=-a[4],V=-a[1],side=X-x<V-v;
+    for(let row=0;row<4;row++)for(let col=0;col<12;col++){
+      const dx=side?row:col,dv=side?col:row,nx=side?4:12,nv=side?12:4;
+      add('키보드 키캡 '+b.name+row+','+col,[x+(dx+.12)*(X-x)/nx,v+(dv+.12)*(V-v)/nv,.818,x+(dx+.87)*(X-x)/nx,v+(dv+.87)*(V-v)/nv,.827],'#abb0aa');
+    }
+  }
+  for(let i=0;i<5;i++){
+    const v=.45+i*1.22;
+    if(i===2){
+      add('냉장고 위 수납장',[.14,v,2.30,.66,v+1.02,2.88],'#eceee7');
+      add('냉장고 상부 빈틈',[.16,v+.025,2.20,.62,v+.995,2.29],'#5c635c');
+      continue;
+    }
+    add('수납장 상판 '+i,[.14,v,.87,.88,v+1.19,.905],'#f1f0e8','ceramic');
+    add('수납장 걸레받이 '+i,[.855,v+.02,.02,.865,v+1.17,.09],'#abb1aa');
+    add('상부장 문 이음 '+i,[.663,v+.588,1.77,.669,v+.598,2.75],'#949c95');
+    for(const dv of [.52,.66])add('하부장 은색 손잡이 '+i+dv,[.861,v+dv,.58,.90,v+dv+.021,.77],'#9da6a4','metal');
+    for(const dv of [0,1.17])add('수납장 옆판 '+i+dv,[.14,v+dv,.90,.69,v+dv+.025,2.88],'#e8eae3');
+    add('수납장 상부 몰딩 '+i,[.14,v,2.76,.69,v+1.19,2.88],'#e8eae3');
+    add('수납장 뒷판 '+i,[.145,v,.91,.17,v+1.19,1.76],'#d2dbd5','glass');
+  }
+  // Open bookcases behind the left-end workstations, below the clock and TV.
+  for(const v of [.42,5.83]){
+    add('흰 책장 뒷판 '+v,[12.82,v,.05,12.87,v+.85,2.05],'#e9ebe5');
+    for(const dv of [0,.82])add('흰 책장 옆판 '+v+dv,[12.55,v+dv,.05,12.84,v+dv+.03,2.05],'#e9ebe5');
+    for(const h of [.08,.65,1.22,1.79,2.03])add('흰 책장 선반 '+v+h,[12.55,v,h,12.84,v+.85,h+.026],'#e9ebe5');
+    if(v>5)for(let row=0;row<3;row++)for(let i=0;i<9;i++)add('책장 파일 '+row+i,[12.57,v+.08+i*.075,.10+row*.57,12.80,v+.135+i*.075,.49+row*.57+(i%3)*.04],['#d4dfdf','#eee6d0','#71898c','#8c5f67'][i%4]);
+  }
+  for(const x of [.105,12.87])add('벽 천장 테두리 '+x,[x,.10,3.055,x+.025,6.90,3.10],'#afb6ae');
+  for(const v of [.10,6.87])add('벽 천장 가로 테두리 '+v,[.11,v,3.055,12.89,v+.025,3.10],'#afb6ae');
+  for(const [x,X] of [[.11,3.94],[5.16,12.89]])add('복도벽 걸레받이 '+x,[x,.10,.01,X,.125,.105],'#969d96');
+  add('탕비 싱크 테두리',[.26,.62,.906,.76,1.35,.928],'#b9c1bd','metal');
+  add('탕비 싱크 안쪽',[.30,.66,.929,.72,1.31,.933],'#7b8987','metal');
+  add('싱크 수전 기둥',[.23,.98,.91,.265,1.015,1.16],'#b3bcb9','metal');
+  add('싱크 수전 목',[.23,.98,1.13,.43,1.015,1.16],'#b3bcb9','metal');
+  add('싱크 수전 끝',[.40,.98,1.075,.433,1.015,1.16],'#b3bcb9','metal');
+  for(const v of [1.77,4.21,5.60]){
+    add('탕비 콘센트 '+v,[.18,v,1.54,.195,v+.23,1.64],'#e4e7df');
+    for(let i=0;i<4;i++)add('콘센트 구멍 '+v+i,[.196,v+.025+i*.048,1.58,.20,v+.042+i*.048,1.60],'#5b6461');
+  }
+  for(const h of [1.02,1.20])add('전자레인지 다이얼 '+h,[.731,2.37,h,.754,2.42,h+.055],'#8a9590','metal',false,'sphere');
+  add('커피머신 받침',[.64,4.35,.915,.82,4.72,.944],'#a4aaa4','metal');
+  add('커피머신 추출구',[.73,4.44,1.19,.78,4.52,1.25],'#858c85','metal');
+  add('커피 컵',[.72,4.43,.95,.80,4.51,1.08],'#e9e8db');
+  for(const row of [0,1])for(let i=0;i<(row?2:3);i++){
+    const x=5.35+i*(row?3:1.95),v=row?5.70:.95;
+    add('업무 전화기 '+row+i,[x+1.05,v+.21,.792,x+1.32,v+.45,.837],'#343b38');
+    add('전화기 수화기 '+row+i,[x+1.07,v+.20,.839,x+1.31,v+.255,.88],'#292f2d');
+    add('전화기 표시창 '+row+i,[x+1.10,v+.29,.839,x+1.27,v+.35,.841],'#8da8a6');
+    for(let j=0;j<3;j++)add('서랍 손잡이 '+row+i+j,[x+1.10,v+.10,.16+j*.17,x+1.33,v+.12,.18+j*.17],'#78827e','metal');
+    add('업무 문서 트레이 '+row+i,[x+.04,v+.13,.787,x+.27,v+.43,.807],'#65767c');
+    add('업무 메모지 '+row+i,[x+.06,v+.15,.809,x+.25,v+.40,.823],'#e7e7d8');
+  }
+  // Keep the monitor tops visible over the low photo-reference partitions.
+  for(const b of [...boxes,...colliders])if(b.name.includes('파티션')){
+    b.bounds=[...b.bounds];b.bounds[2]=3.4+(b.bounds[2]-3.4)*.82;b.bounds[5]=3.4+(b.bounds[5]-3.4)*.82;
+  }
   return {roomId:STAFF_ID,room,boxes,colliders,chairs,workstations:{corridor:3,window:2,endWall:2},spawn:{x:47.55,y:-1,z:3.4},entryYaw:0,reference:STAFF_REFERENCE};
 }
