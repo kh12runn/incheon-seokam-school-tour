@@ -1,10 +1,11 @@
 // Photo-guided exterior finish, not a measured survey or a photographic texture.
 // Original rooms, openings and Blender geometry remain authoritative.
+import {playgroundPhotoDetails} from './야외사진세부.mjs';
 export const EXTERIOR_PALETTE={wall:[.76,.65,.52],trim:[.48,.235,.16],roof:[.47,.5,.45],soil:[.61,.52,.41],mint:[.36,.65,.48],cream:[.81,.8,.59]};
 
 export function exteriorRenderBox(box){
-  if(box.name==='SPACE_EXT_PLAYGROUND'||box.name==='SPACE_EXT_PLAY_AREA')return {...box,color:EXTERIOR_PALETTE.soil,material:'soil'};
-  if(box.name==='SiteGround')return {...box,color:[.48,.48,.41],material:'ground'};
+  if(box.name.startsWith('SPACE_EXT_PLAYGROUND')||box.name==='SPACE_EXT_PLAY_AREA')return {...box,color:EXTERIOR_PALETTE.soil,material:'soil'};
+  if(box.name.startsWith('SiteGround'))return {...box,color:[.48,.48,.41],material:'ground'};
   if(box.kind==='roof')return {...box,color:EXTERIOR_PALETTE.roof,material:'paint'};
   if(box.name.includes('SouthBand'))return {...box,color:EXTERIOR_PALETTE.trim,material:'paint'};
   if(box.name==='SPACE_EXT_ROSTRUM')return {...box,color:[.51,.63,.54],material:'paint'};
@@ -24,7 +25,10 @@ export function exteriorSkins(boxes,data){
     const axis=match[2]==='x'?0:1,n=Number(match[4]),b=[...box.bounds];
     const outer=b[axis+(n>0?3:0)];
     b[axis]=outer+(n>0?.004:-.018);b[axis+3]=outer+(n>0?.018:-.004);
-    add(box.name,b,EXTERIOR_PALETTE.wall,'facade',box.floor,{skinSource:box.name,skinAxis:axis,skinNormal:n});
+    const gateWing=axis===1&&n<0&&b[0]>=-17&&b[3]<=28;
+    const gateColors=[[.16,.47,.67],[.87,.39,.25],[.93,.68,.20],[.80,.33,.24]];
+    const color=gateWing?(Number(match[1])===1?[.73,.75,.74]:gateColors[Math.floor(Math.max(0,(b[0]+b[3])/2)/7)%gateColors.length]):EXTERIOR_PALETTE.wall;
+    add(box.name,b,color,'facade',box.floor,{skinSource:box.name,skinAxis:axis,skinNormal:n});
   }
   // Window trim stays outside the envelope. Do not tint classroom interiors.
   const rooms=new Map(data.rooms.map(r=>[r.id,r]));
@@ -73,12 +77,13 @@ export function courtyardDecor(){
     }
     add(name+' 차양 앞 테두리',map(start,back-3.57,2.67,end,back-3.48,2.78),steel,'metal');
   }
-  canopy('본관 왼쪽',0,36,-9.4);canopy('본관 오른쪽',54,84,-9.4);
+  // The gate montage shows an open ramp and planters, not seating along its edge.
+  canopy('본관 왼쪽',28,36,-9.4);canopy('본관 오른쪽',54,84,-9.4);
   // Annex classroom facade starts at x=92. Keep a 3 m passage behind the canopy.
   canopy('별관 앞 운동장',-66,-25,89,'y');
   // Repeated foliage is instanced; trunks and planter edges are solid.
   const trees=[];
-  for(let x=2;x<=82;x+=8)if(x<38||x>52)trees.push([x,-9,1.1]);
+  for(let x=34;x<=82;x+=8)if(x<38||x>52)trees.push([x,-9,1.1]);
   for(let x=-9;x<=85;x+=7)trees.push([x,-80,1.8]);
   for(let y=-71;y<=-17;y+=8)trees.push([-21,y,1.6]);
   for(const [i,[x,y,r]] of trees.entries()){
@@ -88,5 +93,5 @@ export function courtyardDecor(){
       add('수관 '+i+' '+j,[x+dx-rr,y+dy-rr,z-rr*.5,x+dx+rr,y+dy+rr,z+rr*1.2],j%2?[.25,.34,.17]:[.29,.39,.21],'foliage',false,{shape:'sphere'});
     }
   }
-  return result;
+  return [...result,...playgroundPhotoDetails()];
 }

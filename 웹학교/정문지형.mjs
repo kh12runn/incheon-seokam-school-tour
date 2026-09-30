@@ -1,5 +1,6 @@
 import {subtractBox} from './창문배치.mjs';
 import {HALL_EXIT,BASEMENT_FOOTPRINT} from './지하층배치.mjs';
+import {addGatePhotoDetails} from './야외사진세부.mjs';
 // Lower gate side is level with B1; the yard rises continuously toward the rostrum.
 // Approximate grading, not surveyed dimensions. No external flight of stairs.
 export function gateGroundHeight(x,y,base=-3.4,cap=-.3){
@@ -14,7 +15,7 @@ export function addGateTerrain(boxes,colliders,surfaces,floorHeight){
   for(let i=0;i<xs.length-1;i++)for(let j=0;j<ys.length-1;j++){
     const x0=xs[i],x1=xs[i+1],y0=ys[j],y1=ys[j+1],cap=x0>=-9.5&&y1<=-11?-.3:-.6;
     const heights=[[x0,y0],[x1,y0],[x1,y1],[x0,y1]].map(([x,y])=>gateGroundHeight(x,y,base,cap));
-    const bounds=[x0,y0,base-.2,x1,y1,Math.max(...heights)],path=y0>=-16&&y1<=-7&&x1>HALL_EXIT.left-1;
+    const bounds=[x0,y0,base-.2,x1,y1,Math.max(...heights)],path=y0>=-16&&y1<=-7&&(x1>HALL_EXIT.left-1||y1<=-11);
     boxes.push({name:`정문 경사지 ${i} ${j}`,bounds,heights,shape:'terrain',kind:'finish',floor:0,color:path?[.025,.43,.83]:[.61,.52,.41],material:path?'paint':'soil'});
     surfaces.push({name:`정문 경사지 ${i} ${j}`,bounds,height:(x,y)=>{
       const u=(x-x0)/(x1-x0),v=(y-y0)/(y1-y0),[a,b,c,d]=heights;
@@ -30,8 +31,6 @@ export function addGateTerrain(boxes,colliders,surfaces,floorHeight){
     const wall=add('사진 흰 경사로 옹벽 '+x,[x,-16.22,low-.15,x+2,-16.02,high+.85],[.9,.91,.88]);
     wall.shape='terrain';wall.heights=[low+.85,high+.85,high+.85,low+.85];
   }
-  // Gate stands on the low, level forecourt directly outside the hall exit.
-  for(const x of [HALL_EXIT.left-1.1,HALL_EXIT.right+.9])add('기둥',[x,-12.5,base,x+.3,-12.1,base+2.6],[.61,.63,.61]);
   // Exposed foundation seals the higher classroom block along the uphill path.
   add('본관 하부 기초',[HALL_EXIT.right+4.9,-7.19,base-.2,34,-7.09,0],[.69,.7,.67]);
   add('서쪽 대지 옹벽',[-23.5,-7.1,base-.2,BASEMENT_FOOTPRINT[0]-.08,-6.95,-.6],[.69,.7,.67]);
@@ -43,4 +42,5 @@ export function addGateTerrain(boxes,colliders,surfaces,floorHeight){
     const low=Math.min(...[[a[0],a[1]],[a[3],a[1]],[a[0],a[4]],[a[3],a[4]]].map(([x,y])=>gateGroundHeight(x,y,base,-.6)));
     if(low<a[2]-.05)add('기존 시설 기초 '+b.name,[a[0],a[1],low-.1,a[3],a[4],a[2]],b.color);
   }
+  addGatePhotoDetails(boxes,colliders,surfaces,base);
 }
