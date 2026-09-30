@@ -196,6 +196,16 @@ export function staffRoomInterior(data,worldBoxes,worldColliders,addBox){
     add('업무 문서 트레이 '+row+i,[x+.04,v+.13,.787,x+.27,v+.43,.807],'#65767c');
     add('업무 메모지 '+row+i,[x+.06,v+.15,.809,x+.25,v+.40,.823],'#e7e7d8');
   }
+  // The reference partitions form continuous runs, not isolated cubicles.
+  const infill=(name,x,v,X,V)=>{
+    add('파티션 연결 하부 '+name,[x,v,.15,X,V,1.10],'#a9b7be','staff_fabric',true);
+    add('파티션 연결 베이지 '+name,[x,v,1.10,X,V,1.47],'#c4beab','staff_fabric');
+    add('파티션 연결 걸레받이 '+name,[x,v-.003,.02,X,V+.003,.15],'#818783','metal');
+    add('파티션 연결 상단 '+name,[x,v-.008,1.47,X,V+.008,1.495],'#78817b','metal');
+  };
+  for(const [a,b] of [[6.87,7.30],[8.82,9.25]])infill('복도 '+a,a,1.68,b,1.755);
+  for(const [a,b] of [[6.87,8.35],[9.87,11.02]])infill('창가 '+a,a,5.26,b,5.335);
+  infill('끝벽',11.02,2.95,11.10,4.02);
   // Keep the monitor tops visible over the low photo-reference partitions.
   for(const b of [...boxes,...colliders])if(b.name.includes('파티션')){
     b.bounds=[...b.bounds];b.bounds[2]=3.4+(b.bounds[2]-3.4)*.82;b.bounds[5]=3.4+(b.bounds[5]-3.4)*.82;

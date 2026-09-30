@@ -61,7 +61,7 @@ export function finishMaterial(b){
       float seam=smoothstep(.496-fwidth(uv.x/.60),.499,max(tile.x,tile.y));
       float cloud=grainNoise(uv*9.+vec2(grainNoise(uv*3.)));
       float streak=grainNoise(vec2(uv.x*38.+cloud*3.,uv.y*12.));
-      diffuseColor.rgb*=mix(.96+.055*cloud+.025*streak,.80,seam*.55);`
+      diffuseColor.rgb*=mix(.84+.18*cloud+.06*streak,.76,seam*.55);`
       :kind==='staff_wall'?`
       vec2 uv=vec2(vSurfacePoint.x+vSurfacePoint.z,vSurfacePoint.y);
       float fade=clamp(1.-length(fwidth(uv*240.)),0.,1.);

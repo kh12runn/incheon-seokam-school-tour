@@ -58,10 +58,13 @@ export function staffRoomDetails(config){
   for(let i=1;i<=12;i++){const a=i*Math.PI/6;c.fillText(String(i),128+Math.sin(a)*94,136-Math.cos(a)*94);}
   c.lineWidth=5;c.beginPath();c.moveTo(128,57);c.lineTo(128,128);c.lineTo(180,155);c.stroke();
   const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;const clock=new THREE.Mesh(new THREE.CircleGeometry(.22,48),new THREE.MeshStandardMaterial({map}));clock.position.set(55.86,6.10,3.53);clock.rotation.y=-Math.PI/2;group.add(clock);
-  for(const b of config.boxes.filter(b=>b.renderInDetails&&b.name.includes('회의탁자'))){
-    const a=b.bounds,w=a[3]-a[0],d=a[4]-a[1],cx=(a[0]+a[3])/2,cz=-(a[1]+a[4])/2;
+  const tables=config.boxes.filter(b=>b.renderInDetails&&b.name.includes('회의탁자'));
+  if(tables.length){
+    const b=tables[0],a=[...b.bounds];a[3]=Math.max(...tables.map(t=>t.bounds[3]));
+    const w=a[3]-a[0],d=a[4]-a[1],cx=(a[0]+a[3])/2,cz=-(a[1]+a[4])/2;
     const rim=new THREE.Mesh(roundedPanel(w+.026,d+.026,.15,.06),black);rim.rotation.x=-Math.PI/2;rim.position.set(cx,a[2]-.012,cz);group.add(rim);
     const top=new THREE.Mesh(roundedPanel(w,d,.14,.012),finishMaterial(b));top.rotation.x=-Math.PI/2;top.position.set(cx,a[5]-.012,cz);group.add(top);
+    const glass=new THREE.Mesh(roundedPanel(w-.018,d-.018,.135,.004),new THREE.MeshPhysicalMaterial({color:'#f7ead9',transparent:true,opacity:.13,roughness:.1,metalness:0,clearcoat:1,depthWrite:false}));glass.rotation.x=-Math.PI/2;glass.position.set(cx,a[5]+.001,cz);group.add(glass);
   }
   const white=new THREE.MeshStandardMaterial({color:'#e8e9e3',roughness:.33});
   const soil=new THREE.MeshStandardMaterial({color:'#534839',roughness:1});
@@ -79,8 +82,8 @@ export function staffRoomDetails(config){
       const angle=i*2.399,h=1.13+i*.075,tip=[Math.cos(angle)*.36,h+.12,Math.sin(angle)*.36];
       tube(root,[0,h-.14,0],tip,bark,.009);
       for(let j=0;j<8;j++){
-        const t=.28+j*.09,spin=angle+(j%2?-.8:.8),pos=new THREE.Vector3(tip[0]*t+Math.cos(spin)*.07,h-.12+t*.22,tip[2]*t+Math.sin(spin)*.07);
-        matrix.compose(pos,new THREE.Quaternion().setFromEuler(new THREE.Euler(.25,spin,.28)),new THREE.Vector3(.15,.012,.054));leaves.setMatrixAt(i*8+j,matrix);
+        const t=.28+j*.09,spin=angle+(j%2?-.8:.8),pos=new THREE.Vector3(tip[0]*t+Math.cos(spin)*.10,h-.12+t*.22+Math.sin(i+j)*.055,tip[2]*t+Math.sin(spin)*.10);
+        matrix.compose(pos,new THREE.Quaternion().setFromEuler(new THREE.Euler(.35+Math.sin(i+j)*.5,spin,.28)),new THREE.Vector3(.13,.018,.070));leaves.setMatrixAt(i*8+j,matrix);
       }
     }
     root.add(leaves);
@@ -88,16 +91,23 @@ export function staffRoomDetails(config){
   // Unreadable paper props preserve the scene without reproducing private records.
   const paper=new THREE.MeshStandardMaterial({color:'#f1efe7',roughness:.92});
   for(let i=0;i<8;i++){
-    const x=49.28+Math.floor(i/4)*1.9+(i%4)*.34,z=3.22;
+    const x=49.28+Math.floor(i/4)*1.9+(i%4)*.34,z=3.08+(i%3)*.18;
     for(let k=0;k<4;k++){
-      const page=new THREE.Mesh(new THREE.BoxGeometry(.28,.003,.43),paper);page.position.set(x+.14,4.222+k*.008,z+.215);page.rotation.y=(i%3-1)*.035;group.add(page);
+      const page=new THREE.Mesh(new THREE.BoxGeometry(.28,.003,.43),paper);page.position.set(x+.14,4.222+k*.008,z+.215);page.rotation.y=(i%3-1)*.13;group.add(page);
     }
-    const cover=new THREE.Mesh(new THREE.BoxGeometry(.283,.004,.433),new THREE.MeshStandardMaterial({color:['#d7aabf','#b8b3d7','#58727d','#bbc9b2'][i%4],roughness:.65}));cover.position.set(x+.14,4.251,z+.215);cover.rotation.y=(i%3-1)*.035;group.add(cover);
+    const cover=new THREE.Mesh(new THREE.BoxGeometry(.283,.004,.433),new THREE.MeshStandardMaterial({color:['#d7aabf','#b8b3d7','#58727d','#bbc9b2'][i%4],roughness:.65}));cover.position.set(x+.14,4.251,z+.215);cover.rotation.y=(i%3-1)*.13;group.add(cover);
     const label=new THREE.Mesh(new THREE.BoxGeometry(.17,.002,.12),paper);label.position.set(x+.14,4.254,z+.215);group.add(label);
   }
   const bottle=new THREE.Mesh(new THREE.CylinderGeometry(.045,.057,.20,16),white);bottle.position.set(52.05,4.30,3.30);group.add(bottle);
   tube(group,[52.05,4.39,3.30],[52.05,4.46,3.30],white,.016);tube(group,[52.05,4.46,3.30],[52.10,4.46,3.30],white,.014);
   const cup=new THREE.Mesh(new THREE.CylinderGeometry(.055,.045,.13,16),new THREE.MeshStandardMaterial({color:'#927050'}));cup.position.set(52.43,4.32,3.76);group.add(cup);
   for(let i=0;i<7;i++)tube(group,[52.40+(i%3)*.022,4.33,3.73+Math.floor(i/3)*.022],[52.39+(i%3)*.025,4.57+(i%2)*.04,3.73+Math.floor(i/3)*.025],i%2?red:black,.006);
+  const tissue=new THREE.Mesh(new THREE.BoxGeometry(.23,.065,.13),new THREE.MeshStandardMaterial({color:'#a8c37e'}));tissue.position.set(51.88,4.226,3.85);group.add(tissue);
+  for(let i=0;i<3;i++){const sheet=new THREE.Mesh(new THREE.PlaneGeometry(.12,.10),new THREE.MeshStandardMaterial({color:'#f5f2e9',side:THREE.DoubleSide}));sheet.position.set(51.83+i*.035,4.30+i*.009,3.85);sheet.rotation.set(-.4,i*.5,.3-i*.3);group.add(sheet);}
+  // The CCTV's private live images are replaced with non-identifying panes.
+  const screen=document.createElement('canvas');screen.width=384;screen.height=216;const sc=screen.getContext('2d');sc.fillStyle='#20292c';sc.fillRect(0,0,384,216);
+  for(let i=0;i<9;i++){const x=(i%3)*128,y=Math.floor(i/3)*72;sc.fillStyle=['#788389','#aaa79d','#708486'][i%3];sc.fillRect(x+2,y+2,124,68);sc.fillStyle='#d1d2c5';sc.fillRect(x+9,y+7,85,30);sc.fillStyle='#565d5a';sc.fillRect(x+16,y+43,108,18);}
+  const tvmap=new THREE.CanvasTexture(screen);tvmap.colorSpace=THREE.SRGBColorSpace;
+  const tv=new THREE.Mesh(new THREE.PlaneGeometry(.77,.50),new THREE.MeshBasicMaterial({map:tvmap}));tv.position.set(55.773,5.79,6.135);tv.rotation.y=-Math.PI/2;group.add(tv);
   return group;
 }
