@@ -1,5 +1,11 @@
 # 학교 3D 웹 배포
 
+## 2026-09-30 개별학습실 및 보건실 방향 수정 배포
+
+실행 커밋 `3dd58f5fd601be8ccb9fe5b0916f526b42ac0269`을 main에 푸시하고 기존 school-tour / production에 배포했습니다. Railway `8bf0d3f7-ffcd-4319-af79-cd8b5bb04061` SUCCESS. 개별학습실4·5의 사진 18장 기반 구현, 5-1 창가 흰 이동 보드 삭제, 보건실 입구 기준 오른쪽으로 안정실과 침대 3개를 옮긴 변경입니다.
+
+공개 주소 https://school-tour-production.up.railway.app/ 에서 101개 파일이 업로드한 커밋 아카이브와 바이트 일치했습니다. 모바일 화면 크기로 개별학습실4·5·보건실·교무실 바로가기 성공, 페이지 실행 오류 0, 비공개 파일/관리 API 차단 및 공개 테스트 훅 미노출 확인. 원본 사진·관련 없는 얼굴 실험 파일은 제외했습니다.
+
 ## 2026-09-30 교무실·보건실 및 교실 공통 가구 배포
 
 실행 커밋 `ac808e9fe94dfcbec1fdb304c1b0e8b8468eb351`을 main에 푸시하고, 커밋의 실행 의존성만 아카이브로 구성하여 기존 school-tour / production에 배포했습니다. Railway `6daf5cd1-f91a-43ce-9ba1-a864eace468d` SUCCESS. 주소는 https://school-tour-production.up.railway.app/ 입니다.
