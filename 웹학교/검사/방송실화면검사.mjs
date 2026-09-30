@@ -21,11 +21,11 @@ try{
       list.forEach((b,i)=>{const a=b.bounds;matrix.compose(new THREE.Vector3((a[0]+a[3])/2,(a[2]+a[5])/2,-(a[1]+a[4])/2),new THREE.Quaternion(),new THREE.Vector3(a[3]-a[0],a[5]-a[2],a[4]-a[1]));mesh.setMatrixAt(i,matrix);});mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();scene.add(mesh);
     }
     scene.add(broadcastRoomDetails(room));const camera=new THREE.PerspectiveCamera(78,1100/760,.03,80);
-    const views={입구:[58.8,5.04,.73,60.8,4.70,4.7],창가:[60.4,5.04,6.65,60.9,4.85,.20],방송책상:[62.85,5.02,2.0,60.2,4.8,5.0]};
+    const views={조정실입구:[58.8,5.04,.73,57.8,4.70,5.8],음향장비:[58.0,5.04,1.55,59.92,4.75,4],조정실창가:[59.07,5.04,6.5,58.4,4.85,1],관찰창:[59.07,5.04,3.4,62.3,4.8,4.2],스튜디오:[63.5,5.04,6.3,61.65,4.7,1.4]};
     window.showBroadcast=name=>{const a=views[name];camera.position.set(...a.slice(0,3));camera.lookAt(...a.slice(3));renderer.render(scene,camera);return renderer.info.render.calls;};
   });
   const output=await fs.mkdtemp(path.join(os.tmpdir(),'school-broadcast-preview-')),calls={};
-  for(const name of ['입구','창가','방송책상']){calls[name]=await page.evaluate(name=>window.showBroadcast(name),name);await page.screenshot({path:path.join(output,name+'.png')});}
+  for(const name of ['조정실입구','음향장비','조정실창가','관찰창','스튜디오']){calls[name]=await page.evaluate(name=>window.showBroadcast(name),name);await page.screenshot({path:path.join(output,name+'.png')});}
   await page.setViewportSize({width:390,height:700});await page.goto(base+'/?test=1');
   await page.waitForFunction(()=>window.schoolTour?.getState().ready,null,{timeout:90000});
   await page.locator('#시작').click();await page.locator('#캐릭터확인').click();
@@ -33,5 +33,5 @@ try{
   await page.locator('#방선택').selectOption('2F_BROADCAST');await page.locator('#방이동').click({noWaitAfter:true});
   await page.waitForFunction(()=>schoolTour.getState().position.z===3.4);
   const state=await page.evaluate(()=>schoolTour.getState());assert.equal(state.position.x,58.8);assert.equal(state.position.y,-.7);assert.equal(state.mode,'walk');
-  assert.deepEqual(errors,[]);console.log(JSON.stringify({ok:true,actualWebGL:true,gameRoomTeleport:true,views:3,calls,output}));
+  assert.deepEqual(errors,[]);console.log(JSON.stringify({ok:true,actualWebGL:true,gameRoomTeleport:true,views:5,calls,output}));
 }finally{await browser.close();}

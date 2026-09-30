@@ -3,6 +3,7 @@
 // Never propagate a photographed classroom's distinguishing details to other rooms.
 import {CLASS66_PROFILE} from './육학년육반.mjs';
 import {CLASS34_PROFILE} from './삼학년사반.mjs';
+import {UPLOADED_CLASSROOM_PROFILES} from './업로드교실관찰.mjs';
 const themes=[
   ['1F_3-1','햇살 정원','꽃','#d3ac59','#c4d1b5'],
   ['1F_3-2','파도 이야기','물결','#709fae','#bdd0d0'],
@@ -36,3 +37,4 @@ export const CLASSROOM_PROFILES=Object.fromEntries(themes.map(([roomId,theme,mot
 }]));
 CLASSROOM_PROFILES[CLASS66_PROFILE.roomId]={...CLASS66_PROFILE};
 CLASSROOM_PROFILES[CLASS34_PROFILE.roomId]={...CLASS34_PROFILE};
+for(const [id,profile] of Object.entries(UPLOADED_CLASSROOM_PROFILES))if(CLASSROOM_PROFILES[id])CLASSROOM_PROFILES[id]={...profile};

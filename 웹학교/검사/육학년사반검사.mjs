@@ -6,8 +6,11 @@ const source=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.me
 const original=JSON.stringify(source),before=buildWorld(source,{class64:false}),after=buildWorld(source);
 assert.equal(JSON.stringify(source),original,'Original model must remain immutable');
 assert.deepEqual(after.data,before.data,'All room names and boundaries must remain unchanged');
-assert.deepEqual(after.boxes.filter(b=>!b.name.startsWith('6-4 실내 ')),before.boxes,'No other room/corridor design changes');
-assert.deepEqual(after.colliders.filter(b=>!b.name.startsWith('6-4 충돌 ')),before.colliders);
+// Shared TV generation now also derives 6-4 devices from its interior config.
+// Compare other spaces by stable room ID rather than historical name prefixes.
+const outside64=list=>list.filter(b=>b.spaceId!==CLASS64_ID&&b.interiorRoom!==CLASS64_ID);
+assert.ok(JSON.stringify(outside64(after.boxes))===JSON.stringify(outside64(before.boxes)),'No other room/corridor design changes');
+assert.ok(JSON.stringify(outside64(after.colliders))===JSON.stringify(outside64(before.colliders)),'Other space collisions unchanged');
 for(const b of after.classroom64.boxes){const a=b.bounds;assert.equal(b.spaceId,CLASS64_ID);assert(a[0]>=30&&a[3]<=40&&a[1]>=-7&&a[4]<=0&&a[2]>=10.2&&a[5]<=13.35,b.name+' out of room');}
 assert(after.candidate(CLASS64_SPAWN.x,CLASS64_SPAWN.y,CLASS64_SPAWN.z));
 for(const d of after.classroom64.desks)assert(after.blocked(d.x,d.y,10.2),'Desk collision '+d.id);

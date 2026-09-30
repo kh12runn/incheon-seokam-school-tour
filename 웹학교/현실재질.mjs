@@ -32,12 +32,14 @@ export function finishMaterial(b){
     metalness:kind==='metal'?.72:0,envMapIntensity:kind==='metal'?.8:.28});
   if(kind==='lamp'){material.emissive.set('#fff4dc');material.emissiveIntensity=1.2;}
   if(kind==='meeting_table'){material.roughness=.14;material.envMapIntensity=.7;}
+  if(kind==='control_wood'){material.roughness=.23;material.envMapIntensity=.55;}
+  if(kind==='control_tile')material.roughness=.48;
   if(kind==='glass'){material.roughness=.2;material.envMapIntensity=.65;}
   if(kind==='clear_glass'){
     material.color.set('#e5f3ee');material.transparent=true;material.opacity=.1;material.depthWrite=false;
     material.roughness=.08;material.envMapIntensity=.35;return material;
   }
-  if(!['acoustic_wood','carpet','wood','room_floor','rubber_mat','tactile_mat','restroom_floor','restroom_wall','terrazzo','paint','metal','soil','ground','chalk','asphalt','facade','foliage'].includes(kind))return material;
+  if(!['control_wood','control_tile','acoustic_wood','carpet','wood','room_floor','rubber_mat','tactile_mat','restroom_floor','restroom_wall','terrazzo','paint','metal','soil','ground','chalk','asphalt','facade','foliage'].includes(kind))return material;
   material.onBeforeCompile=shader=>{
     shader.vertexShader='varying vec3 vSurfacePoint;\n'+shader.vertexShader;
     shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
@@ -50,7 +52,16 @@ export function finishMaterial(b){
       float grainHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
       float grainNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(grainHash(i),grainHash(i+vec2(1.,0.)),f.x),mix(grainHash(i+vec2(0.,1.)),grainHash(i+vec2(1.,1.)),f.x),f.y);}
       `+shader.fragmentShader;
-    const detail=kind==='acoustic_wood'?`
+    const detail=kind==='control_wood'?`
+      vec2 uv=vSurfacePoint.xz;
+      float grain=grainNoise(vec2(uv.x*135.+3.*grainNoise(uv*.7),uv.y*3.));
+      diffuseColor.rgb*=.80+.27*grain;`
+      :kind==='control_tile'?`
+      vec2 uv=vSurfacePoint.xz;
+      vec2 tile=abs(fract(uv/.45)-.5);
+      float seam=smoothstep(.487,.498,max(tile.x,tile.y));
+      diffuseColor.rgb*=mix(.97,.76,seam)*(.96+.06*grainNoise(uv*38.));`
+      :kind==='acoustic_wood'?`
       vec2 uv=vec2(vSurfacePoint.x+vSurfacePoint.z,vSurfacePoint.y);
       float holes=1.-smoothstep(.10,.22,length(fract(uv/.024)-.5));
       float grain=grainNoise(vec2(uv.x*43.,uv.y*2.));

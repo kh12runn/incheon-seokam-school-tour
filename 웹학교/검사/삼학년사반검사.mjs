@@ -3,7 +3,7 @@ import {readFileSync} from 'node:fs';
 import {buildWorld} from '../이동물리.mjs';
 import {mainClassroomsInterior} from '../본관교실.mjs';
 import {applyClass34Details,CLASS34_ID,CLASS34_PROFILE} from '../삼학년사반.mjs';
-const data=JSON.parse(readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),original=JSON.stringify(data),world=buildWorld(data),config=world.classroomsMain.rooms.find(r=>r.roomId===CLASS34_ID);
+const data=JSON.parse(readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),original=JSON.stringify(data),world=buildWorld(data,{uploadedClassPhotos:false}),config=world.classroomsMain.rooms.find(r=>r.roomId===CLASS34_ID);
 assert.equal(JSON.stringify(data),original);assert.equal(config.profile.photoCount,6);assert.equal(config.profile.photoStatus,'reviewed');assert.equal(CLASS34_PROFILE.sourceImageIds.length,6);
 for(const r of world.classroomsMain.rooms.filter(r=>r.roomId!==CLASS34_ID))assert.equal(applyClass34Details(r),r,'Other rooms must be untouched');
 const base=mainClassroomsInterior(world.data,{photoOverrides:false});

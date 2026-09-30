@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {spawn} from 'node:child_process';
+import {createHash} from 'node:crypto';
 import {createAdminAPI} from './관리자/API.mjs';
 const root=path.resolve(process.env.SCHOOL_WEB_ROOT??path.join(path.dirname(fileURLToPath(import.meta.url)),'..'));
 const manifest=path.join(root,'배포목록.json');
@@ -10,6 +11,13 @@ const publicFiles=fs.existsSync(manifest)?new Set(JSON.parse(fs.readFileSync(man
 const deployed=process.env.PORT!==undefined,host=deployed?'0.0.0.0':'127.0.0.1';
 const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.png':'image/png','.jpg':'image/jpeg','.glb':'model/gltf-binary','.txt':'text/plain; charset=utf-8','.blend':'application/octet-stream','.csv':'text/csv; charset=utf-8'};
 const adminAPI=createAdminAPI({root});
+const assetTags=new Map();
+function assetTag(file,stat){
+  const version=stat.size+':'+stat.mtimeMs+':'+stat.ctimeMs,previous=assetTags.get(file);
+  if(previous?.version===version)return previous.tag;
+  const tag='"'+createHash('sha256').update(fs.readFileSync(file)).digest('hex')+'"';
+  assetTags.set(file,{version,tag});return tag;
+}
 const server=http.createServer(async(req,res)=>{
   try{
     if(await adminAPI(req,res))return;
@@ -30,8 +38,15 @@ const server=http.createServer(async(req,res)=>{
     const encoding=['br','gzip'].filter(e=>(accepted.get(e)??accepted.get('*')??0)>0&&fs.existsSync(file+(e==='br'?'.br':'.gz')))
       .sort((a,b)=>(accepted.get(b)??accepted.get('*')??0)-(accepted.get(a)??accepted.get('*')??0))[0];
     const served=encoding?file+(encoding==='br'?'.br':'.gz'):file;
+    const stat=fs.statSync(served),etag=assetTag(served,stat);
     if(rel.startsWith('관리자/')){res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");res.setHeader('Referrer-Policy','same-origin');}
-    res.writeHead(200,{'Content-Type':types[path.extname(file)],'Cache-Control':'no-cache','Vary':'Accept-Encoding','X-Content-Type-Options':'nosniff','Content-Length':fs.statSync(served).size,...(encoding?{'Content-Encoding':encoding}:{})});
+    const headers={'Content-Type':types[path.extname(file)],'Cache-Control':'no-cache','Vary':'Accept-Encoding','X-Content-Type-Options':'nosniff','ETag':etag,...(encoding?{'Content-Encoding':encoding}:{})};
+    // Always revalidate so deployment updates appear immediately; unchanged assets
+    // reuse the browser cache instead of transferring large models again.
+    if((req.headers['if-none-match']??'').split(',').some(t=>t.trim()==='*'||t.trim().replace(/^W\//,'')===etag)){
+      res.writeHead(304,headers);res.end();return;
+    }
+    res.writeHead(200,{...headers,'Content-Length':stat.size});
     if(req.method==='HEAD')res.end();else fs.createReadStream(served).pipe(res);
   }catch{res.writeHead(400);res.end('Bad request');}
 });

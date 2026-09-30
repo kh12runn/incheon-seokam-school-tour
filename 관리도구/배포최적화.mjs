@@ -39,7 +39,8 @@ export function packRuntime(output){
     const target=path.join(output,rel);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,bytes);
     if(!files.includes(rel))continue;
     sizes.runtimeBytes+=bytes.length;
-    if(bytes.length>512&&/\.(?:html|css|m?js|json|txt)$/.test(rel)){
+    // HTTP lossless compression preserves every mesh, texture and animation byte.
+    if(bytes.length>512&&/\.(?:html|css|m?js|json|txt|glb)$/.test(rel)){
       const br=brotliCompressSync(bytes,{params:{[constants.BROTLI_PARAM_QUALITY]:8}}),gz=gzipSync(bytes,{level:9});
       fs.writeFileSync(target+'.br',br);fs.writeFileSync(target+'.gz',gz);
       sizes.compressedTransferBytes+=br.length;sizes.sidecarBytes+=br.length+gz.length;

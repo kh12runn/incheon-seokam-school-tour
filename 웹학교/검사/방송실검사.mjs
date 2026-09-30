@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import {buildWorld} from '../이동물리.mjs';
 import {BROADCAST_ID} from '../방송실사진배치.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),snapshot=JSON.stringify(data);
-const before=buildWorld(data,{broadcastPhotos:false}),world=buildWorld(data),room=world.specialInteriors.find(r=>r.roomId===BROADCAST_ID);
+const before=buildWorld(data,{broadcastPhotos:false}),world=buildWorld(data,{broadcastControl:false}),room=world.specialInteriors.find(r=>r.roomId===BROADCAST_ID);
 assert.equal(JSON.stringify(data),snapshot);assert.deepEqual(world.data.rooms,before.data.rooms);
 assert.equal(room.reference.count,6);assert.equal(room.chairs.length,6);assert.equal(new Set(room.reference.imageIds).size,6);
 assert.deepEqual(room.room.bounds,[56,64,-7,0,3.4,6.55]);

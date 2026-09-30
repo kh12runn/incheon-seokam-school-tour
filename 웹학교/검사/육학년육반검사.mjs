@@ -8,7 +8,9 @@ import {CLASSROOM_PROFILES} from '../교실별특징.mjs';
 const source=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),before=JSON.stringify(source);
 const world=buildWorld(source),base=mainClassroomsInterior(world.data,{photoOverrides:false}),after=world.classroomsMain;
 assert.equal(JSON.stringify(source),before);
-assert.ok(JSON.stringify(after.rooms.filter(r=>r.roomId!==CLASS66_ID))===JSON.stringify(base.rooms.filter(r=>r.roomId!==CLASS66_ID)),'Other 23 main classrooms unchanged');
+// Test the 6-6 transformer in isolation: later photo implementations are independent.
+const isolated=base.rooms.map(applyClass66Details);
+assert.ok(JSON.stringify(isolated.filter(r=>r.roomId!==CLASS66_ID))===JSON.stringify(base.rooms.filter(r=>r.roomId!==CLASS66_ID)),'6-6 transformer preserves all other 23 main classrooms');
 for(const config of base.rooms.filter(r=>r.roomId!==CLASS66_ID))assert.equal(applyClass66Details(config),config);
 const room=after.rooms.find(r=>r.roomId===CLASS66_ID),original=base.rooms.find(r=>r.roomId===CLASS66_ID);
 assert.deepEqual(room.desks,original.desks);assert.deepEqual(room.chairs,original.chairs);assert.deepEqual(room.spawn,original.spawn);assert.deepEqual(room.room,original.room);
@@ -16,7 +18,7 @@ assert.notDeepEqual(room.boxes,original.boxes);assert.equal(room.photoDetails.so
 assert.equal(room.photoDetails.latches.length,18,'Approximate split locker banks, not an asserted surveyed count');
 assert(!room.boxes.some(b=>/사물함 몸체$/.test(b.name)&&!b.name.includes('사진')),'Old continuous locker bank removed');
 for(const label of ['돌출 수납장','밝은 매트','키 큰 수납장','거울','이동 교탁','접힌 체육 매트','롤블라인드','옷걸이'])assert(room.boxes.some(b=>b.name.includes(label)),label);
-assert.equal(Object.values(CLASSROOM_PROFILES).filter(p=>p.photoStatus==='reviewed').length,1);
+assert.equal(CLASSROOM_PROFILES[CLASS66_ID].photoStatus,'reviewed');
 assert(world.candidate(room.spawn.x,room.spawn.y,room.spawn.z));
 for(const b of room.colliders.filter(b=>b.name.includes('충돌 사진'))){
   const a=b.bounds;assert(world.blocked((a[0]+a[3])/2,(a[1]+a[4])/2,room.spawn.z),'New furniture blocks walking: '+b.name);

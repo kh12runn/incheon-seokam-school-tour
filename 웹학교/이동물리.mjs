@@ -21,6 +21,8 @@ import {meetingRoomInterior} from './운영위원회회의실.mjs';
 import {audioRoomInterior} from './시청각실사진배치.mjs';
 import {finishCentralStair} from './중앙계단사진마감.mjs';
 import {broadcastRoomInterior} from './방송실사진배치.mjs';
+import {addBroadcastControl} from './방송조정실배치.mjs';
+import {uploadedAnnexClassrooms} from './업로드교실배치.mjs';
 export const PLAYER_RADIUS=.28, PLAYER_HEIGHT=1.7, EYE_HEIGHT=1.58;
 const EPS=.0001, CELL=4;
 const intersect=(x,y,r,b)=>{
@@ -39,7 +41,7 @@ function localBounds(f,u0,u1,v0,v1,z0,z1){
   const p=localPoint(f,u0,v0),q=localPoint(f,u1,v1);
   return [Math.min(p.x,q.x),Math.min(p.y,q.y),z0,Math.max(p.x,q.x),Math.max(p.y,q.y),z1];
 }
-export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,exterior=true,annexFinish=true,restrooms=true,principalOffice=true,basement=true,audioPhotos=true,centralStairPhotos=true,broadcastPhotos=true}={}){
+export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,exterior=true,annexFinish=true,restrooms=true,principalOffice=true,basement=true,audioPhotos=true,centralStairPhotos=true,broadcastPhotos=true,broadcastControl=true,uploadedClassPhotos=true}={}){
   data=applyGroundFloorPlan(data);
   if(restrooms)data=applyRestroomPlan(data);
   if(basement)data=applyBasementPlan(data);
@@ -159,11 +161,13 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
   for(const b of boxes)if(b.name==='SPACE_EXT_ROSTRUM')colliders.push(b);
   const classroom64=class64?class64Interior(data):null;
   if(classroom64){boxes.push(...classroom64.boxes);colliders.push(...classroom64.colliders);}
-  const classroomsMain=mainClassrooms?mainClassroomsInterior(data):{rooms:[],boxes:[],colliders:[]};
+  const classroomsMain=mainClassrooms?mainClassroomsInterior(data,{uploadedPhotos:uploadedClassPhotos}):{rooms:[],boxes:[],colliders:[]};
   boxes.push(...classroomsMain.boxes);colliders.push(...classroomsMain.colliders);
   const classroom21=class21?class21Interior(data):null;
   if(classroom21){boxes.push(...classroom21.boxes);colliders.push(...classroom21.colliders);}
-  const classroomInteriors=[...classroomsMain.rooms,...(classroom21?[classroom21]:[])];
+  const uploadedAnnex=uploadedClassPhotos?uploadedAnnexClassrooms(data):[];
+  for(const config of uploadedAnnex){boxes.push(...config.boxes);colliders.push(...config.colliders);}
+  const classroomInteriors=[...classroomsMain.rooms,...(classroom21?[classroom21]:[]),...uploadedAnnex];
   const equipped=classroomDevices(boxes,data.rooms);boxes.splice(0,boxes.length,...equipped);
   for(const tv of boxes.filter(b=>b.cornerTV&&!b.name.endsWith('벽걸이 화면'))){
     const b=tv.bounds,cx=(b[0]+b[3])/2,cy=(b[1]+b[4])/2,half=(b[3]-b[0]+b[4]-b[1])*Math.SQRT1_2/2;
@@ -174,6 +178,7 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
   const meeting=meetingRoomInterior(data,boxes,colliders,addBox);
   const audio=audioPhotos?audioRoomInterior(data,boxes,colliders,addBox,surfaces):null;
   const broadcast=broadcastPhotos?broadcastRoomInterior(data,boxes,colliders,addBox):null;
+  if(broadcastControl)addBroadcastControl(broadcast);
   const specialInteriors=[meeting,audio,broadcast].filter(Boolean);
   for(const config of specialInteriors){boxes.push(...config.boxes);colliders.push(...config.colliders);}
   const grid=(items)=>{
@@ -237,5 +242,5 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
     let q={...p};if(!blocked(q.x+dx,q.y,q.z))q.x+=dx;
     if(!blocked(q.x,q.y+dy,q.z))q.y+=dy;return q;
   }
-  return {data,boxes,colliders,surfaces,stairs,classroom64,classroom21,classroomsMain,classroomInteriors,specialInteriors,centralStairFinish,principalOffice:office,move,candidate,blocked,support,floorBelow,moveAir,roomAt,spawn:{x:20,y:1.5,z:0}};
+  return {data,boxes,colliders,surfaces,stairs,classroom64,classroom21,classroomsMain,classroomInteriors,uploadedAnnex,specialInteriors,centralStairFinish,principalOffice:office,move,candidate,blocked,support,floorBelow,moveAir,roomAt,spawn:{x:20,y:1.5,z:0}};
 }

@@ -140,7 +140,7 @@ function buildVisuals(){
     visuals.push({mesh,floor:4,interiorRoom:config.roomId,center:convert(config.spawn),ceiling:false});
   }
   const computerEntrance=computerEntranceDetails();scene.add(computerEntrance);visuals.push({mesh:computerEntrance,floor:4,ceiling:false});
-  for(const config of world.classroomsMain.rooms){
+  for(const config of [...world.classroomsMain.rooms,...world.uploadedAnnex]){
     const mesh=mainClassroomDetails(config);scene.add(mesh);
     visuals.push({mesh,floor:parseInt(config.room.floor),interiorRoom:config.roomId,center:convert(config.spawn),ceiling:false});
   }
@@ -354,7 +354,7 @@ $('방이동').addEventListener('click',()=>{
   const b=room.bounds,interior=world.classroomInteriors.find(r=>r.roomId===room.id),special=world.specialInteriors.find(r=>r.roomId===room.id);
   const p=room.id===PRINCIPAL_ID?{...world.principalOffice.spawn}:room.id===CLASS64_ID?{...CLASS64_SPAWN}:interior?{...interior.spawn}:special?{...special.spawn}:{x:(b[0]+b[1])/2,y:(b[2]+b[3])/2,z:b[4]};
   const valid=world.candidate(p.x,p.y,p.z);if(!valid){notice('해당 위치는 이동할 수 없습니다.');return;}
-  position=valid;jumpMotion.reset();yaw=room.id===PRINCIPAL_ID?Math.atan2(p.x-OFFICE_CHARACTERS[0].position.x,OFFICE_CHARACTERS[0].position.y-p.y):special?.entryYaw??(interior?.layoutRotation===Math.PI?-Math.PI/2:interior||room.id===CLASS64_ID?Math.PI/2:room.building==='ANNEX'?-Math.PI/2:0);pitch=0;startWalk();
+  position=valid;jumpMotion.reset();yaw=room.id===PRINCIPAL_ID?Math.atan2(p.x-OFFICE_CHARACTERS[0].position.x,OFFICE_CHARACTERS[0].position.y-p.y):special?.entryYaw??interior?.yaw??(interior?.layoutRotation===Math.PI?-Math.PI/2:interior||room.id===CLASS64_ID?Math.PI/2:room.building==='ANNEX'?-Math.PI/2:0);pitch=0;startWalk();
 });
 document.addEventListener('pointerlockchange',()=>{
   locked=document.pointerLockElement===canvas;

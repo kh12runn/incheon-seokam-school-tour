@@ -3,6 +3,7 @@ import {readFileSync} from 'node:fs';
 import {buildWorld} from '../이동물리.mjs';
 import {mainClassroomsInterior,isMainClassroom} from '../본관교실.mjs';
 import {CLASSROOM_PROFILES} from '../교실별특징.mjs';
+import {UPLOADED_CLASSROOM_PROFILES} from '../업로드교실관찰.mjs';
 const source=JSON.parse(readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),original=JSON.stringify(source);
 const before=buildWorld(source,{mainClassrooms:false}),after=buildWorld(source);
 assert.equal(JSON.stringify(source),original,'원본 데이터 보존');
@@ -17,7 +18,8 @@ const themes=new Set();
 for(const interior of after.classroomsMain.rooms){
   const {room,profile,frame,spawn,entry}=interior,b=room.bounds;
   assert.ok(isMainClassroom(room));assert.notEqual(room.id,'4F_6-4');
-  if(['4F_6-6','1F_3-4'].includes(room.id)){assert.equal(profile.photoStatus,'reviewed');assert.equal(profile.photoCount,6);assert.ok(profile.observedFeatures.length>=6);}
+  if(UPLOADED_CLASSROOM_PROFILES[room.id]){assert.equal(profile.photoStatus,'reviewed');assert.equal(profile.photoCount,UPLOADED_CLASSROOM_PROFILES[room.id].photoCount);assert.ok(profile.observedFeatures.length>=6);}
+  else if(['4F_6-6','1F_3-4'].includes(room.id)){assert.equal(profile.photoStatus,'reviewed');assert.equal(profile.photoCount,6);assert.ok(profile.observedFeatures.length>=6);}
   else {assert.equal(profile.photoStatus,'awaiting');assert.deepEqual(profile.observedFeatures,[]);}
   assert.ok(!themes.has(profile.theme),'개별 테마');themes.add(profile.theme);
   assert.equal(interior.desks.length,24);assert.equal(interior.chairs.length,24);
