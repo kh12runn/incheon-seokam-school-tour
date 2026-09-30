@@ -1,5 +1,21 @@
 # 학교 3D 웹 배포
 
+## 2026-09-30 공동작업자 포함 전체 반영 배포 완료
+
+원격 main의 공동작업자 최신 d924baf까지 병합 없이 fast-forward 동기화한 후 회귀 검사를 수행했습니다. 검증 커밋 `67c6ea9d16c5647153c9041703fddd87af954729`를 main에 푸시하고 커밋 아카이브의 실행 파일만 기존 `school-tour / production`에 배포했습니다. Railway 배포 `2dca1a89-6608-43a4-9ae6-a5f4075a66cd` SUCCESS.
+
+교무실 사진 세부 마감, 정문·운동장·좌측 임시 주차, 5-3·5-6·5학년 연수실과 창 개구부 수정까지 포함합니다. 개별학습실4·5, 5-1 창가 흰 보드 삭제, 보건실 오른쪽 침대 배치도 유지했습니다. 원본 사진·미사용 얼굴 실험 파일·검사 출력은 배포에서 제외했습니다.
+
+검증: 구조/가구/충돌/계단/패키징 11개 검사 통과, 실제 WebGL 16방향 및 연결 여닫이문 통과 확인. 운영 https://school-tour-production.up.railway.app/ 의 공개 파일 104개가 실제 업로드 아카이브와 일치하며, 모바일 화면 크기에서 개별학습실4·5/보건실/교무실/5-3/5-6/5학년 연수실 이동 성공. 페이지 오류 0, 비공개 경로 403·비인증 관리 API 401, 공개 테스트 훅 미노출 확인.
+
+## 다른 PC의 Not Authorized / 프로젝트 관리 화면 404
+
+학교 프로젝트는 `seokamrock's Projects` 워크스페이스의 `incheon-seokam-school-tour`이며 서비스는 `school-tour`, 환경은 `production`입니다. 로컬 `49_Visitor/석암초등학교`는 상위 폴더의 방문증 저장소(`seokamrock/visitor_pass`)와 별도 Git 저장소(`kh12runn/incheon-seokam-school-tour`)입니다.
+
+GitHub 푸시 권한은 Railway 프로젝트 접근 권한을 부여하지 않습니다. 다른 PC에서 프로젝트 API가 Not Authorized이고 관리 링크가 404라면, 기존 소유자 Railway 계정으로 로그인하여 위 워크스페이스가 보이는지 먼저 확인합니다. 브라우저에서는 보이고 CLI에서는 안 보이면 `railway whoami`, `railway status`로 CLI의 계정/대상을 확인하고 다시 로그인·연결합니다. `RAILWAY_TOKEN` 또는 `RAILWAY_API_TOKEN` 환경변수가 있으면 브라우저 로그인과 다른 인증을 사용할 수 있으므로 값은 출력하지 말고 적용 범위를 확인합니다. 팀 계정 초대가 필요할 때는 소유자가 Workspace Settings → People에서 권한을 부여합니다. CLI 배포는 Member 또는 Admin이 필요하며 Deployer는 GitHub 자동 배포용입니다.
+
+공식 안내: https://docs.railway.com/cli/login 및 https://docs.railway.com/projects/workspaces . 기존 주소를 유지하려면 새 프로젝트를 만들지 말고 기존 프로젝트 접근을 복구해야 합니다. 운영 사이트 접속 주소는 https://school-tour-production.up.railway.app/ 이며 Railway 관리 화면 권한과 별개입니다.
+
 ## 2026-09-30 개별학습실 및 보건실 방향 수정 배포
 
 실행 커밋 `3dd58f5fd601be8ccb9fe5b0916f526b42ac0269`을 main에 푸시하고 기존 school-tour / production에 배포했습니다. Railway `8bf0d3f7-ffcd-4319-af79-cd8b5bb04061` SUCCESS. 개별학습실4·5의 사진 18장 기반 구현, 5-1 창가 흰 이동 보드 삭제, 보건실 입구 기준 오른쪽으로 안정실과 침대 3개를 옮긴 변경입니다.
