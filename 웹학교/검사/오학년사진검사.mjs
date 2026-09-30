@@ -7,6 +7,8 @@ assert.equal(JSON.stringify(data),snapshot);
 const research=world.specialInteriors.find(c=>c.roomId===GRADE5_RESEARCH_ID);
 assert.equal(research.reference.count,7);assert.equal(new Set(research.reference.imageIds).size,7);assert(research.reference.approximateDimensions);
 assert.equal(research.chairs.length,8);assert.equal(research.boxes.filter(b=>b.name.includes('교구장 유리문')).length,10);
+assert(!world.boxes.some(b=>b.name.includes('외피 보강')&&b.bounds[0]<46&&b.bounds[3]>46&&b.bounds[1]<10.2&&b.bounds[4]>9.9&&b.bounds[2]<8.5&&b.bounds[5]>8.5),'Exterior backing must not conceal the window');
+assert(world.blocked(46,9.86,6.8),'Window retains collision');
 for(const word of ['회색 타일','코팅기','재단기','냉장고','전자레인지','온수기 배관','분리수거통','창가 모니터','복사기','옷걸이'])assert(research.boxes.some(b=>b.name.includes(word)),word);
 for(const c of [research,...world.classroomInteriors.filter(c=>['3F_5-3','3F_5-6'].includes(c.roomId))]){
   assert(world.candidate(c.spawn.x,c.spawn.y,c.spawn.z),c.roomId+' spawn');

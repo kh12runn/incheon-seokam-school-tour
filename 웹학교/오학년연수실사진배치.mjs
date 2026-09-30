@@ -16,7 +16,12 @@ export function grade5ResearchInterior(data,worldBoxes,worldColliders){
   // Furniture dimensions are photo estimates fitted to the existing envelope.
   const cuts=[bounds([.20,6.8,.99,5.78,7.2,2.43]),bounds([2.95,-.2,1.12,5.6,.2,2.4])];
   for(const list of [worldBoxes,worldColliders]){
-    const next=list.flatMap(b=>b.spaceId!==room.id?[b]:cuts.reduce((parts,cut)=>parts.flatMap(p=>subtractBox(p,cut)),[b]));
+    const next=list.flatMap(b=>{
+      if(b.spaceId===room.id)return cuts.reduce((parts,cut)=>parts.flatMap(p=>subtractBox(p,cut)),[b]);
+      // sealEnvelope adds an unowned backing just outside the photographed window.
+      if(b.floor===3&&b.name.includes('외피 보강'))return subtractBox(b,cuts[0]);
+      return [b];
+    });
     list.splice(0,list.length,...next);
   }
   add('회색 타일 바닥',[.1,.1,.001,5.9,6.9,.009],'#c4c8c3','control_tile');
