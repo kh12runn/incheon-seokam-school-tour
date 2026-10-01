@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="./웹학교/모바일조작.css">
   <link rel="stylesheet" href="./웹학교/NPC말풍선.css">
   <link rel="stylesheet" href="./웹학교/월영어퀴즈.css">
+  <link rel="stylesheet" href="./웹학교/운전.css">
   <title>석암초등학교 · 우리 학교 탐험</title>
 </head>
 <body data-mode="overview" data-playing="false">
@@ -71,6 +72,11 @@
     <span class="시점설명" aria-hidden="true">오른쪽 화면을 밀어 둘러보기</span>
     <div class="터치동작"><button id="터치인사" aria-label="손 흔들어 인사하기" disabled><span aria-hidden="true">👋</span><small>인사</small></button><button id="터치점프" aria-label="점프하기" disabled><span aria-hidden="true">↑</span><small>점프</small></button></div>
   </div>
+  <section id="차량조작" aria-label="차량 조작" hidden>
+    <output id="차량속도" aria-label="현재 속도" hidden>0 km/h</output>
+    <button id="차량탑승" type="button" aria-keyshortcuts="F"><img src="./웹학교/외부도구/car-front.svg" alt=""><span id="차량동작">탑승하기</span></button>
+    <button id="차량브레이크" type="button" hidden>브레이크</button>
+  </section>
   <footer><span id="상태" role="status">구조 불러오는 중…</span></footer>
   <script type="module" src="./웹학교/게임.mjs?v=20260921-교장1명러닝대화"></script>
   <noscript>학교를 보려면 브라우저에서 자바스크립트를 허용하세요.</noscript>

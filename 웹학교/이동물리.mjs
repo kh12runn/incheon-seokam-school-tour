@@ -207,10 +207,11 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
       const key=x+','+y;if(!map.has(key))map.set(key,[]);map.get(key).push(item);
     }}return map;
   };
-  const wallsGrid=grid(colliders),floorGrid=grid(surfaces);
+  const movingCars=colliders.filter(b=>b.vehicleId),wallsGrid=grid(colliders.filter(b=>!b.vehicleId)),floorGrid=grid(surfaces);
   const query=(map,x,y)=>map.get(Math.floor(x/CELL)+','+Math.floor(y/CELL))??[];
+  const nearWalls=(x,y)=>[...query(wallsGrid,x,y),...movingCars];
   function blocked(x,y,z){
-    return query(wallsGrid,x,y).some(o=>!(o.stepSurface&&o.bounds[5]<=z+.34)&&o.bounds[5]>z+.09&&o.bounds[2]<z+PLAYER_HEIGHT&&intersect(x,y,PLAYER_RADIUS,o.bounds));
+    return nearWalls(x,y).some(o=>!(o.stepSurface&&o.bounds[5]<=z+.34)&&o.bounds[5]>z+.09&&o.bounds[2]<z+PLAYER_HEIGHT&&(o.containsXY?o.containsXY(x,y,PLAYER_RADIUS):intersect(x,y,PLAYER_RADIUS,o.bounds)));
   }
   function support(x,y,z){
     let best=-Infinity;
@@ -252,7 +253,7 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
       const h=s.height(x,y);if(h<=z+.025&&h>best)best=h;
     }
     // Solid furniture/slabs can support a landing; never drop through their tops.
-    for(const s of query(wallsGrid,x,y)){
+    for(const s of nearWalls(x,y)){
       const b=s.bounds;if(b[5]<=z+.025&&b[5]>best&&intersect(x,y,PLAYER_RADIUS,b))best=b[5];
     }
     return best;

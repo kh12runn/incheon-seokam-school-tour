@@ -9,14 +9,14 @@ export function segmentBox(start,end,bounds,padding=0){
   return lo;
 }
 export function createCameraCollision(boxes,radius=.16){
-  const size=4,grid=new Map();
-  for(const box of boxes){const b=box.spatialBounds??box.bounds;
+  const size=4,grid=new Map(),cars=boxes.filter(b=>b.vehicleId);
+  for(const box of boxes.filter(b=>!b.vehicleId)){const b=box.spatialBounds??box.bounds;
     for(let x=Math.floor((b[0]-radius)/size);x<=Math.floor((b[3]+radius)/size);x++)for(let y=Math.floor((b[1]-radius)/size);y<=Math.floor((b[4]+radius)/size);y++){
       const key=x+','+y;if(!grid.has(key))grid.set(key,[]);grid.get(key).push(box);
     }
   }
-  return (target,desired)=>{
-    const nearby=new Set();
+  return (target,desired,{ignoreVehicle}={})=>{
+    const nearby=new Set(cars.filter(c=>c.vehicleId!==ignoreVehicle));
     for(let x=Math.floor(Math.min(target.x,desired.x)/size);x<=Math.floor(Math.max(target.x,desired.x)/size);x++)for(let y=Math.floor(Math.min(target.y,desired.y)/size);y<=Math.floor(Math.max(target.y,desired.y)/size);y++)for(const b of grid.get(x+','+y)??[])nearby.add(b);
     let fraction=1;
     for(const b of nearby)fraction=Math.min(fraction,segmentBox(target,desired,b.bounds,radius));

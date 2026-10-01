@@ -1,0 +1,11 @@
+#차량조작{position:fixed;z-index:12;left:50%;bottom:82px;transform:translateX(-50%);display:flex;align-items:center;gap:8px;max-width:calc(100vw - 24px);letter-spacing:0}
+#차량조작[hidden],#차량조작 [hidden]{display:none!important}
+#차량조작 button{height:48px;border-radius:8px;padding:0 15px;display:flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;font-size:14px;background:#183d36;color:#f4faf6;border:1px solid #a4d3ba}
+#차량조작 button:disabled{opacity:.65;cursor:wait}
+#차량조작 img{width:22px;height:22px;filter:invert(1);flex:none}
+#차량속도{min-width:84px;font-variant-numeric:tabular-nums;text-align:center;font-size:18px;color:#fff;background:#152c2ee8;padding:13px 9px;border-radius:8px}
+#차량조작 #차량브레이크{background:#493432;border-color:#b98c7f}
+#차량브레이크.누르는중{background:#8d4136}
+body[data-driving=true] .터치동작,body[data-driving=true] #조작힌트{visibility:hidden}
+body[data-touch=true] #차량조작{bottom:calc(175px + env(safe-area-inset-bottom))}
+@media(max-width:450px){#차량조작{gap:5px}#차량조작 button{font-size:12px;padding:0 10px}#차량속도{font-size:15px;min-width:70px;padding:15px 6px}}

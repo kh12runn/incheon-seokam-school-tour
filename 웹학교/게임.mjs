@@ -16,7 +16,9 @@ import {classroomSigns} from './교실팻말표현.mjs';
 import {getApprovedAssets} from './승인사진자료.mjs';
 import {exteriorRenderBox,exteriorSkins} from './외관사진디자인.mjs';
 import {PARKING,REAR_PARKING} from './주차장.mjs';
-import {parkedCarDetails} from './자동차표현.mjs';
+import {parkedCarDetails,updateDrivenCars} from './자동차표현.mjs';
+import {createDriving} from './운전물리.mjs';
+import {drivingControls} from './운전화면.mjs';
 import {supportRoomDetails} from './지원실사진표현.mjs';
 import {OUTDOOR_YAW} from './운동장환경.mjs';
 import {clearDaySky,playgroundTrees} from './야외풍경.mjs';
@@ -68,6 +70,7 @@ sun.shadow.bias=-.00008;sun.shadow.normalBias=.025;
 const camera=new THREE.PerspectiveCamera(76,1,.045,500);camera.rotation.order='YXZ';
 let data,world,position,mode='overview',locked=false,dragMode=false,freeLook=false,yaw=OUTDOOR_YAW,pitch=0;
 let footballPhysics,footballVisual;
+let driving,carVisual,vehicleUI,lastDriveYaw=null;
 let freeLookPoint=null;
 let lookRequestSerial=0;
 let velocity={x:0,y:0},smoothZ=EYE_HEIGHT,last=performance.now(),elapsed=0,ready=false;
@@ -90,6 +93,7 @@ const principalBubbles=['교장실','중앙현관'].map(name=>{
 const bubblePoint=new THREE.Vector3();
 function updatePrincipalBubble(element,npc,npcPosition,offset=0){
   element.hidden=true;
+  if(driving?.phase!=='walking')return;
   if(monthQuiz.getState().open)return;
   if(!npc?.root.visible||!principalCanGreet(position,npcPosition,{active:isPlaying()&&!document.hidden,colliders:world.colliders}))return;
   element.textContent=principalGreetingAt(new Date(),Math.floor(elapsed/7),offset);
@@ -123,6 +127,7 @@ const characterPicker=createCharacterPicker({initial:selectedCharacter??'boy-cut
 },onStarted(){startWalk(pickerFallback);},onClose(){if(pickerResume)startWalk();else pausePanel();}});
 function openCharacterPicker(fallback=false){
   if(!ready||characterPicker.isOpen())return;
+  leaveVehicle();
   $('게임메뉴').close();
   pickerFallback=fallback;pickerResume=mode==='walk'&&characterChosenThisVisit;clearInput();dragMode=false;freeLook=false;if(document.pointerLockElement)document.exitPointerLock();pausePanel();characterPicker.open();
 }
@@ -146,8 +151,9 @@ function textTexture(text,background=false){
 }
 let connectingDoorVisual;
 function buildVisuals(){
-  const parkedCars=parkedCarDetails();scene.add(parkedCars);visuals.push({mesh:parkedCars,floor:0,ceiling:false});
+  const parkedCars=parkedCarDetails();carVisual=parkedCars;scene.add(parkedCars);visuals.push({mesh:parkedCars,floor:0,ceiling:false});
   scene.add(playgroundTrees());footballPhysics=createFootballPhysics(world);footballVisual=footballDetails(footballPhysics);scene.add(footballVisual.group);
+  driving=createDriving(world,footballPhysics);vehicleUI=drivingControls({onAction:vehicleAction,canPlay:isPlaying});
   scene.add(teacherChairDetails(world.teacherChairs));scene.add(classroomWindowSigns(world.data));
   if(world.centralStairFinish)scene.add(centralStairDetails(world.centralStairFinish));
   for(const config of world.specialInteriors){
@@ -255,7 +261,7 @@ function overviewCamera(dt){
 function cameraWalk(dt){
   smoothZ=THREE.MathUtils.lerp(smoothZ,position.z+EYE_HEIGHT,1-Math.exp(-dt*18));
   const target={x:position.x,y:position.y,z:smoothZ-EYE_HEIGHT+STUDENT_HEIGHT*.68};
-  const desired=thirdPersonDesired(target,yaw,pitch,followDistance),safe=resolveCamera(target,desired);
+  const desired=thirdPersonDesired(target,yaw,pitch,followDistance),safe=resolveCamera(target,desired,{ignoreVehicle:driving?.phase!=='walking'?driving?.active?.id:undefined});
   // Snap inward on collision; only ease outward, so smoothing never crosses a wall.
   cameraDistance=cameraReset||safe.distance<cameraDistance?safe.distance:THREE.MathUtils.lerp(cameraDistance,safe.distance,1-Math.exp(-dt*6));cameraReset=false;cameraBlocked=safe.blocked;
   const length=Math.hypot(desired.x-target.x,desired.y-target.y,desired.z-target.z),t=cameraDistance/Math.max(length,.001);
@@ -264,10 +270,22 @@ function cameraWalk(dt){
   camera.position.copy(convert(cam));camera.lookAt(convert(target));
 }
 function isPlaying(){return mode==='walk'&&avatar.modelStatus==='ready'&&(locked||dragMode||freeLook)&&!document.hidden&&!$('게임메뉴').open&&!characterPicker.isOpen()&&!elevatorBusy&&!$('승강기창').open;}
-function clearInput(){keys.clear();velocity={x:0,y:0};drag=null;freeLookPoint=null;touchControls?.reset();avatar.cancelWave();greeting.hidden=true;}
-function jump(){if(isPlaying()){avatar.cancelWave();jumpMotion.start(position);}}
+function clearInput(){keys.clear();velocity={x:0,y:0};drag=null;freeLookPoint=null;touchControls?.reset();vehicleUI?.reset();avatar.cancelWave();greeting.hidden=true;}
+function leaveVehicle(){if(driving&&driving.phase!=='walking'){position=driving.cancel();avatar.setSeated(false);jumpMotion.reset();cameraReset=true;lastDriveYaw=null;}}
+function vehicleAction(){
+  if(!isPlaying())return;const success=driving.phase==='walking'?driving.enter(position):driving.exit();
+  if(!success&&driving.error)notice(driving.error);clearInput();canvas.focus({preventScroll:true});
+}
+function cameraDrive(dt){
+  const car=driving.active,p=car.body.position,state=driving.getState();
+  if(lastDriveYaw===null){yaw=state.yaw;pitch=.05;cameraReset=true;}else yaw+=Math.atan2(Math.sin(state.yaw-lastDriveYaw),Math.cos(state.yaw-lastDriveYaw));lastDriveYaw=state.yaw;
+  const target={x:p.x,y:p.y,z:p.z+.45},desired=thirdPersonDesired(target,yaw,pitch,6.8),safe=resolveCamera(target,desired,{ignoreVehicle:car.id});
+  if(cameraReset||safe.blocked)camera.position.copy(convert(safe));else camera.position.lerp(convert(safe),1-Math.exp(-dt*9));
+  cameraReset=false;cameraDistance=safe.distance;cameraBlocked=safe.blocked;camera.lookAt(convert(target));
+}
+function jump(){if(isPlaying()&&driving?.phase==='walking'){avatar.cancelWave();jumpMotion.start(position);}}
 function greet(){
-  if(!isPlaying()||jumpMotion.getState().airborne||avatar.getState().waving)return;
+  if(!isPlaying()||driving?.phase!=='walking'||jumpMotion.getState().airborne||avatar.getState().waving)return;
   clearInput();avatar.wave(yaw);notice(touchControls?.isActive()?'안녕~! · 오른쪽 아래 버튼으로 점프와 인사':'안녕~! · Z 인사 · Space 점프');
   if('speechSynthesis' in window){
     const line=new SpeechSynthesisUtterance('안녕!');line.lang='ko-KR';line.rate=1.03;line.pitch=1.2;
@@ -333,13 +351,14 @@ function lockFallback(){
   notice(touchControls?.isActive()?movementHint():'마우스를 움직여 둘러보기 · 클릭·드래그 없이 시점 이동 · ESC 메뉴');
 }
 function overview(){
+  leaveVehicle();
   $('게임메뉴').close();mode='overview';dragMode=false;freeLook=false;clearInput();if(document.pointerLockElement)document.exitPointerLock();
   orbit={yaw:.75,pitch:.83,distance:150};orbitResumeAt=0;
   pausePanel();notice(touchControls?.isActive()?'학교 전체 항공뷰 · 한 손가락 회전 / 두 손가락 확대 · 탐험 시작하기':'학교 전체 항공뷰 · 드래그로 회전 / 휠로 확대 · 학교 탐험 시작하기');
 }
-function reset(){position={...world.spawn};jumpMotion.reset();yaw=OUTDOOR_YAW;pitch=0;smoothZ=position.z+EYE_HEIGHT;cameraReset=true;avatar.snapHeading(Math.PI+yaw);clearInput();notice('중앙현관 밖 구령대로 돌아왔습니다.');}
+function reset(){leaveVehicle();position={...world.spawn};jumpMotion.reset();yaw=OUTDOOR_YAW;pitch=0;smoothZ=position.z+EYE_HEIGHT;cameraReset=true;avatar.snapHeading(Math.PI+yaw);clearInput();notice('중앙현관 밖 구령대로 돌아왔습니다.');}
 function openElevator(){
-  if(!ready||mode!=='walk'||elevatorBusy||!nearElevator(position,data.floorHeight))return;
+  if(!ready||mode!=='walk'||driving?.phase!=='walking'||elevatorBusy||!nearElevator(position,data.floorHeight))return;
   clearInput();dragMode=false;freeLook=false;if(document.pointerLockElement)document.exitPointerLock();pausePanel();
   $('승강기현재층').textContent=Math.round(position.z/data.floorHeight)+1+'층';$('승강기창').showModal();
 }
@@ -356,7 +375,7 @@ for(const button of document.querySelectorAll('[data-elevator-floor]'))button.ad
   }finally{elevatorBusy=false;$('승강기전환').hidden=true;await startWalk();notice(button.dataset.elevatorFloor+'층 엘리베이터 앞에 도착했습니다.');}
 });
 $('걷기').addEventListener('click',()=>mode==='overview'?openCharacterPicker():startWalk());$('시작').addEventListener('click',()=>mode==='overview'?openCharacterPicker():startWalk());
-$('육사이동').addEventListener('click',()=>{if(!ready)return;position={...CLASS64_SPAWN};jumpMotion.reset();yaw=Math.PI/2;pitch=0;avatar.snapHeading(Math.PI+yaw);startWalk();notice('6-4 교실 · 사진을 참고한 실내 · 책상/의자 충돌 적용');});
+$('육사이동').addEventListener('click',()=>{if(!ready)return;leaveVehicle();position={...CLASS64_SPAWN};jumpMotion.reset();yaw=Math.PI/2;pitch=0;avatar.snapHeading(Math.PI+yaw);startWalk();notice('6-4 교실 · 사진을 참고한 실내 · 책상/의자 충돌 적용');});
 $('드래그걷기').addEventListener('click',()=>startWalk(true));$('전체').addEventListener('click',overview);
 $('처음').addEventListener('click',()=>{if(ready){reset();startWalk();}});
 $('동층이동').addEventListener('change',async e=>{
@@ -366,7 +385,7 @@ $('동층이동').addEventListener('change',async e=>{
   const p=destination.point,valid=world.candidate(p.x,p.y,p.z);
   if(!valid){notice('중앙현관 이동 위치를 확인하지 못했습니다.');return;}
   if(document.pointerLockElement)document.exitPointerLock();
-  position=valid;jumpMotion.reset();yaw=destination.yaw;pitch=0;
+  leaveVehicle();position=valid;jumpMotion.reset();yaw=destination.yaw;pitch=0;
   // Free look starts immediately, even without native select user activation.
   await startWalk();notice(destination.label+' · '+movementHint());
 });
@@ -375,7 +394,7 @@ $('방이동').addEventListener('click',()=>{
   const b=room.bounds,interior=world.classroomInteriors.find(r=>r.roomId===room.id),special=world.specialInteriors.find(r=>r.roomId===room.id);
   const p=room.id===PRINCIPAL_ID?{...world.principalOffice.spawn}:room.id===CLASS64_ID?{...CLASS64_SPAWN}:interior?{...interior.spawn}:special?{...special.spawn}:{x:(b[0]+b[1])/2,y:(b[2]+b[3])/2,z:b[4]};
   const valid=world.candidate(p.x,p.y,p.z);if(!valid){notice('해당 위치는 이동할 수 없습니다.');return;}
-  position=valid;jumpMotion.reset();yaw=room.id===PRINCIPAL_ID?Math.atan2(p.x-OFFICE_CHARACTERS[0].position.x,OFFICE_CHARACTERS[0].position.y-p.y):special?.entryYaw??interior?.yaw??(interior?.layoutRotation===Math.PI?-Math.PI/2:interior||room.id===CLASS64_ID?Math.PI/2:room.building==='ANNEX'?-Math.PI/2:0);pitch=0;startWalk();
+  leaveVehicle();position=valid;jumpMotion.reset();yaw=room.id===PRINCIPAL_ID?Math.atan2(p.x-OFFICE_CHARACTERS[0].position.x,OFFICE_CHARACTERS[0].position.y-p.y):special?.entryYaw??interior?.yaw??(interior?.layoutRotation===Math.PI?-Math.PI/2:interior||room.id===CLASS64_ID?Math.PI/2:room.building==='ANNEX'?-Math.PI/2:0);pitch=0;startWalk();
 });
 document.addEventListener('pointerlockchange',()=>{
   locked=document.pointerLockElement===canvas;
@@ -428,9 +447,10 @@ document.addEventListener('keydown',e=>{
   if(e.code==='Escape'&&$('게임메뉴').open){e.preventDefault();if(!e.repeat)dismissMenu();return;}
   if($('게임메뉴').open||$('승강기창').open||characterPicker.isOpen()||elevatorBusy)return;
   if(['INPUT','SELECT','TEXTAREA','BUTTON','SUMMARY'].includes(e.target.tagName)&&e.code!=='Escape')return;
-  if(isPlaying()&&['KeyW','KeyA','KeyS','KeyD'].includes(e.code)){keys.add(e.code);e.preventDefault();}
+  if(isPlaying()&&['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)){keys.add(e.code);e.preventDefault();}
+  if(e.code==='KeyF'&&isPlaying()&&!e.repeat){e.preventDefault();vehicleAction();}
   if(e.code==='Space'&&isPlaying()){
-    e.preventDefault();if(!e.repeat)jump();
+    e.preventDefault();if(driving.phase==='driving')keys.add('Space');else if(!e.repeat)jump();
   }
   if(e.code==='KeyZ'&&isPlaying()){e.preventDefault();if(!e.repeat)greet();}
   if(e.code==='KeyV'&&!e.repeat)overview();
@@ -454,7 +474,7 @@ touchControls=createTouchControls({canvas,canPlay:isPlaying,getMode:()=>mode,
 const map=$('지도'),mapCtx=map.getContext('2d');
 function updateHUD(){
   if(!world)return;
-  $('승강기호출').hidden=!isPlaying()||!nearElevator(position,data.floorHeight);
+  $('승강기호출').hidden=!isPlaying()||driving?.phase!=='walking'||!nearElevator(position,data.floorHeight);
   const at=world.roomAt(position),floor=at.floor;
   const stair=world.stairs.find(s=>{const f=s.frame,dx=position.x-f.origin[0],dy=position.y-f.origin[1],u=dx*f.right[0]+dy*f.right[1],v=dx*f.inward[0]+dy*f.inward[1];return u>0&&u<f.width&&v>0&&v<f.depth;});
   const inParking=b=>position.z<.1&&position.x>=b[0]&&position.x<=b[3]&&position.y>=b[1]&&position.y<=b[4];
@@ -492,7 +512,10 @@ function frame(now){
   const previous={...position};
   if(isPlaying()){
     const touchMove=touchControls.getMovement();
-    let forward=Number(keys.has('KeyW'))-Number(keys.has('KeyS'))+touchMove.forward,right=Number(keys.has('KeyD'))-Number(keys.has('KeyA'))+touchMove.right;
+    let forward=Number(keys.has('KeyW')||keys.has('ArrowUp'))-Number(keys.has('KeyS')||keys.has('ArrowDown'))+touchMove.forward,right=Number(keys.has('KeyD')||keys.has('ArrowRight'))-Number(keys.has('KeyA')||keys.has('ArrowLeft'))+touchMove.right;
+    if(driving.phase!=='walking'){
+      position=driving.update(dt,position,{forward,right,brake:keys.has('Space')||vehicleUI.brake});
+    }else{
     const length=Math.hypot(forward,right);if(length){forward/=length;right/=length;}
     const speed=RUN_SPEED;
     const dx=(-Math.sin(yaw)*forward+Math.cos(yaw)*right)*speed,dy=(Math.cos(yaw)*forward+Math.sin(yaw)*right)*speed;
@@ -504,9 +527,13 @@ function frame(now){
         position.x=previous.x;position.y=previous.y;
       }
     }
+    }
   }
   const officeNearby=mode==='walk'&&Math.abs(position.z-3.4)<1.8&&Math.hypot(position.x-33.5,position.y+3.5)<22;
-  footballPhysics.update(dt,position,previous,{active:isPlaying()&&!document.hidden,yaw});footballVisual.update();
+  footballPhysics.update(dt,position,previous,{active:isPlaying()&&!document.hidden,yaw,canKick:driving.phase==='walking'});footballVisual.update();
+  driving.sync(isPlaying()?dt:0);updateDrivenCars(carVisual,driving);
+  if(driving.phase==='driving')position=driving.seat();else lastDriveYaw=null;
+  vehicleUI.update(driving,position,isPlaying());
   scene.backgroundRotation.y=elapsed*.0006;
   if(officeNearby&&!officePrincipals){officePrincipals=createOfficePrincipalModels(world);[principalNPC]=officePrincipals.characters;scene.add(principalNPC.root);}
   if(officeNearby&&!officeWasNearby)void officePrincipals.load();
@@ -522,9 +549,9 @@ function frame(now){
     ...OFFICE_CHARACTERS.map((config,index)=>({id:'office-'+config.id,name:config.label,position:officePrincipals?.characters[index].getState().position??config.position,available:officeNearby&&officePrincipals?.characters[index].getState().modelStatus==='ready'})),
     {id:'lobby',name:'중앙현관 · 교장선생님',position:lobbyPrincipalState.getState().position,available:lobbyNearby}
   ];
-  const newQuestion=monthQuiz.update(position,quizNPCs,{active:isPlaying()&&!jumpMotion.getState().airborne,colliders:world.colliders});
+  const newQuestion=monthQuiz.update(position,quizNPCs,{active:isPlaying()&&driving.phase==='walking'&&!jumpMotion.getState().airborne,colliders:world.colliders});
   if(newQuestion)monthQuizUI.show(newQuestion);
-  if(mode==='walk')cameraWalk(dt);else overviewCamera(wallDt);
+  if(mode==='walk'){if(driving.phase==='driving')cameraDrive(dt);else cameraWalk(dt);}else overviewCamera(wallDt);
   const quizState=monthQuiz.getState(),quizNPC=quizNPCs.find(n=>n.id===quizState.question?.npcId);
   if(quizState.open&&quizNPC){
     if(mode!=='walk'){
@@ -540,6 +567,7 @@ function frame(now){
   avatar.root.visible=mode==='walk'&&cameraDistance>.32;
   if(mode==='walk'){
     const dx=position.x-previous.x,dy=position.y-previous.y,baseZ=position.z;
+    avatar.setSeated(driving.seated);if(driving.seated)avatar.snapHeading(Math.PI+driving.getState().yaw);
     avatar.root.position.set(position.x,baseZ,-position.y);
     const heading=avatar.getState().heading,c=Math.cos(heading),s=Math.sin(heading);
     avatar.update(isPlaying()?dt:0,{distance:Math.hypot(dx,dy),dx,dy,time:elapsed,baseZ,...jumpMotion.getState(),
@@ -573,6 +601,7 @@ try{
   window.schoolTour.getOfficePrincipalStates=()=>officePrincipals?.characters.map(npc=>npc.getState())??OFFICE_CHARACTERS.map(config=>({id:config.id,position:{...config.position},height:config.height,modelStatus:'not-requested',visible:false}));
   window.schoolTour.getApprovedAssets=getApprovedAssets;
   window.schoolTour.getFootballState=()=>footballPhysics.getState();
+  window.schoolTour.getDrivingState=()=>driving.getState();
   window.schoolTour.getMonthQuizState=()=>monthQuiz.getState();
   window.schoolTour.getLobbyPrincipalState=()=>({...lobbyPrincipalState.getState(),...(lobbyPrincipalNPC?.getState()??{}),visible:lobbyPrincipalNPC?.root.visible??false});
   if(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).has('test'))window.schoolTour.test={

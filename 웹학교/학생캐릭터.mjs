@@ -96,8 +96,8 @@ export function createStudent(requested='boy-cute',{lazy=false}={}){
   if(!STUDENT_MODELS[variant])throw new Error('Unknown character');
   const headScale=variant.endsWith('-cute')?.9:1;
   const root=new THREE.Group();root.name=CHARACTER_NAMES[variant];
-  const materials=new Map(),actions={};
-  let asset,mixer,currentAction,currentAnimation=null,status='not-requested',error=null,disposed=false,loading;
+  const materials=new Map(),actions={},seatPose=new Map();
+  let asset,mixer,currentAction,currentAnimation=null,status='not-requested',error=null,disposed=false,loading,seated=false;
   let heading=0,speed=0,blend=0,opacity=1,waveTime=0,waveHeading=0,airBlend=0,motion='대기',animationNames=[];
   let resolveReady,rejectReady;
   const ready=new Promise((resolve,reject)=>{resolveReady=resolve;rejectReady=reject;});
@@ -130,6 +130,13 @@ export function createStudent(requested='boy-cute',{lazy=false}={}){
     })();return ready;
   }
   function update(dt,{distance=0,dx=0,dy=0,airborne=false,verticalSpeed=0,landing=0}={}){
+    if(seated){
+      play('idle');mixer?.update(Math.max(0,dt));waveTime=0;motion='운전';root.rotation.y=heading;
+      for(const side of ['Left','Right'])for(const [part,angle] of [['UpLeg',-1.45],['Leg',1.50],['Arm',-1.02],['ForeArm',-.35]]){
+        const bone=asset?.getObjectByName(side+part),base=seatPose.get(bone);if(base)bone.quaternion.copy(base).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),angle));
+      }
+      return;
+    }
     const delta=Math.max(0,Math.min(dt,.1)),actualSpeed=dt>0?distance/dt:0,a=1-Math.exp(-delta*12);
     speed+=(actualSpeed-speed)*a;blend+=(clamp(actualSpeed/1.2,0,1)-blend)*a;airBlend+=((airborne?1:0)-airBlend)*a;
     if(distance>.00001){const target=Math.atan2(dx,-dy);heading+=Math.atan2(Math.sin(target-heading),Math.cos(target-heading))*(1-Math.exp(-delta*10));}
@@ -143,8 +150,13 @@ export function createStudent(requested='boy-cute',{lazy=false}={}){
   }
   const api={root,variant,ready,load,update,get modelStatus(){return status;},
     wave(targetHeading=heading){waveHeading=targetHeading;waveTime=actions.wave?.getClip().duration??2.6;},cancelWave(){waveTime=0;},
-    snapHeading(value){heading=value;root.rotation.y=value;},setOpacity,
-    getState:()=>({variant,name:CHARACTER_NAMES[variant],heading,speed,blend,phase:currentAction?.time??0,motion,waving:waveTime>0,waveBlend:currentAnimation==='wave'?1:0,airBlend,opacity,footHeights:[0,0],arms:[],modelStatus:status,error,animationNames:[...animationNames],currentAnimation,height:STUDENT_HEIGHT,headScale}),
+    snapHeading(value){heading=value;root.rotation.y=value;},setOpacity,setSeated(value){
+      value=Boolean(value);if(value===seated)return;seated=value;speed=0;
+      for(const [bone,q] of seatPose)bone.quaternion.copy(q);seatPose.clear();
+      mixer?.stopAllAction();currentAction=actions.idle;currentAnimation='idle';actions.idle?.reset().setEffectiveWeight(1).play();mixer?.update(.01);
+      if(seated)for(const side of ['Left','Right'])for(const part of ['UpLeg','Leg','Arm','ForeArm']){const bone=asset?.getObjectByName(side+part);if(bone)seatPose.set(bone,bone.quaternion.clone());}
+    },
+    getState:()=>({variant,name:CHARACTER_NAMES[variant],heading,speed,blend,phase:currentAction?.time??0,motion,seated,waving:waveTime>0,waveBlend:currentAnimation==='wave'?1:0,airBlend,opacity,footHeights:[0,0],arms:[],modelStatus:status,error,animationNames:[...animationNames],currentAnimation,height:STUDENT_HEIGHT,headScale}),
     dispose(){disposed=true;mixer?.stopAllAction();if(asset)mixer?.uncacheRoot(asset);root.traverse(o=>{if(o.isSkinnedMesh)o.skeleton.dispose();});materials.forEach(m=>m.dispose());root.clear();if(status==='not-requested')rejectReady(new Error('학생 캐릭터가 닫혔습니다.'));}
   };
   if(!lazy)load();return api;
