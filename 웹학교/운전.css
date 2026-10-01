@@ -9,3 +9,5 @@
 body[data-driving=true] .터치동작,body[data-driving=true] #조작힌트{visibility:hidden}
 body[data-touch=true] #차량조작{bottom:calc(175px + env(safe-area-inset-bottom))}
 @media(max-width:450px){#차량조작{gap:5px}#차량조작 button{font-size:12px;padding:0 10px}#차량속도{font-size:15px;min-width:70px;padding:15px 6px}}
+@media(max-width:450px){body:not([data-touch=true]) #차량조작{flex-wrap:wrap;justify-content:center;width:calc(100vw - 24px)}body:not([data-touch=true]) #차량속도{flex-basis:100%;padding:6px}}
+@media(max-width:450px){body[data-driving=true]:not([data-touch=true]) #지도상자{top:128px;bottom:auto;left:12px;width:110px}body[data-driving=true]:not([data-touch=true]) #지도상자 .지도제목,body[data-driving=true]:not([data-touch=true]) #탐험{display:none}}

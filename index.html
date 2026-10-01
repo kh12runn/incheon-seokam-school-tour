@@ -24,6 +24,11 @@
     <p id="캐릭터상태">탐험 시작 후 남학생 / 여학생을 선택하세요</p>
     <p id="차량시작안내">자동차를 탑승하여 학교를 더 편리하게 구경하세요!</p>
     <button id="시작" class="primary" disabled>탐험 시작하기 <span aria-hidden="true">→</span></button>
+    <div class="차량키요약 PC설명" aria-label="자동차 조작 키">
+      <span><kbd>F</kbd> 탑승 · 하차</span><span><kbd>Space</kbd> 브레이크</span>
+      <span><kbd>W / S</kbd> 전진 · 후진</span><span><kbd>A / D</kbd> 좌우 조향</span>
+    </div>
+    <p class="차량터치안내 터치설명">차 근처에서 탑승하기 → 조이스틱으로 운전<br>브레이크 버튼으로 정차 후 내리기</p>
     <p class="시작힌트">달리고, 점프하고, 친구처럼 인사해요.<br>층과 교실 바로 가기는 오른쪽 위 메뉴에서.</p>
     <span id="불러오기" role="status">학교를 불러오는 중…</span>
   </section>
@@ -44,6 +49,13 @@
     <details class="메뉴구역"><summary>조작 방법 · 설정</summary>
       <div class="조작목록 PC설명"><span><kbd>W A S D</kbd> 달리기</span><span><kbd>Space</kbd> 점프</span><span><kbd>Z</kbd> 인사</span><span><kbd>E</kbd> 엘리베이터</span><span>마우스 · 시점 회전</span><span>휠 · 시점 거리</span></div>
       <p class="터치설명">왼쪽 조이스틱: 달리기<br>오른쪽 화면 드래그: 시점 회전<br>점프·인사: 오른쪽 아래 버튼<br>항공뷰: 한 손가락 회전 · 두 손가락 확대/축소<br>엘리베이터 앞에서는 ‘엘리베이터 타기’를 누르세요.</p>
+      <h4 class="차량도움제목">자동차 운전</h4>
+      <div class="조작목록 PC설명" aria-label="자동차 키보드 조작">
+        <span><kbd>F</kbd> 탑승 · 하차</span><span><kbd>Space</kbd> 브레이크</span>
+        <span><kbd>W / S</kbd> 전진 · 후진</span><span><kbd>A / D</kbd> 좌우 조향</span>
+      </div>
+      <p class="PC설명">차 가까이에서 F로 탑승하세요. 방향키로도 운전할 수 있습니다. 브레이크로 정차한 뒤 F로 내리세요.</p>
+      <p class="터치설명">차 근처에서 ‘탑승하기’를 누르세요.<br>왼쪽 조이스틱: 위·아래 전진·후진, 좌우 조향<br>‘브레이크’를 눌러 정차한 뒤 ‘내리기’를 누르세요.</p>
       <label class="터치설정"><input id="터치조작사용" type="checkbox"> 터치 조작 사용</label>
       <label class="감도설정" for="감도">시점 감도 <input id="감도" type="range" min="0.5" max="4" step="0.1" value="1.8"></label>
       <button id="드래그걷기" disabled>마우스 잠금 없이 탐험</button>
@@ -75,8 +87,8 @@
   </div>
   <section id="차량조작" aria-label="차량 조작" hidden>
     <output id="차량속도" aria-label="현재 속도" hidden>0 km/h</output>
-    <button id="차량탑승" type="button" aria-keyshortcuts="F"><img src="./웹학교/외부도구/car-front.svg" alt=""><span id="차량동작">탑승하기</span></button>
-    <button id="차량브레이크" type="button" hidden>브레이크</button>
+    <button id="차량탑승" type="button" aria-keyshortcuts="F" title="탑승 · 하차 (F)"><img src="./웹학교/외부도구/car-front.svg" alt=""><span id="차량동작">탑승하기</span><kbd aria-hidden="true">F</kbd></button>
+    <button id="차량브레이크" type="button" aria-keyshortcuts="Space" title="브레이크 (Space)" hidden>브레이크 <kbd aria-hidden="true">Space</kbd></button>
   </section>
   <footer><span id="상태" role="status">구조 불러오는 중…</span></footer>
   <script type="module" src="./웹학교/게임.mjs?v=20260921-교장1명러닝대화"></script>
