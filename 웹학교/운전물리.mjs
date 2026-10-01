@@ -1,6 +1,7 @@
 import {Body,Box,Vec3,RaycastVehicle,Material,ContactMaterial} from './외부도구/cannon-es.mjs';
 import {PARKED_CARS,CAR_DIMENSIONS} from './주차장.mjs';
 const CENTER_HEIGHT=.52;
+export const DRIVING_TUNING=Object.freeze({forwardSpeed:18,reverseSpeed:6,engineForce:3200,reverseForce:1800,brakeForce:140});
 export function createDriving(school,physics){
   physics.enableDrivingTerrain();const material=new Material('car');
   physics.world.addContactMaterial(new ContactMaterial(material,physics.groundMaterial,{friction:.35,restitution:.03}));
@@ -77,11 +78,11 @@ export function createDriving(school,physics){
     }else if(phase==='driving'){
       const car=active,v=speed(car),forward=Math.max(-1,Math.min(1,input.forward||0)),right=Math.max(-1,Math.min(1,input.right||0));
       const changingDirection=forward*v<-.4,brake=input.brake||changingDirection;
-      car.steering+=(-right*(.48/(1+Math.abs(v)*.07))-car.steering)*(1-Math.exp(-dt*7));
+      car.steering+=(-right*(.48/(1+Math.abs(v)*.10))-car.steering)*(1-Math.exp(-dt*7));
       for(let i=0;i<4;i++){
         car.vehicle.setSteeringValue(i<2?car.steering:0,i);
-        const force=!brake&&((forward>=0&&v<11)||(forward<0&&v>-4))?forward*(forward>=0?1900:1200):0;
-        car.vehicle.applyEngineForce(i>=2?force:0,i);car.vehicle.setBrake(brake?90:forward===0?2:0,i);
+        const force=!brake&&((forward>=0&&v<DRIVING_TUNING.forwardSpeed)||(forward<0&&v>-DRIVING_TUNING.reverseSpeed))?forward*(forward>=0?DRIVING_TUNING.engineForce:DRIVING_TUNING.reverseForce):0;
+        car.vehicle.applyEngineForce(i>=2?force:0,i);car.vehicle.setBrake(brake?DRIVING_TUNING.brakeForce:forward===0?2:0,i);
       }
       p=seat();
     }

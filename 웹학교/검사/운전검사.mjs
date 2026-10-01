@@ -11,11 +11,15 @@ const car=driving.cars[0],door=driving.point(car,-car.d.width/2-.62,.35);p=schoo
 assert.equal(driving.nearby(p)?.id,car.id);assert(driving.enter(p));
 const tick=(input={},frames=1)=>{for(let i=0;i<frames;i++){const prev=p;p=driving.update(1/60,p,input);physics.update(1/60,p,prev,{canKick:false});driving.sync(1/60);if(driving.phase==='driving')p=driving.seat();}};
 tick({},100);assert.equal(driving.phase,'driving');assert(driving.seated);
-const start={...car.body.position};tick({forward:1},120);
+const start={...car.body.position};
+// Turn within the parking aisle, before the playground's raised edge.
+for(let i=0;i<180&&car.body.position.x<start.x+1.6;i++)tick({forward:1});
 assert(car.body.position.x>start.x+1.5,'Acceleration follows vehicle heading');assert(car.body.velocity.length()>1,'Vehicle moves');
 assert.equal(driving.exit(),false,'Cannot exit moving car');
 assert(!school.candidate(car.body.position.x,car.body.position.y,car.body.position.z-.52),'Collider follows car');
-const heading=driving.getState().yaw;tick({forward:.5,right:.8},80);assert(Math.abs(driving.getState().yaw-heading)>.05,'Steering changes heading');
+const heading=driving.getState().yaw;
+for(let i=0;i<80&&Math.abs(driving.getState().yaw-heading)<.08;i++)tick({forward:.5,right:.8});
+assert(Math.abs(driving.getState().yaw-heading)>.05,'Steering changes heading');
 tick({brake:true},180);assert(car.body.velocity.length()<1,'Brake stops car');
 assert(driving.exit(),driving.error);tick({},80);assert.equal(driving.phase,'walking');assert(!driving.seated);assert(school.candidate(p.x,p.y,p.z),'Safe dismount');
 assert(driving.enter(p));tick({},100);assert.equal(driving.phase,'driving','Can re-enter moved car');

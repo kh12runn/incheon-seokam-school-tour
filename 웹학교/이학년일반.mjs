@@ -73,8 +73,9 @@ export function class21Interior(data){
     for(const a of [-.19,.19])for(const b of [-.28,.28])box('책상 다리 '+id+a+b,u+a-.015,u+a+.015,v+b-.018,v+b+.018,.03,.66,'#c6cdcb','metal');
     const chair=u+.43;
     box('남색 의자 좌판 '+id,chair-.16,chair+.17,v-.23,v+.23,.36,.405,'#26394c');
-    box('남색 의자 등받이 '+id,chair+.12,chair+.16,v-.23,v+.23,.46,.76,'#26394c');
+    box('남색 의자 등받이 '+id,chair+.10,chair+.14,v-.23,v+.23,.46,.76,'#26394c');
     for(const b of [-.18,.18])box('의자 다리 '+id+b,chair-.12,chair+.16,v+b-.018,v+b+.018,.02,.36,'#bec8c7','metal');
+    for(const b of [-.18,.18])box('의자 등지지대 '+b+' '+id,chair+.14,chair+.17,v+b-.018,v+b+.018,.33,.73,'#bec8c7','metal');
     const deskBounds=boxBounds(u-.25,u+.25,v-.36,v+.36,0,.72),chairBounds=boxBounds(chair-.16,chair+.17,v-.23,v+.23,0,.76);
     colliders.push({name:'2-1 책상 충돌 '+id,bounds:deskBounds},{name:'2-1 의자 충돌 '+id,bounds:chairBounds});
     desks.push({bounds:deskBounds});chairs.push({bounds:chairBounds});

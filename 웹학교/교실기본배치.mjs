@@ -68,7 +68,8 @@ export function classroomReferenceInterior(data){
     solid(`책상 ${id}`,[x-.30,y-.345,0,x+.30,y+.345,.79]);
     const cx=x+.52,seat=(id===6||id===15||id===20)?'#a3b536':'#b88f50';
     add(`의자 좌판 ${id}`,[cx-.21,y-.245,.405,cx+.21,y+.245,.45],seat,'wood');
-    add(`의자 등받이 ${id}`,[cx+.20,y-.24,.60,cx+.24,y+.24,.85],seat,'wood');
+    // The back panel meets the seat-facing side of the rear metal supports.
+    add(`의자 등받이 ${id}`,[cx+.13,y-.24,.60,cx+.17,y+.24,.85],seat,'wood');
     for(const side of [-1,1]){
       add(`의자 앞다리 ${id}`,[cx-.17,y+side*.20-.018,.025,cx-.135,y+side*.20+.018,.43],steel,'metal');
       add(`의자 뒷다리 ${id}`,[cx+.17,y+side*.20-.018,.025,cx+.205,y+side*.20+.018,.82],steel,'metal');
