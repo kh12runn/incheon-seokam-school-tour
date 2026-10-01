@@ -6,12 +6,25 @@ const output=new URL('../../output/parking-game/',import.meta.url);await fs.mkdi
 const report={checks:[],errors:[]};
 try{
   for(const mobile of [false,true]){
-    const context=await browser.newContext({viewport:mobile?{width:390,height:700}:{width:1100,height:760},isMobile:mobile,hasTouch:mobile,deviceScaleFactor:1});
+    const context=await browser.newContext({viewport:mobile?{width:390,height:700}:{width:1100,height:760},isMobile:mobile,hasTouch:true,deviceScaleFactor:1});
     const page=await context.newPage();page.setDefaultTimeout(120000);page.on('pageerror',e=>report.errors.push(e.message));
+    // Match the existing release harness on CPU-only graphics hosts.
+    await page.addInitScript(()=>{const raf=requestAnimationFrame.bind(window);window.requestAnimationFrame=callback=>setTimeout(()=>raf(callback),200);});
     await page.goto((process.env.SCHOOL_TEST_URL||'http://127.0.0.1:8080')+'/?test=1');
     await page.waitForFunction(()=>window.schoolTour?.getState().ready);
     console.log('Loaded',mobile?'mobile':'desktop');
-    await page.locator('#시작').click();await page.locator('#캐릭터확인').click();await page.locator('#캐릭터창').waitFor({state:'hidden'});
+    await page.locator('#시작').click({force:true});console.log('Picker opened');
+    await page.waitForFunction(()=>!document.getElementById('캐릭터확인').disabled);
+    await page.locator('#캐릭터확인').click({force:true});await page.locator('#캐릭터창').waitFor({state:'hidden'});console.log('Character ready');
+    const spawn=await page.evaluate(()=>schoolTour.getState());assert.equal(spawn.position.x,44);assert.equal(spawn.position.y,-11);assert.equal(spawn.yaw,0);
+    await page.screenshot({path:new URL(`spawn-${mobile?'mobile':'desktop'}.png`,output).pathname});
+    const ball=await page.evaluate(()=>schoolTour.getFootballState()[0]);
+    await page.evaluate(p=>{schoolTour.test.setPosition({x:p.x,y:p.y-.85,z:-.3});schoolTour.test.setYaw(0);},ball.position);
+    await page.keyboard.down('KeyW');
+    try{await page.waitForFunction(()=>schoolTour.getFootballState()[0].kicks>0);}finally{await page.keyboard.up('KeyW');}
+    const kicked=await page.evaluate(()=>schoolTour.getFootballState()[0]);assert(kicked.position.y>ball.position.y||kicked.velocity.y>0);
+    await page.screenshot({path:new URL(`football-${mobile?'mobile':'desktop'}.png`,output).pathname});
+    report.checks.push({name:'outdoor-spawn-and-football',mobile,spawn:spawn.position,kicks:kicked.kicks,forward:true});
     for(const [name,p,yaw] of [['rear',{x:18,y:16.5,z:-.6},-.25],['field',{x:-12.8,y:-52,z:-.6},Math.PI/2]]){
       await page.evaluate(([p,yaw])=>{schoolTour.test.setPosition(p);schoolTour.test.setYaw(yaw);},[p,yaw]);
       await page.waitForTimeout(1500);

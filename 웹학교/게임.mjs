@@ -18,6 +18,10 @@ import {exteriorRenderBox,exteriorSkins} from './외관사진디자인.mjs';
 import {PARKING,REAR_PARKING} from './주차장.mjs';
 import {parkedCarDetails} from './자동차표현.mjs';
 import {supportRoomDetails} from './지원실사진표현.mjs';
+import {OUTDOOR_YAW} from './운동장환경.mjs';
+import {clearDaySky,playgroundTrees} from './야외풍경.mjs';
+import {createFootballPhysics} from './축구공물리.mjs';
+import {footballDetails} from './축구공표현.mjs';
 import {faceMonitorsTowardBoard} from './모니터방향.mjs';
 import {createTouchControls,prefersTouch} from './모바일조작.mjs';
 import {PRINCIPAL_ID} from './교장실배치.mjs';
@@ -54,7 +58,7 @@ catch(error){$('불러오기').textContent='3D 그래픽을 시작할 수 없습
 renderer.setPixelRatio(Math.min(devicePixelRatio,mobileGraphics?1.25:1.6));renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
 renderer.shadowMap.enabled=!mobileGraphics;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-const scene=new THREE.Scene();scene.background=new THREE.Color('#bdd7e5');scene.fog=new THREE.Fog('#bdd7e5',190,350);
+const scene=new THREE.Scene();scene.background=clearDaySky();scene.fog=new THREE.Fog('#cde2ed',190,350);
 scene.add(new THREE.HemisphereLight(0xe4edfa,0xb4ac91,1.35));
 scene.environment=softEnvironment(renderer);
 const interiorLight=new THREE.PointLight(0xfff3de,12,13,2);scene.add(interiorLight);
@@ -62,7 +66,8 @@ const sun=new THREE.DirectionalLight(0xfff4dd,2.7);sun.position.set(-30,90,-65);
 sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-135,right:135,top:135,bottom:-135,near:.5,far:350});
 sun.shadow.bias=-.00008;sun.shadow.normalBias=.025;
 const camera=new THREE.PerspectiveCamera(76,1,.045,500);camera.rotation.order='YXZ';
-let data,world,position,mode='overview',locked=false,dragMode=false,freeLook=false,yaw=-Math.PI/2,pitch=0;
+let data,world,position,mode='overview',locked=false,dragMode=false,freeLook=false,yaw=OUTDOOR_YAW,pitch=0;
+let footballPhysics,footballVisual;
 let freeLookPoint=null;
 let lookRequestSerial=0;
 let velocity={x:0,y:0},smoothZ=EYE_HEIGHT,last=performance.now(),elapsed=0,ready=false;
@@ -112,6 +117,7 @@ const characterPicker=createCharacterPicker({initial:selectedCharacter??'boy-cut
     const next=createStudent(variant);try{await next.ready;}catch(error){next.dispose();throw error;}
     scene.remove(avatar.root);avatar.dispose();avatar=next;scene.add(avatar.root);avatar.snapHeading(Math.PI+yaw);
   }else await avatar.load();
+  avatar.snapHeading(Math.PI+yaw);
   selectedCharacter=variant;characterChosenThisVisit=true;try{localStorage.setItem('석암학교-캐릭터',variant);}catch{}
   updateCharacterLabel();cameraReset=true;
 },onStarted(){startWalk(pickerFallback);},onClose(){if(pickerResume)startWalk();else pausePanel();}});
@@ -141,6 +147,7 @@ function textTexture(text,background=false){
 let connectingDoorVisual;
 function buildVisuals(){
   const parkedCars=parkedCarDetails();scene.add(parkedCars);visuals.push({mesh:parkedCars,floor:0,ceiling:false});
+  scene.add(playgroundTrees());footballPhysics=createFootballPhysics(world);footballVisual=footballDetails(footballPhysics);scene.add(footballVisual.group);
   scene.add(teacherChairDetails(world.teacherChairs));scene.add(classroomWindowSigns(world.data));
   if(world.centralStairFinish)scene.add(centralStairDetails(world.centralStairFinish));
   for(const config of world.specialInteriors){
@@ -330,7 +337,7 @@ function overview(){
   orbit={yaw:.75,pitch:.83,distance:150};orbitResumeAt=0;
   pausePanel();notice(touchControls?.isActive()?'학교 전체 항공뷰 · 한 손가락 회전 / 두 손가락 확대 · 탐험 시작하기':'학교 전체 항공뷰 · 드래그로 회전 / 휠로 확대 · 학교 탐험 시작하기');
 }
-function reset(){position={...world.spawn};jumpMotion.reset();yaw=-Math.PI/2;pitch=0;smoothZ=position.z+EYE_HEIGHT;cameraReset=true;avatar.snapHeading(Math.PI+yaw);clearInput();notice('1층 본관 복도 출발점으로 돌아왔습니다.');}
+function reset(){position={...world.spawn};jumpMotion.reset();yaw=OUTDOOR_YAW;pitch=0;smoothZ=position.z+EYE_HEIGHT;cameraReset=true;avatar.snapHeading(Math.PI+yaw);clearInput();notice('중앙현관 밖 구령대로 돌아왔습니다.');}
 function openElevator(){
   if(!ready||mode!=='walk'||elevatorBusy||!nearElevator(position,data.floorHeight))return;
   clearInput();dragMode=false;freeLook=false;if(document.pointerLockElement)document.exitPointerLock();pausePanel();
@@ -499,6 +506,8 @@ function frame(now){
     }
   }
   const officeNearby=mode==='walk'&&Math.abs(position.z-3.4)<1.8&&Math.hypot(position.x-33.5,position.y+3.5)<22;
+  footballPhysics.update(dt,position,previous,{active:isPlaying()&&!document.hidden,yaw});footballVisual.update();
+  scene.backgroundRotation.y=elapsed*.0006;
   if(officeNearby&&!officePrincipals){officePrincipals=createOfficePrincipalModels(world);[principalNPC]=officePrincipals.characters;scene.add(principalNPC.root);}
   if(officeNearby&&!officeWasNearby)void officePrincipals.load();
   officeWasNearby=officeNearby;
@@ -563,6 +572,7 @@ try{
   window.schoolTour.getPrincipalState=()=>principalNPC?.getState()??{position:{...OFFICE_CHARACTERS[0].position},modelStatus:'not-requested',faceTexture:'not-requested',visible:false};
   window.schoolTour.getOfficePrincipalStates=()=>officePrincipals?.characters.map(npc=>npc.getState())??OFFICE_CHARACTERS.map(config=>({id:config.id,position:{...config.position},height:config.height,modelStatus:'not-requested',visible:false}));
   window.schoolTour.getApprovedAssets=getApprovedAssets;
+  window.schoolTour.getFootballState=()=>footballPhysics.getState();
   window.schoolTour.getMonthQuizState=()=>monthQuiz.getState();
   window.schoolTour.getLobbyPrincipalState=()=>({...lobbyPrincipalState.getState(),...(lobbyPrincipalNPC?.getState()??{}),visible:lobbyPrincipalNPC?.root.visible??false});
   if(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).has('test'))window.schoolTour.test={
