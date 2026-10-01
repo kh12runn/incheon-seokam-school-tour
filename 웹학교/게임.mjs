@@ -15,7 +15,9 @@ import {class21Details,computerEntranceDetails} from './이학년일반표현.mj
 import {classroomSigns} from './교실팻말표현.mjs';
 import {getApprovedAssets} from './승인사진자료.mjs';
 import {exteriorRenderBox,exteriorSkins} from './외관사진디자인.mjs';
-import {PARKING} from './주차장.mjs';
+import {PARKING,REAR_PARKING} from './주차장.mjs';
+import {parkedCarDetails} from './자동차표현.mjs';
+import {supportRoomDetails} from './지원실사진표현.mjs';
 import {faceMonitorsTowardBoard} from './모니터방향.mjs';
 import {createTouchControls,prefersTouch} from './모바일조작.mjs';
 import {PRINCIPAL_ID} from './교장실배치.mjs';
@@ -138,10 +140,11 @@ function textTexture(text,background=false){
 }
 let connectingDoorVisual;
 function buildVisuals(){
+  const parkedCars=parkedCarDetails();scene.add(parkedCars);visuals.push({mesh:parkedCars,floor:0,ceiling:false});
   scene.add(teacherChairDetails(world.teacherChairs));scene.add(classroomWindowSigns(world.data));
   if(world.centralStairFinish)scene.add(centralStairDetails(world.centralStairFinish));
   for(const config of world.specialInteriors){
-    const mesh=config.roomId===GRADE5_RESEARCH_ID?grade5ResearchDetails(config):INDIVIDUAL_REFERENCES[config.roomId]?individualLearningDetails(config):config.roomId===NURSE_ID?nurseRoomDetails(config):config.roomId===STAFF_ID?staffRoomDetails(config):config.roomId===AUDIO_ID?audioRoomDetails(config):config.roomId===BROADCAST_ID?broadcastRoomDetails(config):meetingRoomDetails(config);scene.add(mesh);
+    const mesh=config.photoSupport?supportRoomDetails(config):config.roomId===GRADE5_RESEARCH_ID?grade5ResearchDetails(config):INDIVIDUAL_REFERENCES[config.roomId]?individualLearningDetails(config):config.roomId===NURSE_ID?nurseRoomDetails(config):config.roomId===STAFF_ID?staffRoomDetails(config):config.roomId===AUDIO_ID?audioRoomDetails(config):config.roomId===BROADCAST_ID?broadcastRoomDetails(config):meetingRoomDetails(config);scene.add(mesh);
     visuals.push({mesh,floor:parseInt(config.room.floor,10),interiorRoom:config.roomId,center:convert(config.spawn),ceiling:false});
   }
   hallMirror=createHallMirror(data.floorHeight,mobileGraphics);scene.add(hallMirror);scene.add(createGateTerrain(world.boxes));
@@ -168,7 +171,7 @@ function buildVisuals(){
   const matrix=new THREE.Matrix4(),quaternion=new THREE.Quaternion();
   for(const items of groups.values()){
     const mesh=new THREE.InstancedMesh(items[0].shape==='sphere'?sphere:geometry,finishMaterial(items[0]),items.length);
-    mesh.castShadow=!['clear_glass','glass','lamp'].includes(surfaceKind(items[0]));mesh.receiveShadow=true;
+    mesh.castShadow=!['clear_glass','glass','lamp','ground','soil','asphalt','chalk'].includes(surfaceKind(items[0]));mesh.receiveShadow=true;
     items.forEach((b,i)=>{const a=b.bounds;
       quaternion.identity();if(b.rotation)quaternion.copy(upConversion).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(...b.rotation))).multiply(upConversion.clone().invert());
       matrix.compose(new THREE.Vector3((a[0]+a[3])/2,(a[2]+a[5])/2,-(a[1]+a[4])/2),quaternion,new THREE.Vector3(a[3]-a[0],a[5]-a[2],a[4]-a[1]));
@@ -447,7 +450,8 @@ function updateHUD(){
   $('승강기호출').hidden=!isPlaying()||!nearElevator(position,data.floorHeight);
   const at=world.roomAt(position),floor=at.floor;
   const stair=world.stairs.find(s=>{const f=s.frame,dx=position.x-f.origin[0],dy=position.y-f.origin[1],u=dx*f.right[0]+dy*f.right[1],v=dx*f.inward[0]+dy*f.inward[1];return u>0&&u<f.width&&v>0&&v<f.depth;});
-  where.textContent=mode==='overview'?'학교 전체 · 지하 및 지상 4개 층':at.rooftop?'본관 옥상':`${at.basement?'지하 1층':at.floor+'층'} · ${at.room?.name??(stair?'계단 이동 중':position.x>=PARKING.bounds[0]&&position.x<=PARKING.bounds[3]&&position.y>=PARKING.bounds[1]&&position.y<=PARKING.bounds[4]&&position.z<.1?'운동장 왼쪽 주차장':position.y>3&&position.z<.1?'본관 뒤 야외':position.y<-8&&position.x<90?'운동장':'복도')}`;
+  const inParking=b=>position.z<.1&&position.x>=b[0]&&position.x<=b[3]&&position.y>=b[1]&&position.y<=b[4];
+  where.textContent=mode==='overview'?'학교 전체 · 지하 및 지상 4개 층':at.rooftop?'본관 옥상':`${at.basement?'지하 1층':at.floor+'층'} · ${at.room?.name??(stair?'계단 이동 중':inParking(PARKING.bounds)?'운동장 왼쪽 주차장':inParking(REAR_PARKING.bounds)?'후문 주차장':position.y>3&&position.z<.1?'본관 뒤 야외':position.y<-8&&position.x<90?'운동장':'복도')}`;
   if(isPlaying()){
     if(at.room?.type==='classroom')visitedRooms.add(at.room.id);
     if(Math.hypot(position.x-58,position.y-1.5)<1.5&&Math.abs(position.z-(at.floor-1)*3.4)<.2)visitedFloors.add(at.floor);

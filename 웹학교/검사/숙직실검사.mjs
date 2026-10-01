@@ -1,0 +1,14 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {buildWorld} from '../이동물리.mjs';
+const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),before=JSON.stringify(data);
+const world=buildWorld(data),room=world.specialInteriors.find(c=>c.roomId==='1F_NIGHT_DUTY');
+assert(room?.photoSupport);assert.equal(room.reference.count,7);assert.equal(JSON.stringify(data),before,'Original school plan remains unchanged');
+assert(world.candidate(room.spawn.x,room.spawn.y,room.spawn.z),'Entry spawn unobstructed');
+const p=world.move({x:46.75,y:2.2,z:0},0,1.7);assert(p.y>3.8,'Corridor doorway passable');
+for(const text of ['소파 회색','소파 노란','분홍 내부문','접이식 가림막','목재 옷장','업무 책상 위 반투명 창','달력'])assert(room.boxes.some(b=>b.name.includes(text)),text);
+assert(!world.candidate(45.6,5.2,0),'Sofa collider');
+assert(!world.candidate(49.4,7.2,0),'Wardrobe collider');
+assert(!world.candidate(48.8,3,0),'Window remains impassable');
+assert.equal(room.wallFans.length,1);
+console.log({ok:true,photos:7,entry:true,furnitureCollision:true,windowCollision:true,sourceUnchanged:true});
