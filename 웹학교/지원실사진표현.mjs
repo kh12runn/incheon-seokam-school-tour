@@ -1,4 +1,5 @@
 import * as THREE from './외부도구/three.module.js';
+import {utilityRoomDetails} from './행정실창고사진표현.mjs';
 export function supportRoomDetails(c){
   const g=new THREE.Group(),steel=new THREE.MeshStandardMaterial({color:'#8c9b95',metalness:.65,roughness:.4}),dark=new THREE.MeshStandardMaterial({color:'#293d38',roughness:.7});
   function box(root,size,p,m){const b=new THREE.Mesh(new THREE.BoxGeometry(...size),m);b.position.set(...p);root.add(b);return b;}
@@ -16,5 +17,6 @@ export function supportRoomDetails(c){
     for(let i=0;i<12;i++){const spoke=box(root,[.006,.48,.008],[0,0,.005],steel);spoke.rotation.z=i*Math.PI/12;}
     for(let i=0;i<3;i++){const a=i*Math.PI*2/3,b=new THREE.Mesh(new THREE.SphereGeometry(1,10,7),dark);b.scale.set(.075,.17,.017);b.rotation.z=-a;b.position.set(Math.sin(a)*.09,Math.cos(a)*.09,-.02);root.add(b);}
   }
+  if(c.photoUtility)g.add(utilityRoomDetails(c));
   return g;
 }

@@ -14,6 +14,7 @@ assert(!packed.files.some(p=>/사진보관|미리보기|검사/.test(p)||p.start
 const approvedModels=['교장선생님-귀여운','교장선생님-머리','남학생-귀여운','여학생-귀여운'].map(name=>'웹학교/캐릭터모델/'+name+'.glb');
 assert.deepEqual(packed.files.filter(p=>p.endsWith('.glb')).sort(),approvedModels.sort(),'Only the office principal, shared runner head, and two student models');
 assert(packed.files.includes('웹학교/교실별특징.mjs'));
+for(const file of ['행정실창고사진배치.mjs','행정실창고사진표현.mjs'])assert(packed.files.includes('웹학교/'+file),'Admin and adjacent storage interiors included: '+file);
 for(const file of ['운전물리.mjs','운전화면.mjs','운전.css','외부도구/car-front.svg','외부도구/lucide-LICENSE.txt'])assert(packed.files.includes('웹학교/'+file),'Driving runtime included: '+file);
 for(const file of ['자동차표현.mjs','숙직실사진배치.mjs','지원실사진표현.mjs','야외풍경.mjs','운동장환경.mjs','축구공물리.mjs','축구공표현.mjs','외부도구/cannon-es.mjs','외부도구/cannon-es-LICENSE.txt'])assert(packed.files.includes('웹학교/'+file),'Outdoor interaction runtime included: '+file);
 for(const file of ['개별학습실사진배치.mjs','개별학습실사진표현.mjs'])assert(packed.files.includes('웹학교/'+file),'Individual learning room runtime included: '+file);

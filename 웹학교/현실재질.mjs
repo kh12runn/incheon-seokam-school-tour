@@ -42,7 +42,7 @@ export function finishMaterial(b){
     material.color.set('#e5f3ee');material.transparent=true;material.opacity=.1;material.depthWrite=false;
     material.roughness=.08;material.envMapIntensity=.35;return material;
   }
-  if(!['staff_floor','staff_wall','staff_ceiling','staff_fabric','staff_table','control_wood','control_tile','acoustic_wood','carpet','wood','room_floor','rubber_mat','tactile_mat','restroom_floor','restroom_wall','terrazzo','paint','metal','soil','ground','chalk','asphalt','facade','foliage'].includes(kind))return material;
+  if(!['storage_concrete','staff_floor','staff_wall','staff_ceiling','staff_fabric','staff_table','control_wood','control_tile','acoustic_wood','carpet','wood','room_floor','rubber_mat','tactile_mat','restroom_floor','restroom_wall','terrazzo','paint','metal','soil','ground','chalk','asphalt','facade','foliage'].includes(kind))return material;
   material.onBeforeCompile=shader=>{
     shader.vertexShader='varying vec3 vSurfacePoint;\n'+shader.vertexShader;
     shader.vertexShader=shader.vertexShader.replace('#include <begin_vertex>',`#include <begin_vertex>
@@ -55,7 +55,10 @@ export function finishMaterial(b){
       float grainHash(vec2 p){return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453);}
       float grainNoise(vec2 p){vec2 i=floor(p),f=fract(p);f=f*f*(3.0-2.0*f);return mix(mix(grainHash(i),grainHash(i+vec2(1.,0.)),f.x),mix(grainHash(i+vec2(0.,1.)),grainHash(i+vec2(1.,1.)),f.x),f.y);}
       `+shader.fragmentShader;
-    const detail=kind==='staff_floor'?`
+    const detail=kind==='storage_concrete'?`
+      vec2 uv=vSurfacePoint.xz;
+      diffuseColor.rgb*=.91+.10*grainNoise(uv*2.)+.035*grainNoise(uv*95.);`
+      :kind==='staff_floor'?`
       vec2 uv=vSurfacePoint.xz-vec2(43.,0.);
       vec2 tile=abs(fract(uv/.60)-.5);
       float seam=smoothstep(.496-fwidth(uv.x/.60),.499,max(tile.x,tile.y));
