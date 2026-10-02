@@ -1,0 +1,493 @@
+{
+  "checkedAt": "2026-10-02",
+  "baseCommit": "7bd3525",
+  "spaces": 53,
+  "photos": 443,
+  "remoteCatalogStatusUsedAsProof": false,
+  "originalPhotosPublished": false,
+  "deployed": false,
+  "notes": [
+    "근사 치수의 사진 참고 모델. 실측/자동 복원이 아님.",
+    "기존 사진 ID 기록이 없는 방은 개수와 런타임 연결로 대조.",
+    "관리자 서버 상태 및 원격 파일은 변경하지 않음."
+  ],
+  "rooms": [
+    {
+      "sourceRoomId": "1F_3-4",
+      "name": "3-4 교실",
+      "targetRoomId": "1F_3-4",
+      "photos": 6,
+      "type": "classroom",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "2F_AUDIO_VISUAL",
+      "name": "시청각실",
+      "targetRoomId": "2F_AUDIO_VISUAL",
+      "photos": 6,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "custom_0e69f826066f4770a69c3895f3f58fb9",
+      "name": "쓰레기장",
+      "targetRoomId": "custom_0e69f826066f4770a69c3895f3f58fb9",
+      "photos": 5,
+      "type": "recycling",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "4F_MAIN_STAIR_A",
+      "name": "4F 본관 계단 A",
+      "targetRoomId": "MAIN_STAIR_B",
+      "photos": 9,
+      "type": "central-stair",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "3F_MAIN_STAIR_A",
+      "name": "3F 본관 계단 A",
+      "targetRoomId": "MAIN_STAIR_B",
+      "photos": 7,
+      "type": "central-stair",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "2F_OPERATIONS_MEETING",
+      "name": "학교운영위원회 회의실",
+      "targetRoomId": "2F_OPERATIONS_MEETING",
+      "photos": 6,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "2F_MAIN_STAIR_A",
+      "name": "2F 본관 계단 A",
+      "targetRoomId": "MAIN_STAIR_B",
+      "photos": 10,
+      "type": "central-stair",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "2F_BROADCAST",
+      "name": "방송실(교원회의실)",
+      "targetRoomId": "2F_BROADCAST",
+      "photos": 6,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "1F_MAIN_STAIR_A",
+      "name": "1F 본관 계단 A",
+      "targetRoomId": "MAIN_STAIR_B",
+      "photos": 21,
+      "type": "central-stair",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "1F_NURSE",
+      "name": "보건실",
+      "targetRoomId": "1F_NURSE",
+      "photos": 43,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "1F_3-1",
+      "name": "3-1 교실",
+      "targetRoomId": "1F_3-1",
+      "photos": 6,
+      "type": "classroom",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "1F_3-2",
+      "name": "3-2 교실",
+      "targetRoomId": "1F_3-2",
+      "photos": 6,
+      "type": "classroom",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "4F_6-2",
+      "name": "6-2 교실",
+      "targetRoomId": "4F_6-2",
+      "photos": 6,
+      "type": "classroom",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "1F_3-3",
+      "name": "3-3 교실",
+      "targetRoomId": "1F_3-3",
+      "photos": 9,
+      "type": "classroom",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "4F_6-5",
+      "name": "6-5 교실",
+      "targetRoomId": "4F_6-5",
+      "photos": 6,
+      "type": "classroom",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "4F_6-1",
+      "name": "6-1 교실",
+      "targetRoomId": "4F_6-1",
+      "photos": 5,
+      "type": "classroom",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "4F_6-7",
+      "name": "6-7 교실",
+      "targetRoomId": "4F_6-7",
+      "photos": 6,
+      "type": "classroom",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "3F_5-1",
+      "name": "5-1 교실",
+      "targetRoomId": "3F_5-1",
+      "photos": 6,
+      "type": "classroom",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "3F_5-2",
+      "name": "5-2 교실",
+      "targetRoomId": "3F_5-2",
+      "photos": 6,
+      "type": "classroom",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "2F_STAFF",
+      "name": "교무실",
+      "targetRoomId": "2F_STAFF",
+      "photos": 12,
+      "type": "special-room",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "1F_INDIVIDUAL_5",
+      "name": "개별학습실5",
+      "targetRoomId": "1F_INDIVIDUAL_5",
+      "photos": 12,
+      "type": "special-room",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "1F_INDIVIDUAL_4",
+      "name": "개별학습실4",
+      "targetRoomId": "1F_INDIVIDUAL_4",
+      "photos": 6,
+      "type": "special-room",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "4F_GRADE6_RESEARCH",
+      "name": "6학년 연수실",
+      "targetRoomId": "4F_GRADE6_RESEARCH",
+      "photos": 6,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "4F_4-1",
+      "name": "4-1 교실",
+      "targetRoomId": "4F_4-1",
+      "photos": 6,
+      "type": "classroom",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "4F_4-2",
+      "name": "4-2 교실",
+      "targetRoomId": "4F_4-2",
+      "photos": 6,
+      "type": "classroom",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "4F_2-2",
+      "name": "2-2 교실",
+      "targetRoomId": "4F_2-2",
+      "photos": 6,
+      "type": "classroom",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "4F_2-3",
+      "name": "2-3 교실",
+      "targetRoomId": "4F_2-3",
+      "photos": 6,
+      "type": "classroom",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "4F_COMPUTER",
+      "name": "컴퓨터실",
+      "targetRoomId": "4F_COMPUTER",
+      "photos": 6,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "2F_KOREAN_CLASS",
+      "name": "한국어학급",
+      "targetRoomId": "2F_BROADCAST",
+      "photos": 6,
+      "type": "broadcast-control",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "OTHER_MISC",
+      "name": "기타",
+      "targetRoomId": "OTHER_MISC",
+      "photos": 3,
+      "type": "outdoor",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "4F_6-3",
+      "name": "6-3 교실",
+      "targetRoomId": "4F_6-3",
+      "photos": 6,
+      "type": "classroom",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "3F_5-3",
+      "name": "5-3 교실",
+      "targetRoomId": "3F_5-3",
+      "photos": 9,
+      "type": "classroom",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "3F_5-6",
+      "name": "5-6 교실",
+      "targetRoomId": "3F_5-6",
+      "photos": 9,
+      "type": "classroom",
+      "verification": "photo-count-and-existing-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "3F_GRADE5_RESEARCH",
+      "name": "5학년 연수실",
+      "targetRoomId": "3F_GRADE5_RESEARCH",
+      "photos": 7,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "3F_4-6",
+      "name": "4-6 교실",
+      "targetRoomId": "3F_4-6",
+      "photos": 8,
+      "type": "classroom",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "3F_4-5",
+      "name": "4-5 교실",
+      "targetRoomId": "3F_4-5",
+      "photos": 8,
+      "type": "classroom",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "3F_5-4",
+      "name": "5-4 교실",
+      "targetRoomId": "3F_5-4",
+      "photos": 9,
+      "type": "classroom",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "2F_3-5",
+      "name": "3-5 교실",
+      "targetRoomId": "2F_3-5",
+      "photos": 10,
+      "type": "classroom",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "1F_ADMIN",
+      "name": "행정실",
+      "targetRoomId": "1F_ADMIN",
+      "photos": 8,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "2F_CARE_DREAM_HOPE",
+      "name": "돌봄교실(꿈희망)",
+      "targetRoomId": "2F_CARE_DREAM_HOPE",
+      "photos": 8,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "2F_CARE_DREAM_WISH",
+      "name": "돌봄교실(꿈소망)",
+      "targetRoomId": "2F_CARE_DREAM_WISH",
+      "photos": 8,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "2F_CARE_DREAM_LOVE",
+      "name": "돌봄교실(꿈사랑)",
+      "targetRoomId": "2F_CARE_DREAM_LOVE",
+      "photos": 8,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "1F_PRINTING",
+      "name": "발간실",
+      "targetRoomId": "1F_PRINTING",
+      "photos": 7,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "1F_NIGHT_DUTY",
+      "name": "숙직실",
+      "targetRoomId": "1F_NIGHT_DUTY",
+      "photos": 7,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "1F_STORAGE_1",
+      "name": "창고 1",
+      "targetRoomId": "1F_STORAGE_1",
+      "photos": 7,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "1F_MEAL_CART_STORAGE",
+      "name": "배식차보관실",
+      "targetRoomId": "1F_MEAL_CART_STORAGE",
+      "photos": 6,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "custom_2e406f7fc9c04811a92910bac20efbb8",
+      "name": "과학실",
+      "targetRoomId": "2F_SCIENCE",
+      "photos": 6,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "3F_GRADE1_RESEARCH",
+      "name": "1학년 연수실",
+      "targetRoomId": "3F_GRADE1_RESEARCH",
+      "photos": 8,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "custom_852e6a5c10904a9ca5e29816f603f6be",
+      "name": "지능형 과학실",
+      "targetRoomId": "2F_INTELLIGENT_SCIENCE",
+      "photos": 6,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "3F_INDIVIDUAL_3",
+      "name": "개별학습실3",
+      "targetRoomId": "3F_INDIVIDUAL_3",
+      "photos": 8,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "2F_INDIVIDUAL_1",
+      "name": "개별학습실1",
+      "targetRoomId": "2F_INDIVIDUAL_1",
+      "photos": 8,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "4F_KINDERGARTEN",
+      "name": "까치방",
+      "targetRoomId": "4F_KINDERGARTEN",
+      "photos": 22,
+      "type": "special-room",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    },
+    {
+      "sourceRoomId": "3F_5-5",
+      "name": "5-5 교실",
+      "targetRoomId": "3F_5-5",
+      "photos": 10,
+      "type": "classroom",
+      "verification": "image-id-set-and-runtime",
+      "localImplementation": "photo-guided-3d"
+    }
+  ]
+}

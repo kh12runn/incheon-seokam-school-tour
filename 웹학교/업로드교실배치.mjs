@@ -92,6 +92,17 @@ export function applyUploadedClassroom(config){
     add('낮은 수납장 문 경계',[8.79,-6.423,.08,8.801,-6.414,1.13],'#87795f');
   }
   if(extras.includes('window-low-white'))add('창 아래 흰 수납장',[7.2,-6.81,.03,8.32,-6.38,.82],'#e4e5dc','paint',true);
+  if(extras.includes('window-plant')){
+    add('창가 화분',[6.95,-6.70,.85,7.20,-6.46,1.09],'#a26947');
+    for(let i=0;i<6;i++)add('창가 식물 잎 '+i,[6.87+(i%2)*.15,-6.71+(i%3)*.045,1.03+i*.04,7.16+(i%2)*.15,-6.45+(i%3)*.045,1.14+i*.04],'#648461').shape='sphere';
+  }
+  if(extras.includes('long-window-cubbies')){
+    add('창가 긴 교구장 뒷판',[3.0,-6.85,.03,8.3,-6.79,1.02],'#b19a74','wood');
+    for(const h of [.05,.50,.98])add('창가 긴 교구장 선반',[3,-6.84,h,8.3,-6.45,h+.035],'#bca47d','wood');
+    for(let i=0;i<=8;i++)add('창가 교구장 칸막이 '+i,[3+i*.66,-6.84,.05,3.035+i*.66,-6.45,1.02],'#b59b73','wood');
+    for(let i=0;i<8;i++)add('창가 교구장 바구니 '+i,[3.07+i*.66,-6.75,.10,3.53+i*.66,-6.48,.31],['#c6b849','#83a656','#bdc5bb'][i%3]);
+    colliders.push({name:room.name+' 창가 교구장 충돌',spaceId:room.id,interiorRoom:room.id,kind:'furniture',bounds:localBounds([3,-6.85,0,8.32,-6.45,1.02])});
+  }
   if(extras.includes('rear-color-bins'))for(let i=0;i<3;i++)add('뒤 분리수거함 '+i,[9.35,-.58,.03+i*.22,9.8,-.14,.24+i*.22],['#b3584c','#d0b74d','#8caa45'][i],'paint',true);
   if(profile.shelf==='games')for(const x of [5.22,7.28]){
     for(let i=0;i<7;i++)add('보드게임 상자 '+x+' '+i,[x,-.64,1.04+i*.047,x+.65-(i%3)*.04,-.22,1.082+i*.047],['#caa553','#729582','#b15f56','#4f778b','#dfd9bf'][i%5]);

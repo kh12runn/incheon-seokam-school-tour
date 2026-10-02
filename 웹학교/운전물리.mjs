@@ -1,14 +1,19 @@
 import {Body,Box,Vec3,RaycastVehicle,Material,ContactMaterial} from './외부도구/cannon-es.mjs';
 import {PARKED_CARS,CAR_DIMENSIONS} from './주차장.mjs';
+import {RUN_SPEED} from './달리기모션.mjs';
 const CENTER_HEIGHT=.52;
-export const DRIVING_TUNING=Object.freeze({forwardSpeed:18,reverseSpeed:6,engineForce:3200,reverseForce:1800,brakeForce:140});
+export const DRIVING_TUNING=Object.freeze({forwardSpeed:RUN_SPEED*3,reverseSpeed:RUN_SPEED,brakeForce:140,inputDeadzone:.08});
 export function createDriving(school,physics){
   physics.enableDrivingTerrain();const material=new Material('car');
   physics.world.addContactMaterial(new ContactMaterial(material,physics.groundMaterial,{friction:.35,restitution:.03}));
   const cars=PARKED_CARS.map(source=>{
     const d=CAR_DIMENSIONS[source.type],body=new Body({mass:0,material,position:new Vec3(source.x,source.y,source.z+CENTER_HEIGHT),linearDamping:.05,angularDamping:.5});
     body.addShape(new Box(new Vec3(d.width*.48,d.length*.48,.25)));
-    body.addShape(new Box(new Vec3(d.width*.38,d.length*.27,.30)),new Vec3(0,-.05,.60));
+    const sports=source.type==='sports';
+    // Every car starts/stops instantly, so soften pitch/roll torque for all
+    // chassis while preserving steering and vertical suspension travel.
+    body.angularFactor.set(.035,.035,1);
+    body.addShape(new Box(new Vec3(d.width*.38,d.length*.27,sports?.22:.30)),new Vec3(0,-.05,sports?.44:.60));
     body.quaternion.setFromAxisAngle(new Vec3(0,0,1),source.yaw);body.vehicleId=source.id;physics.world.addBody(body);
     const vehicle=new RaycastVehicle({chassisBody:body,indexRightAxis:0,indexForwardAxis:1,indexUpAxis:2});
     for(const y of [d.wheelbase/2,-d.wheelbase/2])for(const x of [-d.width*.48,d.width*.48])vehicle.addWheel({
@@ -18,7 +23,7 @@ export function createDriving(school,physics){
     });
     const proxy=school.colliders.find(b=>b.vehicleId===source.id);
     if(proxy)proxy.containsXY=(x,y,r)=>{const p=body.pointToLocalFrame(new Vec3(x,y,body.position.z));return Math.hypot(Math.max(0,Math.abs(p.x)-d.width/2),Math.max(0,Math.abs(p.y)-d.length/2))<r;};
-    return {id:source.id,source,d,body,vehicle,proxy,door:0,steering:0,wheelSpin:0};
+    return {id:source.id,source,d,body,vehicle,proxy,tuning:DRIVING_TUNING,door:0,steering:0,wheelSpin:0};
   });
   let phase='walking',active=null,route=[],timer=0,transitionFrom=null,transitionTo=null,error='';
   const point=(car,x,y,z=0)=>{const p=car.body.pointToWorldFrame(new Vec3(x,y,z-CENTER_HEIGHT));return {x:p.x,y:p.y,z:p.z};};
@@ -42,13 +47,20 @@ export function createDriving(school,physics){
     if(!path){error='운전석 쪽 통로가 막혀 있습니다.';return false;}
     active=car;route=path;phase='approaching';timer=0;error='';return true;
   }
-  const seat=()=>point(active,-.36,.15,-.10);
+  // Lower the avatar's root to fit the low coupe roof; the seated hips remain
+  // above the cushion instead of leaving a standing-height head through it.
+  const seat=()=>point(active,-.36,.15,active.source.type==='sports'?-.43:-.10);
+  function resetControls(car){
+    car.parkingBrake=false;car.steering=0;car.body.force.setZero();car.body.torque.setZero();
+    for(let i=0;i<4;i++){car.vehicle.applyEngineForce(0,i);car.vehicle.setBrake(0,i);car.vehicle.setSteeringValue(0,i);}
+  }
   function exitPoint(){
     for(const [x,y] of [[-active.d.width/2-.65,.35],[active.d.width/2+.65,.35],[0,-active.d.length/2-.65],[0,active.d.length/2+.65]]){const p=safePoint(active,x,y);if(p)return p;}
     return null;
   }
   function park(){
     if(!active)return;
+    resetControls(active);
     if(active.body.mass){active.vehicle.removeFromWorld(physics.world);active.body.mass=0;active.body.type=Body.STATIC;active.body.updateMassProperties();active.body.velocity.setZero();active.body.angularVelocity.setZero();physics.world.addBody(active.body);}
   }
   function exit(){
@@ -72,17 +84,24 @@ export function createDriving(school,physics){
       p={x:from.x+(to.x-from.x)*s,y:from.y+(to.y-from.y)*s,z:from.z+(to.z-from.z)*s};active.door=Math.sin(Math.PI*t);
       if(t>=1){
         if(phase==='entering'){
+          resetControls(active);
           phase='driving';physics.world.removeBody(active.body);active.body.mass=1100;active.body.type=Body.DYNAMIC;active.body.updateMassProperties();active.body.wakeUp();active.vehicle.addToWorld(physics.world);
         }else{phase='walking';active.door=0;active=null;}
       }
     }else if(phase==='driving'){
-      const car=active,v=speed(car),forward=Math.max(-1,Math.min(1,input.forward||0)),right=Math.max(-1,Math.min(1,input.right||0));
-      const changingDirection=forward*v<-.4,brake=input.brake||changingDirection;
-      car.steering+=(-right*(.48/(1+Math.abs(v)*.10))-car.steering)*(1-Math.exp(-dt*7));
+      const car=active,tuning=car.tuning,forward=Math.max(-1,Math.min(1,input.forward||0)),right=Math.max(-1,Math.min(1,input.right||0));
+      // Fixed-speed arcade movement. Touch and keys select direction, with no
+      // accumulated engine force, acceleration curve or sports-only boost.
+      const target=input.brake?0:forward>tuning.inputDeadzone?tuning.forwardSpeed:forward< -tuning.inputDeadzone?-tuning.reverseSpeed:0;
+      car.parkingBrake=target===0;
+      if(car.vehicle.numWheelsOnGround>=2||target===0){
+        const heading=carYaw(car);
+        car.body.velocity.x=-Math.sin(heading)*target;car.body.velocity.y=Math.cos(heading)*target;
+      }
+      car.steering+=(-right*(.48/(1+Math.abs(target)*.10))-car.steering)*(1-Math.exp(-dt*7));
       for(let i=0;i<4;i++){
         car.vehicle.setSteeringValue(i<2?car.steering:0,i);
-        const force=!brake&&((forward>=0&&v<DRIVING_TUNING.forwardSpeed)||(forward<0&&v>-DRIVING_TUNING.reverseSpeed))?forward*(forward>=0?DRIVING_TUNING.engineForce:DRIVING_TUNING.reverseForce):0;
-        car.vehicle.applyEngineForce(i>=2?force:0,i);car.vehicle.setBrake(brake?DRIVING_TUNING.brakeForce:forward===0?2:0,i);
+        car.vehicle.applyEngineForce(0,i);car.vehicle.setBrake(car.parkingBrake?tuning.brakeForce:0,i);
       }
       p=seat();
     }
@@ -90,6 +109,15 @@ export function createDriving(school,physics){
   }
   function sync(dt=0){
     for(const c of cars){
+      // Do not restore target velocity after physics: walls must still stop us.
+      if(c===active&&phase==='driving'){
+        const heading=carYaw(c),x=-Math.sin(heading),y=Math.cos(heading),v=c.body.velocity.x*x+c.body.velocity.y*y;
+        const excess=v-Math.max(-c.tuning.reverseSpeed,Math.min(c.tuning.forwardSpeed,v));
+        if(excess){c.body.velocity.x-=x*excess;c.body.velocity.y-=y*excess;}
+        // Hold the parking brake after the physics step; wheel constraints can
+        // otherwise add a small creep velocity even with the brake held.
+        if(c.parkingBrake&&c.vehicle.numWheelsOnGround>=2){c.body.velocity.x=0;c.body.velocity.y=0;}
+      }
       const yaw=carYaw(c),w=(Math.abs(Math.cos(yaw))*c.d.width+Math.abs(Math.sin(yaw))*c.d.length)/2,l=(Math.abs(Math.sin(yaw))*c.d.width+Math.abs(Math.cos(yaw))*c.d.length)/2;
       const {x,y,z}=c.body.position;if(c.proxy)c.proxy.bounds=[x-w,y-l,z-CENTER_HEIGHT+.1,x+w,y+l,z-CENTER_HEIGHT+c.d.height];
       c.wheelSpin+=speed(c)*dt/c.vehicle.wheelInfos[0].radius;

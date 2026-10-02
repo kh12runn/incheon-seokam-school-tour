@@ -26,7 +26,23 @@ export function uploadedClassroomDetails(config){
   panel('사진 참고 뒤 게시판',5.64,1.19,9.706,-3.51,2.0,'u',-1,(c,w,h)=>{
     const sky=c.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#9cbfc9');sky.addColorStop(.78,'#d4e2d4');sky.addColorStop(.8,'#a1b574');sky.addColorStop(1,'#91a263');c.fillStyle=sky;c.fillRect(0,0,w,h);
     const style=profile.back;
-    if(style==='white-papers'){
+    if(style==='three-part-drops'){
+      for(let row=0;row<3;row++)for(let col=0;col<5;col++)artwork(c,22+col*57,16+row*62,43,52,'sketch',col);
+      for(let row=0;row<3;row++)for(let col=0;col<8;col++){const x=335+col*42,y=24+row*55;c.fillStyle=paperColors[(row+col)%5];c.beginPath();c.moveTo(x,y);c.quadraticCurveTo(x-24,y+34,x,y+35);c.quadraticCurveTo(x+24,y+34,x,y);c.fill();}
+      for(let row=0;row<3;row++)for(let col=0;col<5;col++)artwork(c,720+col*54,16+row*60,44,48,'dark',col+row);
+    }else if(style==='right-paper-cluster'){
+      for(let row=0;row<3;row++)for(let col=0;col<6;col++)artwork(c,550+col*69,24+row*53,53,43,'sketch',col+row);
+    }else if(style==='green-framed-grid'){
+      for(let row=0;row<3;row++)for(let col=0;col<10;col++){const x=28+col*80,y=15+row*60;c.fillStyle='#abc671';c.fillRect(x-4,y-4,72,58);artwork(c,x,y,64,50,'sketch',col+row);}
+      c.fillStyle='#eef0db';c.fillRect(855,24,140,156);c.strokeStyle='#97ae7c';for(let i=0;i<6;i++){c.beginPath();c.moveTo(860,50+i*20);c.lineTo(990,50+i*20);c.stroke();}
+    }else if(['news-collage','postcard-gallery','striped-landscapes'].includes(style)){
+      const cols=style==='news-collage'?12:10;
+      for(let row=0;row<2;row++)for(let j=0;j<cols;j++){
+        const x=30+j*(960/cols),y=30+row*80,ww=style==='postcard-gallery'?65:49;
+        artwork(c,x,y,ww,58,style==='striped-landscapes'?'gradient':style==='postcard-gallery'?'sketch':'dark',j+row);
+        if(style==='news-collage'){c.fillStyle='#e7e6db';c.fillRect(x,y+36,ww,22);c.fillStyle='#8e978d';for(let k=0;k<4;k++)c.fillRect(x+4,y+40+k*4,ww-8-(k%2)*10,1);}
+      }
+    }else if(style==='white-papers'){
       for(let row=0;row<2;row++)for(let j=0;j<11;j++){
         const x=35+j*87,y=25+row*89;c.fillStyle='#f0f0e8';c.fillRect(x,y,64,70);
         c.strokeStyle='#bdc3b9';c.lineWidth=1.5;

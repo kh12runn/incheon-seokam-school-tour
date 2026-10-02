@@ -24,6 +24,7 @@
     <p id="캐릭터상태">탐험 시작 후 남학생 / 여학생을 선택하세요</p>
     <p id="차량시작안내">자동차를 탑승하여 학교를 더 편리하게 구경하세요!</p>
     <button id="시작" class="primary" disabled>탐험 시작하기 <span aria-hidden="true">→</span></button>
+    <button id="주차장바로가기" aria-haspopup="dialog" disabled>자동차 탑승하러 가기 <span aria-hidden="true">→</span></button>
     <div class="차량키요약 PC설명" aria-label="자동차 조작 키">
       <span><kbd>F</kbd> 탑승 · 하차</span><span><kbd>Space</kbd> 브레이크</span>
       <span><kbd>W / S</kbd> 전진 · 후진</span><span><kbd>A / D</kbd> 좌우 조향</span>
@@ -32,6 +33,12 @@
     <p class="시작힌트">달리고, 점프하고, 친구처럼 인사해요.<br>층과 교실 바로 가기는 오른쪽 위 메뉴에서.</p>
     <span id="불러오기" role="status">학교를 불러오는 중…</span>
   </section>
+  <dialog id="주차장선택" aria-labelledby="주차장제목">
+    <div class="창제목"><div><span class="작은제목">자동차로 학교 탐험</span><h2 id="주차장제목">어느 주차장으로 갈까요?</h2></div><button id="주차장닫기" class="닫기" aria-label="주차장 선택 닫기">×</button></div>
+    <p>선택한 주차장의 차량 옆으로 이동합니다.<br>도착하면 F키 또는 ‘탑승하기’ 버튼을 누르세요.</p>
+    <div class="주차장선택줄"><button data-parking="rear">후문 주차장</button><button data-parking="front">정문 주차장</button></div>
+    <p>모든 자동차: 전진은 달리기의 3배 · 후진은 달리기와 같은 속도<br>가속 없이 바로 이동하고, 조작을 놓으면 정지합니다.</p>
+  </dialog>
   <dialog id="게임메뉴" aria-labelledby="메뉴제목">
     <div class="창제목"><div><span class="작은제목">잠깐 쉬어가기</span><h2 id="메뉴제목">탐험 메뉴</h2></div><button id="메뉴닫기" class="닫기" aria-label="메뉴 닫기">×</button></div>
     <button id="걷기" class="primary" disabled>탐험 시작하기</button>
@@ -91,7 +98,7 @@
     <button id="차량브레이크" type="button" aria-keyshortcuts="Space" title="브레이크 (Space)" hidden>브레이크 <kbd aria-hidden="true">Space</kbd></button>
   </section>
   <footer><span id="상태" role="status">구조 불러오는 중…</span></footer>
-  <script type="module" src="./웹학교/게임.mjs?v=20260921-교장1명러닝대화"></script>
+  <script type="module" src="./웹학교/게임.mjs?v=20261002-fixed-driving-speed"></script>
   <noscript>학교를 보려면 브라우저에서 자바스크립트를 허용하세요.</noscript>
 </body>
 </html>

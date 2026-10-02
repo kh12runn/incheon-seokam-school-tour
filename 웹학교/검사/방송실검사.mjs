@@ -8,7 +8,7 @@ assert.equal(JSON.stringify(data),snapshot);assert.deepEqual(world.data.rooms,be
 assert.equal(room.reference.count,6);assert.equal(room.chairs.length,6);assert.equal(new Set(room.reference.imageIds).size,6);
 assert.deepEqual(room.room.bounds,[56,64,-7,0,3.4,6.55]);
 for(const key of ['classroomInteriors','principalOffice','centralStairFinish'])assert.equal(JSON.stringify(world[key]),JSON.stringify(before[key]),key+' unchanged');
-for(const r of before.specialInteriors)assert.deepEqual(world.specialInteriors.find(s=>s.roomId===r.roomId),r,'Other special room unchanged');
+for(const r of before.specialInteriors)assert(JSON.stringify(world.specialInteriors.find(s=>s.roomId===r.roomId))===JSON.stringify(r),'Other special room unchanged');
 for(const id of ['2F_STAFF','2F_3-5','2F_OPERATIONS_MEETING','2F_AUDIO_VISUAL'])assert.deepEqual(world.boxes.filter(b=>b.spaceId===id),before.boxes.filter(b=>b.spaceId===id),id+' unchanged');
 assert.equal(world.blocked(room.table.x,room.table.y,3.4),true,'Table collision');
 for(const c of room.chairs)assert.equal(world.blocked(c.x,c.y,c.z),true,'Chair collision');

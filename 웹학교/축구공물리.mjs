@@ -54,7 +54,9 @@ export function createFootballPhysics(school,{random=Math.random,count=BALL_COUN
     if(drivingTerrain)return;drivingTerrain=true;world.removeBody(floor);world.removeBody(field);
     const heights=[];
     for(let x=-24;x<=113;x++){
-      const row=[];for(let y=-87;y<=28;y++){const h=school.floorBelow(x,y,.6);row.push(Number.isFinite(h)?h:-.6);}heights.push(row);
+      // Low sports-car roofs can be below the terrain probe height. Never bake
+      // movable cars into the ground: their separate bodies provide collision.
+      const row=[];for(let y=-87;y<=28;y++){const h=school.floorBelow(x,y,.6,{ignoreVehicles:true});row.push(Number.isFinite(h)?h:-.6);}heights.push(row);
     }
     world.addBody(new Body({mass:0,material:ground,shape:new Heightfield(heights,{elementSize:1}),position:new Vec3(-24,-87,0)}));
     for(const body of [...world.bodies])if(body.vehicleId)world.removeBody(body);

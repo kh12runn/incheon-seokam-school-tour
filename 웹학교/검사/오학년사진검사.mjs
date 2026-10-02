@@ -19,7 +19,7 @@ assert.equal(c3.photoCount,9);assert.equal(c6.photoCount,9);assert.equal(c3.prof
 assert.equal(c3.profile.locker,'green-row');assert.equal(c6.profile.locker,'ivory-row');
 assert(c3.boxes.some(b=>b.name.includes('칠판 중앙 흰 보드')));assert(!c6.boxes.some(b=>b.name.includes('칠판 중앙 흰 보드')));
 for(const c of [c3,c6])assert.equal(c.boxes.filter(b=>/흰 롤블라인드/.test(b.name)).length,4);
-for(const id of ['3F_5-4','3F_5-5','3F_5-7'])assert(!world.classroomInteriors.find(c=>c.roomId===id).photoDetails?.uploaded);
+assert(!world.classroomInteriors.find(c=>c.roomId==='3F_5-7').photoDetails?.uploaded);
 const route=[[46.1,1.5],[46.1,3.62],[45.17,3.62],[45.17,8.70],[48.84,8.70],[48.84,4.10],[46.1,4.10],[46.1,1.5]].map(([x,y])=>({x,y,z:6.8}));
 for(const fps of [30,60,144])for(const sequence of [route,[...route].reverse()]){
   let p={...sequence[0]};for(const q of sequence.slice(1)){

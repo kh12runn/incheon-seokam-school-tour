@@ -1,6 +1,7 @@
 import {openClassroomWindows} from './창문배치.mjs';
+import {PHOTO_REFERENCES} from './추가사진근거.mjs';
 export const NURSE_ID='1F_NURSE';
-export const NURSE_REFERENCE={revision:'f10e7cbc-e609-4bab-89f7-c1f7c7197e73',count:16,approximateDimensions:true,features:['밝은 목재 바닥','나무 아치형 출입구','대기용 원형 의자와 건강 게시판','회색 파티션 상담석','나무 약품 수납장과 흰 유리장','냉장고·정수기·공기청정기','안정실 침대 3개와 접은 이불·커튼'],privacy:'사람·개인 문서·환자 기록 제외'};
+export const NURSE_REFERENCE={...PHOTO_REFERENCES['1F_NURSE'],reviewedAt:'2026-10-02',approximateDimensions:true,features:['밝은 목재 바닥','나무 아치형 출입구','대기용 원형 의자와 건강 게시판','회색 파티션 상담석','나무 약품 수납장과 흰 유리장','냉장고·정수기·공기청정기','안정실 침대 3개와 접은 이불·커튼','흰 스탠드 처치등과 벽걸이 건강자료'],privacy:'사람·개인 문서·환자 기록 제외',additionalReview:'추가 27장은 같은 방의 상세·반복 촬영. 침대 오른쪽 배치 유지'};
 // Keep the existing 6 x 7 metre room and corridor entrance. Photographs describe
 // the interior, not surveyed dimensions: furniture is fitted to traversable zones.
 export function nurseRoomInterior(data,worldBoxes,worldColliders,addBox){
@@ -89,6 +90,9 @@ export function nurseRoomInterior(data,worldBoxes,worldColliders,addBox){
   add('정수기',[3.13,.18,.01,3.61,.62,1.15],'#e5eae2','paint',true);
   add('정수기 출수구',[3.23,.625,.60,3.53,.643,.91],'#394d49');
   add('입구 매트',[1.54,.12,.012,2.73,1.0,.02],'#ae795a','rubber_mat');
+  add('흰 스탠드 처치등 받침',[.13,4.75,.015,.40,5.05,.055],'#e4e9e2','metal',true);
+  add('흰 스탠드 처치등 기둥',[.245,4.86,.055,.28,4.90,1.37],'#dce4df','metal');
+  add('흰 스탠드 처치등 머리',[.15,4.74,1.35,.38,4.94,1.42],'#f0f1e8','lamp');
   add('복도 청록 유리창',[3.92,.12,1.16,5.18,.15,2.23],'#93c9c0','glass');
   for(const x of [3.89,4.54,5.17])add('복도 흰 창틀 '+x,[x,.15,1.13,x+.035,.20,2.27],'#e7eae1');
   for(const h of [1.13,2.24])add('복도 흰 창 가로틀 '+h,[3.89,.15,h,5.20,.20,h+.035],'#e7eae1');

@@ -1,6 +1,8 @@
 // Photo observations, not generic identity themes. Original photographs remain
 // in the photo repository; no people, pupil names or documents are published.
+import {ADDITIONAL_CLASSROOM_OBSERVATIONS} from './추가교실사진관찰.mjs';
 const observations={
+  ...ADDITIONAL_CLASSROOM_OBSERVATIONS,
   '3F_5-3':{count:9,revision:'2026-09-30-012cbaf4',theme:'흰 활동지와 연두 의자',board:'white-narrow',back:'white-papers',locker:'green-row',chairs:['#a6bd45','#ad8759','#293e52'],chairEvery:4,desktopColor:'#d9dcd0',purifier:'rear-blue',shelf:'papers',extras:['back-window-wood','color-bins','lectern'],features:['연두 의자와 일부 목재·남색 의자','초록 칠판 가운데 오른쪽의 좁은 흰 보드','하늘·잔디 배경의 두 줄 흰 활동지','목재 사물함의 연두 중간 줄','뒤 창가 청백색 공기청정기와 높이가 다른 목재 수납장','흰 블라인드와 밝은 마루']},
   '3F_5-6':{count:9,revision:'2026-09-30-3de4fa17',theme:'해바라기 작품과 짝 책상',board:'green',back:'sunflower-autumn',locker:'ivory-row',chairs:['#a6bd45','#ad8759','#293e52'],chairEvery:4,desktopColor:'#d9dcd0',pairedDesks:true,purifier:'front-blue',purifierPosition:[.45,-2.75],shelf:'games',clockSide:'corridor',extras:['back-window-cream','slim-cabinet','window-rect-mirror','autumn-posters','rear-color-bins','window-low-white'],features:['연두색 위주의 혼합 의자와 두 개씩 붙인 책상','흰 보드 없는 초록 칠판','해바라기 두 줄·가을 그림·아래 흰 작품의 뒤 게시판','목재 사물함의 아이보리 중간 줄','앞쪽 청백색 공기청정기','복도 책장의 보드게임·책과 창가 세로 거울','뒤 창가 크림색 키큰 수납장']},
   '4F_4-1':{count:6,revision:'a36aed4a-34c8-4c78-b243-b66074d179cc',theme:'주황 작품과 동그란 창가 전시',board:'green',back:'orange-art',locker:'green-row',chairs:['#263c51','#a4b746'],chairEvery:9,purifier:'rear-blue',shelf:'papers',cabinetColor:'#b9a6ad',extras:['rear-cupboard','corridor-globes','yellow-schedule','lectern'],features:['남색 의자에 소수 연두 의자','뒤 게시판 두 줄 주황 작품과 가운데 큰 공동작품','연두 중간 줄 사물함','복도창의 동그란 작품과 노란 장식','활동지가 쌓인 목재 책장','칠판 오른쪽 노란 일정표']},
@@ -19,6 +21,6 @@ const observations={
 };
 export const UPLOADED_CLASSROOM_PROFILES=Object.fromEntries(Object.entries(observations).map(([roomId,o])=>[roomId,{
   ...o,roomId,referenceRoom:roomId.startsWith('4F_2-')?'4F_2-1':'4F_6-4',photoStatus:'reviewed',photoCount:o.count,sourceRevision:o.revision,
-  reviewedAt:'2026-09-30',observedFeatures:o.features,lowerWall:'#b8c3b4',accent:'#a4b29b',trayColor:'#d8c254',boardLayout:0,lockerPattern:0,
+  reviewedAt:ADDITIONAL_CLASSROOM_OBSERVATIONS[roomId]?'2026-10-02':'2026-09-30',observedFeatures:o.features,lowerWall:'#b8c3b4',accent:'#a4b29b',trayColor:'#d8c254',boardLayout:0,lockerPattern:0,
   seatCountIsApproximate:true,layoutIsApproximate:true,
 }]));

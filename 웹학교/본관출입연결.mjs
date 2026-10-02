@@ -3,23 +3,13 @@ export const REAR_EXIT={left:34,right:36,y:3,height:2.65};
 export const STAIR_REAR_EXIT={left:52.85,right:54.65,y:10,bottom:-.6,top:1.45};
 export const ROOF_STAIR='MAIN_STAIR_B';
 
-export function openRearExit(boxes,colliders,surfaces,addBox){
-  // Exposed north corridor facade west of the storage/night-duty rooms.
-  // Cut glazing, backing, frames and their collision together; leave every room intact.
-  const cut=[34,2.7,-.05,36,3.4,2.65];
+export function removeRearExit(boxes,colliders,addBox){
+  // Restore a continuous wall, not a shut door. No ramp, frame or sign remains.
+  const cut=[33.88,2.7,-.65,36.12,3.4,3.42];
   for(const list of [boxes,colliders]){
     const next=list.flatMap(b=>b.bounds[5]<=.04?[b]:subtractBox(b,cut));list.splice(0,list.length,...next);
   }
-  surfaces.push({name:'뒤 주차장 출입 경사로',bounds:[34,2.85,-.61,36,5.4,.01],height:(x,y)=>-.6*Math.max(0,Math.min(1,(y-3.2)/2.2))});
-  for(let i=0;i<24;i++){
-    const y=3+i*.1,z=-.6*Math.max(0,Math.min(1,(y-3.2)/2.2));
-    addBox('뒤 현관 경사면 '+i,[34,y,z-.18,36,y+.1,z],[.65,.68,.65],'step',1);
-  }
-  for(const x of [33.88,36]){
-    addBox('뒤 현관 문틀',[x,2.83,0,x+.12,3.2,2.78],[.62,.66,.65],'wall',1);
-    addBox('뒤 현관 경사로 난간',[x,3.2,-.6,x+.10,5.4,.9],[.42,.49,.48],'wall',1);
-  }
-  addBox('뒤 현관 상부',[33.88,2.83,2.65,36.12,3.2,2.78],[.62,.66,.65],'wall',1);
+  addBox('후문 철거부 연속 외벽',[33.88,2.91,-.65,36.12,3.145,3.42],[.86,.87,.84],'wall',1);
 }
 
 export function addMainRooftop(data,boxes,surfaces,addBox){

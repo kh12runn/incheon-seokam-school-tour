@@ -10,7 +10,7 @@ assert.equal(room.control.reference.sourceRoomId,'2F_KOREAN_CLASS');assert.equal
 assert.equal(room.control.chairs.length,8);assert.equal(room.chairs.length,6);
 assert.equal(room.boxes.filter(b=>/^방송 조정실 모니터 화면/.test(b.name)).length,3);
 for(const key of ['classroomInteriors','principalOffice','centralStairFinish','stairs','surfaces'])assert.ok(JSON.stringify(world[key])===JSON.stringify(before[key]),key+' unchanged');
-for(const r of before.specialInteriors.filter(r=>r.roomId!=='2F_BROADCAST'))assert.deepEqual(world.specialInteriors.find(s=>s.roomId===r.roomId),r);
+for(const r of before.specialInteriors.filter(r=>r.roomId!=='2F_BROADCAST'))assert(JSON.stringify(world.specialInteriors.find(s=>s.roomId===r.roomId))===JSON.stringify(r),'Other special room unchanged');
 const unrelated=list=>list.filter(b=>b.spaceId!=='2F_BROADCAST'&&!b.name.includes('2F_BROADCAST'));
 assert.deepEqual(unrelated(world.boxes),unrelated(before.boxes));
 assert.deepEqual(unrelated(world.colliders),unrelated(before.colliders));

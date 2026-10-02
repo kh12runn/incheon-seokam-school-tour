@@ -39,9 +39,9 @@ for(let i=0;i<before.length;i++){
   const b=before[i].bounds;assert.equal(before[i].height((b[0]+b[3])/2,(b[1]+b[4])/2),after[i].height((b[0]+b[3])/2,(b[1]+b[4])/2));
 }
 for(const prefix of ['MAIN_STAIR_A','ANNEX_STAIR_D','ANNEX_STAIR_E'])assert.deepEqual(world.boxes.filter(b=>b.name.startsWith(prefix)),original.boxes.filter(b=>b.name.startsWith(prefix)),prefix+' untouched');
-assert.equal(world.centralStairFinish.reference.target,'MAIN_STAIR_B');assert.equal(world.centralStairFinish.reference.photoCount,19);
+assert.equal(world.centralStairFinish.reference.target,'MAIN_STAIR_B');assert.equal(world.centralStairFinish.reference.photoCount,47);assert.equal(world.centralStairFinish.reference.imageIds.length,47);assert.equal(world.centralStairFinish.artworks.length,2);
 assert.equal(world.centralStairFinish.signs.length,4);assert.equal(world.colliders.filter(b=>b.kind==='window_collision'&&b.centralStairFinish).length,3);
 assert.equal(world.blocked(52.5,9.99,3),true,'Landing window remains solid');
 assert.ok(world.colliders.some(b=>b.name==='MAIN_STAIR_B 중앙벽'),'Stair separator safety retained');
 assert.ok(world.boxes.every(b=>b.bounds.length===6&&b.bounds.every(Number.isFinite)&&b.bounds.slice(0,3).every((v,i)=>v<b.bounds[i+3])),'Finite, positive geometry');
-console.log(JSON.stringify({ok:true,photos:25,seats:90,seatCollision:true,stageAndAisles:true,auditoriumCorridorRoundTrip:true,originalStairSurfacesUnchanged:true,otherRoomsUnchanged:true,centralStairFloors:4,landingWindows:3}));
+console.log(JSON.stringify({ok:true,photos:53,seats:90,seatCollision:true,stageAndAisles:true,auditoriumCorridorRoundTrip:true,originalStairSurfacesUnchanged:true,otherRoomsUnchanged:true,centralStairFloors:4,landingWindows:3}));

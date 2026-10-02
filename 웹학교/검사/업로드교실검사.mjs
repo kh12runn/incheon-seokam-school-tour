@@ -4,7 +4,7 @@ import {buildWorld} from '../이동물리.mjs';
 import {UPLOADED_CLASSROOM_PROFILES as profiles} from '../업로드교실관찰.mjs';
 const source=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),snapshot=JSON.stringify(source);
 const before=buildWorld(source,{uploadedClassPhotos:false}),world=buildWorld(source),ids=new Set(Object.keys(profiles));
-assert.equal(ids.size,15);assert.equal(Object.values(profiles).reduce((n,p)=>n+p.photoCount,0),98);
+assert.equal(ids.size,21);assert.equal(Object.values(profiles).reduce((n,p)=>n+p.photoCount,0),149);
 assert.equal(JSON.stringify(source),snapshot);assert.deepEqual(world.data,before.data);
 const unaffected=list=>list.filter(b=>!ids.has(b.spaceId)&&!ids.has(b.interiorRoom));
 assert.ok(JSON.stringify(unaffected(world.boxes))===JSON.stringify(unaffected(before.boxes)),'Only the 15 uploaded classrooms change');
@@ -38,5 +38,5 @@ for(const id of ids){
   }
   assert.equal(world.boxes.filter(box=>box.spaceId===id&&box.cornerTV).length,2,id+' existing corner TV');
 }
-assert.equal(signatures.size,15,'Every photographed classroom has a distinct observed configuration');
-console.log(JSON.stringify({ok:true,rooms:15,photos:98,uniqueConfigurations:15,annexRooms:2,allDoorsAndAislesReachable:true,frameRates:[30,60,144],furnitureCollision:true,previousRoomsPreserved:true}));
+assert.equal(signatures.size,21,'Every photographed classroom has a distinct observed configuration');
+console.log(JSON.stringify({ok:true,rooms:21,photos:149,uniqueConfigurations:21,annexRooms:2,allDoorsAndAislesReachable:true,frameRates:[30,60,144],furnitureCollision:true,previousRoomsPreserved:true}));

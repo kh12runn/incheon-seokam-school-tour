@@ -26,7 +26,7 @@ for(const room of data.rooms.filter(r=>r.type==='classroom'&&r.building==='MAIN'
 assert.equal(classroomDevices(world.boxes,world.data.rooms).length,world.boxes.length,'No duplicate monitors on repeat');
 const near=(a,b)=>assert(Math.abs(a-b)<.075,`${a} != ${b}`);
 const go=(p,x,y)=>{const q=world.move(p,x-p.x,y-p.y);near(q.x,x);near(q.y,y);return q;};
-let p={x:35,y:1.5,z:0};p=go(p,35,15);near(p.z,-.6);p=go(p,35,1.5);near(p.z,0);
+let p={x:35,y:1.5,z:0};p=world.move(p,0,13.5);assert(p.y<3,'Owner requested right-hand rear entrance sealed');
 assert(world.blocked(33,3,0),'Facade remains closed beside the rear doorway');
 for(const x of [53.2,53.75,54.3]){
   p={x,y:1.5,z:0};p=go(p,x,15);near(p.z,-.6);
@@ -49,4 +49,4 @@ for(let floor=1;floor<=4;floor++){
   const finish=world.boxes.filter(b=>b.name.startsWith(floor+'층 사진참고 복도 바닥'));assert.equal(Math.max(...finish.map(b=>b.bounds[3])),103);
   assert(world.boxes.some(b=>b.name.startsWith(floor+'층 사진참고 북측 Wall_')&&b.bounds[0]>=80));
 }
-console.log({ok:true,classrooms:25,monitors:50,cornerTVs:25,mainCorridorFloors:4,rearParkingRoundTrip:true,centralStairParkingRoundTrip:true,rooftopRoundTrip:true});
+console.log({ok:true,classrooms:25,monitors:50,cornerTVs:25,mainCorridorFloors:4,rightRearExitSealed:true,centralStairParkingRoundTrip:true,rooftopRoundTrip:true});

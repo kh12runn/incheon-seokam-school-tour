@@ -1,14 +1,15 @@
 import {subtractBox} from './창문배치.mjs';
+import {PHOTO_REFERENCES} from './추가사진근거.mjs';
 // User confirmed: uploads labelled MAIN_STAIR_A depict the administrative-office
 // central stair B. Never infer target location from these legacy upload folders.
-export const CENTRAL_STAIR_REFERENCE={target:'MAIN_STAIR_B',confirmedByUser:true,photoCount:19,
-  sourceRooms:['2F_MAIN_STAIR_A','3F_MAIN_STAIR_A','4F_MAIN_STAIR_A'],
-  revisions:['ba672a91-40c3-4d8f-908e-851328131010','b9f82678-41a1-4dbd-9413-b97560a2ec40','90bcb9a5-74e3-4628-b1d1-782da2e61f6b'],
-  firstFloorInferred:true,features:['남색 고무 디딤판','은색 논슬립 모서리','노란 점자블록','하늘색 하부 벽','회백색 상부 벽','금속 세로 난간','목재 벽 손잡이','큰 격자창']};
+const sources=['1F_MAIN_STAIR_A','2F_MAIN_STAIR_A','3F_MAIN_STAIR_A','4F_MAIN_STAIR_A'];
+export const CENTRAL_STAIR_REFERENCE={target:'MAIN_STAIR_B',confirmedByUser:true,photoCount:47,
+  sourceRooms:sources,revisions:sources.map(id=>PHOTO_REFERENCES[id].revision),imageIds:sources.flatMap(id=>PHOTO_REFERENCES[id].imageIds),
+  firstFloorInferred:false,reviewedAt:'2026-10-02',features:['남색 고무 디딤판','은색 논슬립 모서리','노란 점자블록','하늘색 하부 벽','회백색 상부 벽','금속 세로 난간','목재 벽 손잡이','큰 격자창','1층 계단 작은 작품 모음','난간 주황 안전띠']};
 const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255);
 export function finishCentralStair(boxes,colliders,stairs){
   const stair=stairs.find(s=>s.id==='MAIN_STAIR_B');if(!stair)return null;
-  const rods=[],panels=[],signs=[],added=[],{height:FH,L,T}=stair,W=stair.frame.width,D=stair.frame.depth;
+  const rods=[],panels=[],signs=[],artworks=[],added=[],{height:FH,L,T}=stair,W=stair.frame.width,D=stair.frame.depth;
   const point=(u,v,z)=>[50+u,3+v,z];
   const add=(name,b,color,material='paint',floor=1)=>{
     const item={name:'중앙계단 사진참고 '+name,bounds:b,color:rgb(color),material,kind:'finish',floor,centralStairFinish:true};boxes.push(item);added.push(item);return item;
@@ -50,6 +51,7 @@ export function finishCentralStair(boxes,colliders,stairs){
     const z=level*FH;
     for(const [u0,u1] of [[.22,2.25],[2.75,4.78]])tactile(u0,u1,.74,z,level+1);
     signs.push({text:(level+1)+'층 · 중앙계단',position:point(.105,.40,z+1.75),rotation:[0,Math.PI/2,0]});
+    if(level<2)artworks.push({position:point(.109,1.10,z+2.18),rotation:[0,Math.PI/2,0],width:1.9,height:1.2});
     // Pale-blue lower-wall strips at each corridor landing; no front wall/door added.
     for(const u of [.091,W-.095])panels.push({color:'#adc1d7',points:[point(u,0,z),point(u,L,z),point(u,L,z+1.30),point(u,0,z+1.30)]});
     if(level===3)continue;
@@ -61,6 +63,7 @@ export function finishCentralStair(boxes,colliders,stairs){
       panels.push({color:'#333d43',points:[point(skirting,L,a-.03),point(skirting,T,b-.03),point(skirting,T,b+.13),point(skirting,L,a+.13)]});
       rod('목재 벽 손잡이',point(lane?W-.16:.16,L,a+.92),point(lane?W-.16:.16,T,b+.92),.029,'wood');
       rod('금속 경사 난간',point(uRail,L,a+.98),point(uRail,T,b+.98),.03);
+      rod('주황 안전띠',point(uRail,L+.10,a+.98+(b-a)*.10/(T-L)),point(uRail,L+.29,a+.98+(b-a)*.29/(T-L)),.034,'orange');
       for(let i=0;i<=18;i++){
         const t=i/18,v=L+(T-L)*t,h=a+(b-a)*t;
         rod('세로 난간살',point(uRail,v,h-.06),point(uRail,v,h+.98),.013);
@@ -86,5 +89,5 @@ export function finishCentralStair(boxes,colliders,stairs){
     rod('난간 끝 연결',point(W/2-.06,L,z+.98),point(W/2+.06,L,z+.98),.032);
     add('중간참 조명 '+level,[51.65,9.0,z+FH+1.44,53.35,9.35,z+FH+1.48],'#f2f1e4','lamp',level+1);
   }
-  return {reference:CENTRAL_STAIR_REFERENCE,rods,panels,signs,boxes:added};
+  return {reference:CENTRAL_STAIR_REFERENCE,rods,panels,signs,artworks,boxes:added};
 }
