@@ -4,6 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import {EXTRA_PHOTO_ROOMS} from '../추가공간사진배치.mjs';
+import {OUTDOOR_SPAWN,OUTDOOR_YAW} from '../운동장환경.mjs';
 const {chromium}=await import(pathToFileURL(process.env.PLAYWRIGHT_MODULE).href);
 const browser=await chromium.launch({headless:true,executablePath:process.env.QUIZ_BROWSER,args:['--enable-unsafe-swiftshader']});
 try{
@@ -43,6 +44,7 @@ try{
  if(process.env.PREVIEW_ONLY){assert.deepEqual(errors,[]);console.log(JSON.stringify({ok:true,views:renders.length,errors,output}));}else{
  await page.setViewportSize({width:390,height:750});await page.goto(base+'/?test=1');await page.waitForFunction(()=>window.schoolTour?.getState().ready,null,{timeout:180000});
  await page.locator('#시작').click();await page.locator('#걸어서선택').click();await page.locator('#캐릭터확인').click();
+ const start=await page.evaluate(()=>schoolTour.getState());assert.deepEqual(start.position,OUTDOOR_SPAWN);assert.equal(start.yaw,OUTDOOR_YAW);
  await page.screenshot({path:path.join(output,'game-start.png')});
  for(const id of ids.filter(id=>id!=='recycling')){
   await page.evaluate(()=>document.getElementById('메뉴').click());await page.locator('#방선택').selectOption(id);await page.evaluate(()=>document.getElementById('방이동').click());

@@ -1,7 +1,7 @@
-// Distance is measured from entrance y=-7 to the nearest rear step y=-17.
-// Preserve a ten-metre clear approach and avoid the existing portable goal.
-export const ROSTRUM={left:40,right:48,front:-25,rear:-20,ground:-.3,top:1.4,treads:8,run:3,roof:4.3};
-export const ROSTRUM_SPAWN={x:44,y:-22.5,z:ROSTRUM.top};
+// Distance is measured from entrance y=-7 to the nearest rear step y=-12.
+// Keep a five-metre approach; the goals sit beyond the stage on the lower field.
+export const ROSTRUM={left:40,right:48,front:-20,rear:-15,ground:-.3,top:1.4,treads:8,run:3,roof:4.3};
+export const ROSTRUM_SPAWN={x:44,y:(ROSTRUM.front+ROSTRUM.rear)/2,z:ROSTRUM.top};
 export function rebuildRostrum(boxes,colliders,surfaces){
  const old=b=>b.name==='SPACE_EXT_ROSTRUM'||b.name.startsWith('구령대 ')||b.name.startsWith('정후문 사진 구령대 ');
  for(const list of [boxes,colliders,surfaces]){const kept=list.filter(b=>!old(b));list.splice(0,list.length,...kept);}

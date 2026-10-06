@@ -1,6 +1,6 @@
 import {ROSTRUM_SPAWN} from './구령대배치.mjs';
 export const OUTDOOR_SPAWN={...ROSTRUM_SPAWN};
-export const OUTDOOR_YAW=0;
+export const OUTDOOR_YAW=Math.PI; // Start on the raised platform facing the field.
 // Additional landscaping requested by the user; placement is not surveyed.
 export const EXTRA_TREES=[
   ...[-4,7,18,29,40,51,62,73,84].map((x,i)=>({x,y:-75-(i%2)*1.4,scale:.90+(i%3)*.13})),

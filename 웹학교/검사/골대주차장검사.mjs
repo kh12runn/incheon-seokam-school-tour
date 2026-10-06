@@ -2,12 +2,13 @@ import fs from 'node:fs';
 import assert from 'node:assert/strict';
 import {buildWorld} from '../이동물리.mjs';
 import {PARKED_CARS,REAR_PARKING} from '../주차장.mjs';
+import {GOAL_LAYOUT} from '../운동장.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8'));
 const original=JSON.stringify(data),world=buildWorld(data),boxes=world.boxes;
 const goals=boxes.filter(b=>b.name.startsWith('운동장 골대 가로대'));
 assert.equal(goals.length,2);
-assert.deepEqual(goals.map(b=>(b.bounds[1]+b.bounds[4])/2).sort((a,b)=>a-b),[-64,-16]);
-for(const g of goals){assert.equal((g.bounds[0]+g.bounds[3])/2,38);assert(g.bounds[3]-g.bounds[0]>7);}
+assert.deepEqual(goals.map(b=>(b.bounds[1]+b.bounds[4])/2).sort((a,b)=>a-b),[GOAL_LAYOUT.south,GOAL_LAYOUT.north]);
+for(const g of goals){assert.equal((g.bounds[0]+g.bounds[3])/2,GOAL_LAYOUT.centreX);assert(g.bounds[3]-g.bounds[0]>7);}
 assert.equal(boxes.filter(b=>b.name.startsWith('운동장 골대 기둥')).length,4);
 assert.equal(JSON.stringify(data),original);
 const site=data.boxes.find(b=>b.name==='SiteGround').bounds,parking=boxes.filter(b=>b.name.startsWith('주차장'));
@@ -34,7 +35,7 @@ for(let y=-74;y<=-43;y+=.5)assert(world.candidate(-11.5,y,-.6),'Field-side parki
 assert(!world.candidate(19.875,21,-.6),'Rear vehicles restored');
 for(let x=11;x<=60;x+=.5)assert(world.candidate(x,16,-.6),'Rear drive aisle blocked at '+x);
 assert(world.candidate(20,-40,-.3),'Courtyard blocked');
-const report={ok:true,goalEnds:'상하',goalCenters:goals.map(g=>[38,(g.bounds[1]+g.bounds[4])/2]),markedParkingSpaces:19,parkedCars:11,fieldCars:6,rearCars:5,rearPlacementEstimated:true,parkingLeftFacingMain:true,gateSlopeClear:true,entranceAisleClear:true,carCollision:true,sourceUnchanged:true};
+const report={ok:true,goalEnds:'상하',goalCenters:goals.map(g=>[GOAL_LAYOUT.centreX,(g.bounds[1]+g.bounds[4])/2]),markedParkingSpaces:19,parkedCars:11,fieldCars:6,rearCars:5,rearPlacementEstimated:true,parkingLeftFacingMain:true,gateSlopeClear:true,entranceAisleClear:true,carCollision:true,sourceUnchanged:true};
 fs.mkdirSync(new URL('../../output/',import.meta.url),{recursive:true});
 fs.writeFileSync(new URL('../../output/골대주차장검사.json',import.meta.url),JSON.stringify(report,null,2)+'\n');
 console.log(report);

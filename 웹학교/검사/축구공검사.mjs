@@ -3,11 +3,12 @@ import fs from 'node:fs';
 import {buildWorld} from '../이동물리.mjs';
 import {createFootballPhysics,BALL_COUNT,BALL_RADIUS} from '../축구공물리.mjs';
 import {EXTRA_TREES,OUTDOOR_YAW} from '../운동장환경.mjs';
+import {ROSTRUM} from '../구령대배치.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),before=JSON.stringify(data),school=buildWorld(data);
-assert.equal(JSON.stringify(data),before);assert(school.candidate(...Object.values(school.spawn)));assert.equal(OUTDOOR_YAW,0);
+assert.equal(JSON.stringify(data),before);assert(school.candidate(...Object.values(school.spawn)));assert.equal(OUTDOOR_YAW,Math.PI);
 assert(school.spawn.y< -7,'Outside main entrance');
-assert(school.move(school.spawn,0,-7).y>-25,'Photo front guard is solid');
-for(const dx of [-7.8,7.8]){let p=school.move(school.spawn,dx,0);assert(Math.abs(p.x-school.spawn.x-dx)<.08,'Walk off rostrum using side stairs');p=school.move(p,0,-4);assert(p.y<-26.45,'Turn from stairs onto field');}
+assert(school.move(school.spawn,0,-7).y>ROSTRUM.front,'Photo front guard is solid');
+for(const dx of [-7.8,7.8]){let p=school.move(school.spawn,dx,0);assert(Math.abs(p.x-school.spawn.x-dx)<.08,'Walk off rostrum using side stairs');p=school.move(p,0,-4);assert(p.y<ROSTRUM.front-1.45,'Turn from stairs onto field');}
 assert(Math.abs(school.move(school.spawn,0,5).y-school.spawn.y-5)<.08,'Rear lobby approach remains open');
 assert.equal(EXTRA_TREES.length,18);
 const random=()=>{let s=27;return()=>{s=(Math.imul(s,1664525)+1013904223)>>>0;return s/4294967296;};};

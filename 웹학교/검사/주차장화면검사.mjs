@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
+import {OUTDOOR_SPAWN,OUTDOOR_YAW} from '../운동장환경.mjs';
 const {chromium}=await import(process.env.PLAYWRIGHT_MODULE||'/tmp/school-browser/node_modules/playwright/index.mjs');
 const browser=await chromium.launch({headless:true,executablePath:process.env.QUIZ_BROWSER||'/tmp/school-browser/browsers/chromium-1243/chrome-linux64/chrome',args:['--enable-unsafe-swiftshader']});
 const output=new URL('../../output/parking-game/',import.meta.url);await fs.mkdir(output,{recursive:true});
@@ -16,7 +17,7 @@ try{
     await page.locator('#시작').click({force:true});await page.locator('#걸어서선택').click();console.log('Picker opened');
     await page.waitForFunction(()=>!document.getElementById('캐릭터확인').disabled);
     await page.locator('#캐릭터확인').click({force:true});await page.locator('#캐릭터창').waitFor({state:'hidden'});console.log('Character ready');
-    const spawn=await page.evaluate(()=>schoolTour.getState());assert.equal(spawn.position.x,44);assert.equal(spawn.position.y,-11);assert.equal(spawn.yaw,0);
+    const spawn=await page.evaluate(()=>schoolTour.getState());assert.deepEqual(spawn.position,OUTDOOR_SPAWN);assert.equal(spawn.yaw,OUTDOOR_YAW);
     await page.screenshot({path:new URL(`spawn-${mobile?'mobile':'desktop'}.png`,output).pathname});
     const ball=await page.evaluate(()=>schoolTour.getFootballState()[0]);
     await page.evaluate(p=>{schoolTour.test.setPosition({x:p.x,y:p.y-.85,z:-.3});schoolTour.test.setYaw(0);},ball.position);

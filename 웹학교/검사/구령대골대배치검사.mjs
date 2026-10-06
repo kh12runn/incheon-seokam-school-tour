@@ -1,0 +1,21 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {buildWorld} from '../이동물리.mjs';
+import {ROSTRUM,ROSTRUM_SPAWN} from '../구령대배치.mjs';
+import {GOAL_LAYOUT} from '../운동장.mjs';
+import {OUTDOOR_YAW} from '../운동장환경.mjs';
+const source=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8'));
+const original=JSON.stringify(source),world=buildWorld(source),r=ROSTRUM,g=GOAL_LAYOUT;
+assert.equal(-7-r.rear-r.run,5,'Main entrance to nearest rear step: 5 m');
+assert(-7>r.rear+r.run&&r.rear>r.front&&r.front>g.north&&g.north>g.south,'Main building → stage → near goal → far goal');
+assert(g.north+g.depth<r.front,'Whole goal and net are beyond platform, not between school and stage');
+assert.equal(g.centreX,(r.left+r.right)/2,'Goals aligned with stage');
+assert(Math.abs(r.top-r.ground-1.7)<.001,'Stage overlooks lower field');
+assert(r.top+1.58>r.top+1.05&&r.top+1.58>2.15,'Standing eye above front rail and goal crossbar');
+assert.deepEqual(world.spawn,ROSTRUM_SPAWN);assert.equal(OUTDOOR_YAW,Math.PI,'Start faces field');
+assert(world.candidate(world.spawn.x,world.spawn.y,world.spawn.z),'Safe stage spawn');
+const goalBoxes=world.boxes.filter(b=>/^운동장 (골대|사진 골)/.test(b.name));
+assert(goalBoxes.length>100);
+for(const box of goalBoxes){assert(box.bounds.every(Number.isFinite));assert(box.bounds[4]<r.front,'No goal overlaps stage: '+box.name);}
+assert.equal(JSON.stringify(source),original,'Original model and interior data unchanged');
+console.log(JSON.stringify({ok:true,gap:5,stageAboveField:1.7,spawn:world.spawn,goalCenters:[[g.centreX,g.north],[g.centreX,g.south]],fieldFacing:true,originalModelUnchanged:true}));
