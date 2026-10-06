@@ -21,7 +21,7 @@ const heading=driving.getState().yaw;
 for(let i=0;i<80&&Math.abs(driving.getState().yaw-heading)<.08;i++)tick({forward:.5,right:.8});
 assert(Math.abs(driving.getState().yaw-heading)>.05,'Steering changes heading');
 tick({brake:true},180);assert(car.body.velocity.length()<1,'Brake stops car');
-const exited=driving.exit();assert(exited,driving.error+' '+JSON.stringify({position:car.body.position,rotation:car.body.quaternion,door:driving.point(car,-car.d.width/2-.65,.35)}));tick({},80);assert.equal(driving.phase,'walking');assert(!driving.seated);assert(school.candidate(p.x,p.y,p.z),'Safe dismount');
+const exited=driving.exit();assert(exited,driving.error+' '+JSON.stringify({position:car.body.position,rotation:car.body.quaternion,door:driving.point(car,-car.d.width/2-.65,.35)}));tick({},100);assert.equal(driving.phase,'walking');assert(!driving.seated);assert(school.candidate(p.x,p.y,p.z),'Safe dismount');
 assert(driving.enter(p));tick({},100);assert.equal(driving.phase,'driving','Can re-enter moved car');
 // Fixed-speed reverse would hit the parking boundary in 90 frames. Check
 // displacement in the free aisle; wall stopping is covered by 자동차속도검사.

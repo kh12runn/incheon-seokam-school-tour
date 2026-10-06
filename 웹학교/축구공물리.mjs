@@ -25,7 +25,7 @@ export function createFootballPhysics(school,{random=Math.random,count=BALL_COUN
     const body=new Body({mass:.43,material:rubber,shape:new Sphere(BALL_RADIUS),position:new Vec3(x,y,-.3+BALL_RADIUS+.015),linearDamping:.28,angularDamping:.3,sleepSpeedLimit:.08,sleepTimeLimit:1.2});
     body.home={x,y};body.lastKick=-Infinity;body.kicks=0;world.addBody(body);balls.push(body);
   }
-  let time=0;
+  let time=0,stepAccumulator=0;
   function update(dt,player,previous,{active=true,yaw=0,canKick=true}={}){
     if(!active||dt<=0)return;dt=Math.min(dt,.1);time+=dt;
     const dx=player.x-previous.x,dy=player.y-previous.y,speed=Math.hypot(dx,dy)/dt;
@@ -42,7 +42,12 @@ export function createFootballPhysics(school,{random=Math.random,count=BALL_COUN
         }
       }
     }
-    world.step(1/120,dt,12);
+    // Cannon's elapsed-time overload drops remaining substeps when its CPU
+    // budget is exceeded. On the school terrain that halved real displacement
+    // while the speedometer still showed the requested velocity. Use bounded
+    // fixed steps without the wall-clock bailout; retain fractional time.
+    stepAccumulator+=dt;
+    while(stepAccumulator>=1/120-1e-9){world.step(1/120);stepAccumulator-=1/120;}
     for(const b of balls){
       if(b.position.z< -5||b.position.x< -23||b.position.x>100||b.position.y< -85||b.position.y>5){
         b.position.set(b.home.x,b.home.y,-.3+BALL_RADIUS);b.velocity.setZero();b.angularVelocity.setZero();b.wakeUp();

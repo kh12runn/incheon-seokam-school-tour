@@ -97,7 +97,7 @@ export function createStudent(requested='boy-cute',{lazy=false}={}){
   const headScale=variant.endsWith('-cute')?.9:1;
   const root=new THREE.Group();root.name=CHARACTER_NAMES[variant];
   const materials=new Map(),actions={},seatPose=new Map();
-  let asset,mixer,currentAction,currentAnimation=null,status='not-requested',error=null,disposed=false,loading,seated=false;
+  let asset,mixer,currentAction,currentAnimation=null,status='not-requested',error=null,disposed=false,loading,seated=false,seatBlend=0;
   let heading=0,speed=0,blend=0,opacity=1,waveTime=0,waveHeading=0,airBlend=0,motion='대기',animationNames=[];
   let resolveReady,rejectReady;
   const ready=new Promise((resolve,reject)=>{resolveReady=resolve;rejectReady=reject;});
@@ -133,7 +133,7 @@ export function createStudent(requested='boy-cute',{lazy=false}={}){
     if(seated){
       play('idle');mixer?.update(Math.max(0,dt));waveTime=0;motion='운전';root.rotation.y=heading;
       for(const side of ['Left','Right'])for(const [part,angle] of [['UpLeg',-1.45],['Leg',1.50],['Arm',-1.02],['ForeArm',-.35]]){
-        const bone=asset?.getObjectByName(side+part),base=seatPose.get(bone);if(base)bone.quaternion.copy(base).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),angle));
+        const bone=asset?.getObjectByName(side+part),base=seatPose.get(bone);if(base)bone.quaternion.copy(base).multiply(new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),angle*seatBlend));
       }
       return;
     }
@@ -151,7 +151,7 @@ export function createStudent(requested='boy-cute',{lazy=false}={}){
   const api={root,variant,ready,load,update,get modelStatus(){return status;},
     wave(targetHeading=heading){waveHeading=targetHeading;waveTime=actions.wave?.getClip().duration??2.6;},cancelWave(){waveTime=0;},
     snapHeading(value){heading=value;root.rotation.y=value;},setOpacity,setSeated(value){
-      value=Boolean(value);if(value===seated)return;seated=value;speed=0;
+      seatBlend=clamp(Number(value),0,1);value=seatBlend>0;if(value===seated)return;seated=value;speed=0;
       for(const [bone,q] of seatPose)bone.quaternion.copy(q);seatPose.clear();
       mixer?.stopAllAction();currentAction=actions.idle;currentAnimation='idle';actions.idle?.reset().setEffectiveWeight(1).play();mixer?.update(.01);
       if(seated)for(const side of ['Left','Right'])for(const part of ['UpLeg','Leg','Arm','ForeArm']){const bone=asset?.getObjectByName(side+part);if(bone)seatPose.set(bone,bone.quaternion.clone());}

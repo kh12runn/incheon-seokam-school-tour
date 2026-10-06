@@ -281,12 +281,14 @@ function vehicleAction(){
   if(!isPlaying())return;
   if(driving.phase==='walking'&&jumpMotion.getState().airborne){notice('착지한 뒤 자동차에 탑승해 주세요.');return;}
   const success=driving.phase==='walking'?driving.enter(position):driving.exit();
-  if(success){jumpMotion.reset();cameraReset=true;lastDriveYaw=null;}
+  if(success){jumpMotion.reset();lastDriveYaw=null;}
   if(!success&&driving.error)notice(driving.error);clearInput();canvas.focus({preventScroll:true});
 }
 function cameraDrive(dt){
   const car=driving.active,p=car.body.position,state=driving.getState();
-  if(lastDriveYaw===null){yaw=state.yaw;pitch=.05;cameraReset=true;}else yaw+=Math.atan2(Math.sin(state.yaw-lastDriveYaw),Math.cos(state.yaw-lastDriveYaw));lastDriveYaw=state.yaw;
+  if(lastDriveYaw!==null)yaw+=Math.atan2(Math.sin(state.yaw-lastDriveYaw),Math.cos(state.yaw-lastDriveYaw));
+  if(driving.phase==='entering'){yaw+=Math.atan2(Math.sin(state.yaw-yaw),Math.cos(state.yaw-yaw))*(1-Math.exp(-dt*4));pitch+=(.05-pitch)*(1-Math.exp(-dt*4));}
+  lastDriveYaw=state.yaw;
   const target={x:p.x,y:p.y,z:p.z+.45},desired=thirdPersonDesired(target,yaw,pitch,6.8),safe=resolveCamera(target,desired,{ignoreVehicle:car.id});
   if(cameraReset||safe.blocked)camera.position.copy(convert(safe));else camera.position.lerp(convert(safe),1-Math.exp(-dt*9));
   cameraReset=false;cameraDistance=safe.distance;cameraBlocked=safe.blocked;camera.lookAt(convert(target));
@@ -542,7 +544,7 @@ function updateHUD(){
   mapCtx.fillStyle='white';mapCtx.font='12px sans-serif';mapCtx.fillText(at.rooftop?'본관 옥상 · 중앙계단으로 내려가기':at.basement?'지하 1층 · 3-4 옆 계단으로 올라가기':floor+'층 · 보라색은 계단',10,176);
 }
 function frame(now){
-  requestAnimationFrame(frame);const wallDt=Math.min((now-last)/1000,1),dt=Math.min(wallDt,.05);last=now;elapsed+=dt;
+  requestAnimationFrame(frame);const wallDt=Math.min((now-last)/1000,1),dt=Math.min(wallDt,.1);last=now;elapsed+=dt;
   if(!ready)return;
   if(characterPicker.isOpen())return;
   world.officeDoor.update(dt,position,isPlaying());connectingDoorVisual.userData.update();
@@ -570,7 +572,7 @@ function frame(now){
   const officeNearby=mode==='walk'&&Math.abs(position.z-3.4)<1.8&&Math.hypot(position.x-33.5,position.y+3.5)<22;
   footballPhysics.update(dt,position,previous,{active:isPlaying()&&!document.hidden,yaw,canKick:driving.phase==='walking'});footballVisual.update();
   driving.sync(isPlaying()?dt:0);updateDrivenCars(carVisual,driving);
-  if(driving.phase==='driving')position=driving.seat();else lastDriveYaw=null;
+  if(driving.phase==='driving')position=driving.seat();else if(driving.phase==='walking'||driving.phase==='approaching')lastDriveYaw=null;
   vehicleUI.update(driving,position,isPlaying());
   scene.backgroundRotation.y=elapsed*.0006;
   if(officeNearby&&!officePrincipals){officePrincipals=createOfficePrincipalModels(world);[principalNPC]=officePrincipals.characters;scene.add(principalNPC.root);}
@@ -589,7 +591,7 @@ function frame(now){
   ];
   const newQuestion=monthQuiz.update(position,quizNPCs,{active:isPlaying()&&driving.phase==='walking'&&!jumpMotion.getState().airborne,colliders:world.colliders});
   if(newQuestion)monthQuizUI.show(newQuestion);
-  if(mode==='walk'){if(driving.phase==='driving')cameraDrive(dt);else cameraWalk(dt);}else overviewCamera(wallDt);
+  if(mode==='walk'){if(['entering','driving','exiting'].includes(driving.phase))cameraDrive(dt);else cameraWalk(dt);}else overviewCamera(wallDt);
   const quizState=monthQuiz.getState(),quizNPC=quizNPCs.find(n=>n.id===quizState.question?.npcId);
   if(quizState.open&&quizNPC){
     if(mode!=='walk'){
@@ -605,10 +607,13 @@ function frame(now){
   avatar.root.visible=mode==='walk'&&cameraDistance>.32;
   if(mode==='walk'){
     const dx=position.x-previous.x,dy=position.y-previous.y,baseZ=position.z;
-    avatar.setSeated(driving.seated);if(driving.seated)avatar.snapHeading(Math.PI+driving.getState().yaw);
+    const vehicleTransition=driving.phase==='entering'||driving.phase==='exiting';
+    avatar.setSeated(driving.seatBlend);
+    if(vehicleTransition){const h=avatar.getState().heading,target=Math.PI+driving.getState().yaw;avatar.snapHeading(h+Math.atan2(Math.sin(target-h),Math.cos(target-h))*(1-Math.exp(-dt*9)));}
+    else if(driving.seated)avatar.snapHeading(Math.PI+driving.getState().yaw);
     avatar.root.position.set(position.x,baseZ,-position.y);
     const heading=avatar.getState().heading,c=Math.cos(heading),s=Math.sin(heading);
-    avatar.update(isPlaying()?dt:0,{distance:Math.hypot(dx,dy),dx,dy,time:elapsed,baseZ,...jumpMotion.getState(),
+    avatar.update(isPlaying()?dt:0,{distance:vehicleTransition?0:Math.hypot(dx,dy),dx:vehicleTransition?0:dx,dy:vehicleTransition?0:dy,time:elapsed,baseZ,...jumpMotion.getState(),
       groundHeight:(x,z)=>{const h=world.support(position.x+c*x+s*z,position.y+s*x-c*z,position.z);return Number.isFinite(h)?h:position.z;}});
     avatar.setOpacity(THREE.MathUtils.clamp((cameraDistance-.3)/.7,0,1));
   }

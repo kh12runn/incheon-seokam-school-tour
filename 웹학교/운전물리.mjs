@@ -2,6 +2,12 @@ import {Body,Box,Vec3,RaycastVehicle,Material,ContactMaterial} from './외부도
 import {PARKED_CARS,CAR_DIMENSIONS} from './주차장.mjs';
 import {RUN_SPEED} from './달리기모션.mjs';
 const CENTER_HEIGHT=.52;
+const TRANSITION_SECONDS=1.35;
+const smooth=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);};
+export function boardingPose(phase,progress){
+  const t=Math.max(0,Math.min(1,progress)),travel=smooth((t-.22)/.56);
+  return {travel,seatBlend:phase==='entering'?travel:1-travel,door:t<.22?smooth(t/.22):t>.78?1-smooth((t-.78)/.22):1};
+}
 export const DRIVING_TUNING=Object.freeze({forwardSpeed:RUN_SPEED*3,reverseSpeed:RUN_SPEED*2,brakeForce:140,inputDeadzone:.08});
 export function createDriving(school,physics){
   physics.enableDrivingTerrain();const material=new Material('car');
@@ -80,8 +86,8 @@ export function createDriving(school,physics){
       if(step>.001&&Math.hypot(q.x-p.x,q.y-p.y)<step*.1){error='운전석 쪽 이동이 막혔습니다.';cancel();return p;}p=q;
       if(distance<.10){route.shift();if(!route.length){phase='entering';transitionFrom=p;timer=0;}}
     }else if(phase==='entering'||phase==='exiting'){
-      timer+=dt;const t=Math.min(1,timer/1.1),s=t*t*(3-2*t),from=transitionFrom,to=phase==='entering'?seat():transitionTo;
-      p={x:from.x+(to.x-from.x)*s,y:from.y+(to.y-from.y)*s,z:from.z+(to.z-from.z)*s};active.door=Math.sin(Math.PI*t);
+      timer+=dt;const t=Math.min(1,timer/TRANSITION_SECONDS),pose=boardingPose(phase,t),s=pose.travel,from=transitionFrom,to=phase==='entering'?seat():transitionTo;
+      p={x:from.x+(to.x-from.x)*s,y:from.y+(to.y-from.y)*s,z:from.z+(to.z-from.z)*s};active.door=pose.door;
       if(t>=1){
         if(phase==='entering'){
           resetControls(active);
@@ -94,6 +100,7 @@ export function createDriving(school,physics){
       // accumulated engine force, acceleration curve or sports-only boost.
       const target=input.brake?0:forward>tuning.inputDeadzone?tuning.forwardSpeed:forward< -tuning.inputDeadzone?-tuning.reverseSpeed:0;
       car.parkingBrake=target===0;
+      if(target!==0)car.body.wakeUp();
       if(car.vehicle.numWheelsOnGround>=2||target===0){
         const heading=carYaw(car);
         car.body.velocity.x=-Math.sin(heading)*target;car.body.velocity.y=Math.cos(heading)*target;
@@ -123,6 +130,7 @@ export function createDriving(school,physics){
       c.wheelSpin+=speed(c)*dt/c.vehicle.wheelInfos[0].radius;
     }
   }
-  return {cars,nearby,enter,exit,cancel,update,sync,point,get phase(){return phase;},get active(){return active;},get error(){return error;},get seated(){return phase==='driving'||phase==='entering'&&timer>.55||phase==='exiting'&&timer<.55;},seat:()=>active?seat():null,
-    getState:()=>({phase,carId:active?.id??null,speed:active?speed(active):0,yaw:active?carYaw(active):0,door:active?.door??0,error,cars:cars.map(c=>({id:c.id,position:point(c,0,0),yaw:carYaw(c)}))})};
+  const seatBlend=()=>phase==='driving'?1:phase==='entering'||phase==='exiting'?boardingPose(phase,timer/TRANSITION_SECONDS).seatBlend:0;
+  return {cars,nearby,enter,exit,cancel,update,sync,point,get phase(){return phase;},get active(){return active;},get error(){return error;},get seated(){return seatBlend()>.5;},get seatBlend(){return seatBlend();},seat:()=>active?seat():null,
+    getState:()=>({phase,seatBlend:seatBlend(),carId:active?.id??null,speed:active?speed(active):0,yaw:active?carYaw(active):0,door:active?.door??0,error,cars:cars.map(c=>({id:c.id,position:point(c,0,0),yaw:carYaw(c)}))})};
 }
