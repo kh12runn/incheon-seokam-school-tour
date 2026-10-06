@@ -43,6 +43,7 @@ try{
  if(process.env.PREVIEW_ONLY){assert.deepEqual(errors,[]);console.log(JSON.stringify({ok:true,views:renders.length,errors,output}));}else{
  await page.setViewportSize({width:390,height:750});await page.goto(base+'/?test=1');await page.waitForFunction(()=>window.schoolTour?.getState().ready,null,{timeout:180000});
  await page.locator('#시작').click();await page.locator('#걸어서선택').click();await page.locator('#캐릭터확인').click();
+ await page.screenshot({path:path.join(output,'game-start.png')});
  for(const id of ids.filter(id=>id!=='recycling')){
   await page.evaluate(()=>document.getElementById('메뉴').click());await page.locator('#방선택').selectOption(id);await page.evaluate(()=>document.getElementById('방이동').click());
   await page.waitForFunction(()=>schoolTour.getState().mode==='walk',null,{timeout:15000});const state=await page.evaluate(()=>schoolTour.getState());assert.equal(state.position.z,(parseInt(id)-1)*3.4);

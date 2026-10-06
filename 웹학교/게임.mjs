@@ -15,6 +15,7 @@ import {class21Details,computerEntranceDetails} from './이학년일반표현.mj
 import {classroomSigns} from './교실팻말표현.mjs';
 import {getApprovedAssets} from './승인사진자료.mjs';
 import {exteriorRenderBox,exteriorSkins} from './외관사진디자인.mjs';
+import {campusEntranceDetails} from './정후문입체표현.mjs';
 import {PARKING,REAR_PARKING} from './주차장.mjs';
 import {parkingDestination} from './주차장이동.mjs';
 import {parkedCarDetails,updateDrivenCars} from './자동차표현.mjs';
@@ -154,6 +155,7 @@ function textTexture(text,background=false){
 }
 let connectingDoorVisual;
 function buildVisuals(){
+  scene.add(campusEntranceDetails(world.boxes));
   const parkedCars=parkedCarDetails();carVisual=parkedCars;scene.add(parkedCars);visuals.push({mesh:parkedCars,floor:0,ceiling:false});
   scene.add(playgroundTrees());footballPhysics=createFootballPhysics(world);footballVisual=footballDetails(footballPhysics);scene.add(footballVisual.group);
   driving=createDriving(world,footballPhysics);vehicleUI=drivingControls({onAction:vehicleAction,canPlay:isPlaying});

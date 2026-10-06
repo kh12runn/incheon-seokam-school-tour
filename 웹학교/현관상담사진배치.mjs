@@ -140,6 +140,12 @@ export function octoberRoomInterior(room,worldBoxes,worldColliders=[]){
   for(let i=0;i<3;i++)add('둥근 초록 노랑 벽 장식 '+i,[.18,3.92+i*.82,.03,.25,4.65+i*.82,.66],i%2?'#8aab46':'#c6ab4e','paint');
   add('안내 게시판 나무벽',[9.81,3.75,.10,9.88,6.56,2.78],'#c5aa78','wood');
   panel('학교 안내 게시판',9.795,5.18,1.64,2.46,1.88,'x','papers','#b4c68f');
+  // Exchange the complete display assemblies across the hall, retaining their
+  // height, lengthwise position and inward-facing orientation. Benches stay put.
+  for(const b of c.boxes.filter(b=>/행복하세요 벽|벽걸이 TV|둥근 초록 노랑 벽 장식|안내 게시판 나무벽/.test(b.name))){
+   const a=b.bounds;b.bounds=[x+X-a[3],a[1],a[2],x+X-a[0],a[4],a[5]];
+  }
+  const notice=c.panels.find(p=>p.name==='학교 안내 게시판');notice.x=x+X-notice.x;
   // Photo-observed pair of small house-shaped reading benches in vestibule.
   for(const [i,b] of [0.35,1.6].entries()){
    add('독서 집 벤치 '+i,[.22,b,.04,.88,b+1.08,.48],'#c5aa78','wood',true);

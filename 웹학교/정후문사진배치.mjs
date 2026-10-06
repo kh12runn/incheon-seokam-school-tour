@@ -10,6 +10,7 @@ export const OCTOBER_OUTDOOR_PHOTOS={
 const rgb=h=>h.match(/[a-f\d]{2}/gi).map(v=>parseInt(v,16)/255);
 OCTOBER_OUTDOOR_PHOTOS.rear.push('e983285c-63e6-4d63-93fd-6b09c372a457','cfc5a97f-e534-45ef-9f60-4b672f5e6665','c0994aa4-5cf5-4ed2-82ee-7fae73b1b84f');
 OCTOBER_OUTDOOR_PHOTOS.rostrum=['05a79f85-0780-4e04-bdb2-ebbcc8cc4352','10a7abcc-4830-4b55-a1c3-1e439381c4c9','68853274-9319-4db0-ae03-50f1976fb9f7','9e384553-8228-460d-9abd-e71aa4fa1ed9','5eef94db-ea1a-48ef-89b2-1f89db9dedc0','b7443a35-366f-4920-a6d1-0af2dc45457a','80619d1c-1625-4ba7-bebe-f49915725a91'];
+OCTOBER_OUTDOOR_PHOTOS.rostrum.push('ab9919fa-0527-4a23-85e2-62dbb3fcd7a4','7bcd56a4-9c53-4aae-9ebb-5f6be142ec9d','1d5b5ff3-dd1c-4066-a6c6-ed011f5a6f40');
 export function addOctoberOutdoorFinish(boxes,colliders,surfaces){
  const add=(name,b,color,material='paint',solid=false,extra={})=>{
   const item={name:'정후문 사진 '+name,bounds:b,color:rgb(color),material,kind:'finish',floor:0,...extra};boxes.push(item);if(solid)colliders.push(item);return item;
@@ -83,42 +84,13 @@ export function addOctoberOutdoorFinish(boxes,colliders,surfaces){
  add('정문 위 가로등 기둥',[32.8,-18.75,-.3,32.94,-18.61,3.6],'#535e51','metal',true);
  add('정문 위 가로등 가지',[32.12,-18.73,3.46,33.62,-18.63,3.55],'#535e51','metal');
  for(const x of [32.2,33.35])add('정문 위 둥근 가로등 '+x,[x-.21,-18.9,3.19,x+.21,-18.46,3.61],'#e7eadc','lamp',false,{shape:'sphere'});
- // Rostrum: retain existing platform elevation and safe spawn, but replace the
- // blanket front treads by left/right flights. The photo has a continuous front
- // guard, open rear approach, yellow stair fascia and blue/cream/green canopy.
- for(const list of [boxes,colliders,surfaces]){
-  const next=list.filter(b=>!b.name.startsWith('구령대 진입 계단 '));list.splice(0,list.length,...next);
+ // Tie both gates into the adjacent perimeter, leaving the entry span clear.
+ for(const [a,b] of [[3,11.05],[19,25.1]]){
+  add('후문 옆 낮은 담장 '+a,[-21.1,a,-.6,-20.83,b,-.24],'#a6aaa1','storage_concrete',true);
+  for(const z of [-.04,1.06])add('후문 옆 초록 가로울타리 '+a+z,[-21.03,a,z,-20.98,b,z+.045],'#5a786a','metal');
+  for(let y=a;y<b;y+=.18)add('후문 옆 초록 세로울타리 '+y,[-21.025,y,-.21,-20.99,y+.025,1.13],'#667f6e','metal');
  }
- for(let i=0;i<4;i++){
-  const inset=(i+1)*.4,top=.3-i*.2;
-  const step=add('구령대 동측 계단 '+i,[50,-12.5,-.6,50+inset,-9.5,top],'#aaa99f','storage_concrete',true,{stepSurface:true});
-  surfaces.push({name:step.name,bounds:step.bounds,height:()=>top});
-  const rear=add('구령대 뒤 현관 연결 계단 '+i,[38,-9.5,-.65,50,-9.5+inset,top],'#aaa99f','storage_concrete',true,{stepSurface:true});
-  surfaces.push({name:rear.name,bounds:rear.bounds,height:()=>top});
- }
- // Follow the original concrete elevation so no new jump lip is introduced.
- add('구령대 상부 바닥',[38,-12.5,.501,50,-9.5,.512],'#b1b0a4','storage_concrete');
- for(const x of [38.16,49.84])for(const y of [-12.28,-9.73])add('구령대 차양 기둥 '+x+y,[x-.045,y-.045,.5,x+.045,y+.045,3.32],metal,'metal',true);
- const stripe=['#1798c9','#169ccc','#dfdcc8','#69b848','#7fc146','#64b242','#e1decf','#219fc8','#189bcb'];
- for(let i=0;i<9;i++){
-  const a=37.62+i*12.76/9,b=a+12.76/9;
-  add('구령대 줄무늬 차양 '+i,[a,-13.02,3.30,b,-9.05,3.57],stripe[i],'paint',true,{shape:'terrain',heights:[3.57,3.57,3.37,3.37]});
-  add('구령대 처마 앞면 '+i,[a,-13.09,3.27,b,-13.01,3.51],stripe[i]);
-  add('구령대 처마 윗곡면 '+i,[a,-13.09,3.50,b,-12.79,3.58],stripe[i],'paint',false,{shape:'terrain',heights:[3.51,3.51,3.58,3.58]});
-  add('구령대 지붕 아래판 '+i,[a,-12.94,3.28,b-.035,-9.11,3.305],'#d0d1c4','metal');
-  add('구령대 지붕 세로보 '+i,[a,-13.02,3.22,a+.045,-9.03,3.31],metal,'metal');
- }
- for(const y of [-12.94,-11.7,-10.4,-9.14])add('구령대 지붕 가로보 '+y,[37.62,y,3.18,50.38,y+.055,3.30],metal,'metal');
- for(const z of [.68,1.51])add('구령대 전면 난간 가로대 '+z,[38,-12.48,z,50,-12.42,z+.045],metal,'metal',true);
- for(let x=38.08;x<50;x+=.22)add('구령대 전면 난간 세로살 '+x,[x,-12.48,.51,x+.03,-12.42,1.54],metal,'metal',true);
- for(const side of [-1,1])for(let i=0;i<9;i++){
-  const x=side<0?36.8+i*.14:50+i*.14,z=side<0?-.1+i*.075:.5-i*.075;
-  add('구령대 계단 노란 측면 '+side+i,[x,-12.52,-.3,x+.181,-12.49,Math.max(-.27,z)],'#efb52e');
-  add('구령대 계단 난간 '+side+i,[x,-12.50,z+.02,x+.025,-12.45,z+1.02],metal,'metal',true);
-  add('구령대 계단 손잡이 '+side+i,[x,-12.51,z+.97,x+.19,-12.43,z+1.02],metal,'metal');
- }
- add('구령대 노란 앞띠',[38,-12.535,.32,50,-12.505,.5],'#e3ae28');
- add('구령대 하부 회색 점검문',[43.5,-12.538,-.28,44.5,-12.525,.29],'#9ba19f','metal');
- add('구령대 점검문 손잡이',[44.3,-12.56,-.02,44.35,-12.54,.13],metal,'metal');
+ // Replace only crude render proxies; physical posts/booths remain solid.
+ for(const b of boxes)if(/^정문 사진 (초록 초소|초소|화강석 문주|문주|열린 파란|철문|안전콘|접힌 파라솔 천)/.test(b.name)||/^정후문 사진 (후문 경비실|경비실|후문 돌 문주|문주 아치|문주 검은|후문 주황 안전봉|안전봉 반사)/.test(b.name))b.renderInDetails=true;
  return {photoCounts:Object.fromEntries(Object.entries(OCTOBER_OUTDOOR_PHOTOS).map(([k,v])=>[k,v.length])),approximate:true,originalsPublished:false};
 }

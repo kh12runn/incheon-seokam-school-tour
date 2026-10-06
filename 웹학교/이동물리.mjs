@@ -36,6 +36,7 @@ import {individualLearningRooms} from './개별학습실사진배치.mjs';
 import {connectPrincipalMeeting} from './교장실연결문.mjs';
 import {teacherOfficeChairs} from './교사자리와창팻말.mjs';
 import {addOctoberOutdoorFinish} from './정후문사진배치.mjs';
+import {rebuildRostrum} from './구령대배치.mjs';
 export const PLAYER_RADIUS=.28, PLAYER_HEIGHT=1.7, EYE_HEIGHT=1.58;
 const EPS=.0001, CELL=4;
 const intersect=(x,y,r,b)=>{
@@ -170,16 +171,10 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
   }
   addBox('현관 경사로 왼쪽 난간',[entranceLeft-.1,-8.5,-.6,entranceLeft,-7,1],[.43,.5,.53]);
   addBox('현관 경사로 오른쪽 난간',[entranceRight,-8.5,-.6,entranceRight+.1,-7,1],[.43,.5,.53]);
-  // Playground's low rostrum and walls are solid, too.
-  for(const b of boxes)if(b.name==='SPACE_EXT_ROSTRUM'){colliders.push({...b,stepSurface:true});flat(b.bounds,b.bounds[5],b.name);}
-  // Estimated access treads keep the new outdoor start walkable without jumping.
-  for(let i=0;i<4;i++){
-    const inset=(i+1)*.4;
-    addFlatBox('구령대 진입 계단 '+i,[38,-12.5-inset,-.6,50+inset,-9.5+inset,.3-i*.2],[.55,.58,.56],0).stepSurface=true;
-    addFlatBox('구령대 서측 계단 '+i,[38-inset,-12.5,-.6,38,-9.5,.3-i*.2],[.55,.58,.56],0).stepSurface=true;
-  }
+  // The owner-confirmed raised rostrum replaces the original low block below.
   addTreeColliders(addBox);
   if(exterior)addOctoberOutdoorFinish(boxes,colliders,surfaces);
+  rebuildRostrum(boxes,colliders,surfaces);
   const classroom64=class64?class64Interior(data):null;
   if(classroom64){boxes.push(...classroom64.boxes);colliders.push(...classroom64.colliders);}
   const classroomsMain=mainClassrooms?mainClassroomsInterior(data,{uploadedPhotos:uploadedClassPhotos}):{rooms:[],boxes:[],colliders:[]};

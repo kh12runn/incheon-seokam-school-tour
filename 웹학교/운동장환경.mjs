@@ -1,4 +1,5 @@
-export const OUTDOOR_SPAWN={x:44,y:-11,z:.5};
+import {ROSTRUM_SPAWN} from './구령대배치.mjs';
+export const OUTDOOR_SPAWN={...ROSTRUM_SPAWN};
 export const OUTDOOR_YAW=0;
 // Additional landscaping requested by the user; placement is not surveyed.
 export const EXTRA_TREES=[

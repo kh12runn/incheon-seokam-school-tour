@@ -4,7 +4,7 @@ import {buildWorld} from '../이동물리.mjs';
 import {OUTDOOR_PHOTO_IDS} from '../야외사진세부.mjs';
 const world=buildWorld(JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')));
 const details=world.boxes.filter(b=>b.name.startsWith('정문 사진 '));
-assert.equal(OUTDOOR_PHOTO_IDS.length,62);
+assert.equal(OUTDOOR_PHOTO_IDS.length,65);
 for(const name of ['초록 초소','파란 현관 차양','반사경 은색 면','게시판 흰 면','붉은 보행 구역','노란 유도 블록','안전콘','열린 파란 철문'])assert(details.some(b=>b.name.includes(name)),name);
 for(const b of details){
   assert(b.bounds.every(Number.isFinite),b.name);

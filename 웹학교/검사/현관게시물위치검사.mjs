@@ -1,0 +1,13 @@
+import fs from 'node:fs';
+import assert from 'node:assert/strict';
+import {buildWorld} from '../이동물리.mjs';
+const w=buildWorld(JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')));
+const c=w.specialInteriors.find(r=>r.roomId==='1F_MAIN_LOBBY');
+const tv=c.boxes.find(b=>b.name.endsWith('벽걸이 TV')),board=c.panels.find(p=>p.name==='학교 안내 게시판');
+assert(tv.bounds[0]>49.7&&tv.bounds[3]<49.9,'TV moved to east wall');
+assert(board.x>40.1&&board.x<40.3,'Noticeboard moved to opposite west wall');
+assert(Math.abs((tv.bounds[1]+tv.bounds[4])/2-board.y)<.001,'Remain opposite each other');
+assert.equal(tv.bounds[2],1.06);assert.equal(board.z,1.64);
+assert(c.boxes.some(b=>b.name.endsWith('독서 집 벤치 0')&&b.bounds[0]<41),'Benches unchanged');
+let p={x:45,y:-9,z:-.3};for(let i=0;i<100;i++)p=w.move(p,0,.1);assert(p.y>.9,'Hallway remains open');
+console.log(JSON.stringify({ok:true,tv:'east',noticeboard:'west',facingEachOther:true,lobbyClear:true}));
