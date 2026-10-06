@@ -1,0 +1,25 @@
+{
+  "date": "2026-10-06",
+  "runtimeCommit": "06638f7",
+  "url": "https://school-tour-production.up.railway.app/",
+  "deploymentId": "49eecec8-6843-4923-858f-8c780110b241",
+  "deploymentStatus": "SUCCESS",
+  "archive": "Committed files only; private photos and unrelated experiments excluded",
+  "checks": {
+    "identicalPublicFiles": 131,
+    "healthStatus": 200,
+    "unauthenticatedAdminStatus": 401,
+    "privatePathsStatus": 403,
+    "magpieWebGLViews": 2,
+    "magpieGameRoomNavigation": true,
+    "magpiePageErrors": [],
+    "otherAdditionalRoomLayoutsUnchanged": 12,
+    "vehiclePhysicsCases": 44,
+    "desktopParkingBoardingExit": ["rear", "front"],
+    "mobileParkingBoardingExit": ["rear", "front"],
+    "parkingPageErrors": []
+  },
+  "scope": ["까치방 사진 22장 참고 재구현", "다목적실 사진 15장 참고 반영", "탐험 방법 및 주차장 선택", "차량 무가속 전진 3배/후진 2배"],
+  "deferred": ["기타 통로 사진 14장", "별도 360도 보기 기능"],
+  "limitations": ["실측 복원이 아닌 사진 참고 근사 구현", "실물 휴대전화 성능 검증은 별도 필요"]
+}
