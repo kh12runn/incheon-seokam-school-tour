@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-06",
+  "runtimeCommit": "583d188",
+  "deploymentId": "b92a806f-1945-4bb7-9102-e75c81038aaa",
+  "deploymentStatus": "SUCCESS",
+  "url": "https://school-tour-production.up.railway.app/",
+  "rostrum": {
+    "distanceMetres": 5,
+    "distanceReference": "중앙현관 출입문에서 구령대 뒤 계단 끝",
+    "heightAboveFieldMetres": 1.7,
+    "platformBounds": [40, -20, 48, -15],
+    "spawn": {"x": 44, "y": -17.5, "z": 1.4},
+    "startFacesField": true,
+    "goalCenters": [[44, -24], [44, -64]],
+    "order": ["본관", "구령대", "낮은 운동장 축구골대"]
+  },
+  "checks": {
+    "identicalPublicFiles": 137,
+    "healthStatus": 200,
+    "unauthenticatedAdminStatus": 401,
+    "privatePathsStatus": 403,
+    "outdoorWebglViews": 11,
+    "interiorWebglViews": 2,
+    "mobileViewportGameStartPositionAndHeading": true,
+    "gameTeleports": ["1F_MAIN_LOBBY"],
+    "pageErrors": [],
+    "rostrumStairsNoJumpFrameRates": [30, 60, 144],
+    "existingStairTraversals": 234,
+    "goalDoesNotOverlapStage": true,
+    "vehicleMovementFrameRates": [10, 20, 30, 60, 144],
+    "carCount": 11,
+    "originalSchoolDataUnchanged": true
+  },
+  "compressedArchiveTransferBytes": 21392570,
+  "rawPhotosPublished": false,
+  "limitations": ["배치는 사용자 요청에 따른 근사 좌표이며 실측 복원은 아님", "모바일 크기 브라우저 검사이며 실물 휴대전화 성능은 별도 확인 필요"]
+}
