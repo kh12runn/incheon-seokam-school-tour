@@ -25,7 +25,7 @@ try{
   await page.setViewportSize({width:390,height:700});
   await page.goto((process.env.SCHOOL_TEST_URL??'http://127.0.0.1:8086')+'/?test=1');
   await page.waitForFunction(()=>window.schoolTour?.getState().ready,null,{timeout:60000});
-  await page.locator('#시작').click();await page.locator('#캐릭터확인').click();
+  await page.locator('#시작').click();await page.locator('#걸어서선택').click();await page.locator('#캐릭터확인').click();
   await page.evaluate(()=>document.getElementById('메뉴').click());
   await page.locator('#방선택').selectOption('2F_OPERATIONS_MEETING');await page.locator('#방이동').click({noWaitAfter:true});
   await page.waitForFunction(()=>schoolTour.getState().position.z===3.4);

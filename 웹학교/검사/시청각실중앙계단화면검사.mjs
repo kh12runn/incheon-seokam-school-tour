@@ -33,7 +33,7 @@ try{
   await page.setViewportSize({width:390,height:700});
   await page.goto(base+'/?test=1');
   await page.waitForFunction(()=>window.schoolTour?.getState().ready,null,{timeout:90000});
-  await page.locator('#시작').click();await page.locator('#캐릭터확인').click();
+  await page.locator('#시작').click();await page.locator('#걸어서선택').click();await page.locator('#캐릭터확인').click();
   await page.evaluate(()=>document.getElementById('메뉴').click());
   await page.locator('#방선택').selectOption('2F_AUDIO_VISUAL');await page.locator('#방이동').click({noWaitAfter:true});
   await page.waitForFunction(()=>schoolTour.getState().position.z===3.4);

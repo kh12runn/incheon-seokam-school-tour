@@ -31,7 +31,7 @@ export async function verifyMenuLook(page,{denyLock=false}={}){
     const before=await state();await page.mouse.move(470,290);
     if(Math.abs((await state()).yaw-before.yaw)>1e-8)throw Error('View moved behind an open menu');
   }
-  await page.locator('#시작').click();
+  await page.locator('#시작').click();await page.locator('#걸어서선택').click();
   await page.locator('#캐릭터확인').click();
   await look('캐릭터 선택 후 시작');
   for(let i=0;i<3;i++){

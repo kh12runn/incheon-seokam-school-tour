@@ -2,7 +2,7 @@ export async function verifyMonthQuiz(page,baseURL='http://127.0.0.1:8085',{touc
   const assert=(v,m)=>{if(!v)throw Error(m);},errors=[];page.on('pageerror',e=>errors.push(e.message));
   await page.goto(baseURL+'/?test=1');await page.waitForFunction(()=>window.schoolTour?.getState().ready);
   if(denyLock)await page.evaluate(()=>{HTMLCanvasElement.prototype.requestPointerLock=()=>Promise.reject(new DOMException('Test free look','NotAllowedError'));});
-  await page.locator('#시작').click();await page.locator('#캐릭터확인').click();
+  await page.locator('#시작').click();await page.locator('#걸어서선택').click();await page.locator('#캐릭터확인').click();
   await page.waitForFunction(()=>schoolTour.getState().mode==='walk'&&schoolTour.getState().character.modelStatus==='ready');
   if(!denyLock&&!touch)await page.waitForFunction(()=>schoolTour.getState().locked);
   if(touch)await page.evaluate(()=>{const el=document.getElementById('터치조작사용');el.checked=true;el.dispatchEvent(new Event('change'));});

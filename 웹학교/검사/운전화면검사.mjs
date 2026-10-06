@@ -10,7 +10,7 @@ try{
   const page=await context.newPage();page.setDefaultTimeout(180000);page.on('pageerror',e=>report.errors.push(e.message));
   await page.addInitScript(()=>{const raf=requestAnimationFrame.bind(window);window.requestAnimationFrame=cb=>setTimeout(()=>raf(cb),200);});
   await page.goto('http://127.0.0.1:8080/?test=1');await page.waitForFunction(()=>window.schoolTour?.getState().ready);
-  await page.locator('#시작').click({force:true});await page.waitForFunction(()=>!document.getElementById('캐릭터확인').disabled);await page.locator('#캐릭터확인').click({force:true});await page.locator('#캐릭터창').waitFor({state:'hidden'});
+  await page.locator('#시작').click({force:true});await page.locator('#걸어서선택').click();await page.waitForFunction(()=>!document.getElementById('캐릭터확인').disabled);await page.locator('#캐릭터확인').click({force:true});await page.locator('#캐릭터창').waitFor({state:'hidden'});
   const name=mobile?'mobile':'desktop';console.log(name,'ready');
   await page.screenshot({path:new URL(`spawn-${name}.png`,output).pathname});
   await page.evaluate(()=>{schoolTour.test.setPosition({x:-18.15,y:-47.66,z:-.6});schoolTour.test.setYaw(0);});

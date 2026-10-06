@@ -41,7 +41,7 @@ try{
   console.log(JSON.stringify({stage:'rendered',views:renders.length,output}));
   await page.setViewportSize({width:390,height:700});await page.goto(base+'/?test=1');
   await page.waitForFunction(()=>window.schoolTour?.getState().ready,null,{timeout:120000});
-  await page.locator('#시작').click();await page.locator('#캐릭터확인').click();
+  await page.locator('#시작').click();await page.locator('#걸어서선택').click();await page.locator('#캐릭터확인').click();
   const selected=[];
   for(const id of Object.keys(profiles)){
     await page.evaluate(()=>document.getElementById('메뉴').click());await page.locator('#방선택').selectOption(id);await page.locator('#방이동').click({noWaitAfter:true});

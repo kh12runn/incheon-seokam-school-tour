@@ -3,6 +3,17 @@ import {Reflector} from './외부도구/Reflector.js';
 import {HALL_MIRROR} from './지하층배치.mjs';
 import {finishMaterial} from './현실재질.mjs';
 
+export function hallPhotoDetails(config){
+  const root=new THREE.Group();root.name='다목적실 사진 참고 체육용품';
+  if(!config)return root;
+  const geometry=new THREE.TorusGeometry(.31,.018,6,32),materials=new Map();
+  for(const hoop of config.hoops){
+    if(!materials.has(hoop.color))materials.set(hoop.color,new THREE.MeshStandardMaterial({color:hoop.color,roughness:.45}));
+    const mesh=new THREE.Mesh(geometry,materials.get(hoop.color));mesh.position.set(hoop.x,hoop.z,-hoop.y);mesh.rotation.x=Math.PI/2;root.add(mesh);
+  }
+  return root;
+}
+
 export function createHallMirror(floorHeight=3.4,mobile=false){
   const m=HALL_MIRROR;
   const mirror=new Reflector(new THREE.PlaneGeometry(m.width,m.height),{color:0x7f7f7f,textureWidth:mobile?512:1024,textureHeight:mobile?128:256,multisample:0,clipBias:.003});

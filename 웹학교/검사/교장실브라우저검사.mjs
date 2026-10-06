@@ -4,7 +4,7 @@ export async function verifyPrincipalRoom(page,baseURL='http://127.0.0.1:8080'){
     await page.goto(baseURL+'/?test=1&principal-check=1');
     await page.waitForFunction(()=>window.schoolTour?.getState().ready);
     const lazy=await page.evaluate(()=>!performance.getEntriesByType('resource').some(r=>decodeURIComponent(r.name).includes('/캐릭터모델/')));assert(lazy,'항공뷰에서 GLB 다운로드 안 함');
-    await page.locator('#시작').click();await page.locator('#캐릭터확인').click();
+    await page.locator('#시작').click();await page.locator('#걸어서선택').click();await page.locator('#캐릭터확인').click();
     await page.evaluate(()=>document.getElementById('메뉴').click());await page.locator('#방선택').selectOption('2F_PRINCIPAL');await page.locator('#방이동').click({noWaitAfter:true});
     await page.waitForFunction(()=>schoolTour.getOfficePrincipalStates().length===1&&schoolTour.getOfficePrincipalStates().every(s=>s.modelStatus==='ready'));
     const pair=await page.evaluate(()=>schoolTour.getOfficePrincipalStates());

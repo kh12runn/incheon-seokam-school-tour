@@ -2,7 +2,7 @@ import {Body,Box,Vec3,RaycastVehicle,Material,ContactMaterial} from './외부도
 import {PARKED_CARS,CAR_DIMENSIONS} from './주차장.mjs';
 import {RUN_SPEED} from './달리기모션.mjs';
 const CENTER_HEIGHT=.52;
-export const DRIVING_TUNING=Object.freeze({forwardSpeed:RUN_SPEED*3,reverseSpeed:RUN_SPEED,brakeForce:140,inputDeadzone:.08});
+export const DRIVING_TUNING=Object.freeze({forwardSpeed:RUN_SPEED*3,reverseSpeed:RUN_SPEED*2,brakeForce:140,inputDeadzone:.08});
 export function createDriving(school,physics){
   physics.enableDrivingTerrain();const material=new Material('car');
   physics.world.addContactMaterial(new ContactMaterial(material,physics.groundMaterial,{friction:.35,restitution:.03}));

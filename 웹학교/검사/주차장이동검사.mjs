@@ -17,6 +17,6 @@ for(const [key,id] of [['front','field-lamborghini'],['rear','rear-lamborghini']
 }
 assert.equal(parkingDestination(world,driving,'invalid'),null);
 assert.equal(driving.cars.filter(c=>c.source.type==='sports').length,2);
-assert(driving.cars.every(c=>c.tuning===DRIVING_TUNING&&c.tuning.forwardSpeed===RUN_SPEED*3&&c.tuning.reverseSpeed===RUN_SPEED));
+assert(driving.cars.every(c=>c.tuning===DRIVING_TUNING&&c.tuning.forwardSpeed===RUN_SPEED*3&&c.tuning.reverseSpeed===RUN_SPEED*2));
 const missing={...driving,cars:[]};assert.equal(parkingDestination(world,missing,'rear'),null);
 console.log({ok:true,frontAndRear:true,sportsCars:2,safeDriverSideSpawn:true,movedVehicleFallback:true,allCarsSameSpeed:true});

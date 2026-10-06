@@ -16,7 +16,7 @@ try{
  const page=await browser.newPage({viewport:{width:390,height:700},isMobile:true,hasTouch:true}),errors=[];page.on('pageerror',e=>errors.push(e.message));
  await page.goto(base);await page.waitForFunction(()=>window.schoolTour?.getState().ready,null,{timeout:150000});
  assert.equal(await page.evaluate(()=>typeof schoolTour.test),'undefined');
- await page.locator('#시작').click();await page.locator('#캐릭터확인').click();
+ await page.locator('#시작').click();await page.locator('#걸어서선택').click();await page.locator('#캐릭터확인').click();
  for(const [room,x,z] of [['1F_INDIVIDUAL_4',99.1,0],['1F_INDIVIDUAL_5',99.1,0],['1F_NURSE',61.1,0],['2F_STAFF',47.55,3.4],['3F_5-3',43.5,6.8],['3F_5-6',13.5,6.8],['3F_GRADE5_RESEARCH',46.1,6.8]]){
   await page.evaluate(()=>document.getElementById('메뉴').click());await page.locator('#방선택').selectOption(room);await page.locator('#방이동').click();
   const state=await page.evaluate(()=>schoolTour.getState());assert.equal(state.position.x,x);assert.equal(state.position.z,z);

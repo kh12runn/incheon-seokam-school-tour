@@ -13,7 +13,7 @@ try{
     await page.goto((process.env.SCHOOL_TEST_URL||'http://127.0.0.1:8080')+'/?test=1');
     await page.waitForFunction(()=>window.schoolTour?.getState().ready);
     console.log('Loaded',mobile?'mobile':'desktop');
-    await page.locator('#시작').click({force:true});console.log('Picker opened');
+    await page.locator('#시작').click({force:true});await page.locator('#걸어서선택').click();console.log('Picker opened');
     await page.waitForFunction(()=>!document.getElementById('캐릭터확인').disabled);
     await page.locator('#캐릭터확인').click({force:true});await page.locator('#캐릭터창').waitFor({state:'hidden'});console.log('Character ready');
     const spawn=await page.evaluate(()=>schoolTour.getState());assert.equal(spawn.position.x,44);assert.equal(spawn.position.y,-11);assert.equal(spawn.yaw,0);

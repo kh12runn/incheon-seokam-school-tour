@@ -52,7 +52,7 @@ import {PRINCIPAL_GREETING,LOBBY_PRINCIPAL_POSITION,principalCanGreet,blocksPrin
 import {createPrincipalWalk} from './교장선생님산책.mjs';
 import {createMonthQuiz} from './월영어퀴즈.mjs';
 import {createMonthQuizBubble} from './월영어퀴즈화면.mjs';
-import {createHallMirror,createGateTerrain} from './다목적실표현.mjs';
+import {createHallMirror,createGateTerrain,hallPhotoDetails} from './다목적실표현.mjs';
 const $=id=>document.getElementById(id);
 const canvas=$('화면'),panel=$('시작안내'),status=$('상태'),where=$('현재위치');
 let renderer,touchControls;
@@ -165,6 +165,7 @@ function buildVisuals(){
     visuals.push({mesh,floor:parseInt(config.room.floor,10),interiorRoom:config.roomId,center:convert(config.spawn),ceiling:false});
   }
   hallMirror=createHallMirror(data.floorHeight,mobileGraphics);scene.add(hallMirror);scene.add(createGateTerrain(world.boxes));
+  const hallDetails=hallPhotoDetails(world.hallPhotoFinish);scene.add(hallDetails);visuals.push({mesh:hallDetails,floor:0,ceiling:false});
   const office=createPrincipalOffice();scene.add(office);visuals.push({mesh:office,floor:2,interiorRoom:PRINCIPAL_ID,center:convert(world.principalOffice.spawn),ceiling:false});
   connectingDoorVisual=officeConnectingDoor(world.officeDoor);scene.add(connectingDoorVisual);
   const roomDetails=class64Details();scene.add(roomDetails);visuals.push({mesh:roomDetails,floor:4,ceiling:false});
@@ -273,7 +274,7 @@ function cameraWalk(dt){
   if(camera.fov!==68){camera.fov=68;camera.updateProjectionMatrix();}
   camera.position.copy(convert(cam));camera.lookAt(convert(target));
 }
-function isPlaying(){return mode==='walk'&&avatar.modelStatus==='ready'&&(locked||dragMode||freeLook)&&!document.hidden&&!$('게임메뉴').open&&!$('주차장선택').open&&!characterPicker.isOpen()&&!elevatorBusy&&!$('승강기창').open;}
+function isPlaying(){return mode==='walk'&&avatar.modelStatus==='ready'&&(locked||dragMode||freeLook)&&!document.hidden&&!$('게임메뉴').open&&!$('탐험방법선택').open&&!$('주차장선택').open&&!characterPicker.isOpen()&&!elevatorBusy&&!$('승강기창').open;}
 function clearInput(){keys.clear();velocity={x:0,y:0};drag=null;freeLookPoint=null;touchControls?.reset();vehicleUI?.reset();avatar.cancelWave();greeting.hidden=true;}
 function leaveVehicle(){if(driving&&driving.phase!=='walking'){position=driving.cancel();avatar.setSeated(false);jumpMotion.reset();cameraReset=true;lastDriveYaw=null;}}
 function vehicleAction(){
@@ -302,7 +303,7 @@ function greet(){
 }
 function pausePanel(){
   const playing=isPlaying();
-  panel.hidden=playing||$('게임메뉴').open||$('주차장선택').open;document.body.dataset.mode=mode;document.body.dataset.playing=String(playing);
+  panel.hidden=playing||$('게임메뉴').open||$('탐험방법선택').open||$('주차장선택').open;document.body.dataset.mode=mode;document.body.dataset.playing=String(playing);
   $('조준점').hidden=true;
   const title=mode==='overview'?'탐험 시작하기':'탐험 계속하기';
   $('걷기').textContent=title;$('시작').textContent=title+'  →';
@@ -312,7 +313,7 @@ function pausePanel(){
   touchControls?.sync();
 }
 function openMenu(){
-  if(!ready||characterPicker.isOpen()||$('주차장선택').open||$('승강기창').open||elevatorBusy||$('게임메뉴').open)return;
+  if(!ready||characterPicker.isOpen()||$('탐험방법선택').open||$('주차장선택').open||$('승강기창').open||elevatorBusy||$('게임메뉴').open)return;
   dragMode=false;freeLook=false;clearInput();if(document.pointerLockElement)document.exitPointerLock();
   $('게임메뉴').showModal();pausePanel();notice('탐험 메뉴 · 이동할 층을 선택하거나 탐험을 계속하세요.');
 }
@@ -325,10 +326,21 @@ function goToParking(key){
   avatar.snapHeading(Math.PI+yaw);cameraReset=true;
   startWalk();notice(destination.label+' 도착 · F키 또는 탑승하기 버튼으로 자동차에 타세요.');
 }
-$('주차장바로가기').addEventListener('click',()=>{
+function openExploreChoice(){
   if(!ready||mode!=='overview'||characterPicker.isOpen())return;
-  pendingParking=null;clearInput();$('주차장선택').showModal();pausePanel();
+  $('게임메뉴').close();pendingParking=null;clearInput();$('탐험방법선택').showModal();pausePanel();
+}
+$('탐험방법닫기').addEventListener('click',()=>$('탐험방법선택').close());
+$('탐험방법선택').addEventListener('close',pausePanel);
+$('걸어서선택').addEventListener('click',()=>{
+  $('탐험방법선택').close();pendingParking=null;
+  if(characterChosenThisVisit)startWalk();else openCharacterPicker();
 });
+$('운전선택').addEventListener('click',()=>{
+  if(!ready||mode!=='overview'||characterPicker.isOpen())return;
+  $('탐험방법선택').close();pendingParking=null;clearInput();$('주차장선택').showModal();pausePanel();
+});
+$('탐험방법뒤로').addEventListener('click',()=>{$('주차장선택').close();openExploreChoice();});
 $('주차장닫기').addEventListener('click',()=>$('주차장선택').close());
 $('주차장선택').addEventListener('close',pausePanel);
 document.querySelectorAll('[data-parking]').forEach(button=>button.addEventListener('click',()=>{
@@ -355,7 +367,7 @@ $('게임메뉴').addEventListener('close',()=>{
 });
 async function startWalk(withoutPointerLock=false){
   if(ready&&!characterChosenThisVisit){openCharacterPicker(withoutPointerLock);return;}
-  if(!ready||characterPicker.isOpen()||$('주차장선택').open||$('승강기창').open||elevatorBusy)return;
+  if(!ready||characterPicker.isOpen()||$('탐험방법선택').open||$('주차장선택').open||$('승강기창').open||elevatorBusy)return;
   $('게임메뉴').close();mode='walk';dragMode=false;freeLook=true;clearInput();
   const request=++lookRequestSerial;
   cameraReset=true;camera.rotation.order='YXZ';smoothZ=position.z+EYE_HEIGHT;cameraWalk(.1);
@@ -400,7 +412,7 @@ for(const button of document.querySelectorAll('[data-elevator-floor]'))button.ad
     await new Promise(resolve=>setTimeout(resolve,700));position=valid;jumpMotion.reset();yaw=Math.PI;pitch=0;smoothZ=p.z+EYE_HEIGHT;
   }finally{elevatorBusy=false;$('승강기전환').hidden=true;await startWalk();notice(button.dataset.elevatorFloor+'층 엘리베이터 앞에 도착했습니다.');}
 });
-$('걷기').addEventListener('click',()=>mode==='overview'?openCharacterPicker():startWalk());$('시작').addEventListener('click',()=>mode==='overview'?openCharacterPicker():startWalk());
+$('걷기').addEventListener('click',()=>mode==='overview'?openExploreChoice():startWalk());$('시작').addEventListener('click',()=>mode==='overview'?openExploreChoice():startWalk());
 $('육사이동').addEventListener('click',()=>{if(!ready)return;leaveVehicle();position={...CLASS64_SPAWN};jumpMotion.reset();yaw=Math.PI/2;pitch=0;avatar.snapHeading(Math.PI+yaw);startWalk();notice('6-4 교실 · 사진을 참고한 실내 · 책상/의자 충돌 적용');});
 $('드래그걷기').addEventListener('click',()=>startWalk(true));$('전체').addEventListener('click',overview);
 $('처음').addEventListener('click',()=>{if(ready){reset();startWalk();}});
@@ -471,7 +483,7 @@ document.addEventListener('keydown',e=>{
     e.preventDefault();if(!e.repeat)monthQuizUI.answer(Number(quizKey[1])-1);return;
   }
   if(e.code==='Escape'&&$('게임메뉴').open){e.preventDefault();if(!e.repeat)dismissMenu();return;}
-  if($('게임메뉴').open||$('주차장선택').open||$('승강기창').open||characterPicker.isOpen()||elevatorBusy)return;
+  if($('게임메뉴').open||$('탐험방법선택').open||$('주차장선택').open||$('승강기창').open||characterPicker.isOpen()||elevatorBusy)return;
   if(['INPUT','SELECT','TEXTAREA','BUTTON','SUMMARY'].includes(e.target.tagName)&&e.code!=='Escape')return;
   if(isPlaying()&&['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)){keys.add(e.code);e.preventDefault();}
   if(e.code==='KeyF'&&isPlaying()&&!e.repeat){e.preventDefault();vehicleAction();}

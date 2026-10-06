@@ -3,7 +3,7 @@ import {World,Body,Plane,Box,Vec3,Material} from '../외부도구/cannon-es.mjs'
 import {createDriving,DRIVING_TUNING} from '../운전물리.mjs';
 import {PARKED_CARS} from '../주차장.mjs';
 import {RUN_SPEED} from '../달리기모션.mjs';
-assert.equal(DRIVING_TUNING.forwardSpeed,RUN_SPEED*3);assert.equal(DRIVING_TUNING.reverseSpeed,RUN_SPEED);
+assert.equal(DRIVING_TUNING.forwardSpeed,RUN_SPEED*3);assert.equal(DRIVING_TUNING.reverseSpeed,RUN_SPEED*2);
 const checks=[];
 for(const source of PARKED_CARS)for(const fps of [20,30,60,144]){
  const world=new World({gravity:new Vec3(0,0,-9.81)}),groundMaterial=new Material('ground');
@@ -21,7 +21,7 @@ for(const source of PARKED_CARS)for(const fps of [20,30,60,144]){
    assert(car.vehicle.wheelInfos.every(w=>w.engineForce===0),'No engine acceleration');
  };
  sample({forward:1},RUN_SPEED*3);assert.equal(driving.exit(),false,'No exit while moving');
- sample({forward:-1},-RUN_SPEED);sample({forward:.2},RUN_SPEED*3);sample({forward:-.2},-RUN_SPEED);
+ sample({forward:-1},-RUN_SPEED*2);sample({forward:.2},RUN_SPEED*3);sample({forward:-.2},-RUN_SPEED*2);
  sample({forward:1,brake:true},0);sample({forward:0},0);sample({forward:.02},0);
  step({forward:1});const saved=car.body.velocity.clone();driving.update(1/fps,p,{forward:-1},{playing:false});assert.deepEqual(car.body.velocity,saved,'Paused input ignored');
  const heading=driving.getState().yaw;step({forward:1,right:.7},fps*2);assert(Math.abs(driving.getState().yaw-heading)>.08,'Steering retained');

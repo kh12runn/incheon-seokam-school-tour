@@ -16,14 +16,20 @@ try{
   await page.waitForFunction(()=>window.schoolTour?.getState().ready);
   console.log({stage:'ready',mobile});
   const before=await page.evaluate(()=>schoolTour.getState().position);
-  await page.locator('#주차장바로가기').click();await page.locator('#주차장닫기').click();
+  assert.equal(await page.locator('#주차장바로가기').count(),0,'No separate car invitation button');
+  const chooseDriving=async()=>{await page.locator('#시작').click();await page.locator('#운전선택').click();};
+  await page.locator('#시작').click();await page.locator('#탐험방법닫기').click();
+  await page.locator('#시작').click();await page.keyboard.press('Escape');assert(!await page.locator('#탐험방법선택').evaluate(d=>d.open));
+  await chooseDriving();await page.locator('#탐험방법뒤로').click();assert(await page.locator('#탐험방법선택').evaluate(d=>d.open));
+  await page.locator('#걸어서선택').click();await page.locator('#캐릭터닫기').click();
+  await chooseDriving();await page.locator('#주차장닫기').click();
   assert.deepEqual(await page.evaluate(()=>schoolTour.getState().position),before);
-  await page.locator('#주차장바로가기').click();await page.keyboard.press('Escape');assert(!await page.locator('#주차장선택').evaluate(d=>d.open));
-  await page.locator('#주차장바로가기').click();await page.locator('[data-parking=rear]').click();
+  await chooseDriving();await page.keyboard.press('Escape');assert(!await page.locator('#주차장선택').evaluate(d=>d.open));
+  await chooseDriving();await page.locator('[data-parking=rear]').click();
   await page.locator('#캐릭터닫기').click();assert.deepEqual(await page.evaluate(()=>schoolTour.getState().position),before);
   for(const [key,prefix] of [['rear','rear'],['front','field']]){
    if(key==='front'){await page.evaluate(()=>document.getElementById('메뉴').click());await page.locator('#전체').click();}
-   await page.locator('#주차장바로가기').click();
+   await chooseDriving();
    await page.screenshot({path:path.join(output,`${mobile?'mobile':'desktop'}-${key}-menu.png`)});
    await page.locator(`[data-parking=${key}]`).click();
    if(key==='rear'){await page.waitForFunction(()=>!document.getElementById('캐릭터확인').disabled);await page.locator('#캐릭터확인').click();}

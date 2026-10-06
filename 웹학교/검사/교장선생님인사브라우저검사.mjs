@@ -5,7 +5,7 @@ export async function verifyPrincipalGreetings(page,baseURL='http://127.0.0.1:80
     await page.goto(baseURL+'/?test=1&greeting-check=1');
     await page.waitForFunction(()=>window.schoolTour?.getState().ready);
     assert(!await bubble('중앙현관').isVisible(),'항공뷰 말풍선 숨김');
-    await page.locator('#시작').click();await page.locator('#캐릭터확인').click();
+    await page.locator('#시작').click();await page.locator('#걸어서선택').click();await page.locator('#캐릭터확인').click();
     await page.evaluate(()=>{schoolTour.test.setPosition({x:45,y:-2.8,z:0});schoolTour.test.setYaw(-Math.PI/2);});
     await page.locator('#월퀴즈말풍선').waitFor({state:'visible'});
     assert(/월은 영어로/.test(await page.locator('#월퀴즈문제').textContent()),'월 영어 퀴즈 인사');

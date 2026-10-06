@@ -28,7 +28,7 @@ try{
   for(const name of ['조정실입구','음향장비','조정실창가','관찰창','스튜디오']){calls[name]=await page.evaluate(name=>window.showBroadcast(name),name);await page.screenshot({path:path.join(output,name+'.png')});}
   await page.setViewportSize({width:390,height:700});await page.goto(base+'/?test=1');
   await page.waitForFunction(()=>window.schoolTour?.getState().ready,null,{timeout:90000});
-  await page.locator('#시작').click();await page.locator('#캐릭터확인').click();
+  await page.locator('#시작').click();await page.locator('#걸어서선택').click();await page.locator('#캐릭터확인').click();
   await page.evaluate(()=>document.getElementById('메뉴').click());
   await page.locator('#방선택').selectOption('2F_BROADCAST');await page.locator('#방이동').click({noWaitAfter:true});
   await page.waitForFunction(()=>schoolTour.getState().position.z===3.4);

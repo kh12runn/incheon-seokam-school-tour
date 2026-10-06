@@ -16,6 +16,7 @@ import {classroomDevices} from './교실영상기기.mjs';
 import {addAnnexCorridorFinish} from './별관복도마감.mjs';
 import {removeRearExit,openStairRearExit,addMainRooftop,ROOF_STAIR} from './본관출입연결.mjs';
 import {applyBasementPlan,openBasementGround,BASEMENT_STAIR,isBasementPosition} from './지하층배치.mjs';
+import {addHallPhotoFinish} from './다목적실사진배치.mjs';
 import {addGateTerrain} from './정문지형.mjs';
 import {meetingRoomInterior} from './운영위원회회의실.mjs';
 import {audioRoomInterior} from './시청각실사진배치.mjs';
@@ -205,6 +206,7 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
   const officeDoor=connectPrincipalMeeting(boxes,colliders);
   const teacherChairs=teacherOfficeChairs(data,boxes,colliders);
   const recyclingShelter=addRecyclingShelter(boxes,colliders);
+  const hallPhotoFinish=basement?addHallPhotoFinish(boxes,colliders,data.floorHeight):null;
   const grid=(items)=>{
     const map=new Map();
     for(const item of items){const b=item.spatialBounds??item.bounds;for(let x=Math.floor((b[0]-.5)/CELL);x<=Math.floor((b[3]+.5)/CELL);x++)for(let y=Math.floor((b[1]-.5)/CELL);y<=Math.floor((b[4]+.5)/CELL);y++){
@@ -268,5 +270,5 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
     let q={...p};if(!blocked(q.x+dx,q.y,q.z))q.x+=dx;
     if(!blocked(q.x,q.y+dy,q.z))q.y+=dy;return q;
   }
-  return {data,boxes,colliders,surfaces,stairs,classroom64,classroom21,classroomsMain,classroomInteriors,uploadedAnnex,specialInteriors,officeDoor,teacherChairs,centralStairFinish,recyclingShelter,principalOffice:office,move,candidate,blocked,support,floorBelow,moveAir,roomAt,spawn:{...OUTDOOR_SPAWN}};
+  return {data,boxes,colliders,surfaces,stairs,classroom64,classroom21,classroomsMain,classroomInteriors,uploadedAnnex,specialInteriors,officeDoor,teacherChairs,centralStairFinish,recyclingShelter,hallPhotoFinish,principalOffice:office,move,candidate,blocked,support,floorBelow,moveAir,roomAt,spawn:{...OUTDOOR_SPAWN}};
 }
