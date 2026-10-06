@@ -632,7 +632,7 @@ try{
   world=buildWorld(await response.json());data=world.data;position={...world.spawn};lobbyPrincipalState=createPrincipalWalk(world,'lobby');jumpMotion=createJumpMotion(world);resolveCamera=createCameraCollision([...world.colliders,...world.boxes.filter(b=>b.kind==='step')]);buildVisuals();ready=true;
   for(let floor=1;floor<=4;floor++){
     const group=document.createElement('optgroup');group.label=floor+'층';
-    for(const r of data.rooms.filter(r=>parseInt(r.floor)===floor&&['classroom','special_room'].includes(r.type))){const option=document.createElement('option');option.value=r.id;option.textContent=r.name;group.append(option);}
+    for(const r of data.rooms.filter(r=>parseInt(r.floor)===floor&&(['classroom','special_room'].includes(r.type)||r.id==='1F_MAIN_LOBBY'))){const option=document.createElement('option');option.value=r.id;option.textContent=r.name;group.append(option);}
     $('방선택').append(group);
   }
   document.querySelectorAll('button').forEach(b=>b.disabled=false);$('동층이동').disabled=false;autoOrbit=true;overview();last=performance.now();updateHUD();

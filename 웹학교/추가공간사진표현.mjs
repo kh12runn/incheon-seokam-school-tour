@@ -30,10 +30,15 @@ export function additionalRoomDetails(c){
  }
  const palette=['#e2b850','#7cacb7','#9fba70','#c593ac','#d79669'];
  for(const p of c.panels){
-  const key=p.style+'|'+p.color;
+  const key=p.style+'|'+p.color+'|'+(p.text??'');
   if(!textures.has(key)){
    const canvas=document.createElement('canvas');canvas.width=512;canvas.height=256;const ctx=canvas.getContext('2d');ctx.fillStyle=p.color??'#d8ddd0';ctx.fillRect(0,0,512,256);
-   if(p.style==='screen'){
+   if(p.style==='room-sign'){
+    ctx.fillStyle='#f5f3e8';ctx.font='bold 84px "Malgun Gothic",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(p.text,256,128,460);
+   }else if(p.style==='plain'||p.style==='whiteboard'){
+    ctx.strokeStyle='#929e91';ctx.lineWidth=5;ctx.strokeRect(3,3,506,250);
+    if(p.style==='whiteboard'){ctx.strokeStyle='#72928c';ctx.lineWidth=2;for(let n=0;n<5;n++){ctx.beginPath();ctx.arc(58+n*97,128,24+n%2*12,0,Math.PI*2);ctx.stroke();}}
+   }else if(p.style==='screen'){
     ctx.fillStyle='#d7e7df';ctx.fillRect(0,0,512,256);ctx.fillStyle='#376a76';ctx.fillRect(0,0,512,37);
     for(let row=0;row<4;row++)for(let col=0;col<9;col++){ctx.fillStyle=palette[(row+col)%5];ctx.fillRect(12+col*55,48+row*48,44,34);ctx.fillStyle='#eff0de';ctx.fillRect(18+col*55,54+row*48,23,9);}
    }else if(p.style==='landscape'){

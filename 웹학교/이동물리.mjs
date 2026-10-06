@@ -35,6 +35,7 @@ import {nurseRoomInterior} from './보건실사진배치.mjs';
 import {individualLearningRooms} from './개별학습실사진배치.mjs';
 import {connectPrincipalMeeting} from './교장실연결문.mjs';
 import {teacherOfficeChairs} from './교사자리와창팻말.mjs';
+import {addOctoberOutdoorFinish} from './정후문사진배치.mjs';
 export const PLAYER_RADIUS=.28, PLAYER_HEIGHT=1.7, EYE_HEIGHT=1.58;
 const EPS=.0001, CELL=4;
 const intersect=(x,y,r,b)=>{
@@ -178,6 +179,7 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
     addFlatBox('구령대 서측 계단 '+i,[38-inset,-12.5,-.6,38,-9.5,.3-i*.2],[.55,.58,.56],0).stepSurface=true;
   }
   addTreeColliders(addBox);
+  if(exterior)addOctoberOutdoorFinish(boxes,colliders,surfaces);
   const classroom64=class64?class64Interior(data):null;
   if(classroom64){boxes.push(...classroom64.boxes);colliders.push(...classroom64.colliders);}
   const classroomsMain=mainClassrooms?mainClassroomsInterior(data,{uploadedPhotos:uploadedClassPhotos}):{rooms:[],boxes:[],colliders:[]};
@@ -202,7 +204,7 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
   const nurse=nurseRoomInterior(data,boxes,colliders,addBox);
   const grade5Research=grade5ResearchInterior(data,boxes,colliders);
   const specialInteriors=[meeting,audio,broadcast,staff,nurse,grade5Research,nightDutyInterior(data,boxes,colliders),adminInterior(data,boxes),storageInterior(data,boxes),...individualLearningRooms(data,boxes,colliders,addBox),...(additionalPhotos?additionalPhotoInteriors(data,boxes,colliders):[])].filter(Boolean);
-  for(const config of specialInteriors){boxes.push(...config.boxes);colliders.push(...config.colliders);}
+  for(const config of specialInteriors){boxes.push(...config.boxes);colliders.push(...config.colliders);surfaces.push(...(config.walkSurfaces??[]));}
   const officeDoor=connectPrincipalMeeting(boxes,colliders);
   const teacherChairs=teacherOfficeChairs(data,boxes,colliders);
   const recyclingShelter=addRecyclingShelter(boxes,colliders);

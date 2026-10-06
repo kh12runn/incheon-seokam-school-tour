@@ -6,7 +6,9 @@ import {EXTRA_TREES,OUTDOOR_YAW} from '../운동장환경.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),before=JSON.stringify(data),school=buildWorld(data);
 assert.equal(JSON.stringify(data),before);assert(school.candidate(...Object.values(school.spawn)));assert.equal(OUTDOOR_YAW,0);
 assert(school.spawn.y< -7,'Outside main entrance');
-for(const dy of [-7,5]){const p=school.move(school.spawn,0,dy);assert(Math.abs(p.y-school.spawn.y-dy)<.08,'Walk off rostrum in both directions');}
+assert(school.move(school.spawn,0,-7).y>-12.5,'Photo front guard is solid');
+for(const dx of [-7.6,7.6]){let p=school.move(school.spawn,dx,0);assert(Math.abs(p.x-school.spawn.x-dx)<.08,'Walk off rostrum using side stairs');p=school.move(p,0,-3);assert(p.y<-13.95,'Turn from stairs onto field');}
+assert(Math.abs(school.move(school.spawn,0,5).y-school.spawn.y-5)<.08,'Rear lobby approach remains open');
 assert.equal(EXTRA_TREES.length,18);
 const random=()=>{let s=27;return()=>{s=(Math.imul(s,1664525)+1013904223)>>>0;return s/4294967296;};};
 const distances=[];

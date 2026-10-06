@@ -30,7 +30,7 @@ try{
     root.add(outdoor?recyclingShelterDetails(c):c.additionalRoom?supportRoomDetails(c):nurseRoomDetails(c));
    }
    const [x,X,y,Y,z]=c.room.bounds,pt=(a,b)=>({x:x+(X-x)*a,y:y+(Y-y)*b,z:z+1.68});
-   const eye=outdoor?(side==='front'?{x:23,y:16,z:7}:{x:34.6,y:10.7,z:1.8}):side==='front'?pt(.88,.13):pt(.16,.83),target=outdoor?{x:35.5,y:6.6,z:.65}:side==='front'?pt(.25,.70):pt(.75,.25);
+   const eye=outdoor?(side==='front'?{x:23,y:16,z:7}:{x:34.6,y:10.7,z:1.8}):id==='3F_COUNSELING'?(side==='front'?{x:.9,y:1.5,z:8.45}:{x:-2.8,y:-.6,z:8.45}):id==='2F_GRADE3_RESEARCH'?(side==='front'?pt(.35,.13):pt(.25,.77)):side==='front'?pt(.88,.13):pt(.16,.83),target=outdoor?{x:35.5,y:6.6,z:.65}:id==='3F_COUNSELING'?(side==='front'?{x:-2,y:1,z:8.3}:{x:.8,y:1.4,z:8.3}):side==='front'?pt(.25,.70):pt(.75,.25);
    camera.position.set(eye.x,eye.z,-eye.y);camera.lookAt(target.x,target.z-.15,-target.y);renderer.render(scene,camera);
    return {calls:renderer.info.render.calls,triangles:renderer.info.render.triangles};
   };

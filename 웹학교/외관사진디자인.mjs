@@ -8,7 +8,7 @@ export function exteriorRenderBox(box){
   if(box.name.startsWith('SiteGround'))return {...box,color:[.48,.48,.41],material:'ground'};
   if(box.kind==='roof')return {...box,color:EXTERIOR_PALETTE.roof,material:'paint'};
   if(box.name.includes('SouthBand'))return {...box,color:EXTERIOR_PALETTE.trim,material:'paint'};
-  if(box.name==='SPACE_EXT_ROSTRUM')return {...box,color:[.51,.63,.54],material:'paint'};
+  if(box.name==='SPACE_EXT_ROSTRUM')return {...box,color:[.64,.65,.61],material:'storage_concrete'};
   // The new references show a mostly unmarked field. Preserve the goal locations.
   if(box.name.startsWith('운동장 임시 '))return null;
   return box;

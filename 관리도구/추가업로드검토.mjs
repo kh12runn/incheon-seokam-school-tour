@@ -3,9 +3,11 @@ import fs from 'node:fs';
 import {fileURLToPath} from 'node:url';
 import {execFileSync} from 'node:child_process';
 import sharp from '../../node_modules/sharp/lib/index.js';
-const root=new URL('../참고자료/업로드점검-20261006/',import.meta.url);
+const current=process.argv[2]??'20261006',baseline=process.argv[3]??'20261002';
+if(![current,baseline].every(s=>/^\d{8}(?:-[a-z0-9]+)?$/.test(s)))throw new Error('Invalid snapshot label');
+const root=new URL('../참고자료/업로드점검-'+current+'/',import.meta.url);
 const fresh=JSON.parse(fs.readFileSync(new URL('catalog.json',root)));
-const old=JSON.parse(fs.readFileSync(new URL('../업로드점검-20261002/catalog.json',root)));
+const old=JSON.parse(fs.readFileSync(new URL('../업로드점검-'+baseline+'/catalog.json',root)));
 for(const room of Object.values(fresh.rooms)){
  const previous=new Set(old.rooms[room.roomId]?.images.map(i=>i.id));
  const images=room.images.filter(i=>!previous.has(i.id));

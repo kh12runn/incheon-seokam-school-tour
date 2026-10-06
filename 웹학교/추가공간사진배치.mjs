@@ -2,8 +2,13 @@ import {photoRoom} from './사진실내도구.mjs';
 import {PHOTO_REFERENCES} from './추가사진근거.mjs';
 import {subtractBox} from './창문배치.mjs';
 import {magpieRoomInterior,MAGPIE_ID} from './까치방사진배치.mjs';
+import {octoberRoomInterior} from './현관상담사진배치.mjs';
+import {OCT6_REFERENCES} from './현관상담사진근거.mjs';
 // Geometry is fitted to the existing room bounds; photos do not resurvey walls.
 export const EXTRA_PHOTO_ROOMS={
+ '1F_MAIN_LOBBY':{count:15,kind:'lobby',features:['양쪽 유리 출입문','반투명 하부 필름','벽걸이 TV와 안내 게시판','집 모양 독서 벤치','점자블록과 현관 매트']},
+ '3F_COUNSELING':{count:27,kind:'counseling',features:['살구·민트 벽','주황 벤치와 흰 상담탁자','모래놀이 상자','미니어처 흰 수납장','민트 원형 상담탁자','풍경 블라인드']},
+ '2F_GRADE3_RESEARCH':{count:9,kind:'research3',features:['긴 목재 회의탁자','검정 회의의자','유리 자료장','창가 연두 업무의자','복합기와 자료 분류장']},
  '2F_SCIENCE':{count:6,kind:'science',features:['흰 대리석 무늬 실험대','청록·검정·목재 의자','창가 긴 싱크대','흰 전면 보드','높은 유리 실험기구장','뒤쪽 화면과 장비장']},
  '2F_INTELLIGENT_SCIENCE':{count:6,kind:'intelligentScience',features:['색색 모둠 실습탁자','남색 학생 의자','창가 스탠드 모니터','큰 전자칠판과 흰 보드','흰 상하 수납장','충전 보관장과 창의교육 블라인드']},
  '4F_KINDERGARTEN':{count:22,kind:'kindergarten',features:['연두색 둥근 모둠탁자','연두 학생 의자','흰 높은 유리 수납장','연두 창가 업무 파티션','벽걸이 화면과 활동 게시판','싱크대와 낮은 수조 받침']},
@@ -223,11 +228,12 @@ function careGreen({c,add,table,cabinet,cubbies,seat,sink,fridge,panel,toys,scre
  if(love){seat('둥근 탁자 의자',2.05,v-1,Math.PI);seat('둥근 탁자 의자',2.05,v+1,0);}
 }
 export function additionalPhotoInteriors(data,boxes,colliders=[]){
- const configs=Object.entries(EXTRA_PHOTO_ROOMS).map(([id,recipe])=>{const r=data.rooms.find(r=>r.id===id);return r?(id===MAGPIE_ID?magpieRoomInterior(r,boxes):makeRoom(r,boxes,recipe)):null;}).filter(Boolean);
+ const configs=Object.entries(EXTRA_PHOTO_ROOMS).map(([id,recipe])=>{const r=data.rooms.find(r=>r.id===id);return r?(OCT6_REFERENCES[id]?octoberRoomInterior(r,boxes,colliders):id===MAGPIE_ID?magpieRoomInterior(r,boxes):makeRoom(r,boxes,recipe)):null;}).filter(Boolean);
  // Open only the already-drawn exterior window panes, including the rear/north
  // science room. Keep glazing collision and do not invent new architectural bays.
  for(const c of configs){
-  const r=c.room,annex=r.building==='ANNEX',axis=annex?0:1,span=annex?1:0,edge=annex?r.bounds[0]:r.bounds[2]>=3?r.bounds[3]:r.bounds[2];
+  if(c.skipPhotoWindows)continue;
+  const r=c.room,annex=r.building==='ANNEX',axis=c.photoWindowAxis??(annex?0:1),span=1-axis,edge=axis===0?r.bounds[0]:r.bounds[2]>=3?r.bounds[3]:r.bounds[2];
   const panes=data.boxes.filter(b=>b.spaceId===r.id&&b.name.startsWith('Window_')&&Math.abs((b.bounds[axis]+b.bounds[axis+3])/2-edge)<.3);
   for(const pane of panes){
    const cut=[...pane.bounds];cut[axis]=edge-.24;cut[axis+3]=edge+.24;cut[span]+=.04;cut[span+3]-=.04;cut[2]+=.03;cut[5]-=.03;

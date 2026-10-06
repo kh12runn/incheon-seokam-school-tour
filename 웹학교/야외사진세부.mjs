@@ -1,6 +1,7 @@
 // Approved OTHER_MISC photographs, 2026-09-30. Placement follows the owner's
 // directions; all dimensions are photo-guided estimates, not survey geometry.
-export const OUTDOOR_PHOTO_IDS=['414b2f87-7aae-42a9-ba04-e661de00f03f','700af775-b3a6-4c79-9c43-129093467f19','ac3f6a9e-c7cc-4e0e-bcaf-9c9799f9b71d'];
+import {OCTOBER_OUTDOOR_PHOTOS} from './정후문사진배치.mjs';
+export const OUTDOOR_PHOTO_IDS=['414b2f87-7aae-42a9-ba04-e661de00f03f','700af775-b3a6-4c79-9c43-129093467f19','ac3f6a9e-c7cc-4e0e-bcaf-9c9799f9b71d',...Object.values(OCTOBER_OUTDOOR_PHOTOS).flat()];
 const white=[.89,.9,.87],blue=[.04,.36,.75],steel=[.36,.42,.43],yellow=[.96,.72,.08];
 
 export function addGatePhotoDetails(boxes,colliders,surfaces,base){
@@ -18,7 +19,7 @@ export function addGatePhotoDetails(boxes,colliders,surfaces,base){
       add(name+' '+i,[x0,y0,Math.min(...hs)-.012,x1,y1,Math.max(...hs)],color,material,false,{shape:'terrain',heights:hs});
     }
   }
-  patch('붉은 보행 구역',[-15,-23,-2.4,-16.5],[.60,.23,.26],'rubber_mat');
+  patch('붉은 보행 구역',[-17.5,-23,30,-16.5],[.60,.23,.26],'rubber_mat');
   patch('노란 유도 블록',[-23.5,-11.6,29,-11.22],yellow,'tactile_mat');
   patch('현관 유도 블록',[-11.25,-11.6,-10.85,-7.3],yellow,'tactile_mat');
   patch('보행 구역 흰 경계',[-15,-16.65,-2.4,-16.5],white);
@@ -77,9 +78,10 @@ export function addGatePhotoDetails(boxes,colliders,surfaces,base){
     for(const dx of [-.5,.4])add('본관 둥근 관목 '+x+dx,[x+dx-.55,-9.8,z+.35,x+dx+.55,-8.1,z+1.2],[.24,.39,.10],'foliage',false,{shape:'sphere'});
   }
   // Right-hand red patio: brick wall, planting rocks, noticeboard and cones.
-  for(let x=-14;x<-3;x+=1){
+  for(let x=-14;x<26;x+=1){
     const z=height(x,-23);
     add('붉은 담장 '+x,[x,-23.25,z-.08,x+1,-23.02,z+2.4],[.52,.23,.18],'facade',true);
+    add('담장 흰 하단 '+x,[x,-23.015,z-.05,x+1,-22.975,z+.64],white);
     add('담장 모자돌 '+x,[x-.03,-23.32,z+2.4,x+1.03,-22.96,z+2.5],[.38,.24,.22]);
     for(let row=0;row<9;row++)add('담장 가로 줄눈 '+x+row,[x,-23.01,z+.18+row*.25,x+1,-22.99,z+.195+row*.25],[.68,.51,.44]);
     add('화단 자연석 '+x,[x,-22.8,z,x+.85,-21.8,z+.7],[.49,.51,.47],'facade',false,{shape:'sphere'});

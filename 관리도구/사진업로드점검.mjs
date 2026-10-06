@@ -7,7 +7,7 @@ const root=fileURLToPath(new URL('..',import.meta.url));
 const response=JSON.parse(execFileSync('gh',['api','repos/kh12runn/incheon-seokam-school-photos/contents/school-assets/catalog.json?ref=main'],{encoding:'utf8',maxBuffer:8*1024*1024}));
 const catalog=JSON.parse(Buffer.from(response.content,'base64'));
 const auditDate=process.argv[2]??'20261002';
-if(!/^\d{8}$/.test(auditDate))throw new Error('Use YYYYMMDD audit date');
+if(!/^\d{8}(?:-[a-z0-9]+)?$/.test(auditDate))throw new Error('Use YYYYMMDD or YYYYMMDD-label audit date');
 const target=path.join(root,'참고자료','업로드점검-'+auditDate);
 fs.mkdirSync(target,{recursive:true});
 fs.writeFileSync(path.join(target,'catalog.json'),JSON.stringify(catalog,null,2));
