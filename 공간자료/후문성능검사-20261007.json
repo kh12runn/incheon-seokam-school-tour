@@ -1,5 +1,19 @@
 {
   "date": "2026-10-07",
+  "deployment": {
+    "runtimeCommit": "00f85c5",
+    "id": "e57a663b-9f55-45cb-abd1-b86193ecbe3a",
+    "status": "SUCCESS",
+    "url": "https://school-tour-production.up.railway.app/",
+    "identicalPublicFiles": 139,
+    "healthStatus": 200,
+    "unauthenticatedAdminStatus": 401,
+    "privatePathsStatus": 403,
+    "productionWebglViews": 12,
+    "pageErrors": [],
+    "compressedArchiveTransferBytes": 21394561,
+    "rawPhotosPublished": false
+  },
   "gate": {
     "reference": "주차장에서 본관을 바라본 뒤왼쪽 끝, 차량은 본관을 바라보며 진입",
     "center": [64, 24.5],
@@ -35,6 +49,8 @@
     "outdoorWebglViews": 12,
     "interiorWebglViews": 2,
     "mobileViewportGameStartAndLobbyTravel": true,
+    "localBrowserBoardingDrivingAndExit": true,
+    "boardingIntermediatePoseSamples": 27,
     "pageErrors": [],
     "publicBuildFiles": 139
   }
