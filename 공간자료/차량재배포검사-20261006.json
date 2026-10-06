@@ -1,0 +1,22 @@
+{
+  "runtimeCommit": "7d822a7",
+  "deploymentId": "745f0ab5-3b74-4f23-9d31-e46abfa7c109",
+  "status": "SUCCESS",
+  "url": "https://school-tour-production.up.railway.app/",
+  "publicRuntimeFilesMatched": 131,
+  "healthStatus": 200,
+  "unauthenticatedAdminStatus": 401,
+  "privateFileStatus": 403,
+  "cause": "Cannon elapsed-time step discarded unprocessed substeps under CPU load, yielding 7.2m displacement for 1s at a displayed 14.4m/s.",
+  "actualTerrainTest": {
+    "frameRates": [10, 20, 30, 60, 144],
+    "forwardMetersInOneSecond": [14.360062, 14.378477, 14.384622, 14.390770, 14.393846],
+    "reverseMetersInOneSecond": [9.573375, 9.585651, 9.589748, 9.593847, 9.595897],
+    "targetForward": 14.4,
+    "targetReverse": 9.6
+  },
+  "vehicleUnitCases": 44,
+  "publicBrowser": {"smoothBoarding": true, "transitionSamples": 27, "actualForwardMovement": true, "safeExit": true, "errors": []},
+  "regressions": ["vehicle wall collision", "steering", "brakes", "re-entry", "pause", "football", "jump", "runtime packaging"],
+  "limitations": ["Browser emulation, not a physical phone benchmark", "Elapsed frame time remains capped at 0.1s for background-tab and long-stall safety"]
+}

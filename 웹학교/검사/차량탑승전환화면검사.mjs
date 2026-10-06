@@ -9,7 +9,7 @@ const output=await fs.mkdtemp(path.join(os.tmpdir(),'school-boarding-v3-')),erro
 try{
  const page=await browser.newPage({viewport:{width:900,height:650},hasTouch:true,isMobile:true,deviceScaleFactor:.65});page.setDefaultTimeout(180000);page.on('pageerror',e=>errors.push(e.message));
  await page.goto((process.env.SCHOOL_TEST_URL??'http://127.0.0.1:8080')+'/?test=1');
- await page.waitForFunction(()=>schoolTour?.getState().ready);
+ await page.waitForFunction(()=>window.schoolTour?.getState().ready);
  await page.locator('#시작').click();await page.locator('#운전선택').click();await page.locator('[data-parking=rear]').click();await page.waitForFunction(()=>!document.getElementById('캐릭터확인').disabled);await page.locator('#캐릭터확인').click();
  await page.locator('#차량탑승').waitFor({state:'visible'});
  await page.evaluate(()=>{
