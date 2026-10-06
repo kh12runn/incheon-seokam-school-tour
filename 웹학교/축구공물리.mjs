@@ -1,8 +1,14 @@
-import {World,Body,Vec3,Sphere,Box,Plane,Heightfield,Material,ContactMaterial,SAPBroadphase} from './외부도구/cannon-es.mjs';
+import {World,Body,Vec3,Sphere,Box,Plane,Heightfield,Material,ContactMaterial,ObjectCollisionMatrix} from './외부도구/cannon-es.mjs';
+import {ActiveBodyBroadphase} from './활성물체충돌.mjs';
+import {GOAL_LAYOUT} from './운동장.mjs';
+import {REAR_GATE} from './후문배치.mjs';
 export const BALL_RADIUS=.115;
 export const BALL_COUNT=12;
 export function createFootballPhysics(school,{random=Math.random,count=BALL_COUNT}={}){
-  const world=new World({gravity:new Vec3(0,0,-9.81),allowSleep:true});world.broadphase=new SAPBroadphase(world);
+  const world=new World({gravity:new Vec3(0,0,-9.81),allowSleep:true});world.broadphase=new ActiveBodyBroadphase(world);
+  // Record actual contacts, not a dense ~3.2 million-entry wall/wall matrix
+  // that Cannon would clear on every fixed step despite only ~12 contacts.
+  world.collisionMatrix=new ObjectCollisionMatrix();world.collisionMatrixPrevious=new ObjectCollisionMatrix();
   const rubber=new Material('football'),ground=new Material('field');
   world.addContactMaterial(new ContactMaterial(rubber,ground,{friction:.48,restitution:.53}));
   world.addContactMaterial(new ContactMaterial(rubber,rubber,{friction:.3,restitution:.65}));
@@ -14,7 +20,7 @@ export function createFootballPhysics(school,{random=Math.random,count=BALL_COUN
   const field=box([-9.5,-69,-.6,85.5,-11,-.3]),staticSources=new Set();
   function addObstacle(c){const body=box(c.bounds);if(body){body.vehicleId=c.vehicleId;staticSources.add(c);}}
   for(const c of school.colliders){const b=c.bounds;if(b[0]<90&&b[3]>-23&&b[1]<-8&&b[4]>-82&&b[2]<3&&b[5]>-.5)addObstacle(c);}
-  for(const y of [-65.25,-14.75])box([34.5,y-.035,-.3,41.5,y+.035,2.1]);
+  const g=GOAL_LAYOUT;for(const y of [g.south-g.depth,g.north+g.depth])box([g.centreX-g.width/2,y-.035,-.3,g.centreX+g.width/2,y+.035,2.1]);
   const balls=[];
   for(let i=0;i<count;i++){
     let x,y;
@@ -61,12 +67,13 @@ export function createFootballPhysics(school,{random=Math.random,count=BALL_COUN
     for(let x=-24;x<=113;x++){
       // Low sports-car roofs can be below the terrain probe height. Never bake
       // movable cars into the ground: their separate bodies provide collision.
-      const row=[];for(let y=-87;y<=28;y++){const h=school.floorBelow(x,y,.6,{ignoreVehicles:true});row.push(Number.isFinite(h)?h:-.6);}heights.push(row);
+      const row=[];for(let y=-87;y<=Math.ceil(REAR_GATE.lane[4])+1;y++){const h=school.floorBelow(x,y,.6,{ignoreVehicles:true});row.push(Number.isFinite(h)?h:-.6);}heights.push(row);
     }
     world.addBody(new Body({mass:0,material:ground,shape:new Heightfield(heights,{elementSize:1}),position:new Vec3(-24,-87,0)}));
     for(const body of [...world.bodies])if(body.vehicleId)world.removeBody(body);
     for(const c of school.colliders){const b=c.bounds;if(!c.vehicleId&&!staticSources.has(c)&&b[0]<113&&b[3]>-24&&b[1]<28&&b[4]>-87&&b[2]<2.8&&b[5]>-3.5)addObstacle(c);}
-    for(const b of [[-24,-87,-4,-23,28,3],[112,-87,-4,113,28,3],[-24,-87,-4,113,-86,3],[-24,27,-4,113,28,3]])box(b);
+    const L=REAR_GATE.lane[0],R=REAR_GATE.lane[3],Y=REAR_GATE.lane[4];
+    for(const b of [[-24,-87,-4,-23,28,3],[112,-87,-4,113,28,3],[-24,-87,-4,113,-86,3],[-24,27,-4,L,28,3],[R,27,-4,113,28,3],[L-1,27,-4,L,Y+1,3],[R,27,-4,R+1,Y+1,3],[L,Y,-4,R,Y+1,3]])box(b);
   }
   return {balls,update,world,groundMaterial:ground,enableDrivingTerrain,getState:()=>balls.map((b,id)=>({id,position:{x:b.position.x,y:b.position.y,z:b.position.z},velocity:{x:b.velocity.x,y:b.velocity.y,z:b.velocity.z},kicks:b.kicks,sleeping:b.sleepState===Body.SLEEPING}))};
 }

@@ -2,11 +2,14 @@ import * as THREE from './외부도구/three.module.js';
 import {mergeGeometries} from './외부도구/BufferGeometryUtils.js';
 import {finishMaterial} from './현실재질.mjs';
 import {ROSTRUM as R} from './구령대배치.mjs';
+import {REAR_GATE} from './후문배치.mjs';
 
 // Photo-observed architecture rebuilt with curved meshes and shared materials.
 // No source photos, people, licence plates or document scans are published.
 export function campusEntranceDetails(boxes=[]){
  const root=new THREE.Group();root.name='정문 후문 구령대 입체 마감';
+ const rearTransform=new THREE.Matrix4().makeRotationY(-Math.PI/2);rearTransform.setPosition(REAR_GATE.x-15,0,21-REAR_GATE.y);
+ let rearAssembly=false;
  const batches=new Map(),materials=new Map(),vec=(x,y,z)=>new THREE.Vector3(x,z,-y);
  const material=(color,kind='paint')=>{
   const key=color+'|'+kind;
@@ -20,6 +23,7 @@ export function campusEntranceDetails(boxes=[]){
  };
  function put(geo,x,y,z,color,kind='paint',q=new THREE.Quaternion()){
   geo.applyMatrix4(new THREE.Matrix4().compose(vec(x,y,z),q,new THREE.Vector3(1,1,1)));
+  if(rearAssembly)geo.applyMatrix4(rearTransform);
   if(geo.index){const original=geo;geo=geo.toNonIndexed();original.dispose();}
   for(const attr of Object.keys(geo.attributes))if(!['position','normal'].includes(attr))geo.deleteAttribute(attr);
   const key=color+'|'+kind;if(!batches.has(key))batches.set(key,{geos:[],color,kind});batches.get(key).geos.push(geo);
@@ -34,7 +38,7 @@ export function campusEntranceDetails(boxes=[]){
   ctx.strokeStyle=fg;ctx.lineWidth=4;ctx.strokeRect(8,8,752,176);ctx.fillStyle=fg;ctx.font='bold 70px "Malgun Gothic",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,384,96,710);
   const t=new THREE.CanvasTexture(c);t.colorSpace=THREE.SRGBColorSpace;t.anisotropy=4;
   const m=new THREE.MeshStandardMaterial({map:t,roughness:.85,side:THREE.DoubleSide});
-  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(w,h),m);mesh.name=text;mesh.position.copy(vec(x,y,z));if(normal==='east')mesh.rotation.y=Math.PI/2;if(normal==='ground')mesh.rotation.x=-Math.PI/2;root.add(mesh);
+  const mesh=new THREE.Mesh(new THREE.PlaneGeometry(w,h),m);mesh.name=text;mesh.position.copy(vec(x,y,z));if(normal==='east')mesh.rotation.y=Math.PI/2;if(normal==='ground')mesh.rotation.x=-Math.PI/2;if(rearAssembly)mesh.applyMatrix4(rearTransform);root.add(mesh);
  }
  function curvedStrip(x0,x1,profile,color,kind='paint'){
   const pos=[];
@@ -79,6 +83,7 @@ export function campusEntranceDetails(boxes=[]){
  sign('인천석암초등학교',-18.28,-10.65,-2.16,.55,1.52,'#424c49','#e8e4d5','east');
  // Rear entrance has grey security booth, arched masonry posts, steel leaves,
  // a raised barrier and visible warm-coloured footway to distinguish the gate.
+ rearAssembly=true;
  booth(-20.6,19,-.6,3.4,2.4,false);
  for(const y of [11.39,18.59]){
   arch(-21.1,y,-.6,.76,2.25,.65,'#a9aaa1');
@@ -100,6 +105,7 @@ export function campusEntranceDetails(boxes=[]){
  }
  // Information plaques do not reproduce private notices from source photos.
  sign('후문 주차장',-18.86,18.80,.99,2.65,.23,'#314a50','#edead7');
+ rearAssembly=false;
  // More articulated front noticeboard, umbrella and safety cones.
  const board=boxes.find(b=>b.name==='정문 사진 게시판 흰 면');
  if(board)sign('학교 소식',-6,-20.905,board.bounds[5]-.16,1.84,.25,'#426b66','#f1eee2');

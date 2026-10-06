@@ -2,6 +2,7 @@
 // No original imagery, faces, licence plates, notices or approval mutations.
 // Locations use the existing approximate campus geometry, not survey dimensions.
 import {STAIR_REAR_EXIT} from './본관출입연결.mjs';
+import {REAR_GATE,rearGateBounds,isRearGatePart} from './후문배치.mjs';
 export const OCTOBER_OUTDOOR_PHOTOS={
  front:`a508fc58-1ee7-4a7c-8d34-a717ec676181 a219b561-f968-4271-bf2f-a428c77b1a50 f83d9229-18f5-4b4f-96ef-a4bd2a4ae8cc bdc6d839-a1b0-4503-b3b2-38f4c5e4e95f 8abb8530-2400-4625-8b72-62d4eeee2ffd 8d4a7c0c-77df-4bdb-bd0d-cb79e1226cf6 f0581a33-b4e3-48d9-b1dd-bf3721b8354c dc6adc02-e0f4-4084-b6ee-ca5bd52175bb e3a1932e-4ff6-4d30-8590-786393881dd0 b98a3530-0c9c-4389-9a81-b0abdcbf23d2 9ec27bd3-1709-4be1-a5a2-a08dcc00beab 7b571108-2806-4648-8757-22f63d957073 28919e38-0edf-47d7-8ec1-a58c2035c5e0 4d75d7ac-407d-427a-ab59-71603df18c06 992521dd-098b-46ce-8d2d-76a82ef6f1f1 1f2bf6b4-ac7a-4772-af4c-33d856c0fc1a 0391c9e1-382e-48d2-906d-4d9f55ac6dbb 6a4adf64-a7fc-4dd0-befa-4685cece8838 2f1b8d2a-c59a-4726-867a-fa1ed4a6f160 ea91537d-64d7-42a7-8f28-cad5bc210999 ef85a8db-728b-403b-9fc3-c921ff8a82a0 0a958c3c-0ce9-40e2-ae6e-16f36ae533ef f69622dc-e13f-480e-85f9-fbf5c9b6cd4f 3a48e9de-078f-4425-990e-799126515278 ab32f740-6f1d-44f2-bf69-6e0b66d4b558 731f875b-80b0-4ef9-9798-55b61aa48b24`.split(' '),
  parking:`2d5e0380-ddd6-4c9e-89d4-1ffec1ebf227 b91cd429-d000-475e-81c8-e84b1e5282f3 07eb096f-8b12-4e27-9d7c-a038ba7c7b69 8dbbbc48-87f1-429b-8186-742298b79f1a cea1e3e1-bff0-47ce-b464-51e13f026f8a df7ba637-dc6e-4cbe-99cd-4d66174a9047 a2afd7d8-2831-4c75-a6e0-465a822a9845 b3bee14f-cb60-469c-99d5-10298d8b8f93 8e5cade0-767b-4368-be18-471b73c66ec1 590b0856-b9c0-4555-bb6e-bb72d74db6b1 c2c3f8f6-e350-40cc-a87e-10fdde903166 6a489058-9bac-40da-b2d8-8ff0613a119f 1d63b15e-4cc0-444a-9c80-e1142ee7a8f0 ae845709-bc38-4c92-b318-7ed403585482 5f120b07-87e2-41fd-bcd1-68a0430e9068 bc6d3c60-bf37-4f4e-a15d-fc26f3430787 f32e9c5a-5099-41ce-9388-ba348b6ce604`.split(' '),
@@ -13,17 +14,21 @@ OCTOBER_OUTDOOR_PHOTOS.rostrum=['05a79f85-0780-4e04-bdb2-ebbcc8cc4352','10a7abcc
 OCTOBER_OUTDOOR_PHOTOS.rostrum.push('ab9919fa-0527-4a23-85e2-62dbb3fcd7a4','7bcd56a4-9c53-4aae-9ebb-5f6be142ec9d','1d5b5ff3-dd1c-4066-a6c6-ed011f5a6f40');
 export function addOctoberOutdoorFinish(boxes,colliders,surfaces){
  const add=(name,b,color,material='paint',solid=false,extra={})=>{
-  const item={name:'정후문 사진 '+name,bounds:b,color:rgb(color),material,kind:'finish',floor:0,...extra};boxes.push(item);if(solid)colliders.push(item);return item;
+  const item={name:'정후문 사진 '+name,bounds:isRearGatePart(name)?rearGateBounds(b):b,color:rgb(color),material,kind:'finish',floor:0,...extra};boxes.push(item);if(solid)colliders.push(item);return item;
  };
  const white='#e4e5df',metal='#9fa9a4',blue='#32567d';
  // Existing rear-lot topology, parking bays and drivable vehicles are retained.
  for(const b of boxes.filter(b=>/^후문 주차장 (아스팔트|진입로)$/.test(b.name))){b.color=rgb('#94968f');b.material='storage_concrete';}
- for(let x=-17;x<61;x+=8)add('주차장 콘크리트 줄눈 '+x,[x,12.05,-.578,x+.023,18.2,-.569],'#696d68');
- for(let x=13;x<60;x+=7)add('주차장 뒤 초록 울타리 기둥 '+x,[x,25.12,-.6,x+.07,25.2,1.38],'#61986b','metal',true);
- for(const z of [-.15,1.27])add('주차장 뒤 울타리 가로대 '+z,[10,25.15,z,62,25.20,z+.065],'#61986b','metal');
- for(let x=10;x<62;x+=.35)add('주차장 뒤 울타리 세로살 '+x,[x,25.16,-.14,x+.032,25.19,1.28],'#789f69','metal');
- // Security booth, raised barrier and masonry gateposts at the existing west
- // mouth of the rear parking lane. No road or gate is placed through classrooms.
+ const lane=add('새 후문 본관방향 진입로',REAR_GATE.lane,'#94968f','storage_concrete');
+ surfaces.push({name:lane.name,bounds:lane.bounds,height:()=>lane.bounds[5]});
+ for(const x of [59.8,68])add('새 후문 진입로 가장자리 '+x,[x,26.5,-.6,x+.2,34.5,-.38],'#c1c3ba','storage_concrete',true);
+ const curb=boxes.find(b=>b.name==='후문 주차장 경계석');if(curb)curb.bounds[3]=59.6;
+ for(let x=-17;x<68;x+=8)add('주차장 콘크리트 줄눈 '+x,[x,12.05,-.578,x+.023,18.2,-.569],'#696d68');
+ for(let x=13;x<59.6;x+=7)add('주차장 뒤 초록 울타리 기둥 '+x,[x,25.12,-.6,x+.07,25.2,1.38],'#61986b','metal',true);
+ for(const z of [-.15,1.27])add('주차장 뒤 울타리 가로대 '+z,[10,25.15,z,59.6,25.20,z+.065],'#61986b','metal');
+ for(let x=10;x<59.6;x+=.35)add('주차장 뒤 울타리 세로살 '+x,[x,25.16,-.14,x+.032,25.19,1.28],'#789f69','metal');
+ // Gate assembly is rotated together, independently of the building rear door.
+ add('이전 후문 자리 경계 담장',[-21.1,3,-.6,-20.83,25.1,.65],'#a6aaa1','storage_concrete',true);
  add('후문 경비실',[-20.6,19,-.6,-17.2,21.4,1.92],'#c6c8c3','storage_concrete',true);
  add('경비실 지붕',[-20.8,18.85,1.92,-17,21.55,2.10],'#56646a','metal');
  add('경비실 노란 간판',[-20.8,18.81,1.73,-17,18.86,2.15],'#edc056');
@@ -45,7 +50,7 @@ export function addOctoberOutdoorFinish(boxes,colliders,surfaces){
   for(const z of [-.34,-.04])add('안전봉 반사띠 '+y+z,[-18.86,y-.075,z,-18.71,y+.075,z+.095],white);
  }
  // White directional arrows on the concrete, without copying vehicle plates.
- for(const x of [-12,4,29]){
+ for(const x of [-19,-16]){
   add('주차장 화살표 줄 '+x,[x,14.9,-.568,x+1.25,15.10,-.560],white,'chalk');
   for(let i=0;i<7;i++){const w=.60*(1-i/7);add('주차장 화살촉 '+x+i,[x-.7+i*.1,15-w,-.568,x-.6+i*.1,15+w,-.560],white,'chalk');}
  }

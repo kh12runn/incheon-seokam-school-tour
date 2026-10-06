@@ -6,11 +6,11 @@
   "compression": true,
   "losslessModels": true,
   "cacheRevalidation": true,
-  "publicFiles": 137,
-  "sourceBytes": 27645078,
-  "runtimeBytes": 27639952,
-  "compressedTransferBytes": 21389560,
-  "sidecarBytes": 36524414,
+  "publicFiles": 139,
+  "sourceBytes": 27648876,
+  "runtimeBytes": 27643750,
+  "compressedTransferBytes": 21391329,
+  "sidecarBytes": 36528101,
   "files": [
     "index.html",
     "관리자/index.html",
@@ -148,6 +148,8 @@
     "웹학교/현관상담사진근거.mjs",
     "웹학교/현관상담사진배치.mjs",
     "웹학교/현실재질.mjs",
-    "웹학교/화장실배치.mjs"
+    "웹학교/화장실배치.mjs",
+    "웹학교/활성물체충돌.mjs",
+    "웹학교/후문배치.mjs"
   ]
 }

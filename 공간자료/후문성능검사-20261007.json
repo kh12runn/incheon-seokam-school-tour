@@ -1,0 +1,41 @@
+{
+  "date": "2026-10-07",
+  "gate": {
+    "reference": "주차장에서 본관을 바라본 뒤왼쪽 끝, 차량은 본관을 바라보며 진입",
+    "center": [64, 24.5],
+    "entryYaw": 3.141592653589793,
+    "northApproach": [60, 26.5, 68, 34.5],
+    "buildingEntryUnchanged": true,
+    "oldWestGateReplacedWithWall": true,
+    "vehicleAfterEntry": [64, 15.609229505080503, -0.055071428571428716],
+    "walkRoundTripFrameRates": [30, 60, 144]
+  },
+  "performance": {
+    "method": "동일 학교·난수 시드·120Hz 물리로 60Hz 업데이트 100회, 첫10회 제외, 기존 SAP/ArrayCollisionMatrix와 개선 구현 비교",
+    "bodies": 2543,
+    "baselineMedianMs": 40.4941,
+    "optimizedMedianMs": 8.3557,
+    "baselineP95Ms": 52.4375,
+    "optimizedP95Ms": 12.7335,
+    "medianReductionPercent": 79.3656,
+    "baselineContactStorageEntries": 3232153,
+    "optimizedContactStorageEntriesAtEnd": 1,
+    "contactPairAndRayQueryEquivalenceFrames": 20,
+    "graphicsQualityReduced": false,
+    "fixedStepHz": 120,
+    "backgroundRenderingSuspended": true,
+    "limitation": "로컬 CPU 물리 계산 시간 비교이며 전체 게임 FPS나 모든 PC에서 동일한 개선을 보장하지 않음"
+  },
+  "regressions": {
+    "vehicles": 11,
+    "speedCases": 44,
+    "forwardSpeedMps": 14.4,
+    "reverseSpeedMps": 9.6,
+    "stairTraversals": 234,
+    "outdoorWebglViews": 12,
+    "interiorWebglViews": 2,
+    "mobileViewportGameStartAndLobbyTravel": true,
+    "pageErrors": [],
+    "publicBuildFiles": 139
+  }
+}

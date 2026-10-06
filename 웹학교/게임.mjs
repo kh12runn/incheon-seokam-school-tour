@@ -548,6 +548,7 @@ function updateHUD(){
 function frame(now){
   requestAnimationFrame(frame);const wallDt=Math.min((now-last)/1000,1),dt=Math.min(wallDt,.1);last=now;elapsed+=dt;
   if(!ready)return;
+  if(document.hidden)return; // No GPU/physics work in a background browser tab.
   if(characterPicker.isOpen())return;
   world.officeDoor.update(dt,position,isPlaying());connectingDoorVisual.userData.update();
   if(mode==='walk'&&position.z>9.8&&Math.hypot(position.x-35,position.y+3.5)<14)class64PhotoFinish.load();
