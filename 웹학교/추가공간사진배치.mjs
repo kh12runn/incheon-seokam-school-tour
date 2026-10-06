@@ -1,6 +1,7 @@
 import {photoRoom} from './사진실내도구.mjs';
 import {PHOTO_REFERENCES} from './추가사진근거.mjs';
 import {subtractBox} from './창문배치.mjs';
+import {magpieRoomInterior,MAGPIE_ID} from './까치방사진배치.mjs';
 // Geometry is fitted to the existing room bounds; photos do not resurvey walls.
 export const EXTRA_PHOTO_ROOMS={
  '2F_SCIENCE':{count:6,kind:'science',features:['흰 대리석 무늬 실험대','청록·검정·목재 의자','창가 긴 싱크대','흰 전면 보드','높은 유리 실험기구장','뒤쪽 화면과 장비장']},
@@ -104,17 +105,6 @@ const BUILDERS={
   panel('창의 탐구 게시판',5,.17,1.87,3.8,1.15,'y','papers','#97b4c3');
   for(let i=0;i<2;i++){add('충전 보관장',[8.7,4.7+i*.87,.02,9.65,5.5+i*.87,1.28],i?'#e1e5dc':'#303d3b','paint',true);for(let j=0;j<6;j++)add('충전장 표시등',[8.74+j*.14,4.69+i*.87,1.15,8.81+j*.14,4.70+i*.87,1.18],'#83c784');}
   workDesk(7.6,.95);
- },
- kindergarten({c,add,table,cabinet,seat,sink,panel,screen,workDesk}){
-  for(let i=0;i<6;i++)cabinet('흰 높은 교구장',.2+i*1.05,.18,1.0,.55,2.85,'#e2e8e0',i===2||i===3);
-  c.props.push({type:'roundedTable',x:4.8,y:3.4,z:.76,w:3.7,d:1.6,color:'#a8ce57'});
-  add('둥근 모둠탁자 충돌',[2.95,2.6,.02,6.65,4.2,.8],'#a8ce57','wood',true).renderInDetails=true;
-  for(const x of [3.4,4.8,6.2]){seat('연두 의자',x,2.0,Math.PI,'#81ac30');seat('연두 의자',x,4.9,0,'#81ac30');}
-  seat('연두 끝 의자',2.15,3.0,-Math.PI/2,'#81ac30');seat('연두 끝 의자',7.5,3.0,Math.PI/2,'#81ac30');
-  workDesk(2.7,6.1);workDesk(5.3,6.1);
-  add('연두 업무 파티션',[2.5,5.65,.03,7.2,5.73,1.17],'#8cab4b','fabric',true);
-  sink(8.35,6.0,1.2);screen(8.0,.2,1.65,.93);panel('활동 게시판',8.0,.18,2.18,1.7,.75,'y','flowers');
-  table('낮은 수조 받침',8.6,3.8,.8,1.5,.45);add('작은 수조',[8.65,3.9,.5,9.3,5.15,1.03],'#a4c4bb','clear_glass');
  },
  careWish(h){careGreen(h,false);},
  careLove(h){careGreen(h,true);},
@@ -233,7 +223,7 @@ function careGreen({c,add,table,cabinet,cubbies,seat,sink,fridge,panel,toys,scre
  if(love){seat('둥근 탁자 의자',2.05,v-1,Math.PI);seat('둥근 탁자 의자',2.05,v+1,0);}
 }
 export function additionalPhotoInteriors(data,boxes,colliders=[]){
- const configs=Object.entries(EXTRA_PHOTO_ROOMS).map(([id,recipe])=>{const r=data.rooms.find(r=>r.id===id);return r?makeRoom(r,boxes,recipe):null;}).filter(Boolean);
+ const configs=Object.entries(EXTRA_PHOTO_ROOMS).map(([id,recipe])=>{const r=data.rooms.find(r=>r.id===id);return r?(id===MAGPIE_ID?magpieRoomInterior(r,boxes):makeRoom(r,boxes,recipe)):null;}).filter(Boolean);
  // Open only the already-drawn exterior window panes, including the rear/north
  // science room. Keep glazing collision and do not invent new architectural bays.
  for(const c of configs){

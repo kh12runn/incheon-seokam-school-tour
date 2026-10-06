@@ -16,6 +16,7 @@ assert.deepEqual(packed.files.filter(p=>p.endsWith('.glb')).sort(),approvedModel
 assert(packed.files.includes('웹학교/교실별특징.mjs'));
 for(const file of ['추가교실사진관찰.mjs','추가사진근거.mjs','추가공간사진배치.mjs','추가공간사진표현.mjs','분리수거장사진배치.mjs','분리수거장사진표현.mjs'])assert(packed.files.includes('웹학교/'+file),'2026-10-02 reviewed uploads included: '+file);
 assert(packed.files.includes('웹학교/다목적실사진배치.mjs'),'2026-10-06 hall photo layout included');
+for(const file of ['까치방사진배치.mjs','까치방사진표현.mjs'])assert(packed.files.includes('웹학교/'+file),'Magpie room reconstruction included');
 for(const file of ['행정실창고사진배치.mjs','행정실창고사진표현.mjs'])assert(packed.files.includes('웹학교/'+file),'Admin and adjacent storage interiors included: '+file);
 for(const file of ['운전물리.mjs','운전화면.mjs','주차장이동.mjs','운전.css','외부도구/car-front.svg','외부도구/lucide-LICENSE.txt'])assert(packed.files.includes('웹학교/'+file),'Driving runtime included: '+file);
 for(const file of ['자동차표현.mjs','숙직실사진배치.mjs','지원실사진표현.mjs','야외풍경.mjs','운동장환경.mjs','축구공물리.mjs','축구공표현.mjs','외부도구/cannon-es.mjs','외부도구/cannon-es-LICENSE.txt'])assert(packed.files.includes('웹학교/'+file),'Outdoor interaction runtime included: '+file);

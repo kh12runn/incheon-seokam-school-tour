@@ -1,10 +1,12 @@
 import * as THREE from './외부도구/three.module.js';
+import {magpieRoomDetails} from './까치방사진표현.mjs';
 // Small code-native textures, not private source photographs.
 export function additionalRoomDetails(c){
  const group=new THREE.Group(),materials=new Map(),textures=new Map();
+ if(c.magpieRoom)group.add(magpieRoomDetails(c));
  const mat=color=>{if(!materials.has(color))materials.set(color,new THREE.MeshStandardMaterial({color,roughness:.65}));return materials.get(color);};
  const box=(parent,w,h,d,x,y,z,color)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(color));m.position.set(x,y,z);parent.add(m);return m;};
- for(const chair of c.chairs){
+ for(const chair of c.chairs.filter(q=>!q.magpieStudent)){
   const g=new THREE.Group();g.position.set(chair.x,chair.z,-chair.y);g.rotation.y=chair.angle;g.scale.setScalar(chair.scale??1);group.add(g);
   box(g,.46,.065,.43,0,.43,0,chair.color);box(g,.44,.31,.06,0,.65,.20,chair.color);
   if(chair.office){
