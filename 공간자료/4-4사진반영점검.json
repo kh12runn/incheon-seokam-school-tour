@@ -1,0 +1,21 @@
+{
+  "reviewedAt": "2026-10-07",
+  "roomId": "4F_4-4",
+  "roomName": "4-4 교실",
+  "sourceRevision": "1065e061-b691-4b51-82ac-9f41cab5a291",
+  "photoCount": 9,
+  "implementation": "사진 관찰 기반 3D 가구와 코드 생성 게시판. 원본 사진·학생 얼굴·이름은 공개 파일에 포함하지 않음.",
+  "features": ["남색 중심 의자와 일부 연두 의자", "넓은 중앙 흰 보드", "콜라주·나뭇잎·활동지 세 구획 게시판", "연두 중간 줄 사물함", "노란 바구니 목재 책장", "갈색 시계와 복도 기둥 목재장", "붉은 창틀·높이가 다른 흰 블라인드", "회베이지 타일", "은색 타공 강연대"],
+  "scope": "이번 변경은 4-4만. 4-1·4-2·4-5·4-6의 기존 사진 반영 유지. 4-3·4-7·4-8은 이 점검 시 새 사진 없음.",
+  "limitations": "가구 치수·좌석 수는 근사하며 기존 건물 구조와 통행 간격을 우선 유지함.",
+  "verification": {
+    "classrooms": 22,
+    "sourcePhotos": 158,
+    "aislesAndFurnitureCollision": "30/60/144fps 통과",
+    "stairsWithoutJump": "234개 통과",
+    "browser": "Playwright CLI로 4-4 앞뒤 및 기존 4-2·4-5 비교 렌더 6개 확인. 실제 게임 메뉴 4-4 선택, 4층 입장, W 이동 성공. JavaScript pageerror 없음.",
+    "nonBlockingPreviewIssue": "독립 healthz 미리보기의 favicon.ico 요청은 기존 서버 정책으로 403. 실제 게임 페이지 Chrome DevTools 오류·경고 없음.",
+    "productionPackage": "139개 공개 런타임 파일 패키징 및 서버·압축·비공개 경로 차단 검사 통과"
+  },
+  "deployment": "이번 작업은 로컬 구현·검증 완료. 운영 배포는 아직 하지 않음."
+}

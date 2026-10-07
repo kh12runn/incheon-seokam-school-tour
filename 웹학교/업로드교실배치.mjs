@@ -5,7 +5,7 @@ export function applyUploadedClassroom(config){
   const observed=UPLOADED_CLASSROOM_PROFILES[config.roomId];if(!observed)return config;
   const profile={...observed,...config.profile},room=config.room,frame=config.frame,floor=parseInt(room.floor),annex=room.building==='ANNEX';
   const replace=/사물함|뒤 게시판|공기청정기|중앙 화이트보드|높은 청소함|낮은 청소함|청소도구|책장| 사진 책 |정리바구니|교구 바구니| 실내 책가방| 충돌 책가방/;
-  const boxes=config.boxes.filter(b=>!replace.test(b.name)).map(b=>{
+  const boxes=config.boxes.filter(b=>!replace.test(b.name)&&!(profile.roomId==='4F_4-4'&&/흰 롤블라인드/.test(b.name))).map(b=>{
     let hex,material=b.material;
     if(/의자 좌판|의자 등받이/.test(b.name)){
       const id=Number(b.name.match(/\d+$/)?.[0]??0),colors=profile.chairs;
@@ -14,6 +14,7 @@ export function applyUploadedClassroom(config){
     if(/책상 다리|책상 발|의자 앞다리|의자 뒷다리|의자 다리|책상 서랍/.test(b.name))hex='#bbc5c3';
     if(/책상 상판/.test(b.name))hex=profile.desktopColor??'#c9b89a';
     if(/원목 마루/.test(b.name))hex='#bba98c';
+    if(profile.floorColor&&/원목 마루|밝은 타일 바닥/.test(b.name)){hex=profile.floorColor;material=profile.floorMaterial;}
     if(/하부벽|하부 /.test(b.name))hex=profile.lowerWall;
     if(/상부벽|흰 상부/.test(b.name))hex='#e4e7df';
     if(/녹색 칠판| 사진 칠판$/.test(b.name))hex='#2a5146';
@@ -74,6 +75,10 @@ export function applyUploadedClassroom(config){
   }
   if(profile.shelf==='purple')add('보라색 별빛 가림천',[5.12,-.705,.14,6.68,-.69,1.12],'#674789','fabric');
   const extras=profile.extras??[];
+  if(extras.includes('corridor-slim-cabinet')){
+    add('복도 기둥 좁은 목재장',[3.12,-.37,.02,3.7,-.17,1.95],'#b49b77','wood',true);
+    add('목재장 세로 손잡이',[3.6,-.386,.92,3.63,-.371,1.12],'#7d8175','metal');
+  }
   if(profile.desktopColor){
     for(let i=0;i<4;i++){
       const x=.4+i*2.37,low=[1.95,2.08,1.91,2.13][i];

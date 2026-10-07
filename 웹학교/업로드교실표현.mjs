@@ -26,7 +26,20 @@ export function uploadedClassroomDetails(config){
   panel('사진 참고 뒤 게시판',5.64,1.19,9.706,-3.51,2.0,'u',-1,(c,w,h)=>{
     const sky=c.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#9cbfc9');sky.addColorStop(.78,'#d4e2d4');sky.addColorStop(.8,'#a1b574');sky.addColorStop(1,'#91a263');c.fillStyle=sky;c.fillRect(0,0,w,h);
     const style=profile.back;
-    if(style==='three-part-drops'){
+    if(style==='leaf-worksheets'){
+      // Re-create the three displays without copying pupil photographs or names.
+      for(let row=0;row<3;row++)for(let col=0;col<4;col++)artwork(c,22+col*68,12+row*62,53,51,'sketch',col+row);
+      for(let row=0;row<3;row++)for(let col=0;col<5;col++){
+        const x=320+col*65,y=12+row*62;c.fillStyle='#f1f0e5';c.fillRect(x,y,54,53);
+        c.save();c.translate(x+27,y+26);c.rotate((col%3-1)*.28);
+        c.fillStyle=['#678d50','#83a657','#517f55'][(col+row)%3];c.beginPath();c.ellipse(0,0,13,21,0,0,Math.PI*2);c.fill();
+        c.strokeStyle='#d6deb1';c.lineWidth=1.4;c.beginPath();c.moveTo(0,24);c.lineTo(0,-18);for(let k=-10;k<=12;k+=6){c.moveTo(-10,k-5);c.lineTo(0,k);c.lineTo(10,k-5);}c.stroke();c.restore();
+      }
+      for(let row=0;row<3;row++)for(let col=0;col<5;col++){
+        const x=672+col*67,y=12+row*62;c.fillStyle='#f1f1e8';c.fillRect(x,y,54,53);
+        c.strokeStyle='#a2b5ad';c.lineWidth=1;c.strokeRect(x+6,y+6,42,19);for(let k=0;k<4;k++){c.beginPath();c.moveTo(x+6,y+31+k*4);c.lineTo(x+46-(k%2)*9,y+31+k*4);c.stroke();}
+      }
+    }else if(style==='three-part-drops'){
       for(let row=0;row<3;row++)for(let col=0;col<5;col++)artwork(c,22+col*57,16+row*62,43,52,'sketch',col);
       for(let row=0;row<3;row++)for(let col=0;col<8;col++){const x=335+col*42,y=24+row*55;c.fillStyle=paperColors[(row+col)%5];c.beginPath();c.moveTo(x,y);c.quadraticCurveTo(x-24,y+34,x,y+35);c.quadraticCurveTo(x+24,y+34,x,y);c.fill();}
       for(let row=0;row<3;row++)for(let col=0;col<5;col++)artwork(c,720+col*54,16+row*60,44,48,'dark',col+row);
@@ -106,6 +119,7 @@ export function uploadedClassroomDetails(config){
   // Generic non-identifying illustrations reproduce the placement and shape,
   // not the pupils' faces/names or legible private documents in the originals.
   for(const extra of profile.extras){
+    if(extra==='perforated-lectern')panel('강연대 타공판',.46,.63,1.306,-3.636,.71,'u',1,(c,w,h)=>{c.fillStyle='#acb5b0';c.fillRect(0,0,w,h);c.fillStyle='#4e5a56';for(let row=0;row<10;row++)for(let col=0;col<6;col++){c.beginPath();c.arc(100+col*165,90+row*(h-180)/9,15,0,Math.PI*2);c.fill();}});
     if(extra==='autumn-posters')for(let i=0;i<4;i++)panel('복도창 가을 그림 '+i,.36,.49,5.5+i*.82,-.28,1.84,'v',-1,(c,w,h)=>{c.fillStyle='#efeee2';c.fillRect(0,0,w,h);for(let j=0;j<10;j++)flower(c,w*.2+(j%3)*w*.3,h*.15+Math.floor(j/3)*h*.22,w*.16,['#b58545','#a5513f','#ccae56'][j%3]);});
     if(extra==='window-rect-mirror')panel('창가 세로 거울',.3,.86,6.97,-6.79,1.73,'v',1,(c,w,h)=>{c.fillStyle='#303c39';c.fillRect(0,0,w,h);c.fillStyle='#b7c9c7';c.fillRect(14,14,w-28,h-28);});
     if(extra==='window-butterflies')for(const x of [2.8,4.1,7.3])panel('창문 나비 작품',.65,.65,x,-6.77,1.93,'v',1,(c,w,h)=>{for(let i=0;i<4;i++){const xx=w*.25+(i%2)*w*.5,yy=h*.25+Math.floor(i/2)*h*.5;c.fillStyle=paperColors[i];for(const s of [-1,1]){c.beginPath();c.ellipse(xx+s*60,yy,65,100,s*.4,0,Math.PI*2);c.fill();}c.fillStyle='#706b51';c.fillRect(xx-9,yy-65,18,145);}},true);
@@ -117,7 +131,7 @@ export function uploadedClassroomDetails(config){
     if(extra.includes('mirror')&&extra!=='window-rect-mirror')panel('복도쪽 '+extra,.42,extra==='corridor-mirror'?1.2:.6,6.85,-.31,1.79,'v',-1,(c,w,h)=>{c.fillStyle='#8f7864';c.beginPath();c.ellipse(w/2,h/2,w*.48,h*.48,0,0,Math.PI*2);c.fill();const g=c.createLinearGradient(0,0,w,h);g.addColorStop(0,'#e6e7d8');g.addColorStop(.5,'#a5c6c5');g.addColorStop(1,'#c9d4c8');c.fillStyle=g;c.beginPath();c.ellipse(w/2,h/2,w*.42,h*.44,0,0,Math.PI*2);c.fill();},true);
   }
   if(profile.shelf==='purple')panel('별빛 가림천',1.5,.9,5.9,-.713,.64,'v',-1,(c,w,h)=>{const g=c.createLinearGradient(0,0,w,h);g.addColorStop(0,'#594185');g.addColorStop(1,'#9276ac');c.fillStyle=g;c.fillRect(0,0,w,h);for(let i=0;i<22;i++){const x=(i*149)%w,y=20+Math.sin(i*2)*18;c.strokeStyle='#d7cde6';c.lineWidth=2;c.beginPath();c.moveTo(x-6,y);c.lineTo(x+6,y);c.moveTo(x,y-6);c.lineTo(x,y+6);c.stroke();}});
-  panel('학급 시계',.34,.34,profile.clockSide==='corridor'?6.85:5,profile.clockSide==='corridor'?-.3:-6.76,2.55,'v',profile.clockSide==='corridor'?-1:1,(c,w,h)=>{c.fillStyle=profile.roomId==='4F_6-7'?'#885c48':'#828b80';c.beginPath();c.arc(w/2,h/2,w*.49,0,Math.PI*2);c.fill();c.fillStyle='#eeeeDF';c.beginPath();c.arc(w/2,h/2,w*.44,0,Math.PI*2);c.fill();c.strokeStyle='#506059';c.lineWidth=12;for(let i=0;i<12;i++){const a=i*Math.PI/6;c.beginPath();c.moveTo(w/2+Math.sin(a)*w*.36,h/2-Math.cos(a)*h*.36);c.lineTo(w/2+Math.sin(a)*w*.40,h/2-Math.cos(a)*h*.40);c.stroke();}c.lineWidth=18;c.beginPath();c.moveTo(w*.34,h*.32);c.lineTo(w*.5,h*.5);c.lineTo(w*.70,h*.27);c.stroke();},true);
+panel('학급 시계',.34,.34,profile.clockSide==='corridor'?(profile.clockPosition??6.85):5,profile.clockSide==='corridor'?-.3:-6.76,2.55,'v',profile.clockSide==='corridor'?-1:1,(c,w,h)=>{c.fillStyle=profile.clockColor??(profile.roomId==='4F_6-7'?'#885c48':'#828b80');c.beginPath();c.arc(w/2,h/2,w*.49,0,Math.PI*2);c.fill();c.fillStyle='#eeeeDF';c.beginPath();c.arc(w/2,h/2,w*.44,0,Math.PI*2);c.fill();c.strokeStyle='#506059';c.lineWidth=12;for(let i=0;i<12;i++){const a=i*Math.PI/6;c.beginPath();c.moveTo(w/2+Math.sin(a)*w*.36,h/2-Math.cos(a)*h*.36);c.lineTo(w/2+Math.sin(a)*w*.40,h/2-Math.cos(a)*h*.40);c.stroke();}c.lineWidth=18;c.beginPath();c.moveTo(w*.34,h*.32);c.lineTo(w*.5,h*.5);c.lineTo(w*.70,h*.27);c.stroke();},true);
   const dark=new THREE.MeshStandardMaterial({color:'#515d57',metalness:.45,roughness:.55}),metal=new THREE.MeshStandardMaterial({color:'#c4cec5',roughness:.7});
   const handles=new THREE.InstancedMesh(new THREE.CylinderGeometry(.033,.033,.012,10),dark,photoDetails.handles.length),matrix=new THREE.Matrix4();
   const normal=new THREE.Vector3(uNormal[0],0,-uNormal[1]).normalize(),q=new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0,1,0),normal);

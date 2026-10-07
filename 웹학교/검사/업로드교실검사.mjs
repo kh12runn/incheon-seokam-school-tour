@@ -4,7 +4,7 @@ import {buildWorld} from '../이동물리.mjs';
 import {UPLOADED_CLASSROOM_PROFILES as profiles} from '../업로드교실관찰.mjs';
 const source=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),snapshot=JSON.stringify(source);
 const before=buildWorld(source,{uploadedClassPhotos:false}),world=buildWorld(source),ids=new Set(Object.keys(profiles));
-assert.equal(ids.size,21);assert.equal(Object.values(profiles).reduce((n,p)=>n+p.photoCount,0),149);
+assert.equal(ids.size,22);assert.equal(Object.values(profiles).reduce((n,p)=>n+p.photoCount,0),158);
 assert.equal(JSON.stringify(source),snapshot);assert.deepEqual(world.data,before.data);
 const unaffected=list=>list.filter(b=>!ids.has(b.spaceId)&&!ids.has(b.interiorRoom));
 assert.ok(JSON.stringify(unaffected(world.boxes))===JSON.stringify(unaffected(before.boxes)),'Only the 15 uploaded classrooms change');
@@ -38,5 +38,11 @@ for(const id of ids){
   }
   assert.equal(world.boxes.filter(box=>box.spaceId===id&&box.cornerTV).length,2,id+' existing corner TV');
 }
-assert.equal(signatures.size,21,'Every photographed classroom has a distinct observed configuration');
-console.log(JSON.stringify({ok:true,rooms:21,photos:149,uniqueConfigurations:21,annexRooms:2,allDoorsAndAislesReachable:true,frameRates:[30,60,144],furnitureCollision:true,previousRoomsPreserved:true}));
+assert.equal(signatures.size,22,'Every photographed classroom has a distinct observed configuration');
+const classroom44=world.classroomInteriors.find(r=>r.roomId==='4F_4-4');
+assert.equal(classroom44.profile.sourceRevision,'1065e061-b691-4b51-82ac-9f41cab5a291');
+assert.equal(classroom44.photoCount,9);assert.equal(classroom44.profile.reviewedAt,'2026-10-07');
+assert.ok(classroom44.boxes.some(b=>/밝은 타일 바닥/.test(b.name)&&b.material==='staff_floor'));
+assert.ok(classroom44.colliders.some(b=>b.name.includes('복도 기둥 좁은 목재장')));
+assert.equal(classroom44.profile.back,'leaf-worksheets');
+console.log(JSON.stringify({ok:true,rooms:22,photos:158,uniqueConfigurations:22,annexRooms:3,allDoorsAndAislesReachable:true,frameRates:[30,60,144],furnitureCollision:true,previousRoomsPreserved:true}));

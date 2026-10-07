@@ -21,6 +21,6 @@ const observations={
 };
 export const UPLOADED_CLASSROOM_PROFILES=Object.fromEntries(Object.entries(observations).map(([roomId,o])=>[roomId,{
   ...o,roomId,referenceRoom:roomId.startsWith('4F_2-')?'4F_2-1':'4F_6-4',photoStatus:'reviewed',photoCount:o.count,sourceRevision:o.revision,
-  reviewedAt:ADDITIONAL_CLASSROOM_OBSERVATIONS[roomId]?'2026-10-02':'2026-09-30',observedFeatures:o.features,lowerWall:'#b8c3b4',accent:'#a4b29b',trayColor:'#d8c254',boardLayout:0,lockerPattern:0,
+  reviewedAt:o.reviewedAt??(ADDITIONAL_CLASSROOM_OBSERVATIONS[roomId]?'2026-10-02':'2026-09-30'),observedFeatures:o.features,lowerWall:'#b8c3b4',accent:'#a4b29b',trayColor:'#d8c254',boardLayout:0,lockerPattern:0,
   seatCountIsApproximate:true,layoutIsApproximate:true,
 }]));
