@@ -17,5 +17,17 @@
     "nonBlockingPreviewIssue": "독립 healthz 미리보기의 favicon.ico 요청은 기존 서버 정책으로 403. 실제 게임 페이지 Chrome DevTools 오류·경고 없음.",
     "productionPackage": "139개 공개 런타임 파일 패키징 및 서버·압축·비공개 경로 차단 검사 통과"
   },
-  "deployment": "이번 작업은 로컬 구현·검증 완료. 운영 배포는 아직 하지 않음."
+  "deployment": {
+    "date": "2026-10-07",
+    "runtimeCommit": "de20bd3f3b4a131c733425116533766928337102",
+    "id": "6e968c7d-6ffd-43e1-a6f8-7dc0e9ec0c2b",
+    "status": "SUCCESS",
+    "url": "https://school-tour-production.up.railway.app/",
+    "identicalRuntimeFiles": 139,
+    "healthStatus": 200,
+    "unauthenticatedAdminStatus": 401,
+    "privatePathsStatus": 403,
+    "productionBrowser": "Playwright CLI에서 4-4 선택·입장·W 이동 성공, 페이지 실행 오류 없음, 공개 테스트 훅 미노출 확인",
+    "compressedTransferBytes": 21395459
+  }
 }
