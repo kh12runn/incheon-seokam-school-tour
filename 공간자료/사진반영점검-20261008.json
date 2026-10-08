@@ -1,0 +1,48 @@
+{
+  "reviewedAt": "2026-10-08",
+  "catalogSha": "6ef20010d736dcdbffdd37696007bd23f1c24d5c",
+  "catalogSpaces": 67,
+  "catalogPhotos": 675,
+  "implementedSpaces": 9,
+  "reviewedPhotos": 81,
+  "rooms": [
+    {"id":"2F_2-6","photos":10,"revision":"47fbdadb-bae3-440a-9366-082267823914"},
+    {"id":"1F_1-5","photos":10,"revision":"76fd8c23-f894-42b1-9852-ee97741c78cb"},
+    {"id":"1F_1-4","photos":8,"revision":"52db1170-cca1-4cb3-b5f0-31997102ad81"},
+    {"id":"1F_1-6","photos":10,"revision":"c6d5b0c1-2e9e-4d73-b3fb-87c6a671a55e"},
+    {"id":"2F_1-1","photos":9,"revision":"8e2f3c4c-ad5c-4f14-9e7a-583d80a6c284"},
+    {"id":"3F_4-7","photos":9,"revision":"bc18f3aa-9cf9-4c28-8f33-c7a3781fc6de"},
+    {"id":"3F_4-8","photos":8,"revision":"faf68b7f-da8d-4f40-8b26-9ee563428bea"},
+    {"id":"2F_INDIVIDUAL_2","photos":8,"revision":"490d99cb-b156-43b7-9e01-884cd3679c3b"},
+    {"id":"4F_GRADE2_RESEARCH","photos":9,"revision":"76cc6f3b-5fc2-43fe-b647-2229bba2bdcb"}
+  ],
+  "implementation": {
+    "method": "사진에서 확인한 칠판·가구·창틀·게시판 특징을 기존 Three.js 공간에 코드로 재구성",
+    "originalPhotosAddedToRuntime": false,
+    "pupilFacesOrNamesPublished": false,
+    "existingOtherInteriorsPreserved": true,
+    "deferred360AndConnectingPassageUnchanged": true,
+    "uncertainty": "4-8의 촬영 당시 책상 위 뒤집힌 의자는 정상 수업 상태로 바닥에 배치. 미확인 치수·좌석 수는 근사값."
+  },
+  "verification": {
+    "십월팔일사진검사": "통과: 9곳·81장 및 기존 공간 보존",
+    "업로드교실검사": "통과: 29교실, 출입·통로·가구 충돌",
+    "추가공간사진검사": "통과: 18공간, 출입·통로·가구 충돌",
+    "본관연결검사": "통과",
+    "계단턱검사": "통과: 234회, 30/60/144fps, 점프 불필요",
+    "배포검사": "통과: 142개 공개 파일, 압축 전송 합계 21399076바이트",
+    "browser": "Playwright: 9공간 앞뒤 18개 렌더 및 실제 게임 메뉴 입장 9곳 통과. 게임 JS 오류 없음.",
+    "knownLegacyFailure": {
+      "test": "이학년일반검사.mjs",
+      "description": "컴퓨터실 안쪽 목표 x=97,y=-70.6375로 이동할 때 x=98.7357142857143에서 멈춤",
+      "baseline": "기존 배포자료/release-de20bd3에서도 동일 실패 재현. 이번 변경 회귀 아님. 해당 기존 공간은 수정하지 않음."
+    }
+  },
+  "followupCorrections": {
+    "6학년 연수실": "6장 재검토: 출입문 왼쪽 유리 교구장, 긴 타원탁자·노란 매트·유리 덮개, 오른쪽 PC 책상·복합기, 창가 냉장고·싱크대 및 교구 재배치",
+    "컴퓨터실": "6장 재검토: 학생 모니터·좌석 반전, 전면 중앙 롤형 빔스크린·프로젝터, 스크린을 바라볼 때 우측 구석 교사용 책상",
+    "교실 크기": "사용자 확인에 따라 4-6·4-2만 약 20×7m에서 10×7m로 축소. 외벽·바닥·지붕·복도와 다른 교실 유지. 남는 면적 내부 분리.",
+    "verification": "추가공간사진검사·업로드교실검사·본관연결검사·연수실컴퓨터실크기검사 통과. Playwright 13공간 입장과 26개 앞뒤 렌더 검증."
+  },
+  "productionDeployment": "사용자 요청에 따라 이번 수정 전체를 커밋·푸시 후 기존 Railway 운영 서비스에 배포 진행. 성공 결과는 후속 배포 기록 참조."
+}

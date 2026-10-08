@@ -1,7 +1,9 @@
 // Photo observations, not generic identity themes. Original photographs remain
 // in the photo repository; no people, pupil names or documents are published.
 import {ADDITIONAL_CLASSROOM_OBSERVATIONS} from './추가교실사진관찰.mjs';
+import {OCT8_CLASSROOM_OBSERVATIONS} from './십월팔일교실관찰.mjs';
 const observations={
+  ...OCT8_CLASSROOM_OBSERVATIONS,
   ...ADDITIONAL_CLASSROOM_OBSERVATIONS,
   '3F_5-3':{count:9,revision:'2026-09-30-012cbaf4',theme:'흰 활동지와 연두 의자',board:'white-narrow',back:'white-papers',locker:'green-row',chairs:['#a6bd45','#ad8759','#293e52'],chairEvery:4,desktopColor:'#d9dcd0',purifier:'rear-blue',shelf:'papers',extras:['back-window-wood','color-bins','lectern'],features:['연두 의자와 일부 목재·남색 의자','초록 칠판 가운데 오른쪽의 좁은 흰 보드','하늘·잔디 배경의 두 줄 흰 활동지','목재 사물함의 연두 중간 줄','뒤 창가 청백색 공기청정기와 높이가 다른 목재 수납장','흰 블라인드와 밝은 마루']},
   '3F_5-6':{count:9,revision:'2026-09-30-3de4fa17',theme:'해바라기 작품과 짝 책상',board:'green',back:'sunflower-autumn',locker:'ivory-row',chairs:['#a6bd45','#ad8759','#293e52'],chairEvery:4,desktopColor:'#d9dcd0',pairedDesks:true,purifier:'front-blue',purifierPosition:[.45,-2.75],shelf:'games',clockSide:'corridor',extras:['back-window-cream','slim-cabinet','window-rect-mirror','autumn-posters','rear-color-bins','window-low-white'],features:['연두색 위주의 혼합 의자와 두 개씩 붙인 책상','흰 보드 없는 초록 칠판','해바라기 두 줄·가을 그림·아래 흰 작품의 뒤 게시판','목재 사물함의 아이보리 중간 줄','앞쪽 청백색 공기청정기','복도 책장의 보드게임·책과 창가 세로 거울','뒤 창가 크림색 키큰 수납장']},

@@ -4,7 +4,7 @@ import {buildWorld} from '../이동물리.mjs';
 import {EXTRA_PHOTO_ROOMS} from '../추가공간사진배치.mjs';
 const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url))),snapshot=JSON.stringify(data);
 const w=buildWorld(data),before=buildWorld(data,{additionalPhotos:false}),ids=new Set(Object.keys(EXTRA_PHOTO_ROOMS));
-assert.equal(JSON.stringify(data),snapshot);assert.deepEqual(w.data,before.data);assert.equal(ids.size,16);
+assert.equal(JSON.stringify(data),snapshot);assert.deepEqual(w.data,before.data);assert.equal(ids.size,18);
 for(const key of ['classroomInteriors','principalOffice','stairs','centralStairFinish'])assert(JSON.stringify(w[key])===JSON.stringify(before[key]),key+' unchanged');
 assert.equal(JSON.stringify(w.surfaces.filter(s=>s.spaceId!=='3F_COUNSELING')),JSON.stringify(before.surfaces),'Only approved counseling entry floor added');
 const keep=list=>list.filter(b=>b.spaceId&&!ids.has(b.spaceId)&&!ids.has(b.interiorRoom));assert(JSON.stringify(keep(w.boxes))===JSON.stringify(keep(before.boxes)),'Unrelated spaces unchanged');

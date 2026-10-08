@@ -19,6 +19,8 @@ export function applyUploadedClassroom(config){
     if(/상부벽|흰 상부/.test(b.name))hex='#e4e7df';
     if(/녹색 칠판| 사진 칠판$/.test(b.name))hex='#2a5146';
     if(/벽걸이 화면$|모니터 화면$/.test(b.name))hex='#17282d';
+    if(profile.windowFrame&&/붉은 창/.test(b.name))hex=profile.windowFrame;
+    if(profile.blindColor&&/롤블라인드/.test(b.name))hex=profile.blindColor;
     if(profile.desktopColor&&/흰 흡음 천장/.test(b.name)){hex='#e8eae2';material='staff_ceiling';}
     return hex?{...b,color:rgb(hex),material}:b;
   });
@@ -42,7 +44,7 @@ export function applyUploadedClassroom(config){
   };
   // Keep original door/window geometry and seating aisles. Reconstruction counts
   // are approximate because some furniture is occluded in the phone photos.
-  const rows=profile.locker==='green-double'?4:3,cols=9,top=rows===4?1.22:1.14;
+  const rows=profile.lockerRows??(profile.locker==='green-double'?4:3),cols=9,top=rows===4?1.22:1.14;
   const split=profile.locker.startsWith('split');
   for(const [a,b] of split?[[-6.38,-4.47],[-2.55,-.70]]:[[-6.38,-.70]])add('뒤 수납 몸체 '+a,[9.33,a,.03,9.83,b,top],'#938673','wood',true);
   const handles=[];
@@ -54,7 +56,8 @@ export function applyUploadedClassroom(config){
     if(['checker','split-checker'].includes(profile.locker)&&(row+col)%2===0)color='#e2e1d3';
     if(profile.locker==='ivory')color=row%2?'#e4e2d5':'#cbb89b';
     if(profile.locker==='ivory-row'&&row===1)color='#e5e3d5';
-    add('사물함 문 '+row+' '+col,[9.30,y,h,9.33,y+width-.027,h+(top-.10)/rows-.022],color,'wood');
+    if(profile.locker==='green-white-checker')color=(row+col)%2?'#a2bf65':'#e2e5d9';
+    add('사물함 문 '+row+' '+col,[9.30,y,h,9.33,y+width-.027,h+(top-.10)/rows-.022],color,profile.locker==='green-white-checker'?'paint':'wood');
     handles.push(p(9.285,y+width*.73,h+.16));
   }
   add('뒤 게시판 프레임',[9.75,-6.44,1.32,9.86,-.61,2.67],'#b3b6a5','metal');
@@ -63,7 +66,7 @@ export function applyUploadedClassroom(config){
   // Two independent low bookcases; for the annex, flank its existing door.
   const shelfStarts=annex?[.45,7.35]:[5.1,7.15];
   for(const [bank,x] of shelfStarts.entries()){
-    const width=annex?1.75:1.6,depth=annex?.51:.68,tall=profile.shelf==='orange-books'&&bank===1,height=tall?1.43:1.04,wood=tall?'#b88f50':'#b89d77';
+    const width=annex?1.75:1.6,depth=annex?.51:.68,tall=profile.shelf==='orange-books'&&bank===1,height=tall?1.43:1.04,wood=profile.shelfColor??(tall?'#b88f50':'#b89d77');
     add('복도 책장 등판 '+bank,[x,-.22,.03,x+width,-.17,height-.01],wood,'wood');
     for(const h of tall?[.05,.36,.70,1.00,1.39]:[.05,.36,.70,1.00])add('책장 선반 '+bank+' '+h,[x,-depth,h,x+width,-.17,h+.032],wood,'wood');
     for(const a of [0,width/2,width-.035])add('책장 측판 '+bank+' '+a,[x+a,-depth,.04,x+a+.035,-.17,height],wood,'wood');
@@ -75,6 +78,20 @@ export function applyUploadedClassroom(config){
   }
   if(profile.shelf==='purple')add('보라색 별빛 가림천',[5.12,-.705,.14,6.68,-.69,1.12],'#674789','fabric');
   const extras=profile.extras??[];
+  if(extras.includes('corridor-white-cabinet')){
+    add('복도 흰 수납장',[2.3,-.37,.02,3.65,-.17,1.43],'#e0e4d9','paint',true);
+    for(const x of [2.96,3.01])add('흰 수납장 손잡이',[x,-.391,.78,x+.025,-.372,.97],'#8a968b','metal');
+  }
+  if(extras.includes('rear-block-display'))for(let i=0;i<15;i++){
+    const y=-6.1+i*.35;
+    add('사물함 위 블록 받침 '+i,[9.37,y,top,9.64,y+.25,top+.05],'#adbc9d');
+    for(let j=0;j<3;j++)add('색색 블록 작품 '+i+' '+j,[9.41,y+.03,top+.05+j*.06,9.57,y+.18,top+.11+j*.06],['#c95142','#deb946','#68986c','#6b94b7'][(i+j)%4]);
+  }
+  if(extras.includes('rear-window-printer')){
+    add('뒤 창가 복합기 받침장',[7.5,-6.82,.02,8.5,-6.38,.73],'#b9a47f','wood',true);
+    add('뒤 창가 흰 복합기',[7.6,-6.77,.73,8.4,-6.39,1.10],'#d4d9cf','paint',true);
+    add('복합기 검정 스캐너',[7.57,-6.78,1.10,8.43,-6.38,1.16],'#34423c');
+  }
   if(extras.includes('corridor-slim-cabinet')){
     add('복도 기둥 좁은 목재장',[3.12,-.37,.02,3.7,-.17,1.95],'#b49b77','wood',true);
     add('목재장 세로 손잡이',[3.6,-.386,.92,3.63,-.371,1.12],'#7d8175','metal');
@@ -82,7 +99,7 @@ export function applyUploadedClassroom(config){
   if(profile.desktopColor){
     for(let i=0;i<4;i++){
       const x=.4+i*2.37,low=[1.95,2.08,1.91,2.13][i];
-      add('흰 롤블라인드 '+i,[x,-6.80,low,x+2.12,-6.78,2.34],'#e7e8df','staff_fabric');
+      add('흰 롤블라인드 '+i,[x,-6.80,low,x+2.12,-6.78,2.34],profile.blindColor??'#e7e8df','staff_fabric');
       add('블라인드 아래 봉 '+i,[x,-6.815,low-.024,x+2.12,-6.773,low],'#c5cec4','metal');
       for(const z of [1.17,1.33])add('외창 안전봉 '+i+' '+z,[x,-6.71,z,x+2.12,-6.688,z+.02],'#bac7c2','metal');
     }
@@ -160,15 +177,16 @@ export function applyUploadedClassroom(config){
 
 export function uploadedAnnexClassrooms(data){
   return data.rooms.filter(r=>r.building==='ANNEX'&&UPLOADED_CLASSROOM_PROFILES[r.id]).map(room=>{
-    const base=class21Interior({rooms:[{...room,id:'4F_2-1'}]});
     const [x0,x1,y0,y1,z]=room.bounds;
+    const templateLength=y1-y0>7?y1-y0:6.75;
+    const base=class21Interior({rooms:[{...room,id:'4F_2-1'}]},{length:templateLength});
     // 2-1's photographed envelope is 6.75m long; these two rooms are 7m.
     // Extend only its rear lining/floor, never shift the actual corridor door.
     const convert=b=>{
-      const bounds=[...b.bounds],extra=y1-y0-6.75;
+      const bounds=[...b.bounds],extra=y1-y0-templateLength;
       if(/밝은 타일 바닥|흰 천장/.test(b.name))bounds[1]-=extra;
       if(/앞뒤|걸레받이/.test(b.name)&&bounds[4]<y1-6.5){bounds[1]-=extra;bounds[4]-=extra;}
-      return {...b,bounds,name:b.name.replace(/^2-1/,room.name),spaceId:room.id,interiorRoom:room.id};
+      return {...b,bounds,name:b.name.replace(/^2-1/,room.name),spaceId:room.id,interiorRoom:room.id,floor:parseInt(room.floor)};
     };
     const frame={width:y1-y0,depth:x1-x0,z,point:(x,y,h=0)=>base.point(x*(y1-y0)/10,-y*(x1-x0)/7,h)};
     const config={...base,roomId:room.id,room,frame,profile:UPLOADED_CLASSROOM_PROFILES[room.id],boxes:base.boxes.map(convert),colliders:base.colliders.map(convert),entry:{x:x1+1.5,y:base.spawn.y,z},yaw:0};

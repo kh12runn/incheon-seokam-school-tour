@@ -1,7 +1,7 @@
 // Photo-guided 2-1 only. Local u = board → rear, v = corridor → playground.
 export const CLASS21_ID='4F_2-1';
 export const COMPUTER_GATE={y:-67.5,left:100.27,right:102.73,base:10.2,height:2.32};
-export function class21Interior(data){
+export function class21Interior(data,{length=6.75}={}){
   const room=data.rooms.find(r=>r.id===CLASS21_ID);if(!room)return null;
   const [x0,x1,y0,y1,z]=room.bounds,boxes=[],colliders=[],desks=[],chairs=[];
   const point=(u,v,h=0)=>({x:x1-v,y:y1-u,z:z+h});
@@ -13,14 +13,14 @@ export function class21Interior(data){
   }
   const door=(y1-y0)*.65;
   // Do not change the existing door/wall topology or adjoining classrooms.
-  box('밝은 타일 바닥',.1,6.65,.1,7.9,.003,.008,'#c9c7b9','restroom_floor');
-  box('흰 천장',.1,6.65,.1,7.9,3.115,3.13,'#e4e3da').kind='ceiling';
-  for(const [a,b] of [[.1,.14],[6.61,6.65]]){
+  box('밝은 타일 바닥',.1,length-.1,.1,7.9,.003,.008,'#c9c7b9','restroom_floor');
+  box('흰 천장',.1,length-.1,.1,7.9,3.115,3.13,'#e4e3da').kind='ceiling';
+  for(const [a,b] of [[.1,.14],[length-.14,length-.1]]){
     box('앞뒤 연녹색 하부 '+a,a,b,.1,7.9,.08,1.06,'#b8c1b4');
     box('앞뒤 흰 상부 '+a,a,b,.1,7.9,1.06,3.1,'#e8e7df');
     box('검정 걸레받이 '+a,a,b,.1,7.9,.01,.10,'#242925');
   }
-  for(const [a,b] of [[.12,door-.63],[door+.63,6.63]]){
+  for(const [a,b] of [[.12,door-.63],[door+.63,length-.12]]){
     box('복도 하부 '+a,a,b,.11,.15,.1,1.07,'#b8c1b4');
     box('복도 창틀 '+a,a+.12,b-.12,.15,.18,1.12,2.86,'#e7e7df');
     box('복도 반투명 창 '+a,a+.18,b-.18,.181,.187,1.18,2.8,'#c4d1cf','glass');

@@ -18,8 +18,11 @@ export function additionalRoomDetails(c){
  for(const prop of c.props){
   const g=new THREE.Group();g.position.set(prop.x,prop.z,-prop.y);group.add(g);
   if(prop.type==='roundedTable'){
-   const mesh=new THREE.Mesh(new THREE.CylinderGeometry(.5,.5,.055,32),mat(prop.color));mesh.scale.set(prop.w*prop.sx,1,prop.d*prop.sy);g.add(mesh);
+   const material=prop.glass?new THREE.MeshStandardMaterial({color:prop.color,transparent:true,opacity:.18,roughness:.12,depthWrite:false}):mat(prop.color);
+   const mesh=new THREE.Mesh(new THREE.CylinderGeometry(.5,.5,prop.thickness??.055,32),material);mesh.scale.set(prop.w*prop.sx,1,prop.d*prop.sy);g.add(mesh);
    if(!prop.noLegs)for(const x of [-prop.w*.28,prop.w*.28])box(g,.07,Math.max(.12,prop.z-c.room.bounds[4]-.06),.07,x*prop.sx,-(prop.z-c.room.bounds[4])*.5,0,'#a99674');
+  }else if(prop.type==='smallEgg'){
+   const egg=new THREE.Mesh(new THREE.SphereGeometry(.06,8,6),mat(prop.color));egg.scale.set(.85,1.3,1);g.add(egg);
   }else if(prop.type==='flag'){
    const geo=new THREE.BufferGeometry();geo.setAttribute('position',new THREE.Float32BufferAttribute([-.14,0,0,.14,0,0,0,-.24,0],3));geo.computeVertexNormals();const material=mat(prop.color).clone();material.side=THREE.DoubleSide;g.add(new THREE.Mesh(geo,material));
   }else if(prop.type==='balloon'){

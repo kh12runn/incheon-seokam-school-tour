@@ -1,4 +1,5 @@
 import * as THREE from './외부도구/three.module.js';
+import {drawOctoberClassBoard} from './십월팔일교실표현.mjs';
 const paperColors=['#d9b5b1','#c6d5ae','#bbcfd8','#e2d295','#bcb0cd'];
 export function uploadedClassroomDetails(config){
   const {profile,frame,room,photoDetails}=config,group=new THREE.Group();group.name=room.name+' 업로드 사진별 특징';
@@ -26,7 +27,9 @@ export function uploadedClassroomDetails(config){
   panel('사진 참고 뒤 게시판',5.64,1.19,9.706,-3.51,2.0,'u',-1,(c,w,h)=>{
     const sky=c.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#9cbfc9');sky.addColorStop(.78,'#d4e2d4');sky.addColorStop(.8,'#a1b574');sky.addColorStop(1,'#91a263');c.fillStyle=sky;c.fillRect(0,0,w,h);
     const style=profile.back;
-    if(style==='leaf-worksheets'){
+    if(drawOctoberClassBoard(c,w,h,style)){
+      // Classroom-specific October photo layouts, drawn without private images.
+    }else if(style==='leaf-worksheets'){
       // Re-create the three displays without copying pupil photographs or names.
       for(let row=0;row<3;row++)for(let col=0;col<4;col++)artwork(c,22+col*68,12+row*62,53,51,'sketch',col+row);
       for(let row=0;row<3;row++)for(let col=0;col<5;col++){
@@ -103,7 +106,7 @@ export function uploadedClassroomDetails(config){
     c.fillStyle='#355548';c.font='bold 17px "Malgun Gothic",sans-serif';c.textAlign='left';c.fillText(room.name+' · 우리들의 작품',16,h-9);
   });
   panel('칠판 수업 안내',4.55,1.34,room.building==='ANNEX'?.40:.285,-3.39,1.68,'u',1,(c,w,h)=>{
-    c.fillStyle='#294d42';c.fillRect(0,0,w,h);
+    c.fillStyle=profile.board==='white-full'?'#ecefe5':'#294d42';c.fillRect(0,0,w,h);
     if(profile.board.startsWith('white')){c.fillStyle='#ecefe5';c.fillRect(profile.board==='white-wide'?w*.12:profile.board==='white-narrow'?w*.46:w*.33,0,profile.board==='white-wide'?w*.72:profile.board==='white-narrow'?w*.3:w*.43,h);}
     c.fillStyle='#e4e9d4';c.font='23px "Malgun Gothic",sans-serif';c.fillText(room.name,21,35);
     for(let i=0;i<6;i++){c.fillStyle=paperColors[i%5];c.fillRect(18,65+i*29,70,21);}
@@ -119,6 +122,18 @@ export function uploadedClassroomDetails(config){
   // Generic non-identifying illustrations reproduce the placement and shape,
   // not the pupils' faces/names or legible private documents in the originals.
   for(const extra of profile.extras){
+    if(extra==='corridor-art-cards')panel('복도창 작품 카드',1.5,.55,3.3,-.28,2.03,'v',-1,(c,w,h)=>{for(let j=0;j<6;j++)artwork(c,15+j*167,22,140,h-44,'flower',j);},true);
+    if(extra==='rear-heart')panel('뒤 게시판 빨간 하트',.55,.63,9.69,-5.9,2.13,'u',-1,(c,w,h)=>{c.strokeStyle='#c43e42';c.lineWidth=55;c.beginPath();c.moveTo(w*.5,h*.82);c.bezierCurveTo(-w*.2,h*.39,w*.18,-h*.09,w*.5,h*.3);c.bezierCurveTo(w*.82,-h*.09,w*1.2,h*.39,w*.5,h*.82);c.stroke();},true);
+    if(extra==='floor-hopscotch'){
+      const canvas=document.createElement('canvas');canvas.width=256;canvas.height=512;const c=canvas.getContext('2d');
+      c.strokeStyle='#495149';c.lineWidth=4;c.font='28px sans-serif';c.textAlign='center';
+      for(let row=0;row<5;row++)for(let col=0;col<(row%2?2:1);col++){
+        const x=row%2?24+col*105:77,y=12+row*97;c.strokeRect(x,y,100,94);c.fillStyle=row%2?'#aa5045':'#ada14c';c.fillText(String(row+col+1),x+50,y+61);
+      }
+      const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;
+      const mesh=new THREE.Mesh(new THREE.PlaneGeometry(1.15,2.2),new THREE.MeshStandardMaterial({map,transparent:true,roughness:1,depthWrite:false}));
+      const p=frame.point(2,-3.1,.018);mesh.position.set(p.x,p.z,-p.y);mesh.rotation.x=-Math.PI/2;mesh.name='사진 참고 바닥 사방치기';group.add(mesh);
+    }
     if(extra==='perforated-lectern')panel('강연대 타공판',.46,.63,1.306,-3.636,.71,'u',1,(c,w,h)=>{c.fillStyle='#acb5b0';c.fillRect(0,0,w,h);c.fillStyle='#4e5a56';for(let row=0;row<10;row++)for(let col=0;col<6;col++){c.beginPath();c.arc(100+col*165,90+row*(h-180)/9,15,0,Math.PI*2);c.fill();}});
     if(extra==='autumn-posters')for(let i=0;i<4;i++)panel('복도창 가을 그림 '+i,.36,.49,5.5+i*.82,-.28,1.84,'v',-1,(c,w,h)=>{c.fillStyle='#efeee2';c.fillRect(0,0,w,h);for(let j=0;j<10;j++)flower(c,w*.2+(j%3)*w*.3,h*.15+Math.floor(j/3)*h*.22,w*.16,['#b58545','#a5513f','#ccae56'][j%3]);});
     if(extra==='window-rect-mirror')panel('창가 세로 거울',.3,.86,6.97,-6.79,1.73,'v',1,(c,w,h)=>{c.fillStyle='#303c39';c.fillRect(0,0,w,h);c.fillStyle='#b7c9c7';c.fillRect(14,14,w-28,h-28);});

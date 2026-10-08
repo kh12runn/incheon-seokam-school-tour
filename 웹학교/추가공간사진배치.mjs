@@ -4,8 +4,11 @@ import {subtractBox} from './창문배치.mjs';
 import {magpieRoomInterior,MAGPIE_ID} from './까치방사진배치.mjs';
 import {octoberRoomInterior} from './현관상담사진배치.mjs';
 import {OCT6_REFERENCES} from './현관상담사진근거.mjs';
+import {OCT8_SPACE_REFERENCES,OCT8_BUILDERS} from './십월팔일특별실배치.mjs';
+import {research6PhotoLayout,computerPhotoLayout} from './연수실컴퓨터실수정.mjs';
 // Geometry is fitted to the existing room bounds; photos do not resurvey walls.
 export const EXTRA_PHOTO_ROOMS={
+ ...OCT8_SPACE_REFERENCES,
  '1F_MAIN_LOBBY':{count:15,kind:'lobby',features:['양쪽 유리 출입문','반투명 하부 필름','벽걸이 TV와 안내 게시판','집 모양 독서 벤치','점자블록과 현관 매트']},
  '3F_COUNSELING':{count:27,kind:'counseling',features:['살구·민트 벽','주황 벤치와 흰 상담탁자','모래놀이 상자','미니어처 흰 수납장','민트 원형 상담탁자','풍경 블라인드']},
  '2F_GRADE3_RESEARCH':{count:9,kind:'research3',features:['긴 목재 회의탁자','검정 회의의자','유리 자료장','창가 연두 업무의자','복합기와 자료 분류장']},
@@ -19,8 +22,8 @@ export const EXTRA_PHOTO_ROOMS={
  '3F_GRADE1_RESEARCH':{count:8,kind:'research1',features:['긴 타원 목재 회의탁자','벽면 유리 교구장','검정 회의의자와 연두 회전의자','컴퓨터 업무탁자','복사기','빨간 창틀과 회색 타일']},
  '3F_INDIVIDUAL_3':{count:8,kind:'individual3',features:['긴 연결형 개별 탁자','목재 의자','흰 수납장과 냉장고','노랑·연두 벽띠','청록 겨울 풍경 블라인드','교사용 모니터 책상']},
  '2F_INDIVIDUAL_1':{count:8,kind:'individual1',features:['ㄷ자 목재 모둠탁자','파란 하부 수납벽과 연두 상부','전면 화면','교사용 모니터 책상 여러 개','독서 책장과 정리함','빨간 창틀과 밝은 그림 블라인드']},
- '4F_GRADE6_RESEARCH':{count:6,kind:'research6',features:['목재 유리 교구장 벽','노란 중앙판 둥근 회의탁자','검정 의자','교구통과 자료','PC와 복합기','냉장고와 싱크대']},
- '4F_COMPUTER':{count:6,kind:'computer',features:['목재 컴퓨터 책상 열','갈색 학생 의자','빨간 창틀','앞 대형 스크린','천장 색색 가랜드와 풍선','벽면 컴퓨터부 안내판']},
+ '4F_GRADE6_RESEARCH':{count:6,kind:'research6',reviewedAt:'2026-10-08',features:['입구 왼쪽 천장 높이 은색 유리문 교구장','길쭉한 타원 회의탁자와 노란 매트·유리 덮개','양쪽 검정 회의 의자','투명 교구통·정리 바구니·트레이','오른쪽 PC 책상 두 개와 복합기','창가 냉장고와 싱크대']},
+ '4F_COMPUTER':{count:6,kind:'computer',reviewedAt:'2026-10-08',features:['학생 모니터와 의자 방향 반전','전면 가운데 흰 롤형 빔 스크린과 천장 프로젝터','스크린을 바라볼 때 우측 구석 교사용 책상','목재 컴퓨터 책상 열과 갈색 의자','빨간 창틀','천장 색색 가랜드·풍선과 컴퓨터부 안내판']},
  '2F_CARE_DREAM_HOPE':{count:8,kind:'careHope',features:['원목 사각·반원 활동탁자','원목 어린이 의자','흰 벽면 붙박이장','초록 칠판','검정 냉장고와 전자레인지','창가 낮은 책장']},
 };
 const colors=['#dcbd63','#78a1ac','#a7bd70','#b588a0','#dc936e'];
@@ -29,7 +32,7 @@ function makeRoom(room,worldBoxes,recipe){
  const [x,X,y,Y,z]=room.bounds,sx=(X-x)/10,sy=(Y-y)/7;
  // Author in a ten-by-seven reference frame, keeping original architectural doors.
  const virtual={...room,bounds:[x,x+10,y,y+7,z,z+3.15]};
- const p=photoRoom(virtual,worldBoxes,{...recipe,...PHOTO_REFERENCES[room.id],reviewedAt:'2026-10-02',approximateDimensions:true,peopleExcluded:true});
+ const p=photoRoom(virtual,worldBoxes,{...recipe,...PHOTO_REFERENCES[room.id],reviewedAt:recipe.reviewedAt??'2026-10-02',approximateDimensions:true,peopleExcluded:true});
  const {config:c,add,table,monitor}=p;c.additionalRoom=true;c.photoSupport=true;c.room=room;
  function cabinet(name,a,b,w,d,h,color,open=false,facing='south'){
   const start=c.boxes.length,startC=c.colliders.length;p.cabinet(name,a,b,w,d,h,color,open,facing);
@@ -69,7 +72,8 @@ function makeRoom(room,worldBoxes,recipe){
  // Convert authored geometry once; renderer and collision use the same transform.
  const point=(a,b,h=0)=>({x:x+a*sx,y:y+b*sy,z:z+h});
  for(const item of [...c.boxes,...c.colliders]){const b=item.bounds;item.bounds=[x+(b[0]-x)*sx,y+(b[1]-y)*sy,b[2],x+(b[3]-x)*sx,y+(b[4]-y)*sy,b[5]];}
- for(const q of c.chairs){q.x=x+(q.x-x)*sx;q.y=y+(q.y-y)*sy;q.scale=Math.min(1,sx,sy);}
+ for(const q of c.chairs){q.x=x+(q.x-x)*sx;q.y=y+(q.y-y)*sy;q.scale=recipe.kind==='research6'?.95:Math.min(1,sx,sy);}
+ if(recipe.kind==='research6')for(const b of c.colliders.filter(b=>/의자/.test(b.name))){const a=b.bounds,cx=(a[0]+a[3])/2,cy=(a[1]+a[4])/2;b.bounds=[cx-.2375,cy-.2375,a[2],cx+.2375,cy+.2375,a[5]];}
  c.panels=c.panels.map(q=>({...q,...point(q.x,q.y,q.z),width:q.width*(q.axis==='y'?sx:sy)}));
  c.props=c.props.map(q=>({...q,...point(q.x,q.y,q.z),sx,sy}));
  c.point=point;
@@ -81,6 +85,7 @@ function makeRoom(room,worldBoxes,recipe){
 }
 
 const BUILDERS={
+ ...OCT8_BUILDERS,
  science({add,table,cabinet,seat,sink,screen,panel}){
   for(let i=0;i<6;i++)sink(.3+i*1.25,.2,1.2);
   for(let row=0;row<2;row++)for(let col=0;col<3;col++){
@@ -173,34 +178,8 @@ const BUILDERS={
   cabinet('흰 붙박이장',7.5,.18,2.1,.55,2.75,'#e4e6dc');
   panel('그림 블라인드',.18,3.2,2.1,4.9,.68,'x','landscape');toys(3.25,4.81,.77,3.5);
  },
- research6({c,add,table,cabinet,seat,fridge,sink,copier,workDesk,toys}){
-  for(let i=0;i<6;i++){
-   cabinet('목재 교구장 '+i,8.8,.3+i*1.04,.65,.96,2.95,'#bda780',true,'west');
-   add('교구장 유리 '+i,[8.76,.34+i*1.04,.85,8.78,1.20+i*1.04,2.45],'#98b7ad','clear_glass');
-   for(const yy of [.31+i*1.04,1.22+i*1.04])add('유리장 은색틀',[8.74,yy,.8,8.79,yy+.028,2.49],'#bccbc3','metal');
-  }
-  table('노란판 회의탁자',4.1,2.05,2.2,3.15,.75,'#d0b88b');
-  add('노란 중앙 매트',[4.12,2.30,.804,6.28,4.88,.81],'#d7ce6b');
-  c.props.push({type:'roundedTable',x:5.2,y:3.63,z:.77,w:2.2,d:3.4,color:'#c8ac7c'});
-  for(let i=0;i<3;i++){seat('검정 회의 의자',3.5,2.4+i*1.05,-Math.PI/2,'#2e3b38');seat('검정 회의 의자',6.95,2.4+i*1.05,Math.PI/2,'#2e3b38');}
-  toys(4.45,3,.82,1.4);toys(4.45,4,.82,1.4);
-  workDesk(.2,4.2);copier(.2,2.8);fridge(.2,5.75);sink(1.15,6.15,1.4);
-  for(let i=0;i<4;i++)add('복사용지 상자',[.25,4.34,.81+i*.22,.86,4.92,1+i*.22],'#bb9f70');
- },
- computer({c,add,table,monitor,seat,panel,screen}){
-  screen(3.5,6.72,3.4,1.5);panel('컴퓨터부 안내판',5,.17,1.7,7.6,1.28,'y','computer-posters');
-  for(let row=0;row<4;row++)for(let col=0;col<4;col++){
-   const a=.65+col*1.91,b=.9+row*1.3;
-   table('컴퓨터 책상 '+row+col,a,b,1.62,.60,.73,'#baa07a');
-   add('컴퓨터 책상 가림판',[a+.03,b+.5,.07,a+1.59,b+.56,.74],'#c4aa83','wood',true);
-   monitor('학생 컴퓨터 '+row+col,a+.48,b+.37,.79);seat('갈색 학생 의자',a+.82,b-.35,Math.PI,'#754c3f');
-   add('키보드',[a+.4,b+.09,.79,a+1.10,b+.28,.82],'#303c39');
-   panel('학습 모니터',a+.765,b+.361,1.134,.52,.30,'y','screen');
-  }
-  for(let i=0;i<12;i++)c.props.push({type:'flag',x:.8+i*.7,y:3.6,z:2.79-Math.sin(i/11*Math.PI)*.28,color:colors[i%5]});
-  for(let i=0;i<5;i++)c.props.push({type:'balloon',x:.6+i*2,y:5.9,z:2.65,color:colors[i%5]});
-  for(let i=0;i<4;i++){add('빨간 외창 세로틀',[.14,.35+i*1.55,.95,.18,.40+i*1.55,2.48],'#a9544c');add('외창 흰 블라인드',[.16,.42+i*1.55,1.92,.18,1.74+i*1.55,2.48],'#dbded3','fabric');}
- },
+ research6:research6PhotoLayout,
+ computer:computerPhotoLayout,
  careHope({c,add,table,cabinet,seat,cubbies,fridge,sink,panel,toys,workDesk}){
   for(let i=0;i<4;i++)cabinet('흰 붙박이장 '+i,.18+i*1.17,.16,1.12,.54,2.98,'#e8e7df');
   fridge(5.2,.17,'#2c3a3c');sink(6.05,.17,1.5);cabinet('전자레인지장',7.85,.16,1.6,.60,1.15,'#e4e3d9');

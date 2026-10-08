@@ -37,6 +37,7 @@ import {connectPrincipalMeeting} from './교장실연결문.mjs';
 import {teacherOfficeChairs} from './교사자리와창팻말.mjs';
 import {addOctoberOutdoorFinish} from './정후문사진배치.mjs';
 import {rebuildRostrum} from './구령대배치.mjs';
+import {resizeOversizedClassrooms} from './큰교실면적조정.mjs';
 export const PLAYER_RADIUS=.28, PLAYER_HEIGHT=1.7, EYE_HEIGHT=1.58;
 const EPS=.0001, CELL=4;
 const intersect=(x,y,r,b)=>{
@@ -57,6 +58,7 @@ function localBounds(f,u0,u1,v0,v1,z0,z1){
 }
 export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,exterior=true,annexFinish=true,restrooms=true,principalOffice=true,basement=true,audioPhotos=true,centralStairPhotos=true,broadcastPhotos=true,broadcastControl=true,uploadedClassPhotos=true,additionalPhotos=true}={}){
   data=applyGroundFloorPlan(data);
+  data=resizeOversizedClassrooms(data);
   if(restrooms)data=applyRestroomPlan(data);
   if(basement)data=applyBasementPlan(data);
   const {left:entranceLeft,right:entranceRight,height:entranceHeight}=LOBBY_OPEN;
