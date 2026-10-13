@@ -1,0 +1,26 @@
+{
+  "runtimeCommit": "510c26d",
+  "deploymentId": "2a05ce49-8f6a-41c2-8d8c-f4e8a554abe6",
+  "status": "SUCCESS",
+  "url": "https://school-tour-production.up.railway.app/",
+  "customDomain": "https://tour.seokam.es.kr/",
+  "publicRuntimeFilesMatched": 152,
+  "healthStatus": 200,
+  "customDomainHealthStatus": 200,
+  "unauthenticatedAdminStatus": 401,
+  "privateFileStatus": 403,
+  "browser": {
+    "overviewRendered": true,
+    "autoOrbit": true,
+    "groundedCampusBackdrop": true,
+    "studentModelLoaded": true,
+    "class64Teleport": true,
+    "interactiveDoors": 77,
+    "classroomSlidingDoors": 41,
+    "publicTestHookAbsent": true,
+    "pageErrors": []
+  },
+  "localChecks": ["77 door layouts and passage checks", "desktop F and mobile touch close/reopen", "600 idle frames without physics steps", "static transforms and colors preserved", "77 photo references in 7 spaces", "library desk orientation", "production packaging"],
+  "limitations": ["Browser validation is not a physical phone performance benchmark"],
+  "excluded": ["original photo uploads", "unused face experiments", "local test outputs"]
+}
