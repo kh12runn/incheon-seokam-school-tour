@@ -16,6 +16,9 @@ __pycache__/
 node_modules/
 .railway/
 /배포자료/
+/output/
+/.playwright-cli/
+/debug.log
 
 # Only generated instructions are tracked in the photo intake tree.
 /촬영사진_넣는곳/**/*

@@ -1,0 +1,79 @@
+{
+  "reviewedAt": "2026-10-13",
+  "catalogSha": "8d88fc5b7c95930e618a38ec8f992e41babe84b2",
+  "baselineCatalogSha": "6ef20010d736dcdbffdd37696007bd23f1c24d5c",
+  "newPhotos": 77,
+  "spaces": [
+    {
+      "roomId": "3F_BOOK_LIBRARY",
+      "sourceRoomId": "OTHER_MISC",
+      "photoCount": 21,
+      "sourceRevision": "c89f7b7e-cba5-4031-8581-b77fe73a3c47",
+      "implementation": "local-verified",
+      "locationConfirmedByUser": true,
+      "location": "본관 3층 책터 도서관 내부"
+    },
+    {
+      "roomId": "2F_3-6",
+      "sourceRoomId": "2F_3-6",
+      "photoCount": 6,
+      "sourceRevision": "e51de1a0-c460-48cf-943f-ebf85783dc51",
+      "implementation": "local-verified"
+    },
+    {
+      "roomId": "3F_2-5",
+      "sourceRoomId": "3F_2-5",
+      "photoCount": 6,
+      "sourceRevision": "41fc5284-44c7-4f02-86ea-009335b0c2f8",
+      "implementation": "local-verified"
+    },
+    {
+      "roomId": "2F_3-7",
+      "sourceRoomId": "2F_3-7",
+      "photoCount": 6,
+      "sourceRevision": "7040a96b-636c-45d1-8e96-e6f0b6b37882",
+      "implementation": "local-verified"
+    },
+    {
+      "roomId": "1F_CAFETERIA",
+      "sourceRoomId": "custom_62bd284c95074790a9a33fe8ac6321c3",
+      "photoCount": 18,
+      "sourceRevision": "f3148838-2235-45bc-9f08-cea94abc84a8",
+      "implementation": "local-verified"
+    },
+    {
+      "roomId": "2F_1-2",
+      "sourceRoomId": "2F_1-2",
+      "photoCount": 9,
+      "sourceRevision": "215258c0-7c58-462a-b4d0-63c8041cd531",
+      "implementation": "local-verified"
+    },
+    {
+      "roomId": "3F_2-4",
+      "sourceRoomId": "3F_2-4",
+      "photoCount": 11,
+      "sourceRevision": "2bf0f453-bc1a-4042-90af-b7f0662d9bee",
+      "implementation": "local-verified"
+    }
+  ],
+  "checks": {
+    "originalPlanAndOtherRoomsPreserved": true,
+    "photosNotPublished": true,
+    "peopleExcluded": true,
+    "classroomCollisionAndDoorRoutes": [
+      30,
+      60,
+      144
+    ],
+    "specialRoomFloodFill": true,
+    "renderedViews": 14,
+    "actualKeyboardMovementRooms": 7,
+    "pageErrors": 0,
+    "productionPackage": true
+  },
+  "browserNotes": [
+    "healthz 기반 독립 렌더링 페이지의 favicon.ico 403은 기존 정적 허용 목록 동작; 실제 탐험 화면 JavaScript 오류 없음",
+    "첫 짧은 키 입력 검사에서 1개 방 입력이 잡히지 않아 메뉴 종료 대기 및 입력 시간을 보완; 최종 7개 방 W 이동 성공"
+  ],
+  "deployment": "Not requested this turn; not committed, pushed, or deployed."
+}

@@ -38,6 +38,7 @@ import {teacherOfficeChairs} from './교사자리와창팻말.mjs';
 import {addOctoberOutdoorFinish} from './정후문사진배치.mjs';
 import {rebuildRostrum} from './구령대배치.mjs';
 import {resizeOversizedClassrooms} from './큰교실면적조정.mjs';
+import {createRoomDoors} from './출입문.mjs';
 export const PLAYER_RADIUS=.28, PLAYER_HEIGHT=1.7, EYE_HEIGHT=1.58;
 const EPS=.0001, CELL=4;
 const intersect=(x,y,r,b)=>{
@@ -56,7 +57,7 @@ function localBounds(f,u0,u1,v0,v1,z0,z1){
   const p=localPoint(f,u0,v0),q=localPoint(f,u1,v1);
   return [Math.min(p.x,q.x),Math.min(p.y,q.y),z0,Math.max(p.x,q.x),Math.max(p.y,q.y),z1];
 }
-export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,exterior=true,annexFinish=true,restrooms=true,principalOffice=true,basement=true,audioPhotos=true,centralStairPhotos=true,broadcastPhotos=true,broadcastControl=true,uploadedClassPhotos=true,additionalPhotos=true}={}){
+export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,exterior=true,annexFinish=true,restrooms=true,principalOffice=true,basement=true,audioPhotos=true,centralStairPhotos=true,broadcastPhotos=true,broadcastControl=true,uploadedClassPhotos=true,additionalPhotos=true,interactiveDoors=false}={}){
   data=applyGroundFloorPlan(data);
   data=resizeOversizedClassrooms(data);
   if(restrooms)data=applyRestroomPlan(data);
@@ -206,6 +207,9 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
   const teacherChairs=teacherOfficeChairs(data,boxes,colliders);
   const recyclingShelter=addRecyclingShelter(boxes,colliders);
   const hallPhotoFinish=basement?addHallPhotoFinish(boxes,colliders,data.floorHeight):null;
+  // Opt in for live gameplay; geometry-only furniture/access audits retain their
+  // open-door world. Interactive tests explicitly enable and operate the leaves.
+  const roomDoors=interactiveDoors?createRoomDoors(data,boxes,colliders):null;
   const grid=(items)=>{
     const map=new Map();
     for(const item of items){const b=item.spatialBounds??item.bounds;for(let x=Math.floor((b[0]-.5)/CELL);x<=Math.floor((b[3]+.5)/CELL);x++)for(let y=Math.floor((b[1]-.5)/CELL);y<=Math.floor((b[4]+.5)/CELL);y++){
@@ -251,7 +255,7 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
     const found=data.rooms.find(r=>parseInt(r.floor)===floor&&['classroom','special_room','entrance','toilet'].includes(r.type)&&p.x>r.bounds[0]&&p.x<r.bounds[1]&&p.y>r.bounds[2]&&p.y<r.bounds[3]);
     return {floor,room:found};
   }
-  function floorBelow(x,y,z,{ignoreVehicles=false}={}){
+  function floorBelow(x,y,z,{ignoreVehicles=false,ignoreDoors=false}={}){
     let best=-Infinity;
     for(const s of query(floorGrid,x,y)){
       const b=s.bounds;if(x<b[0]-EPS||x>b[3]+EPS||y<b[1]-EPS||y>b[4]+EPS)continue;
@@ -260,6 +264,7 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
     // Solid furniture/slabs can support a landing; never drop through their tops.
     for(const s of nearWalls(x,y)){
       if(ignoreVehicles&&s.vehicleId)continue;
+      if(ignoreDoors&&s.dynamicDoor)continue;
       const b=s.bounds;if(b[5]<=z+.025&&b[5]>best&&intersect(x,y,PLAYER_RADIUS,b))best=b[5];
     }
     return best;
@@ -269,5 +274,5 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
     let q={...p};if(!blocked(q.x+dx,q.y,q.z))q.x+=dx;
     if(!blocked(q.x,q.y+dy,q.z))q.y+=dy;return q;
   }
-  return {data,boxes,colliders,surfaces,stairs,classroom64,classroom21,classroomsMain,classroomInteriors,uploadedAnnex,specialInteriors,officeDoor,teacherChairs,centralStairFinish,recyclingShelter,hallPhotoFinish,principalOffice:office,move,candidate,blocked,support,floorBelow,moveAir,roomAt,spawn:{...OUTDOOR_SPAWN}};
+  return {data,boxes,colliders,surfaces,stairs,classroom64,classroom21,classroomsMain,classroomInteriors,uploadedAnnex,specialInteriors,officeDoor,roomDoors,teacherChairs,centralStairFinish,recyclingShelter,hallPhotoFinish,principalOffice:office,move,candidate,blocked,support,floorBelow,moveAir,roomAt,spawn:{...OUTDOOR_SPAWN}};
 }

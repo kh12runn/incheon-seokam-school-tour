@@ -1,5 +1,6 @@
 import * as THREE from './외부도구/three.module.js';
 import {drawOctoberClassBoard} from './십월팔일교실표현.mjs';
+import {drawOct13Board} from './십월십삼일교실표현.mjs';
 const paperColors=['#d9b5b1','#c6d5ae','#bbcfd8','#e2d295','#bcb0cd'];
 export function uploadedClassroomDetails(config){
   const {profile,frame,room,photoDetails}=config,group=new THREE.Group();group.name=room.name+' 업로드 사진별 특징';
@@ -27,7 +28,7 @@ export function uploadedClassroomDetails(config){
   panel('사진 참고 뒤 게시판',5.64,1.19,9.706,-3.51,2.0,'u',-1,(c,w,h)=>{
     const sky=c.createLinearGradient(0,0,0,h);sky.addColorStop(0,'#9cbfc9');sky.addColorStop(.78,'#d4e2d4');sky.addColorStop(.8,'#a1b574');sky.addColorStop(1,'#91a263');c.fillStyle=sky;c.fillRect(0,0,w,h);
     const style=profile.back;
-    if(drawOctoberClassBoard(c,w,h,style)){
+    if(drawOctoberClassBoard(c,w,h,style)||drawOct13Board(c,w,h,style)){
       // Classroom-specific October photo layouts, drawn without private images.
     }else if(style==='leaf-worksheets'){
       // Re-create the three displays without copying pupil photographs or names.
@@ -108,6 +109,7 @@ export function uploadedClassroomDetails(config){
   panel('칠판 수업 안내',4.55,1.34,room.building==='ANNEX'?.40:.285,-3.39,1.68,'u',1,(c,w,h)=>{
     c.fillStyle=profile.board==='white-full'?'#ecefe5':'#294d42';c.fillRect(0,0,w,h);
     if(profile.board.startsWith('white')){c.fillStyle='#ecefe5';c.fillRect(profile.board==='white-wide'?w*.12:profile.board==='white-narrow'?w*.46:w*.33,0,profile.board==='white-wide'?w*.72:profile.board==='white-narrow'?w*.3:w*.43,h);}
+    if(profile.board==='green-right-white'){c.fillStyle='#ecefe5';c.fillRect(w*.84,0,w*.16,h);}
     c.fillStyle='#e4e9d4';c.font='23px "Malgun Gothic",sans-serif';c.fillText(room.name,21,35);
     for(let i=0;i<6;i++){c.fillStyle=paperColors[i%5];c.fillRect(18,65+i*29,70,21);}
     c.fillStyle='#d8dbc5';c.font='18px sans-serif';c.fillText('함께 배우고 서로 도와요',w*.24,h-22);

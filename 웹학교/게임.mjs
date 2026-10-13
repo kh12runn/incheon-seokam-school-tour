@@ -1,7 +1,7 @@
 import * as THREE from './외부도구/three.module.js';
 import {buildWorld,EYE_HEIGHT,localPoint} from './이동물리.mjs';
 import {floorDestination} from './층별이동.mjs';
-import {surfaceKind,finishMaterial,softEnvironment} from './현실재질.mjs';
+import {surfaceKind,finishMaterial,softEnvironment,batchSurfaceColors,surfaceInstanceColor} from './현실재질.mjs';
 import {ELEVATOR,nearElevator,elevatorDestination} from './엘리베이터.mjs';
 import {shoeCabinets} from './사진참고마감.mjs';
 import {createStudent,CHARACTER_NAMES,RUN_SPEED,STUDENT_HEIGHT} from './학생캐릭터.mjs';
@@ -24,7 +24,7 @@ import {drivingControls} from './운전화면.mjs';
 import {supportRoomDetails} from './지원실사진표현.mjs';
 import {recyclingShelterDetails} from './분리수거장사진표현.mjs';
 import {OUTDOOR_YAW} from './운동장환경.mjs';
-import {clearDaySky,playgroundTrees} from './야외풍경.mjs';
+import {clearDaySky,playgroundTrees,campusGroundBackdrop} from './야외풍경.mjs';
 import {createFootballPhysics} from './축구공물리.mjs';
 import {footballDetails} from './축구공표현.mjs';
 import {faceMonitorsTowardBoard} from './모니터방향.mjs';
@@ -41,6 +41,8 @@ import {nurseRoomDetails} from './보건실사진표현.mjs';
 import {INDIVIDUAL_REFERENCES} from './개별학습실사진배치.mjs';
 import {individualLearningDetails} from './개별학습실사진표현.mjs';
 import {officeConnectingDoor} from './교장실연결문표현.mjs';
+import {roomDoorVisuals,doorControls} from './출입문표현.mjs';
+import {freezeStaticTree} from './정적장면최적화.mjs';
 import {teacherChairDetails,classroomWindowSigns} from './교사자리와창팻말표현.mjs';
 import {audioRoomDetails} from './시청각실사진표현.mjs';
 import {AUDIO_ID} from './시청각실사진배치.mjs';
@@ -153,8 +155,9 @@ function textTexture(text,background=false){
   lines.forEach((s,i)=>ctx.fillText(s,c.width/2,44+i*68,c.width-12));
   const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;return {tex,ratio:c.width/c.height};
 }
-let connectingDoorVisual;
+let connectingDoorVisual,roomDoorVisual,doorUI,staticObjects=0;
 function buildVisuals(){
+  scene.add(campusGroundBackdrop());
   scene.add(campusEntranceDetails(world.boxes));
   const parkedCars=parkedCarDetails();carVisual=parkedCars;scene.add(parkedCars);visuals.push({mesh:parkedCars,floor:0,ceiling:false});
   scene.add(playgroundTrees());footballPhysics=createFootballPhysics(world);footballVisual=footballDetails(footballPhysics);scene.add(footballVisual.group);
@@ -170,6 +173,7 @@ function buildVisuals(){
   const hallDetails=hallPhotoDetails(world.hallPhotoFinish);scene.add(hallDetails);visuals.push({mesh:hallDetails,floor:0,ceiling:false});
   const office=createPrincipalOffice();scene.add(office);visuals.push({mesh:office,floor:2,interiorRoom:PRINCIPAL_ID,center:convert(world.principalOffice.spawn),ceiling:false});
   connectingDoorVisual=officeConnectingDoor(world.officeDoor);scene.add(connectingDoorVisual);
+  roomDoorVisual=roomDoorVisuals(world.roomDoors);scene.add(roomDoorVisual);doorUI=doorControls(doorAction);
   const roomDetails=class64Details();scene.add(roomDetails);visuals.push({mesh:roomDetails,floor:4,ceiling:false});
   class64PhotoFinish=roomDetails.userData.photoFinish;
   if(world.classroom21){
@@ -185,18 +189,21 @@ function buildVisuals(){
   const exteriorBoxes=[...faceMonitorsTowardBoard(world.boxes).map(exteriorRenderBox).filter(Boolean),...exteriorSkins(world.boxes,data)];
   for(const b of exteriorBoxes){
     if(b.shape==='terrain'||b.renderInDetails)continue;
-    const groupKey=b.color.join(',')+'|'+b.floor+'|'+(b.kind==='ceiling'?'ceiling':'normal')+'|'+surfaceKind(b)+'|'+(b.interiorRoom??'')+'|'+(b.shape??'box');
+    const groupKey=(batchSurfaceColors(b)?'instance':b.color.join(','))+'|'+b.floor+'|'+(b.kind==='ceiling'?'ceiling':'normal')+'|'+surfaceKind(b)+'|'+(b.interiorRoom??'')+'|'+(b.shape??'box');
     if(!groups.has(groupKey))groups.set(groupKey,[]);groups.get(groupKey).push(b);
   }
   const matrix=new THREE.Matrix4(),quaternion=new THREE.Quaternion();
   for(const items of groups.values()){
-    const mesh=new THREE.InstancedMesh(items[0].shape==='sphere'?sphere:geometry,finishMaterial(items[0]),items.length);
+    const colored=batchSurfaceColors(items[0]);
+    const mesh=new THREE.InstancedMesh(items[0].shape==='sphere'?sphere:geometry,finishMaterial(colored?{...items[0],color:[1,1,1]}:items[0]),items.length);
     mesh.castShadow=!['clear_glass','glass','lamp','ground','soil','asphalt','chalk'].includes(surfaceKind(items[0]));mesh.receiveShadow=true;
     items.forEach((b,i)=>{const a=b.bounds;
       quaternion.identity();if(b.rotation)quaternion.copy(upConversion).multiply(new THREE.Quaternion().setFromEuler(new THREE.Euler(...b.rotation))).multiply(upConversion.clone().invert());
       matrix.compose(new THREE.Vector3((a[0]+a[3])/2,(a[2]+a[5])/2,-(a[1]+a[4])/2),quaternion,new THREE.Vector3(a[3]-a[0],a[5]-a[2],a[4]-a[1]));
       mesh.setMatrixAt(i,matrix);
+      if(colored)mesh.setColorAt(i,surfaceInstanceColor(b));
     });
+    if(colored)mesh.instanceColor.needsUpdate=true;
     mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();scene.add(mesh);
     const interiorRoom=items[0].interiorRoom,config=[...world.classroomInteriors,...world.specialInteriors].find(r=>r.roomId===interiorRoom);
     const roomBounds=data.rooms.find(r=>r.id===interiorRoom)?.bounds;
@@ -256,6 +263,8 @@ function buildVisuals(){
     const beacon=new THREE.Mesh(new THREE.OctahedronGeometry(.16),new THREE.MeshBasicMaterial({color:[0,0xffb54c,0xbd99ff,0x39d7b2,0xffdb50][floor]}));
     beacon.position.set(58,(floor-1)*3.4+1.15,-1.5);beacon.userData.floor=floor;markerGroup.add(beacon);
   }
+  const moving=new Set([avatar.root,markerGroup,carVisual,footballVisual.group,connectingDoorVisual,roomDoorVisual]);
+  for(const root of scene.children)if(!moving.has(root)&&!root.isLight&&!root.isCamera)staticObjects+=freezeStaticTree(root);
 }
 function overviewCamera(dt){
   if(camera.fov!==76){camera.fov=76;camera.updateProjectionMatrix();}
@@ -285,6 +294,11 @@ function vehicleAction(){
   const success=driving.phase==='walking'?driving.enter(position):driving.exit();
   if(success){jumpMotion.reset();lastDriveYaw=null;}
   if(!success&&driving.error)notice(driving.error);clearInput();canvas.focus({preventScroll:true});
+}
+function doorAction(){
+  if(!isPlaying()||driving.phase!=='walking')return false;
+  const used=world.roomDoors.toggle(position);
+  if(used)canvas.focus({preventScroll:true});return used;
 }
 function cameraDrive(dt){
   const car=driving.active,p=car.body.position,state=driving.getState();
@@ -488,9 +502,9 @@ document.addEventListener('keydown',e=>{
   }
   if(e.code==='Escape'&&$('게임메뉴').open){e.preventDefault();if(!e.repeat)dismissMenu();return;}
   if($('게임메뉴').open||$('탐험방법선택').open||$('주차장선택').open||$('승강기창').open||characterPicker.isOpen()||elevatorBusy)return;
-  if(['INPUT','SELECT','TEXTAREA','BUTTON','SUMMARY'].includes(e.target.tagName)&&e.code!=='Escape')return;
+  if(['INPUT','SELECT','TEXTAREA','BUTTON','SUMMARY'].includes(e.target.tagName)&&e.code!=='Escape'&&!(e.code==='KeyF'&&e.target.id==='출입문조작'))return;
   if(isPlaying()&&['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)){keys.add(e.code);e.preventDefault();}
-  if(e.code==='KeyF'&&isPlaying()&&!e.repeat){e.preventDefault();vehicleAction();}
+  if(e.code==='KeyF'&&isPlaying()&&!e.repeat){e.preventDefault();if(!doorAction())vehicleAction();}
   if(e.code==='Space'&&isPlaying()){
     e.preventDefault();if(driving.phase==='driving')keys.add('Space');else if(!e.repeat)jump();
   }
@@ -564,6 +578,7 @@ function frame(now){
     const dx=(-Math.sin(yaw)*forward+Math.cos(yaw)*right)*speed,dy=(Math.cos(yaw)*forward+Math.sin(yaw)*right)*speed;
     const a=1-Math.exp(-dt*14);velocity.x+=(dx-velocity.x)*a;velocity.y+=(dy-velocity.y)*a;
     if(length&&avatar.getState().waving)avatar.cancelWave();
+    world.roomDoors.update(dt,position,{x:velocity.x*dt,y:velocity.y*dt});
     position=jumpMotion.step(position,velocity.x*dt,velocity.y*dt,dt);
     for(const npc of principalPositions()){
       if(blocksPrincipal(previous,position,npc)){
@@ -577,6 +592,7 @@ function frame(now){
   driving.sync(isPlaying()?dt:0);updateDrivenCars(carVisual,driving);
   if(driving.phase==='driving')position=driving.seat();else if(driving.phase==='walking'||driving.phase==='approaching')lastDriveYaw=null;
   vehicleUI.update(driving,position,isPlaying());
+  roomDoorVisual.userData.update(position,mode==='walk');doorUI.update(world.roomDoors,position,isPlaying()&&driving.phase==='walking');
   scene.backgroundRotation.y=elapsed*.0006;
   if(officeNearby&&!officePrincipals){officePrincipals=createOfficePrincipalModels(world);[principalNPC]=officePrincipals.characters;scene.add(principalNPC.root);}
   if(officeNearby&&!officeWasNearby)void officePrincipals.load();
@@ -632,7 +648,7 @@ function frame(now){
 requestAnimationFrame(frame);
 try{
   const response=await fetch(new URL('./학교구조.json',import.meta.url));if(!response.ok)throw new Error('학교 구조 파일 '+response.status);
-  world=buildWorld(await response.json());data=world.data;position={...world.spawn};lobbyPrincipalState=createPrincipalWalk(world,'lobby');jumpMotion=createJumpMotion(world);resolveCamera=createCameraCollision([...world.colliders,...world.boxes.filter(b=>b.kind==='step')]);buildVisuals();ready=true;
+  world=buildWorld(await response.json(),{interactiveDoors:true});data=world.data;position={...world.spawn};lobbyPrincipalState=createPrincipalWalk(world,'lobby');jumpMotion=createJumpMotion(world);resolveCamera=createCameraCollision([...world.colliders,...world.boxes.filter(b=>b.kind==='step')]);buildVisuals();ready=true;
   for(let floor=1;floor<=4;floor++){
     const group=document.createElement('optgroup');group.label=floor+'층';
     for(const r of data.rooms.filter(r=>parseInt(r.floor)===floor&&(['classroom','special_room'].includes(r.type)||r.id==='1F_MAIN_LOBBY'))){const option=document.createElement('option');option.value=r.id;option.textContent=r.name;group.append(option);}
@@ -648,6 +664,8 @@ try{
   window.schoolTour.getApprovedAssets=getApprovedAssets;
   window.schoolTour.getFootballState=()=>footballPhysics.getState();
   window.schoolTour.getDrivingState=()=>driving.getState();
+  window.schoolTour.getDoorState=()=>world.roomDoors.getState();
+  window.schoolTour.getPerformanceState=()=>({staticObjects,physics:footballPhysics.getWorkState(),drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures});
   window.schoolTour.getMonthQuizState=()=>monthQuiz.getState();
   window.schoolTour.getLobbyPrincipalState=()=>({...lobbyPrincipalState.getState(),...(lobbyPrincipalNPC?.getState()??{}),visible:lobbyPrincipalNPC?.root.visible??false});
   if(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).has('test'))window.schoolTour.test={

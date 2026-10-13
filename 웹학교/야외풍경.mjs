@@ -1,5 +1,6 @@
 import * as THREE from './외부도구/three.module.js';
 import {EXTRA_TREES} from './운동장환경.mjs';
+import {finishMaterial} from './현실재질.mjs';
 
 // A seamless, locally generated sky bitmap. No school images leave the device.
 export function clearDaySky(){
@@ -15,13 +16,16 @@ export function clearDaySky(){
   }
   function fbm(x,y,z){let n=0,a=.57;for(let i=0;i<5;i++){n+=a*noise(x,y,z);x=x*2.03+3.1;y=y*2.03+5.7;z=z*2.03+1.4;a*=.48;}return n;}
   for(let y=0;y<canvas.height;y++){
+    // Clouds belong above the horizon, never beneath the school in aerial view.
     const theta=y/(canvas.height-1)*Math.PI,up=Math.cos(theta),ring=Math.sin(theta),alt=Math.pow(Math.max(0,up),.48);
     for(let x=0;x<canvas.width;x++){
       const angle=x/canvas.width*Math.PI*2,dx=Math.cos(angle)*ring,dz=Math.sin(angle)*ring;
-      const base=[mix(205,65,alt),mix(226,146,alt),mix(237,215,alt)];
+      const base=[mix(202,72,alt),mix(231,158,alt),mix(250,234,alt)];
+      // Match the distant ground fog at the camera's far clip, avoiding a seam.
+      if(up<0)for(let c=0;c<3;c++)base[c]=[205,226,237][c];
       if(up>.015){
-        const scale=5.6,cloud=fbm(dx*scale+7,up*scale*.85+11,dz*scale+3),mask=THREE.MathUtils.smoothstep(cloud,.49,.66)*THREE.MathUtils.smoothstep(up,.015,.15);
-        const light=THREE.MathUtils.clamp((cloud-fbm(dx*scale+7.09,up*scale*.85+11.14,dz*scale+2.9))*.8+.96,.88,1);
+        const scale=5.6,cloud=fbm(dx*scale+7,up*scale*.85+11,dz*scale+3),mask=THREE.MathUtils.smoothstep(cloud,.47,.60)*THREE.MathUtils.smoothstep(up,.015,.12);
+        const light=THREE.MathUtils.clamp((cloud-fbm(dx*scale+7.09,up*scale*.85+11.14,dz*scale+2.9))*.55+.99,.95,1);
         for(let c=0;c<3;c++)base[c]=mix(base[c],[253,254,253][c]*light,mask);
       }
       const index=(y*canvas.width+x)*4;image.data.set([...base,255],index);
@@ -29,6 +33,15 @@ export function clearDaySky(){
   }
   ctx.putImageData(image,0,0);const texture=new THREE.CanvasTexture(canvas);texture.colorSpace=THREE.SRGBColorSpace;texture.mapping=THREE.EquirectangularReflectionMapping;
   return texture;
+}
+
+export function campusGroundBackdrop(){
+  // Visual-only surroundings, below the basement and existing entrance slope.
+  // A single two-triangle surface: no added collision world or image downloads.
+  const ground=new THREE.Mesh(new THREE.PlaneGeometry(2000,2000),finishMaterial({name:'학교 부지 바깥 지면',material:'ground',color:[.64,.65,.55]}));
+  ground.name='학교 주변 연속 지면';ground.rotation.x=-Math.PI/2;
+  ground.position.set(44,-3.8,30);ground.receiveShadow=true;
+  return ground;
 }
 
 export function playgroundTrees(){

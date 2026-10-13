@@ -6,8 +6,10 @@ import {octoberRoomInterior} from './현관상담사진배치.mjs';
 import {OCT6_REFERENCES} from './현관상담사진근거.mjs';
 import {OCT8_SPACE_REFERENCES,OCT8_BUILDERS} from './십월팔일특별실배치.mjs';
 import {research6PhotoLayout,computerPhotoLayout} from './연수실컴퓨터실수정.mjs';
+import {OCT13_SPACE_REFERENCES,OCT13_BUILDERS} from './십월십삼일특별실배치.mjs';
 // Geometry is fitted to the existing room bounds; photos do not resurvey walls.
 export const EXTRA_PHOTO_ROOMS={
+ ...OCT13_SPACE_REFERENCES,
  ...OCT8_SPACE_REFERENCES,
  '1F_MAIN_LOBBY':{count:15,kind:'lobby',features:['양쪽 유리 출입문','반투명 하부 필름','벽걸이 TV와 안내 게시판','집 모양 독서 벤치','점자블록과 현관 매트']},
  '3F_COUNSELING':{count:27,kind:'counseling',features:['살구·민트 벽','주황 벤치와 흰 상담탁자','모래놀이 상자','미니어처 흰 수납장','민트 원형 상담탁자','풍경 블라인드']},
@@ -60,7 +62,8 @@ function makeRoom(room,worldBoxes,recipe){
  function screen(a,b,w=2.5,h=1.25){add('학습 화면 검정틀',[a,b,1.03,a+w,b+.07,1.03+h],'#263431');panel('학습 화면',a+w/2,b-.008,1.03+h/2,w-.08,h-.08,'y','screen');}
  function toys(a,b,z0=0,w=1.4){for(let i=0;i<8;i++)add('알록달록 교구 '+i,[a+(i%4)*w/4,b+Math.floor(i/4)*.17,z0,a+(i%4)*w/4+.15,b+.13+Math.floor(i/4)*.17,z0+.11+(i%3)*.04],colors[i%5]);}
  function workDesk(a,b){table('교사용 책상',a,b,1.7,.7,.73,'#c6af8d');monitor('업무 모니터',a+.15,b+.40,.79);seat('업무 의자',a+.85,b-.5,Math.PI,'#303f3d',true);}
- p.finish(/research|printing|mealCart/.test(recipe.kind)?'staff_floor':'wood',/research|printing|mealCart/.test(recipe.kind)?'#b9c0ba':'#cabda4');
+ p.finish(/research|printing|mealCart|cafeteria|library/.test(recipe.kind)?'staff_floor':'wood',/research|printing|mealCart|cafeteria|library/.test(recipe.kind)?'#b9c0ba':'#cabda4');
+ if(recipe.kind==='cafeteria')for(const b of c.boxes)if(b.name.endsWith('사진 바닥'))b.material='terrazzo';
  const h={p,c,add,table,cabinet,monitor,panel,seat,cubbies,fridge,copier,sink,screen,toys,workDesk};
  BUILDERS[recipe.kind](h);
  if(/research/.test(recipe.kind)){
@@ -85,6 +88,7 @@ function makeRoom(room,worldBoxes,recipe){
 }
 
 const BUILDERS={
+ ...OCT13_BUILDERS,
  ...OCT8_BUILDERS,
  science({add,table,cabinet,seat,sink,screen,panel}){
   for(let i=0;i<6;i++)sink(.3+i*1.25,.2,1.2);

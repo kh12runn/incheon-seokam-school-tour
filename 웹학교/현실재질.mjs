@@ -172,6 +172,14 @@ export function finishMaterial(b){
   material.customProgramCacheKey=()=>kind+'-surface-v2';
   return material;
 }
+// All remaining surface shaders multiply the input diffuse color, so vertex
+// instance color is equivalent. Keep facade's fixed-color mix and transparent
+// glazing in their original batches to retain their exact shader/blend order.
+export const batchSurfaceColors=b=>!['facade','clear_glass'].includes(surfaceKind(b));
+export function surfaceInstanceColor(b){
+  const color=new THREE.Color(...b.color);
+  return surfaceKind(b)==='original'?color:color.convertSRGBToLinear();
+}
 export function softEnvironment(renderer){
   const faces=Array.from({length:6},(_,i)=>{
     const canvas=document.createElement('canvas');canvas.width=canvas.height=64;

@@ -17,8 +17,17 @@ export function createFootballPhysics(school,{random=Math.random,count=BALL_COUN
     const [x,y,z,X,Y,Z]=b;if(X-x<.005||Y-y<.005||Z-z<.005)return;
     const body=new Body({mass:0,material:ground,shape:new Box(new Vec3((X-x)/2,(Y-y)/2,(Z-z)/2)),position:new Vec3((x+X)/2,(y+Y)/2,(z+Z)/2)});world.addBody(body);return body;
   }
-  const field=box([-9.5,-69,-.6,85.5,-11,-.3]),staticSources=new Set();
-  function addObstacle(c){const body=box(c.bounds);if(body){body.vehicleId=c.vehicleId;staticSources.add(c);}}
+  const field=box([-9.5,-69,-.6,85.5,-11,-.3]),staticSources=new Set(),movingDoors=[];
+  function syncDoor(pair){
+    const {source:c,body}=pair,p=c.pose;if(pair.lastPose===p)return false;pair.lastPose=p;
+    body.position.set(p.x+p.ux*c.width/2,p.y+p.uy*c.width/2,(c.bounds[2]+c.bounds[5])/2);body.quaternion.setFromAxisAngle(new Vec3(0,0,1),p.heading);body.aabbNeedsUpdate=true;body.updateAABB();world.broadphase.dirty=true;
+    for(const b of world.bodies)if(b.type!==Body.STATIC&&b.sleepState===Body.SLEEPING){if(b.aabbNeedsUpdate)b.updateAABB();if(body.aabb.overlaps(b.aabb))b.wakeUp();}
+    return true;
+  }
+  function addObstacle(c){
+    if(c.dynamicDoor){const body=box([0,0,c.bounds[2],c.width,.065,c.bounds[5]]);if(body){const pair={source:c,body};movingDoors.push(pair);syncDoor(pair);staticSources.add(c);}return;}
+    const body=box(c.bounds);if(body){body.vehicleId=c.vehicleId;staticSources.add(c);}
+  }
   for(const c of school.colliders){const b=c.bounds;if(b[0]<90&&b[3]>-23&&b[1]<-8&&b[4]>-82&&b[2]<3&&b[5]>-.5)addObstacle(c);}
   const g=GOAL_LAYOUT;for(const y of [g.south-g.depth,g.north+g.depth])box([g.centreX-g.width/2,y-.035,-.3,g.centreX+g.width/2,y+.035,2.1]);
   const balls=[];
@@ -31,9 +40,10 @@ export function createFootballPhysics(school,{random=Math.random,count=BALL_COUN
     const body=new Body({mass:.43,material:rubber,shape:new Sphere(BALL_RADIUS),position:new Vec3(x,y,-.3+BALL_RADIUS+.015),linearDamping:.28,angularDamping:.3,sleepSpeedLimit:.08,sleepTimeLimit:1.2});
     body.home={x,y};body.lastKick=-Infinity;body.kicks=0;world.addBody(body);balls.push(body);
   }
-  let time=0,stepAccumulator=0;
+  let time=0,stepAccumulator=0,physicsSteps=0,idleFrames=0,doorSyncs=0;
   function update(dt,player,previous,{active=true,yaw=0,canKick=true}={}){
     if(!active||dt<=0)return;dt=Math.min(dt,.1);time+=dt;
+    for(const pair of movingDoors)if(syncDoor(pair))doorSyncs++;
     const dx=player.x-previous.x,dy=player.y-previous.y,speed=Math.hypot(dx,dy)/dt;
     for(const b of balls){
       const distance=Math.hypot(b.position.x-player.x,b.position.y-player.y),height=b.position.z-player.z;
@@ -52,8 +62,11 @@ export function createFootballPhysics(school,{random=Math.random,count=BALL_COUN
     // budget is exceeded. On the school terrain that halved real displacement
     // while the speedometer still showed the requested velocity. Use bounded
     // fixed steps without the wall-clock bailout; retain fractional time.
+    // Kicks and door contact above, or vehicle input, wake bodies before this.
+    // No elapsed-time debt: sleeping objects have no motion to integrate.
+    if(!world.bodies.some(b=>b.type!==Body.STATIC&&b.sleepState!==Body.SLEEPING)){stepAccumulator=0;idleFrames++;return;}
     stepAccumulator+=dt;
-    while(stepAccumulator>=1/120-1e-9){world.step(1/120);stepAccumulator-=1/120;}
+    while(stepAccumulator>=1/120-1e-9){world.step(1/120);stepAccumulator-=1/120;physicsSteps++;}
     for(const b of balls){
       if(b.position.z< -5||b.position.x< -23||b.position.x>100||b.position.y< -85||b.position.y>5){
         b.position.set(b.home.x,b.home.y,-.3+BALL_RADIUS);b.velocity.setZero();b.angularVelocity.setZero();b.wakeUp();
@@ -67,7 +80,7 @@ export function createFootballPhysics(school,{random=Math.random,count=BALL_COUN
     for(let x=-24;x<=113;x++){
       // Low sports-car roofs can be below the terrain probe height. Never bake
       // movable cars into the ground: their separate bodies provide collision.
-      const row=[];for(let y=-87;y<=Math.ceil(REAR_GATE.lane[4])+1;y++){const h=school.floorBelow(x,y,.6,{ignoreVehicles:true});row.push(Number.isFinite(h)?h:-.6);}heights.push(row);
+      const row=[];for(let y=-87;y<=Math.ceil(REAR_GATE.lane[4])+1;y++){const h=school.floorBelow(x,y,.6,{ignoreVehicles:true,ignoreDoors:true});row.push(Number.isFinite(h)?h:-.6);}heights.push(row);
     }
     world.addBody(new Body({mass:0,material:ground,shape:new Heightfield(heights,{elementSize:1}),position:new Vec3(-24,-87,0)}));
     for(const body of [...world.bodies])if(body.vehicleId)world.removeBody(body);
@@ -75,5 +88,5 @@ export function createFootballPhysics(school,{random=Math.random,count=BALL_COUN
     const L=REAR_GATE.lane[0],R=REAR_GATE.lane[3],Y=REAR_GATE.lane[4];
     for(const b of [[-24,-87,-4,-23,28,3],[112,-87,-4,113,28,3],[-24,-87,-4,113,-86,3],[-24,27,-4,L,28,3],[R,27,-4,113,28,3],[L-1,27,-4,L,Y+1,3],[R,27,-4,R+1,Y+1,3],[L,Y,-4,R,Y+1,3]])box(b);
   }
-  return {balls,update,world,groundMaterial:ground,enableDrivingTerrain,getState:()=>balls.map((b,id)=>({id,position:{x:b.position.x,y:b.position.y,z:b.position.z},velocity:{x:b.velocity.x,y:b.velocity.y,z:b.velocity.z},kicks:b.kicks,sleeping:b.sleepState===Body.SLEEPING}))};
+  return {balls,update,world,groundMaterial:ground,enableDrivingTerrain,getWorkState:()=>({physicsSteps,idleFrames,doorSyncs}),getState:()=>balls.map((b,id)=>({id,position:{x:b.position.x,y:b.position.y,z:b.position.z},velocity:{x:b.velocity.x,y:b.velocity.y,z:b.velocity.z},kicks:b.kicks,sleeping:b.sleepState===Body.SLEEPING}))};
 }

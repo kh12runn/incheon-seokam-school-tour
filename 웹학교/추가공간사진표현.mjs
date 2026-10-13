@@ -1,12 +1,14 @@
 import * as THREE from './외부도구/three.module.js';
 import {magpieRoomDetails} from './까치방사진표현.mjs';
+import {cafeteriaChairs} from './급식의자표현.mjs';
 // Small code-native textures, not private source photographs.
 export function additionalRoomDetails(c){
  const group=new THREE.Group(),materials=new Map(),textures=new Map();
  if(c.magpieRoom)group.add(magpieRoomDetails(c));
  const mat=color=>{if(!materials.has(color))materials.set(color,new THREE.MeshStandardMaterial({color,roughness:.65}));return materials.get(color);};
  const box=(parent,w,h,d,x,y,z,color)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(color));m.position.set(x,y,z);parent.add(m);return m;};
- for(const chair of c.chairs.filter(q=>!q.magpieStudent)){
+ if(c.reference.kind==='cafeteria')group.add(cafeteriaChairs(c.chairs));
+ for(const chair of c.chairs.filter(q=>!q.magpieStudent&&c.reference.kind!=='cafeteria')){
   const g=new THREE.Group();g.position.set(chair.x,chair.z,-chair.y);g.rotation.y=chair.angle;g.scale.setScalar(chair.scale??1);group.add(g);
   box(g,.46,.065,.43,0,.43,0,chair.color);box(g,.44,.31,.06,0,.65,.20,chair.color);
   if(chair.office){
@@ -17,7 +19,11 @@ export function additionalRoomDetails(c){
  }
  for(const prop of c.props){
   const g=new THREE.Group();g.position.set(prop.x,prop.z,-prop.y);group.add(g);
-  if(prop.type==='roundedTable'){
+  if(prop.type==='cafeteriaColumn'){
+   const body=new THREE.Mesh(new THREE.CylinderGeometry(prop.radius,prop.radius,3.09,20),mat(prop.color));body.position.y=1.545;g.add(body);
+   const base=new THREE.Mesh(new THREE.CylinderGeometry(prop.radius+.003,prop.radius+.003,1.12,20),mat(prop.baseColor));base.position.y=.56;g.add(base);
+   const ring=new THREE.Mesh(new THREE.TorusGeometry(prop.radius+.055,.027,6,24),mat('#bac4bf'));ring.rotation.x=Math.PI/2;ring.position.y=.88;g.add(ring);
+  }else if(prop.type==='roundedTable'){
    const material=prop.glass?new THREE.MeshStandardMaterial({color:prop.color,transparent:true,opacity:.18,roughness:.12,depthWrite:false}):mat(prop.color);
    const mesh=new THREE.Mesh(new THREE.CylinderGeometry(.5,.5,prop.thickness??.055,32),material);mesh.scale.set(prop.w*prop.sx,1,prop.d*prop.sy);g.add(mesh);
    if(!prop.noLegs)for(const x of [-prop.w*.28,prop.w*.28])box(g,.07,Math.max(.12,prop.z-c.room.bounds[4]-.06),.07,x*prop.sx,-(prop.z-c.room.bounds[4])*.5,0,'#a99674');
@@ -38,6 +44,12 @@ export function additionalRoomDetails(c){
    const canvas=document.createElement('canvas');canvas.width=512;canvas.height=256;const ctx=canvas.getContext('2d');ctx.fillStyle=p.color??'#d8ddd0';ctx.fillRect(0,0,512,256);
    if(p.style==='room-sign'){
     ctx.fillStyle='#f5f3e8';ctx.font='bold 84px "Malgun Gothic",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(p.text,256,128,460);
+   }else if(p.style==='library-index'){
+    ctx.fillStyle='#335d6a';ctx.font='bold 37px sans-serif';ctx.fillText('책터 도서관',34,48);ctx.font='25px sans-serif';ctx.fillText('함께 읽는 즐거움',34,226);
+    ctx.fillStyle='#f1eddb';ctx.fillRect(146,88,104,83);ctx.fillRect(256,88,104,83);ctx.strokeStyle='#789c9c';for(let i=0;i<5;i++){ctx.beginPath();ctx.moveTo(160,105+i*12);ctx.lineTo(233,105+i*12);ctx.moveTo(274,105+i*12);ctx.lineTo(346,105+i*12);ctx.stroke();}
+   }else if(p.style==='nutrition'){
+    ctx.fillStyle='#638647';ctx.fillRect(0,0,512,42);ctx.fillStyle='#fffbe5';ctx.font='bold 26px sans-serif';ctx.fillText('골고루 먹고 건강하게 자라요',32,30);
+    for(let i=0;i<3;i++){const x=20+i*166;ctx.fillStyle=['#accb71','#efbe78','#8ab7c6'][i];ctx.fillRect(x,57,150,180);ctx.fillStyle='#fff7e4';ctx.beginPath();ctx.arc(x+75,122,44,0,Math.PI*2);ctx.fill();ctx.fillStyle=['#87a557','#c88955','#b99c66'][i];for(let j=0;j<5;j++){ctx.beginPath();ctx.arc(x+55+(j%3)*19,107+Math.floor(j/3)*20,9,0,Math.PI*2);ctx.fill();}ctx.fillStyle='#405748';ctx.font='22px sans-serif';ctx.fillText(['채소와 과일','따뜻한 식사','깨끗한 식판'][i],x+15,204);}
    }else if(p.style==='plain'||p.style==='whiteboard'){
     ctx.strokeStyle='#929e91';ctx.lineWidth=5;ctx.strokeRect(3,3,506,250);
     if(p.style==='whiteboard'){ctx.strokeStyle='#72928c';ctx.lineWidth=2;for(let n=0;n<5;n++){ctx.beginPath();ctx.arc(58+n*97,128,24+n%2*12,0,Math.PI*2);ctx.stroke();}}

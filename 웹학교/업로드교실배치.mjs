@@ -78,6 +78,12 @@ export function applyUploadedClassroom(config){
   }
   if(profile.shelf==='purple')add('보라색 별빛 가림천',[5.12,-.705,.14,6.68,-.69,1.12],'#674789','fabric');
   const extras=profile.extras??[];
+  if(profile.board==='green-right-white')add('칠판 오른쪽 흰 보드',[.265,-2.08,1.05,.28,-1.42,2.36],'#ecefe5');
+  if(extras.includes('rear-green-baskets'))for(let i=0;i<8;i++){
+    const y=-6.20+i*.66;
+    add('사물함 위 연두 바구니 '+i,[9.34,y,1.15,9.77,y+.57,1.32],'#a1b951');
+    add('바구니 안쪽 '+i,[9.35,y+.025,1.321,9.75,y+.545,1.328],'#839643');
+  }
   if(extras.includes('corridor-white-cabinet')){
     add('복도 흰 수납장',[2.3,-.37,.02,3.65,-.17,1.43],'#e0e4d9','paint',true);
     for(const x of [2.96,3.01])add('흰 수납장 손잡이',[x,-.391,.78,x+.025,-.372,.97],'#8a968b','metal');

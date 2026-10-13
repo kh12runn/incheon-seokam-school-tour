@@ -2,7 +2,9 @@
 // in the photo repository; no people, pupil names or documents are published.
 import {ADDITIONAL_CLASSROOM_OBSERVATIONS} from './추가교실사진관찰.mjs';
 import {OCT8_CLASSROOM_OBSERVATIONS} from './십월팔일교실관찰.mjs';
+import {OCT13_CLASSROOM_OBSERVATIONS} from './십월십삼일교실관찰.mjs';
 const observations={
+  ...OCT13_CLASSROOM_OBSERVATIONS,
   ...OCT8_CLASSROOM_OBSERVATIONS,
   ...ADDITIONAL_CLASSROOM_OBSERVATIONS,
   '3F_5-3':{count:9,revision:'2026-09-30-012cbaf4',theme:'흰 활동지와 연두 의자',board:'white-narrow',back:'white-papers',locker:'green-row',chairs:['#a6bd45','#ad8759','#293e52'],chairEvery:4,desktopColor:'#d9dcd0',purifier:'rear-blue',shelf:'papers',extras:['back-window-wood','color-bins','lectern'],features:['연두 의자와 일부 목재·남색 의자','초록 칠판 가운데 오른쪽의 좁은 흰 보드','하늘·잔디 배경의 두 줄 흰 활동지','목재 사물함의 연두 중간 줄','뒤 창가 청백색 공기청정기와 높이가 다른 목재 수납장','흰 블라인드와 밝은 마루']},
