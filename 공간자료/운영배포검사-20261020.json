@@ -1,0 +1,27 @@
+{
+  "runtimeCommit": "2c44b59",
+  "deploymentId": "fbe030da-4d10-48ca-a083-5135fb467960",
+  "status": "SUCCESS",
+  "url": "https://school-tour-production.up.railway.app/",
+  "customDomain": "https://tour.seokam.es.kr/",
+  "scope": "6학년 협의실: 입구 오른쪽 책장, 11시 개수대, 12~1시 PC 1대, 9시 마주 보는 PC 책상 2개",
+  "publicRuntimeFilesMatched": 152,
+  "healthStatus": 200,
+  "customDomainHealthStatus": 200,
+  "unauthenticatedAdminStatus": 401,
+  "privateFileStatus": 403,
+  "browser": {
+    "rendered": true,
+    "roomTeleport": true,
+    "studentModelLoaded": true,
+    "keyboardMovement": true,
+    "reviewedAt": "2026-10-19",
+    "rightCupboards": 7,
+    "computers": 3,
+    "publicTestHookAbsent": true,
+    "pageErrors": []
+  },
+  "localChecks": ["room orientation and aisle traversal", "77 doors and 72 crossings", "runtime packaging"],
+  "excluded": ["original photo uploads", "unused face experiments", "local test outputs"],
+  "limitations": ["Desktop browser verification; no physical phone test"]
+}
