@@ -1,0 +1,37 @@
+{
+  "date": "2026-10-21",
+  "deployment": "local only",
+  "reported": "All grade-six teachers missing at localhost:8080",
+  "diagnosis": {
+    "modelsPresent": true,
+    "corridorVisibilityExcluded": true,
+    "emptyUntilAtlasFinishingAndRigComplete": true,
+    "observed6_4EntryToReadyMs": 21377.4,
+    "note": "Original teacher geometry rendered normally after completion; no teacher asset was deleted."
+  },
+  "fixes": [
+    "Include the classroom-front corridor in loading and visibility range",
+    "Display original approved model as soon as parsed, before async rig completes",
+    "Keep ready teacher moving while atlas finishing runs independently",
+    "Allow next classroom model loading without waiting for previous atlas finishing",
+    "Serialize finishing, cancel evicted worker, retain at most two full models",
+    "Show a loading label during actual download; keep original avatar if optional finishing fails"
+  ],
+  "verifiedRooms": ["4F_6-1", "4F_6-2", "4F_6-3", "4F_6-4", "4F_6-5", "4F_6-6", "4F_6-7", "2F_SCIENCE"],
+  "verification": {
+    "actualMeshRenderCallbacksAllEight": true,
+    "allSevenGradeSixScreenshotsInspected": true,
+    "browserErrors": [],
+    "failedRequests": [],
+    "finalWorkerCompleted": true,
+    "aerialVisibilityReset": true,
+    "previewBeforeRigUnit": true,
+    "visibleBeforeFinishingUnit": true,
+    "filterFailureKeepsAvatarUnit": true,
+    "singleWorkerAndTwoModelCacheUnit": true,
+    "realWorkerAbortMs": 74.8,
+    "runtimeBuildAnd164FileHttpRoundTrip": true
+  },
+  "unchanged": ["teacher GLB files", "school structure", "classroom furnishings", "navigation layout", "teacher appearance design"],
+  "caveat": "Network transfer, decoding and shader setup still take time, especially on a cold or software-rendered browser; instant downloads are not guaranteed."
+}

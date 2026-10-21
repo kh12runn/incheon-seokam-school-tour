@@ -1,0 +1,42 @@
+{
+  "date": "2026-10-21",
+  "scope": "local only; production not deployed",
+  "changes": [
+    "교사 UV 경계/피부 텍스처 필터를 모듈 Worker로 분리",
+    "교사 보행용 정점 변환과 가중치 계산을 분할 실행",
+    "항공뷰의 고정 태양 그림자 캐시; 탐험에서는 동적 그림자 복구",
+    "교사 캐시 교체 시 전송된 밉맵 ImageBitmap 자원 해제"
+  ],
+  "preserved": ["학교 구조", "교실 가구", "원본 GLB", "텍스처 해상도", "렌더링 해상도", "2048px 그림자"],
+  "teacherPreparation": {
+    "model": "teacher-science",
+    "vertices": 316838,
+    "synchronousMaterialBlockingMs": 9190.3,
+    "workerMaterialElapsedMs": 9529.2,
+    "asyncPreparationMax16msTimerGapMs": 146.1,
+    "asyncLongTasks": [],
+    "exactTexturePixelsAllThreeMipLevels": true,
+    "exactRigAttributesAndWeights": true,
+    "workerUnavailableFallbackPassed": true,
+    "note": "Preparation still takes time in the worker; this is removal of main-thread blocking, not a claim of faster total download/preparation. Browser/host timings vary."
+  },
+  "aerialAB": {
+    "viewport": [960, 640],
+    "dynamicShadowsMeanFrameMs": [53.5414, 51.8757],
+    "cachedShadowsMeanFrameMs": [38.5514, 44.2629],
+    "sameDrawnGeometryTriangles": 721500,
+    "sameGeometryCount": 423,
+    "sameTextureCount": 83,
+    "automaticOrbitPassed": true,
+    "teacherDownloadsAtStart": 0,
+    "note": "Alternating A/B test in the same browser, no resolution or model reduction. Not a real-device FPS guarantee."
+  },
+  "tests": {
+    "teacherMaterialUnit": "passed",
+    "rigTransformAgainstOriginalThreeApplyMatrix4": "passed",
+    "eightTeachers30And60fpsNavigation": "passed; classroom/world fingerprint unchanged",
+    "threeRoomBrowserNavigation": "passed: 6-4, 6-6, science; worker used, cache <= 2, no game errors or failed requests",
+    "deploymentRuntimeRoundTrip": "passed; 164 public runtime files, worker included",
+    "legacyMovementTest": "failed at 이동검사.mjs:42, expected -3.5 but got 0.3961038961038965; all 65 test/physics dependencies unchanged from HEAD; not fixed by this rendering optimization"
+  }
+}

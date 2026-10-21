@@ -1,0 +1,19 @@
+{
+  "date": "2026-10-21",
+  "status": "local-verified-not-deployed",
+  "scope": "6학년 담임 7명 및 과학 교사 재질만 변경. 원본 GLB, 교실 배치, 이동 로직 유지.",
+  "changes": ["반사광 강도 0, 금속성 0, 거칠기 1", "텍스처 고립 잡음 보정 및 색상 범위 조절", "축소 아틀라스 3단계 제한으로 다른 부위 색상 혼합 완화", "별도 머리 조각과 텍스처의 색상 처리 통일"],
+  "tests": {
+    "materialUnitTests": "passed",
+    "eightTeacherVisualAndSkinWeights": "passed",
+    "eightTeacherNavigation30And60fps": "passed",
+    "gameRooms": ["4F_6-4", "4F_6-6", "2F_SCIENCE"],
+    "gameJavaScriptErrors": [],
+    "gameFailedRequestsExcludingFavicon": [],
+    "maxCachedTeachers": 2,
+    "runtimeBuild": "passed",
+    "runtimePublicFiles": 163
+  },
+  "limitations": ["원본 메시 및 텍스처의 미세한 흠집은 일부 남아 있음", "실제 휴대전화 하드웨어 검증은 수행하지 않음"],
+  "screenshots": ["output/teachers-idle.png", "output/teachers-back.png", "output/matte-game-4F_6-6.png"]
+}

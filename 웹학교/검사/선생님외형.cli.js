@@ -11,7 +11,7 @@ async page => {
   for(const config of CLASS_TEACHERS){
    const asset=await new GLTFLoader().loadAsync(config.url.href),model=normalizePrincipalModel(asset.scene,config.height);let originalVertices=0;model.traverse(o=>{if(o.isMesh)originalVertices+=o.geometry.attributes.position.count;});
    finishTeacherMaterials(model);const rig=createPrincipalWalkRig(model,{height:config.height,receiveShadow:false});rig.root.position.x=(rigs.length-3.5)*1.05;scene.add(rig.root);rigs.push(rig);
-   let valid=true;rig.root.traverse(o=>{if(o.isMesh){const w=o.geometry.attributes.skinWeight;for(let i=0;i<w.count;i++)if(Math.abs(w.getX(i)+w.getY(i)+w.getZ(i)+w.getW(i)-1)>.0001)valid=false;for(const m of [].concat(o.material))if(m.metalness!==0||m.roughness<.8)valid=false;}});
+   let valid=true;rig.root.traverse(o=>{if(o.isMesh){const w=o.geometry.attributes.skinWeight;for(let i=0;i<w.count;i++)if(Math.abs(w.getX(i)+w.getY(i)+w.getZ(i)+w.getW(i)-1)>.0001)valid=false;for(const m of [].concat(o.material))if(!m.isMeshPhysicalMaterial||m.specularIntensity!==0||m.roughness!==1||m.metalness!==0||m.normalMap||m.envMap||m.flatShading||m.vertexColors)valid=false;}});
    checks.push({id:config.id,originalVertices,rigVertices:rig.vertexCount,weightsAndMaterials:valid});
   }
   window.teacherProbe={scene,rigs,r,c,T};

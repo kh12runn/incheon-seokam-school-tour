@@ -75,6 +75,7 @@ sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.c
 sun.shadow.bias=-.00008;sun.shadow.normalBias=.025;
 const camera=new THREE.PerspectiveCamera(76,1,.045,500);camera.rotation.order='YXZ';
 let data,world,position,mode='overview',locked=false,dragMode=false,freeLook=false,yaw=OUTDOOR_YAW,pitch=0;
+let shadowMode=null;
 let footballPhysics,footballVisual;
 let driving,carVisual,vehicleUI,lastDriveYaw=null;
 let freeLookPoint=null;
@@ -526,7 +527,7 @@ touchControls=createTouchControls({canvas,canPlay:isPlaying,getMode:()=>mode,
   onModeChange:active=>{
     freeLookPoint=null;
     if(active&&document.pointerLockElement===canvas){freeLook=true;document.exitPointerLock();}
-    renderer.setPixelRatio(Math.min(devicePixelRatio,active?1.25:1.6));renderer.shadowMap.enabled=!active;resize();
+    renderer.setPixelRatio(Math.min(devicePixelRatio,active?1.25:1.6));renderer.shadowMap.enabled=!active;shadowMode=null;resize();
   }
 });
 const map=$('지도'),mapCtx=map.getContext('2d');
@@ -646,6 +647,11 @@ function frame(now){
   if(hallMirror)hallMirror.visible=mode==='walk'&&world.roomAt(position).room?.id==='B1_MAIN_HALL';
   markerGroup.children.forEach(m=>m.rotation.y+=dt);
   if(Math.floor(elapsed*10)!==Math.floor((elapsed-dt)*10))updateHUD();
+  // Sun and buildings do not move during the aerial orbit. Keep the same
+  // full-resolution shadow map instead of redrawing the campus every frame.
+  // Walking restores per-frame shadows for people, doors and vehicles.
+  if(shadowMode!==mode){updateHUD();renderer.shadowMap.needsUpdate=true;shadowMode=mode;}
+  renderer.shadowMap.autoUpdate=mode==='walk';
   renderer.render(scene,camera);
 }
 requestAnimationFrame(frame);
@@ -670,7 +676,7 @@ try{
   window.schoolTour.getFootballState=()=>footballPhysics.getState();
   window.schoolTour.getDrivingState=()=>driving.getState();
   window.schoolTour.getDoorState=()=>world.roomDoors.getState();
-  window.schoolTour.getPerformanceState=()=>({staticObjects,physics:footballPhysics.getWorkState(),drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures});
+  window.schoolTour.getPerformanceState=()=>({staticObjects,physics:footballPhysics.getWorkState(),drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,shadowAutoUpdate:renderer.shadowMap.autoUpdate});
   window.schoolTour.getMonthQuizState=()=>monthQuiz.getState();
   window.schoolTour.getLobbyPrincipalState=()=>({...lobbyPrincipalState.getState(),...(lobbyPrincipalNPC?.getState()??{}),visible:lobbyPrincipalNPC?.root.visible??false});
   if(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).has('test'))window.schoolTour.test={

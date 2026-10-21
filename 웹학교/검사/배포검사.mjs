@@ -9,6 +9,8 @@ import {packRuntime} from '../../관리도구/배포최적화.mjs';
 const root=new URL('../../',import.meta.url),port=18081;
 const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'school-deploy-test-')),output=path.join(temporary,'runtime');
 const packed=packRuntime(output);
+assert(packed.files.includes('웹학교/선생님재질작업자.mjs'),'Teacher worker included in production');
+assert(packed.files.includes('웹학교/과학교사자세.mjs'),'Science teacher pose correction included in production');
 for(const rel of ['관리도구/관리자/사진변환.mjs','관리도구/관리자/이미지정책/policy.xml'])assert(fs.existsSync(path.join(output,rel)),'Phone converter runtime dependency: '+rel);
 assert(!packed.files.some(p=>/사진보관|미리보기|검사/.test(p)||p.startsWith('모델/')||p==='웹학교/실사목록.json'||p.startsWith('웹학교/실사/')),'Only current game runtime');
 const approvedModels=['교장선생님-귀여운','교장선생님-머리','남학생-귀여운','여학생-귀여운',...[1,2,3,4,5,6,7].map(n=>`6-${n}-담임선생님`),'과학선생님'].map(name=>'웹학교/캐릭터모델/'+name+'.glb');
