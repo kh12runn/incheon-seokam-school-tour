@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-21",
+  "runtimeCommit": "abfc136",
+  "changes": ["Science-only head alignment and narrower upright stance", "Localized mouth tilt and opening correction", "Preserved original GLB, UVs, clothing, book and other teachers", "Includes prior teacher visibility restoration and asynchronous finishing"],
+  "verification": {
+    "poseUnitTest": true,
+    "teacherVisibilityUnitTest": true,
+    "chunkedRigUnitTest": true,
+    "materialUnitTest": true,
+    "runtimeBuildAnd165PublicFileHttpChecks": true,
+    "browserRooms": ["4F_6-4", "4F_6-6", "2F_SCIENCE"],
+    "scienceRenderedInRoom": true,
+    "frontSideAndFaceScreenshotsInspected": true,
+    "browserErrors": [],
+    "failedRequests": []
+  },
+  "deployment": {
+    "status": "blocked-by-provider-outage",
+    "attempts": 2,
+    "error": "Deploys have been paused temporarily",
+    "officialStatus": "https://status.railway.com/",
+    "incident": "Builds are temporarily paused, October 21 07:24 UTC, all build regions",
+    "productionHealth": 200,
+    "productionUpdated": false,
+    "releaseArchive": "배포자료/release-abfc136.zip",
+    "releaseDirectory": "배포자료/release-abfc136",
+    "nextStep": "Retry this committed runtime on existing school-tour production after Railway resumes builds, then verify live files. No credentials or configuration changes needed."
+  }
+}
