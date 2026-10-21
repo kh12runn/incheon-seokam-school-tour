@@ -1,0 +1,26 @@
+{
+  "date": "2026-10-21",
+  "baselineCommit": "2b7b767",
+  "latestResearchLayoutCommit": "2c44b59",
+  "recoveredTeacherDeployment": "c25c39b0-0a25-47ed-a105-0ee1f4bda38b",
+  "cause": "운영본은 오래된 학교 코드에 선생님 GLB 8명만 추가한 직접 배포본이었다. 로컬 main의 학교 구현은 보존하고 모델만 통합한다.",
+  "classroomSourcePolicy": "로컬 최신 교실, 특별실, 복도, 외부 환경 및 관리자 구현을 유지한다. 운영본 게임 코드로 덮어쓰지 않는다.",
+  "comparison": "학교복구비교-20261021.json",
+  "teacherModels": 8,
+  "teacherBehavior": {
+    "rooms": ["4F_6-1", "4F_6-2", "4F_6-3", "4F_6-4", "4F_6-5", "4F_6-6", "4F_6-7", "2F_SCIENCE"],
+    "appearance": "기존 모델과 얼굴/복장/UV/정점 수 보존. 비금속 무광 재질, 과도한 노멀맵과 자체 그림자 얼룩 제거, 텍스처 경계 보정.",
+    "motion": "교실 가구 충돌을 반영한 연결 경로 탐색, 부드러운 방향 전환과 보행 리그, 플레이어 가까이서 정지, 메뉴에서 일시정지",
+    "loading": "항공뷰에서 다운로드하지 않음. 가까운 교실에서 순차 로드. 모델 캐시 최대 2명. 떠난 모델의 geometry/material/texture/ImageBitmap 해제."
+  },
+  "verification": {
+    "uploadedClassrooms": 34,
+    "distinctPhotoConfigurations": 34,
+    "teacherNavigation": "8명 × 150초 × 30/60fps, 교실 내 이동/가구 충돌/플레이어 양보/메뉴 정지 통과",
+    "doors": 77,
+    "doorCrossings": 72,
+    "regressionScripts": ["업로드교실검사", "추가공간사진검사", "십월팔일사진검사", "십월십삼일사진검사", "연수실컴퓨터실크기검사", "교무실연결문검사", "보건실검사", "개별학습실검사", "방송실검사", "방송조정실검사", "도서관데스크검사", "출입문검사", "교장산책검사"],
+    "browser": "Playwright: 8명 정면/측면/후면/보행 포즈, 실제 6-4·과학실·6-6 이동, 연수실·보건실·교무실 입장",
+    "limits": "실제 휴대전화 하드웨어 성능 검사는 수행하지 않음. 자동 생성 원본 모델의 세부 형상 자체는 재제작하지 않음."
+  }
+}

@@ -11,8 +11,9 @@ const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'school-deploy-test-')),out
 const packed=packRuntime(output);
 for(const rel of ['관리도구/관리자/사진변환.mjs','관리도구/관리자/이미지정책/policy.xml'])assert(fs.existsSync(path.join(output,rel)),'Phone converter runtime dependency: '+rel);
 assert(!packed.files.some(p=>/사진보관|미리보기|검사/.test(p)||p.startsWith('모델/')||p==='웹학교/실사목록.json'||p.startsWith('웹학교/실사/')),'Only current game runtime');
-const approvedModels=['교장선생님-귀여운','교장선생님-머리','남학생-귀여운','여학생-귀여운'].map(name=>'웹학교/캐릭터모델/'+name+'.glb');
-assert.deepEqual(packed.files.filter(p=>p.endsWith('.glb')).sort(),approvedModels.sort(),'Only the office principal, shared runner head, and two student models');
+const approvedModels=['교장선생님-귀여운','교장선생님-머리','남학생-귀여운','여학생-귀여운',...[1,2,3,4,5,6,7].map(n=>`6-${n}-담임선생님`),'과학선생님'].map(name=>'웹학교/캐릭터모델/'+name+'.glb');
+assert.deepEqual(packed.files.filter(p=>p.endsWith('.glb')).sort(),approvedModels.sort(),'Only approved principal/student models and the eight recovered teachers');
+for(const file of ['담임선생님.mjs','선생님교실산책.mjs','선생님재질.mjs','연수실컴퓨터실수정.mjs','십월팔일교실관찰.mjs','십월십삼일교실관찰.mjs','큰교실면적조정.mjs','출입문.mjs'])assert(packed.files.includes('웹학교/'+file),'Latest school survives teacher integration: '+file);
 assert(packed.files.includes('웹학교/교실별특징.mjs'));
 for(const file of ['추가교실사진관찰.mjs','추가사진근거.mjs','추가공간사진배치.mjs','추가공간사진표현.mjs','분리수거장사진배치.mjs','분리수거장사진표현.mjs'])assert(packed.files.includes('웹학교/'+file),'2026-10-02 reviewed uploads included: '+file);
 assert(packed.files.includes('웹학교/다목적실사진배치.mjs'),'2026-10-06 hall photo layout included');

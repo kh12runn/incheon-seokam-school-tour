@@ -1,0 +1,1014 @@
+{
+  "checkedAt": "2026-10-21T03:51:16.080Z",
+  "basis": "local latest main; recover only teacher models from direct Railway deployment",
+  "compared": 131,
+  "unpublishedFiles": 80,
+  "changes": [
+    {
+      "file": "웹학교/개별학습실사진표현.mjs",
+      "status": 403,
+      "localBytes": 2561,
+      "remoteBytes": 13
+    },
+    {
+      "file": "index.html",
+      "status": 200,
+      "localBytes": 10929,
+      "remoteBytes": 7593
+    },
+    {
+      "file": "관리자/index.html",
+      "status": 200,
+      "localBytes": 4681,
+      "remoteBytes": 3638
+    },
+    {
+      "file": "관리자/관리자.mjs",
+      "status": 200,
+      "localBytes": 12964,
+      "remoteBytes": 11804
+    },
+    {
+      "file": "웹학교/개별학습실사진배치.mjs",
+      "status": 403,
+      "localBytes": 6976,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/교사자리와창팻말.mjs",
+      "status": 403,
+      "localBytes": 3153,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/교무실사진배치.mjs",
+      "status": 403,
+      "localBytes": 16502,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/게임.mjs",
+      "status": 200,
+      "localBytes": 54394,
+      "remoteBytes": 40397
+    },
+    {
+      "file": "웹학교/교무실사진표현.mjs",
+      "status": 403,
+      "localBytes": 10081,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/교사자리와창팻말표현.mjs",
+      "status": 403,
+      "localBytes": 2840,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/교실별특징.mjs",
+      "status": 200,
+      "localBytes": 2466,
+      "remoteBytes": 2176
+    },
+    {
+      "file": "웹학교/교실기본배치.mjs",
+      "status": 200,
+      "localBytes": 7264,
+      "remoteBytes": 7186
+    },
+    {
+      "file": "웹학교/교장선생님산책.mjs",
+      "status": 403,
+      "localBytes": 2699,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/교장보행리그.mjs",
+      "status": 403,
+      "localBytes": 3152,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/교장선생님인사.mjs",
+      "status": 200,
+      "localBytes": 3088,
+      "remoteBytes": 1856
+    },
+    {
+      "file": "웹학교/교장실연결문.mjs",
+      "status": 403,
+      "localBytes": 1612,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/교장실연결문표현.mjs",
+      "status": 403,
+      "localBytes": 1155,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/급식의자표현.mjs",
+      "status": 403,
+      "localBytes": 1880,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/교장실캐릭터.mjs",
+      "status": 200,
+      "localBytes": 4427,
+      "remoteBytes": 3960
+    },
+    {
+      "file": "웹학교/까치방사진배치.mjs",
+      "status": 403,
+      "localBytes": 6470,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/구령대배치.mjs",
+      "status": 403,
+      "localBytes": 2300,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/교장실표현.mjs",
+      "status": 200,
+      "localBytes": 22315,
+      "remoteBytes": 22462
+    },
+    {
+      "file": "웹학교/다목적실표현.mjs",
+      "status": 403,
+      "localBytes": 2401,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/다목적실사진배치.mjs",
+      "status": 403,
+      "localBytes": 6505,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/담임선생님.mjs",
+      "status": 200,
+      "localBytes": 5366,
+      "remoteBytes": 2646
+    },
+    {
+      "file": "웹학교/까치방사진표현.mjs",
+      "status": 403,
+      "localBytes": 5205,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/방송실사진배치.mjs",
+      "status": 403,
+      "localBytes": 7046,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/마라토너교장선생님.mjs",
+      "status": 200,
+      "localBytes": 9258,
+      "remoteBytes": 7263
+    },
+    {
+      "file": "웹학교/방송실사진표현.mjs",
+      "status": 403,
+      "localBytes": 7805,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/방송조정실배치.mjs",
+      "status": 403,
+      "localBytes": 10171,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/보건실사진배치.mjs",
+      "status": 403,
+      "localBytes": 9399,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/방송조정실표현.mjs",
+      "status": 403,
+      "localBytes": 3172,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/보건실사진표현.mjs",
+      "status": 403,
+      "localBytes": 4521,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/분리수거장사진표현.mjs",
+      "status": 403,
+      "localBytes": 1903,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/본관출입연결.mjs",
+      "status": 200,
+      "localBytes": 3953,
+      "remoteBytes": 4623
+    },
+    {
+      "file": "웹학교/본관교실표현.mjs",
+      "status": 200,
+      "localBytes": 5729,
+      "remoteBytes": 5511
+    },
+    {
+      "file": "웹학교/본관교실.mjs",
+      "status": 200,
+      "localBytes": 5212,
+      "remoteBytes": 5030
+    },
+    {
+      "file": "웹학교/분리수거장사진배치.mjs",
+      "status": 403,
+      "localBytes": 4191,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/삼학년사반.mjs",
+      "status": 403,
+      "localBytes": 6462,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/삼학년사반표현.mjs",
+      "status": 403,
+      "localBytes": 7339,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/사진실내도구.mjs",
+      "status": 403,
+      "localBytes": 3470,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/삼인칭카메라.mjs",
+      "status": 200,
+      "localBytes": 2213,
+      "remoteBytes": 2074
+    },
+    {
+      "file": "웹학교/선생님교실산책.mjs",
+      "status": 403,
+      "localBytes": 4110,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/상담실출입연결.mjs",
+      "status": 403,
+      "localBytes": 3776,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/선생님재질.mjs",
+      "status": 403,
+      "localBytes": 3802,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/숙직실사진배치.mjs",
+      "status": 403,
+      "localBytes": 5328,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/시청각실사진표현.mjs",
+      "status": 403,
+      "localBytes": 2936,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/십월십삼일사진근거.mjs",
+      "status": 403,
+      "localBytes": 5406,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/십월십삼일교실관찰.mjs",
+      "status": 403,
+      "localBytes": 3287,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/시청각실사진배치.mjs",
+      "status": 403,
+      "localBytes": 8122,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/십월십삼일교실표현.mjs",
+      "status": 403,
+      "localBytes": 1558,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/야외사진세부.mjs",
+      "status": 403,
+      "localBytes": 10756,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/십월십삼일특별실배치.mjs",
+      "status": 403,
+      "localBytes": 6224,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/십월팔일특별실배치.mjs",
+      "status": 403,
+      "localBytes": 5315,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/십월팔일교실관찰.mjs",
+      "status": 403,
+      "localBytes": 4882,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/십월팔일교실표현.mjs",
+      "status": 403,
+      "localBytes": 2890,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/야외풍경.mjs",
+      "status": 403,
+      "localBytes": 5270,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/업로드교실관찰.mjs",
+      "status": 403,
+      "localBytes": 9604,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/업로드교실표현.mjs",
+      "status": 403,
+      "localBytes": 19511,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/업로드교실배치.mjs",
+      "status": 403,
+      "localBytes": 15947,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/연수실컴퓨터실수정.mjs",
+      "status": 403,
+      "localBytes": 7893,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/오학년연수실사진배치.mjs",
+      "status": 403,
+      "localBytes": 12864,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/오학년연수실사진표현.mjs",
+      "status": 403,
+      "localBytes": 3513,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/외관사진디자인.mjs",
+      "status": 200,
+      "localBytes": 6352,
+      "remoteBytes": 5773
+    },
+    {
+      "file": "웹학교/운동장환경.mjs",
+      "status": 403,
+      "localBytes": 773,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/운동장.mjs",
+      "status": 200,
+      "localBytes": 2766,
+      "remoteBytes": 1487
+    },
+    {
+      "file": "웹학교/운영위원회회의실표현.mjs",
+      "status": 403,
+      "localBytes": 1068,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/운영위원회회의실.mjs",
+      "status": 403,
+      "localBytes": 7044,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/운전물리.mjs",
+      "status": 403,
+      "localBytes": 10314,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/월영어퀴즈.mjs",
+      "status": 403,
+      "localBytes": 2909,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/운전화면.mjs",
+      "status": 403,
+      "localBytes": 1551,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/월영어퀴즈화면.mjs",
+      "status": 403,
+      "localBytes": 2299,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/이동물리.mjs",
+      "status": 200,
+      "localBytes": 18148,
+      "remoteBytes": 13115
+    },
+    {
+      "file": "웹학교/이학년일반.mjs",
+      "status": 200,
+      "localBytes": 9394,
+      "remoteBytes": 9217
+    },
+    {
+      "file": "웹학교/정문지형.mjs",
+      "status": 403,
+      "localBytes": 3453,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/자동차표현.mjs",
+      "status": 403,
+      "localBytes": 14850,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/정후문입체표현.mjs",
+      "status": 403,
+      "localBytes": 11439,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/정후문사진배치.mjs",
+      "status": 403,
+      "localBytes": 10507,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/주차장이동.mjs",
+      "status": 403,
+      "localBytes": 1091,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/정적장면최적화.mjs",
+      "status": 403,
+      "localBytes": 364,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/주차장.mjs",
+      "status": 200,
+      "localBytes": 3073,
+      "remoteBytes": 1828
+    },
+    {
+      "file": "웹학교/지하층배치.mjs",
+      "status": 403,
+      "localBytes": 5404,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/중앙계단사진표현.mjs",
+      "status": 403,
+      "localBytes": 3255,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/중앙계단사진마감.mjs",
+      "status": 403,
+      "localBytes": 7309,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/지원실사진표현.mjs",
+      "status": 403,
+      "localBytes": 2136,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/추가공간사진배치.mjs",
+      "status": 403,
+      "localBytes": 21712,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/추가공간사진표현.mjs",
+      "status": 403,
+      "localBytes": 7365,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/축구공물리.mjs",
+      "status": 403,
+      "localBytes": 7032,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/추가교실사진관찰.mjs",
+      "status": 403,
+      "localBytes": 5452,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/추가사진근거.mjs",
+      "status": 403,
+      "localBytes": 16871,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/출입문.mjs",
+      "status": 403,
+      "localBytes": 6123,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/출입문표현.mjs",
+      "status": 403,
+      "localBytes": 4652,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/축구공표현.mjs",
+      "status": 403,
+      "localBytes": 2155,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/행정실창고사진표현.mjs",
+      "status": 403,
+      "localBytes": 5626,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/학생캐릭터.mjs",
+      "status": 200,
+      "localBytes": 10947,
+      "remoteBytes": 9692
+    },
+    {
+      "file": "웹학교/큰교실면적조정.mjs",
+      "status": 403,
+      "localBytes": 1679,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/행정실창고사진배치.mjs",
+      "status": 403,
+      "localBytes": 13196,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/현관상담사진근거.mjs",
+      "status": 403,
+      "localBytes": 2702,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/현관상담사진배치.mjs",
+      "status": 403,
+      "localBytes": 12254,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/활성물체충돌.mjs",
+      "status": 403,
+      "localBytes": 1374,
+      "remoteBytes": 13
+    },
+    {
+      "file": "웹학교/현실재질.mjs",
+      "status": 200,
+      "localBytes": 11424,
+      "remoteBytes": 7753
+    },
+    {
+      "file": "웹학교/후문배치.mjs",
+      "status": 403,
+      "localBytes": 768,
+      "remoteBytes": 13
+    }
+  ],
+  "localRooms": [
+    {
+      "id": "4F_6-4",
+      "boxes": 469,
+      "name": "6-4 교실"
+    },
+    {
+      "id": "1F_3-1",
+      "name": "3-1 교실",
+      "boxes": 480,
+      "photos": 6
+    },
+    {
+      "id": "1F_3-2",
+      "name": "3-2 교실",
+      "boxes": 478,
+      "photos": 6
+    },
+    {
+      "id": "1F_3-3",
+      "name": "3-3 교실",
+      "boxes": 480,
+      "photos": 9
+    },
+    {
+      "id": "1F_3-4",
+      "name": "3-4 교실",
+      "boxes": 520,
+      "photos": 6
+    },
+    {
+      "id": "2F_3-5",
+      "name": "3-5 교실",
+      "boxes": 517,
+      "photos": 10
+    },
+    {
+      "id": "2F_3-6",
+      "name": "3-6 교실",
+      "boxes": 506,
+      "photos": 6
+    },
+    {
+      "id": "3F_5-1",
+      "name": "5-1 교실",
+      "boxes": 475,
+      "photos": 6
+    },
+    {
+      "id": "3F_5-2",
+      "name": "5-2 교실",
+      "boxes": 476,
+      "photos": 6
+    },
+    {
+      "id": "3F_5-3",
+      "name": "5-3 교실",
+      "boxes": 517,
+      "photos": 9
+    },
+    {
+      "id": "3F_5-4",
+      "name": "5-4 교실",
+      "boxes": 530,
+      "photos": 9
+    },
+    {
+      "id": "3F_5-5",
+      "name": "5-5 교실",
+      "boxes": 505,
+      "photos": 10
+    },
+    {
+      "id": "3F_5-6",
+      "name": "5-6 교실",
+      "boxes": 535,
+      "photos": 9
+    },
+    {
+      "id": "3F_5-7",
+      "name": "5-7 교실",
+      "boxes": 469
+    },
+    {
+      "id": "3F_4-5",
+      "name": "4-5 교실",
+      "boxes": 509,
+      "photos": 8
+    },
+    {
+      "id": "3F_4-6",
+      "name": "4-6 교실",
+      "boxes": 531,
+      "photos": 8
+    },
+    {
+      "id": "4F_6-1",
+      "name": "6-1 교실",
+      "boxes": 469,
+      "photos": 5
+    },
+    {
+      "id": "4F_6-2",
+      "name": "6-2 교실",
+      "boxes": 483,
+      "photos": 6
+    },
+    {
+      "id": "4F_6-3",
+      "name": "6-3 교실",
+      "boxes": 530,
+      "photos": 6
+    },
+    {
+      "id": "4F_6-5",
+      "name": "6-5 교실",
+      "boxes": 483,
+      "photos": 6
+    },
+    {
+      "id": "4F_6-6",
+      "name": "6-6 교실",
+      "boxes": 497,
+      "photos": 6
+    },
+    {
+      "id": "4F_6-7",
+      "name": "6-7 교실",
+      "boxes": 476,
+      "photos": 6
+    },
+    {
+      "id": "4F_4-1",
+      "name": "4-1 교실",
+      "boxes": 478,
+      "photos": 6
+    },
+    {
+      "id": "4F_4-2",
+      "name": "4-2 교실",
+      "boxes": 484,
+      "photos": 6
+    },
+    {
+      "id": "4F_4-3",
+      "name": "4-3 교실",
+      "boxes": 469
+    },
+    {
+      "id": "4F_2-1",
+      "name": "2-1 교실",
+      "boxes": 427,
+      "photos": 9
+    },
+    {
+      "id": "2F_1-1",
+      "name": "1-1 교실",
+      "boxes": 505,
+      "photos": 9
+    },
+    {
+      "id": "2F_1-2",
+      "name": "1-2 교실",
+      "boxes": 452,
+      "photos": 9
+    },
+    {
+      "id": "1F_1-4",
+      "name": "1-4 교실",
+      "boxes": 490,
+      "photos": 8
+    },
+    {
+      "id": "1F_1-5",
+      "name": "1-5 교실",
+      "boxes": 427,
+      "photos": 10
+    },
+    {
+      "id": "1F_1-6",
+      "name": "1-6 교실",
+      "boxes": 428,
+      "photos": 10
+    },
+    {
+      "id": "4F_2-2",
+      "name": "2-2 교실",
+      "boxes": 409,
+      "photos": 6
+    },
+    {
+      "id": "4F_2-3",
+      "name": "2-3 교실",
+      "boxes": 415,
+      "photos": 6
+    },
+    {
+      "id": "3F_2-4",
+      "name": "2-4 교실",
+      "boxes": 439,
+      "photos": 11
+    },
+    {
+      "id": "3F_2-5",
+      "name": "2-5 교실",
+      "boxes": 453,
+      "photos": 6
+    },
+    {
+      "id": "2F_2-6",
+      "name": "2-6 교실",
+      "boxes": 496,
+      "photos": 10
+    },
+    {
+      "id": "2F_3-7",
+      "name": "3-7 교실",
+      "boxes": 438,
+      "photos": 6
+    },
+    {
+      "id": "4F_4-4",
+      "name": "4-4 교실",
+      "boxes": 432,
+      "photos": 9
+    },
+    {
+      "id": "3F_4-7",
+      "name": "4-7 교실",
+      "boxes": 436,
+      "photos": 9
+    },
+    {
+      "id": "3F_4-8",
+      "name": "4-8 교실",
+      "boxes": 432,
+      "photos": 8
+    },
+    {
+      "id": "2F_OPERATIONS_MEETING",
+      "name": "학교운영위원회 회의실",
+      "boxes": 239
+    },
+    {
+      "id": "2F_AUDIO_VISUAL",
+      "name": "시청각실",
+      "boxes": 450
+    },
+    {
+      "id": "2F_BROADCAST",
+      "name": "방송실(교원회의실)",
+      "boxes": 419
+    },
+    {
+      "id": "2F_STAFF",
+      "name": "교무실",
+      "boxes": 920
+    },
+    {
+      "id": "1F_NURSE",
+      "name": "보건실",
+      "boxes": 182
+    },
+    {
+      "id": "3F_GRADE5_RESEARCH",
+      "name": "5학년 연수실",
+      "boxes": 598
+    },
+    {
+      "id": "1F_NIGHT_DUTY",
+      "name": "숙직실",
+      "boxes": 249
+    },
+    {
+      "id": "1F_ADMIN",
+      "name": "행정실",
+      "boxes": 535
+    },
+    {
+      "id": "1F_STORAGE_1",
+      "name": "창고 1",
+      "boxes": 326
+    },
+    {
+      "id": "1F_INDIVIDUAL_4",
+      "name": "개별학습실4",
+      "boxes": 227
+    },
+    {
+      "id": "1F_INDIVIDUAL_5",
+      "name": "개별학습실5",
+      "boxes": 99
+    },
+    {
+      "id": "1F_CAFETERIA",
+      "name": "식당",
+      "boxes": 103
+    },
+    {
+      "id": "3F_BOOK_LIBRARY",
+      "name": "책터 도서관",
+      "boxes": 2254
+    },
+    {
+      "id": "2F_INDIVIDUAL_2",
+      "name": "개별학습실2",
+      "boxes": 204
+    },
+    {
+      "id": "4F_GRADE2_RESEARCH",
+      "name": "2학년 연수실",
+      "boxes": 247
+    },
+    {
+      "id": "1F_MAIN_LOBBY",
+      "name": "중앙현관",
+      "boxes": 98
+    },
+    {
+      "id": "3F_COUNSELING",
+      "name": "상담실",
+      "boxes": 213
+    },
+    {
+      "id": "2F_GRADE3_RESEARCH",
+      "name": "3학년 연수실",
+      "boxes": 239
+    },
+    {
+      "id": "2F_SCIENCE",
+      "name": "과학실",
+      "boxes": 312
+    },
+    {
+      "id": "2F_INTELLIGENT_SCIENCE",
+      "name": "지능형과학실",
+      "boxes": 160
+    },
+    {
+      "id": "4F_KINDERGARTEN",
+      "name": "까치방",
+      "boxes": 201
+    },
+    {
+      "id": "2F_CARE_DREAM_WISH",
+      "name": "돌봄교실(꿈소망)",
+      "boxes": 278
+    },
+    {
+      "id": "2F_CARE_DREAM_LOVE",
+      "name": "돌봄교실(꿈사랑)",
+      "boxes": 260
+    },
+    {
+      "id": "1F_PRINTING",
+      "name": "발간실",
+      "boxes": 128
+    },
+    {
+      "id": "1F_MEAL_CART_STORAGE",
+      "name": "배식차보관실",
+      "boxes": 144
+    },
+    {
+      "id": "3F_GRADE1_RESEARCH",
+      "name": "1학년 연수실",
+      "boxes": 134
+    },
+    {
+      "id": "3F_INDIVIDUAL_3",
+      "name": "개별학습실3",
+      "boxes": 95
+    },
+    {
+      "id": "2F_INDIVIDUAL_1",
+      "name": "개별학습실1",
+      "boxes": 181
+    },
+    {
+      "id": "4F_GRADE6_RESEARCH",
+      "name": "6학년 연수실",
+      "boxes": 339
+    },
+    {
+      "id": "4F_COMPUTER",
+      "name": "컴퓨터실",
+      "boxes": 220
+    },
+    {
+      "id": "2F_CARE_DREAM_HOPE",
+      "name": "돌봄교실(꿈희망)",
+      "boxes": 298
+    }
+  ]
+}

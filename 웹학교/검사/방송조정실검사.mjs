@@ -13,7 +13,9 @@ for(const key of ['classroomInteriors','principalOffice','centralStairFinish','s
 for(const r of before.specialInteriors.filter(r=>r.roomId!=='2F_BROADCAST'))assert(JSON.stringify(world.specialInteriors.find(s=>s.roomId===r.roomId))===JSON.stringify(r),'Other special room unchanged');
 const unrelated=list=>list.filter(b=>b.spaceId!=='2F_BROADCAST'&&!b.name.includes('2F_BROADCAST'));
 assert.deepEqual(unrelated(world.boxes),unrelated(before.boxes));
-assert.deepEqual(unrelated(world.colliders),unrelated(before.colliders));
+// Dynamic collision predicates are independently-created closures. Compare all
+// geometry/state, then exercise actual collision and access behavior below.
+assert.equal(JSON.stringify(unrelated(world.colliders)),JSON.stringify(unrelated(before.colliders)));
 for(const [x,y] of [[57.4,-3],[59.75,-3.8],[59.8,-6.1],[62.1,-4.7],[60.31,-3.8]])assert.equal(world.blocked(x,y,3.4),true,'Solid furniture/glass '+[x,y]);
 for(const c of [...room.chairs,...room.control.chairs])assert.equal(world.blocked(c.x,c.y,c.z),true,'Chair collision');
 const route=[{x:58.8,y:1,z:3.4},room.spawn,{x:59.08,y:-1.65,z:3.4},{x:59.08,y:-6.3,z:3.4},{x:59.08,y:-1.04,z:3.4},{x:61.1,y:-1.04,z:3.4},{x:61.1,y:-2.6,z:3.4},{x:63.5,y:-2.6,z:3.4},{x:63.5,y:-6.3,z:3.4}];

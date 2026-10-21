@@ -1,5 +1,6 @@
 import * as THREE from './외부도구/three.module.js';
 import {buildWorld,EYE_HEIGHT,localPoint} from './이동물리.mjs';
+import {createClassTeachers} from './담임선생님.mjs';
 import {floorDestination} from './층별이동.mjs';
 import {surfaceKind,finishMaterial,softEnvironment,batchSurfaceColors,surfaceInstanceColor} from './현실재질.mjs';
 import {ELEVATOR,nearElevator,elevatorDestination} from './엘리베이터.mjs';
@@ -87,11 +88,12 @@ let jumpMotion;
 let class64PhotoFinish;
 let hallMirror;
 let officePrincipals,principalNPC,officeWasNearby=false;
+let classTeachers;
 let lobbyPrincipalNPC;
 const monthQuiz=createMonthQuiz();
 let monthQuizUI;
 let lobbyPrincipalState;
-const principalPositions=()=>[...(officePrincipals?.characters.map(n=>n.getState().position)??OFFICE_CHARACTERS.map(n=>n.position)),lobbyPrincipalState?.getState().position??LOBBY_PRINCIPAL_POSITION];
+const principalPositions=()=>[...(officePrincipals?.characters.map(n=>n.getState().position)??OFFICE_CHARACTERS.map(n=>n.position)),lobbyPrincipalState?.getState().position??LOBBY_PRINCIPAL_POSITION,...(classTeachers?.getStates().filter(n=>n.visible&&n.modelStatus==='ready').map(n=>n.position)??[])];
 const principalBubbles=['교장실','중앙현관'].map(name=>{
   const element=document.createElement('div');element.id=name+'교장말풍선';element.className='교장말풍선';element.textContent=PRINCIPAL_GREETING;element.hidden=true;element.setAttribute('role','status');document.body.append(element);return element;
 });
@@ -594,6 +596,7 @@ function frame(now){
   vehicleUI.update(driving,position,isPlaying());
   roomDoorVisual.userData.update(position,mode==='walk');doorUI.update(world.roomDoors,position,isPlaying()&&driving.phase==='walking');
   scene.backgroundRotation.y=elapsed*.0006;
+  classTeachers?.update(dt,position,mode,{paused:!isPlaying()||document.hidden});
   if(officeNearby&&!officePrincipals){officePrincipals=createOfficePrincipalModels(world);[principalNPC]=officePrincipals.characters;scene.add(principalNPC.root);}
   if(officeNearby&&!officeWasNearby)void officePrincipals.load();
   officeWasNearby=officeNearby;
@@ -661,6 +664,8 @@ try{
   window.schoolTour={getState:()=>({ready,mode,locked,dragMode,freeLook,touch:touchControls.getState(),graphics:{pixelRatio:renderer.getPixelRatio(),shadows:renderer.shadowMap.enabled},position:{...position},yaw,pitch,photoFinish:class64PhotoFinish.getState(),jump:jumpMotion.getState(),character:{...avatar.getState(),visible:avatar.root.visible,position:avatar.root.position.toArray()},thirdPerson:{distance:cameraDistance,requestedDistance:followDistance,blocked:cameraBlocked,camera:camera.position.toArray()},overview:{autoOrbit,orbit:{...orbit},camera:camera.position.toArray()},visitedRooms:visitedRooms.size,visitedFloors:visitedFloors.size,drawCalls:renderer.info.render.calls,menuOpen:$('게임메뉴').open})};
   window.schoolTour.getPrincipalState=()=>principalNPC?.getState()??{position:{...OFFICE_CHARACTERS[0].position},modelStatus:'not-requested',faceTexture:'not-requested',visible:false};
   window.schoolTour.getOfficePrincipalStates=()=>officePrincipals?.characters.map(npc=>npc.getState())??OFFICE_CHARACTERS.map(config=>({id:config.id,position:{...config.position},height:config.height,modelStatus:'not-requested',visible:false}));
+  classTeachers=createClassTeachers(world);for(const teacher of classTeachers.teachers)scene.add(teacher.root);
+  window.schoolTour.getClassTeacherStates=()=>classTeachers.getStates();
   window.schoolTour.getApprovedAssets=getApprovedAssets;
   window.schoolTour.getFootballState=()=>footballPhysics.getState();
   window.schoolTour.getDrivingState=()=>driving.getState();
