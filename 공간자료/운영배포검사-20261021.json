@@ -1,0 +1,32 @@
+{
+  "checkedAt": "2026-10-21T04:07:21.552Z",
+  "runtimeCommit": "e93e019",
+  "deploymentId": "3fcf2515-1120-4059-922d-1e7db115ca9b",
+  "deploymentStatus": "SUCCESS",
+  "url": "https://tour.seokam.es.kr/",
+  "publicFilesMatchedBySHA256": 163,
+  "totalBytes": 120412796,
+  "fileFailures": [],
+  "checks": {
+    "/healthz": 200,
+    "/admin": 200,
+    "/api/admin/structure": 401,
+    "/.env": 403,
+    "/school-assets/catalog.json": 403
+  },
+  "productionBrowser": {
+    "ok": true,
+    "teachersRegistered": 8,
+    "noTeacherDownloadsOnStartScreen": true,
+    "roomsVisited": ["4F_6-4", "2F_SCIENCE", "4F_GRADE6_RESEARCH"],
+    "teachersObservedMoving": ["teacher-6-4", "teacher-science"],
+    "javascriptErrors": [],
+    "failedRequestsExcludingFavicon": []
+  },
+  "retry": {
+    "firstDeployment": "9e423894-cc81-4209-8b56-06a1ed4df8f2",
+    "error": "Failed to snapshot repository. Please try again in a few minutes.",
+    "resolution": "Retried the identical committed source archive; no code or configuration changes were required."
+  },
+  "note": "This verification-only record does not change the deployed runtime. Other workstations must update from main before deploying to avoid restoring the older school copy again."
+}
