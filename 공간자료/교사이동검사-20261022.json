@@ -25,5 +25,19 @@
     "browserErrors": [],
     "failedRequests": []
   },
-  "deployment": "Pending provider deployment attempt; this is not a production success record."
+  "deployment": {
+    "runtimeCommit": "82daa27",
+    "status": "blocked-by-provider-outage",
+    "authenticationRestored": true,
+    "attempts": 2,
+    "error": "Failed to upload code with status code 502 Bad Gateway",
+    "newDeploymentCreated": false,
+    "lastProductionDeployment": "3fcf2515-1120-4059-922d-1e7db115ca9b",
+    "productionHealth": 200,
+    "releaseDirectory": "배포자료/release-82daa27",
+    "statusSource": "https://status.railway.com/",
+    "securityNotice": "https://blog.railway.com/p/security-disclosure-wednesday-october-21st",
+    "credentialsChanged": false,
+    "nextStep": "After builds resume, deploy this runtime or a newer descendant commit to the existing service, then verify production. Review Railway's credential rotation recommendation separately with the owner."
+  }
 }
