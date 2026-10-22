@@ -1,6 +1,14 @@
 // Navigation is derived from the current classroom furniture, never an older map.
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 const turn=(a,b)=>Math.atan2(Math.sin(b-a),Math.cos(b-a));
+// Segment/circle test is cheap enough for steering; furniture stays in the
+// precomputed graph. Never choose a shortcut through the student's body.
+function avoidsPlayer(a,b,player){
+  if(!player)return true;
+  const dx=b.x-a.x,dy=b.y-a.y,len2=dx*dx+dy*dy;
+  const t=len2?Math.max(0,Math.min(1,((player.x-a.x)*dx+(player.y-a.y)*dy)/len2)):0;
+  return Math.hypot(a.x+dx*t-player.x,a.y+dy*t-player.y)>=.68;
+}
 export function createTeacherWalk(world,config){
   const room=world.data.rooms.find(r=>r.id===config.roomId);
   if(!room)throw new Error('선생님 교실을 찾을 수 없습니다: '+config.roomId);
@@ -19,28 +27,41 @@ export function createTeacherWalk(world,config){
   const connected=new Set([initial.id]),queue=[initial.id];
   for(let i=0;i<queue.length;i++)for(const id of nodes[queue[i]].neighbors)if(!connected.has(id)){connected.add(id);queue.push(id);}
   const reachable=queue.map(id=>nodes[id]);
-  let position={x:initial.x,y:initial.y,z},heading=Math.PI/2,speed=0,phase=0,total=0,wait=1.1,serial=0,path=[],moving=false,yielding=false;
-  function choosePath(){
-    const start=[...reachable].sort((a,c)=>distance(a,position)-distance(c,position)).find(n=>clear(position,n));
+  let position={x:initial.x,y:initial.y,z},heading=Math.PI/2,speed=0,phase=0,total=0,wait=1.1,serial=0,path=[],moving=false,yielding=false,replanIn=0,replans=0;
+  function choosePath(player=null){
+    path=[];replans++;
+    const passable=(a,c)=>avoidsPlayer(a,c,player);
+    const start=[...reachable].sort((a,c)=>distance(a,position)-distance(c,position)).find(n=>clear(position,n)&&passable(position,n));
     if(!start)return;
+    const prev=new Map([[start.id,null]]),q=[start.id];
+    for(let i=0;i<q.length;i++)for(const id of nodes[q[i]].neighbors)if(!prev.has(id)&&passable(nodes[q[i]],nodes[id])){prev.set(id,q[i]);q.push(id);}
     // Alternate distant clear aisles, rather than jitter between nearby cells.
-    const ranked=reachable.filter(n=>distance(n,position)>1.5).sort((a,c)=>distance(c,position)-distance(a,position));
+    let ranked=q.map(id=>nodes[id]).filter(n=>distance(n,position)>1.5).sort((a,c)=>distance(c,position)-distance(a,position));
+    // A student can divide a narrow aisle. Use the free side instead of waiting
+    // forever for a target in the disconnected half of the room.
+    if(!ranked.length)ranked=q.map(id=>nodes[id]).filter(n=>distance(n,position)>.45).sort((a,c)=>distance(c,position)-distance(a,position));
     if(!ranked.length)return;
     const target=ranked[(serial++*37)%Math.max(1,Math.floor(ranked.length*.35))];
-    const prev=new Map([[start.id,null]]),q=[start.id];
-    for(let i=0;i<q.length&&!prev.has(target.id);i++)for(const id of nodes[q[i]].neighbors)if(!prev.has(id)){prev.set(id,q[i]);q.push(id);}
     const route=[];for(let id=target.id;id!==null&&id!==undefined;id=prev.get(id))route.unshift(nodes[id]);
     let anchor=position;path=[];
-    while(route.length){let index=route.length-1;while(index>0&&!clear(anchor,route[index]))index--;const point=route[index];path.push(point);anchor=point;route.splice(0,index+1);}
+    while(route.length){let index=route.length-1;while(index>0&&(!clear(anchor,route[index])||!passable(anchor,route[index])))index--;const point=route[index];path.push(point);anchor=point;route.splice(0,index+1);}
   }
-  const state=()=>({position:{...position},heading,speed,phase,distance:total,moving,yielding,waiting:wait>0,roomId:config.roomId,navigationNodes:reachable.length});
+  const state=()=>({position:{...position},heading,speed,phase,distance:total,moving,yielding,waiting:wait>0,roomId:config.roomId,navigationNodes:reachable.length,replans});
   return {getState:state,update(dt,player,{paused=false}={}){
     if(paused||!Number.isFinite(dt)||dt<=0){speed=0;moving=false;return state();}
-    dt=Math.min(dt,.05);moving=false;
-    yielding=!!player&&Math.abs(player.z-z)<1.15&&distance(player,position)<1.05;
+    dt=Math.min(dt,.05);moving=false;replanIn=Math.max(0,replanIn-dt);
+    const obstacle=player&&Math.abs(player.z-z)<1.15?player:null;
+    // Physical contact still stops the teacher; merely watching from 0.8–1 m
+    // away no longer freezes them indefinitely.
+    yielding=!!obstacle&&distance(obstacle,position)<.68;
     if(yielding){speed=0;return state();}
     if(wait>0){wait-=dt;speed=0;return state();}
-    if(!path.length){choosePath();if(!path.length)return state();}
+    if(path.length&&!avoidsPlayer(position,path[0],obstacle)){
+      speed=0;yielding=true;
+      if(replanIn<=0){choosePath(obstacle);replanIn=.8;wait=.35;}
+      return state();
+    }
+    if(!path.length){if(replanIn>0)return state();choosePath(obstacle);replanIn=.8;if(!path.length)return state();}
     const target=path[0],len=distance(position,target);
     if(len<.001){path.shift();if(!path.length)wait=1.2+(serial%4)*.45;speed=0;return state();}
     const dx=(target.x-position.x)/len,dy=(target.y-position.y)/len,angle=turn(heading,Math.atan2(dx,-dy));
@@ -48,7 +69,7 @@ export function createTeacherWalk(world,config){
     const desired=Math.abs(angle)>.55?0:Math.min(.48,Math.sqrt(len*.8));
     speed+=Math.max(-1.5*dt,Math.min(.65*dt,desired-speed));
     const step=Math.min(speed*dt,len),next={x:position.x+dx*step,y:position.y+dy*step,z};
-    if(!safe(next,.04)){speed=0;path=[];wait=.4;return state();}
+    if(!safe(next,.04)||!avoidsPlayer(position,next,obstacle)){speed=0;path=[];wait=.4;return state();}
     position=next;total+=step;phase+=step*Math.PI*2/.68;moving=step>.00001;return state();
   }};
 }

@@ -19,6 +19,8 @@ async page=>{
    schoolTour.test.setPosition({...c.position,y:1.5});return performance.now();
   },i);
   await page.waitForFunction(i=>{const t=schoolTour.getClassTeacherStates()[i];return t.visible&&t.hasModel&&t.modelStatus==='ready';},i,{timeout:60000});
+  const before=await page.evaluate(i=>schoolTour.getClassTeacherStates()[i].distance,i);
+  await page.waitForFunction(({i,before})=>schoolTour.getClassTeacherStates()[i].distance>before+.45,{i,before},{timeout:30000});
   const check=await page.evaluate(({i,started})=>{
    window.pauseTeacherProbe=true;
    const {classTeachers,scene,camera,renderer,THREE:T}=teacherProbe,t=classTeachers.teachers[i],p=t.root.position;
@@ -29,8 +31,8 @@ async page=>{
    const bounds=new T.Box3();for(const child of t.root.children)if(!child.isSprite)bounds.expandByObject(child);
    const size=bounds.getSize(new T.Vector3());
    const cached=classTeachers.getStates().filter(t=>t.hasModel).length;
-   if(!meshes||!drawn||size.y<1.5||size.y>2.1||cached>2)throw Error('Teacher not rendered: '+JSON.stringify({i,meshes,drawn,size,cached}));
-   return {roomId:state.roomId,hasModel:state.hasModel,readyMs:performance.now()-started,preparation:state.preparation,meshes,drawn,height:size.y,cached};
+   if(!meshes||!drawn||size.y<t.config.height-.15||size.y>t.config.height+.08||cached>2)throw Error('Teacher not rendered: '+JSON.stringify({i,meshes,drawn,size,cached}));
+   return {roomId:state.roomId,hasModel:state.hasModel,readyMs:performance.now()-started,preparation:state.preparation,meshes,drawn,height:size.y,configuredHeight:t.config.height,distance:state.distance,cached};
   },{i,started});checks.push(check);
   await page.screenshot({path:'output/restored-'+check.roomId+'.png'});
   await page.evaluate(()=>teacherProbe.resume());

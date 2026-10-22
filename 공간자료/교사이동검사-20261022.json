@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-22",
+  "diagnosis": "6-2 teacher remained yielding for 30 seconds with a stationary student 0.8 m away; distance stayed zero.",
+  "changes": [
+    "Route around the student on the existing collision-safe aisle graph, with bounded replanning frequency",
+    "Use shorter clear paths when the student divides a narrow aisle",
+    "Keep physical contact and menu pauses, smooth turns and speed transitions",
+    "Reduce 6-2 and 6-5 heights from 1.68 m to 1.512 m (90%), preserving proportions"
+  ],
+  "verification": {
+    "allEightTeachersAt30And60Fps": true,
+    "stationaryAndMovedStudentAvoidanceAllEight": true,
+    "minimumStudentClearanceMetres": 0.68,
+    "shortAisleFallback": true,
+    "classroomGeometryUnchanged": true,
+    "principalPatrolAndConversationStop": true,
+    "scienceRestPose": true,
+    "teacherLoadingAndCacheRegression": true,
+    "rigTransformRegression": true,
+    "runtimeBuildAnd165FileHttpChecks": true,
+    "browserActualMovementAndMeshDrawAllEight": true,
+    "browserHeight6_2": 1.51849,
+    "browserHeight6_5": 1.52363,
+    "heightNote": "Animated bounds vary during a stride; normalized neutral height is exactly 1.512 m.",
+    "browserErrors": [],
+    "failedRequests": []
+  },
+  "deployment": "Pending provider deployment attempt; this is not a production success record."
+}

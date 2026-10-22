@@ -9,10 +9,10 @@ import {correctScienceRestPose} from './과학교사자세.mjs';
 // Recover only the collaborator's models, not their older copy of the school.
 export const CLASS_TEACHERS=Object.freeze([
   {id:'teacher-6-1',roomId:'4F_6-1',label:'6-1 담임선생님',position:{x:62.6,y:-4.55,z:10.2},height:1.79,url:new URL('./캐릭터모델/6-1-담임선생님.glb',import.meta.url)},
-  {id:'teacher-6-2',roomId:'4F_6-2',label:'6-2 담임선생님',position:{x:52.6,y:-4.55,z:10.2},height:1.68,url:new URL('./캐릭터모델/6-2-담임선생님.glb',import.meta.url)},
+  {id:'teacher-6-2',roomId:'4F_6-2',label:'6-2 담임선생님',position:{x:52.6,y:-4.55,z:10.2},height:1.512,url:new URL('./캐릭터모델/6-2-담임선생님.glb',import.meta.url)},
   {id:'teacher-6-3',roomId:'4F_6-3',label:'6-3 담임선생님',position:{x:42.6,y:-4.55,z:10.2},height:1.79,url:new URL('./캐릭터모델/6-3-담임선생님.glb',import.meta.url)},
   {id:'teacher-6-4',roomId:'4F_6-4',label:'6-4 담임선생님',position:{x:32.6,y:-4.55,z:10.2},height:1.78,url:new URL('./캐릭터모델/6-4-담임선생님.glb',import.meta.url)},
-  {id:'teacher-6-5',roomId:'4F_6-5',label:'6-5 담임선생님',position:{x:22.6,y:-4.55,z:10.2},height:1.68,url:new URL('./캐릭터모델/6-5-담임선생님.glb',import.meta.url)},
+  {id:'teacher-6-5',roomId:'4F_6-5',label:'6-5 담임선생님',position:{x:22.6,y:-4.55,z:10.2},height:1.512,url:new URL('./캐릭터모델/6-5-담임선생님.glb',import.meta.url)},
   {id:'teacher-6-6',roomId:'4F_6-6',label:'6-6 담임선생님',position:{x:12.6,y:-4.55,z:10.2},height:1.82,url:new URL('./캐릭터모델/6-6-담임선생님.glb',import.meta.url)},
   {id:'teacher-6-7',roomId:'4F_6-7',label:'6-7 담임선생님',position:{x:2.6,y:-4.55,z:10.2},height:1.76,url:new URL('./캐릭터모델/6-7-담임선생님.glb',import.meta.url)},
   {id:'teacher-science',roomId:'2F_SCIENCE',label:'과학선생님',position:{x:82.6,y:-4.55,z:3.4},height:1.68,url:new URL('./캐릭터모델/과학선생님.glb',import.meta.url)}
