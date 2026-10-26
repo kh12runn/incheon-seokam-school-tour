@@ -1,8 +1,8 @@
 async page=>{
  const result=await page.evaluate(async()=>{
-  const {T,scene,r,camera,models}=suitProbe,{GLTFLoader}=await import('/웹학교/외부도구/GLTFLoader.js'),{restoreTeacher67Suit}=await import('/웹학교/검사/육칠정장복구.mjs?rev=2');
+  const {T,scene,r,camera,models}=suitProbe,{GLTFLoader}=await import('/웹학교/외부도구/GLTFLoader.js'),{restoreTeacher67Suit}=await import('/웹학교/검사/육칠정장복구.mjs?rev=8');
   const loader=new GLTFLoader(),face=(await loader.loadAsync('/웹학교/캐릭터모델/검토-20261025/teacher-6-7.glb')).scene,body=(await loader.loadAsync('/웹학교/캐릭터모델/교장선생님-귀여운.glb')).scene;
-  const combined=restoreTeacher67Suit(face,body);scene.remove(models[0].root);const root=new T.Group();root.add(combined);root.position.x=-.65;scene.add(root);models[0]={root,model:combined};window.suit67=combined;suitView();return {edit:combined.userData.edit,vertices:combined.children.map(m=>m.geometry.attributes.position.count)};
+  const combined=restoreTeacher67Suit(face,body);scene.remove(models[0].root);const root=new T.Group();root.add(combined);root.position.x=-.65;scene.add(root);models[0]={root,model:combined};window.suit67=combined;suitView();return {...combined.userData,vertices:combined.children.map(m=>m.geometry.attributes.position.count)};
  });
  for(const [name,angle]of [['front',0],['back',Math.PI],['side',Math.PI/2]]){await page.evaluate(a=>suitView(a),angle);await page.screenshot({path:'output/suit67-'+name+'.png'});}
  const download=page.waitForEvent('download');

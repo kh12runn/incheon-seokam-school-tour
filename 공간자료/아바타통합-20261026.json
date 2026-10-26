@@ -55,9 +55,9 @@
       "file": "6-7-담임선생님.glb",
       "releaseAsset": "teacher-6-7.glb",
       "sourceSHA256": "cda929798369ab0a9e7852fadb62638e58b14587bf72d8c2dab7ef80cfe677c7",
-      "sha256": "0ee4f26139543e20f4cd7515ca8671b5ce68dd359b9349e5694ca4c4758d08bc",
-      "bytes": 54464880,
-      "edit": "기존 얼굴·머리 유지; 교장실 정장·손·구두 일체형 몸체, 손목 보행 연결 개선",
+      "sha256": "713b844547710a945b7a737bdde52684b4692ac8ffc6fd0bc0a754e78464a0be",
+      "bytes": 54481496,
+      "edit": "기존 얼굴·머리와 본래 목 유지; 겹친 목 제거 및 목·깃 위치 맞춤, 검정 정장",
       "bodySource": "교장선생님-귀여운.glb"
     },
     {
