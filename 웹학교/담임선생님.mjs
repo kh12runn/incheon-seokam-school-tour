@@ -3,8 +3,7 @@ import {GLTFLoader} from './외부도구/GLTFLoader.js';
 import {normalizePrincipalModel} from './교장실캐릭터.mjs';
 import {createPrincipalWalkRigAsync} from './교장보행리그.mjs';
 import {createTeacherWalk} from './선생님교실산책.mjs';
-import {finishTeacherMaterials,finishTeacherMaterialsAsync} from './선생님재질.mjs';
-import {correctScienceRestPose} from './과학교사자세.mjs';
+import {prepareApprovedTeacherMaterials,TEACHER_MODEL_RELEASE} from './승인교사모델.mjs';
 
 // Recover only the collaborator's models, not their older copy of the school.
 export const CLASS_TEACHERS=Object.freeze([
@@ -42,7 +41,7 @@ export function createClassTeachers(world,services={}){
     const response=await fetch(config.url,{signal:AbortSignal.timeout(45000)});if(!response.ok)throw new Error('모델 HTTP '+response.status);
     return (await loader.parseAsync(await response.arrayBuffer(),new URL('.',config.url).href)).scene;
   });
-  const prepare=services.prepareMaterials??finishTeacherMaterialsAsync;
+  const prepare=services.prepareMaterials??prepareApprovedTeacherMaterials;
   const makeRig=services.makeRig??createPrincipalWalkRigAsync;
   const teachers=CLASS_TEACHERS.map(config=>{
     const root=new THREE.Group();root.name=config.label;root.visible=false;
@@ -67,7 +66,7 @@ export function createClassTeachers(world,services={}){
       }finally{if(finishAbort===controller)finishAbort=null;}
     }
     return {root,config,near(player,mode){const b=room.bounds;return !!player&&mode==='walk'&&Math.abs(player.z-b[4])<1&&player.x>=b[0]-1.25&&player.x<=b[1]+1.25&&player.y>=b[2]-1.5&&player.y<=b[3]+4;},
-      getState:()=>({...walk?.getState(),position:walk?.getState().position??{...config.position},id:config.id,roomId:config.roomId,label:config.label,height:config.height,modelStatus:status,visible:root.visible,hasModel:!!(preview||rig),error,lastUsed,preparation,animation:'procedural-skinned-walk'}),
+      getState:()=>({...walk?.getState(),position:walk?.getState().position??{...config.position},id:config.id,roomId:config.roomId,label:config.label,height:config.height,modelRelease:TEACHER_MODEL_RELEASE,modelStatus:status,visible:root.visible,hasModel:!!(preview||rig),error,lastUsed,preparation,animation:'procedural-skinned-walk'}),
       update(dt,player,paused){lastUsed=tick;const state=walk?.update(dt,player,{paused:paused||status!=='ready'});if(!state)return;root.position.set(state.position.x,state.position.z,-state.position.y);root.rotation.y=state.heading;rig?.update(paused?0:dt,state);},
       evict(){generation++;finishAbort?.abort();if(rig)root.remove(rig.root);if(preview)root.remove(preview);release(owned);owned.clear();rig=null;preview=null;source=null;status='not-requested';preparation=null;if(label)label.visible=true;},
       canLoad:()=>status==='not-requested'||status==='error'&&tick>retryAt,
@@ -78,23 +77,18 @@ export function createClassTeachers(world,services={}){
           const asset=await fetchModel(config);
           if(version!==generation){release(resources(asset));return;}
           owned=resources(asset);source=normalizePrincipalModel(asset,config.height);
-          if(config.id==='teacher-science'){
-            await correctScienceRestPose(source);resources(source,owned);
-            if(version!==generation){release(owned);return;}
-          }
-          // Show the actual approved model immediately. Do not gate visibility on
-          // the expensive atlas filter. Cloned nodes share the original geometry.
-          const rigSource=source.clone(true),textures=new Map();
-          rigSource.traverse(o=>{if(o.isMesh)for(const m of [].concat(o.material))if(m.map)textures.set(m.map,m.map);});
-          finishTeacherMaterials(rigSource,textures);resources(rigSource,owned);
+          // Show the approved model immediately while the walk rig is assembled.
+          // Keep the release's vertex tints and maps; this is not the old scan.
+          const rigSource=source.clone(true);
+          prepareApprovedTeacherMaterials(rigSource);resources(rigSource,owned);
           preview=rigSource.clone(true);root.add(preview);if(label)label.visible=false;
           preparation={processing:'pending'};
           const built=await makeRig(rigSource,{height:config.height,receiveShadow:false});
           if(version!==generation){release(resources(built.root));return;}
           rig=built;resources(rig.root,owned);walk??=createTeacherWalk(world,config);
           root.add(rig.root);root.remove(preview);preview=null;status='ready';
-          // One filter at a time, independent of loading/visibility. Moving to the
-          // next classroom no longer waits for the previous teacher's filtering.
+          // Finishing remains independent of loading/visibility. The approved
+          // release needs no old scanned-face atlas processing.
           finishQueue=finishQueue.catch(()=>{}).then(()=>finish(version));
         }catch(reason){
           if(version!==generation)return;

@@ -19,6 +19,7 @@ node_modules/
 /output/
 /.playwright-cli/
 /debug.log
+/웹학교/캐릭터모델/검토-20261025/
 
 # Only generated instructions are tracked in the photo intake tree.
 /촬영사진_넣는곳/**/*

@@ -1,0 +1,48 @@
+{
+  "ok": true,
+  "schoolInteriorsPreserved": 71,
+  "teacherModels": [
+    {
+      "file": "6-1-담임선생님.glb",
+      "byteExact": true
+    },
+    {
+      "file": "6-2-담임선생님.glb",
+      "byteExact": true
+    },
+    {
+      "file": "6-3-담임선생님.glb",
+      "byteExact": true
+    },
+    {
+      "file": "6-4-담임선생님.glb",
+      "byteExact": true
+    },
+    {
+      "file": "6-5-담임선생님.glb",
+      "byteExact": true
+    },
+    {
+      "file": "6-6-담임선생님.glb",
+      "originalImagesExact": true,
+      "faceVertices": 16212,
+      "roundingBoundaryMisses": 7
+    },
+    {
+      "file": "6-7-담임선생님.glb",
+      "originalImagesExact": true,
+      "faceVertices": 108102,
+      "roundingBoundaryMisses": 48
+    },
+    {
+      "file": "과학선생님.glb",
+      "byteExact": true
+    },
+    {
+      "file": "교장선생님-귀여운.glb",
+      "byteExact": true
+    }
+  ],
+  "approvedRelease": "teacher-models-20261025",
+  "authoringAssetsExcluded": true
+}

@@ -1,0 +1,79 @@
+{
+  "release": "teacher-models-20261025",
+  "schoolBaseline": "9cfeca3",
+  "date": "2026-10-26",
+  "models": [
+    {
+      "file": "6-1-담임선생님.glb",
+      "releaseAsset": "teacher-6-1.glb",
+      "sourceSHA256": "2c3812d128ba051520a44adb2d62f17ff1f2cadd70227292de71420f3e9cad8a",
+      "sha256": "2c3812d128ba051520a44adb2d62f17ff1f2cadd70227292de71420f3e9cad8a",
+      "bytes": 48216708,
+      "edit": "승인 원본 바이트 그대로"
+    },
+    {
+      "file": "6-2-담임선생님.glb",
+      "releaseAsset": "teacher-6-2.glb",
+      "sourceSHA256": "9122a09832d043efa186ce1b806736ee4bb5dc5f101c2fee75c02d2ea528c762",
+      "sha256": "9122a09832d043efa186ce1b806736ee4bb5dc5f101c2fee75c02d2ea528c762",
+      "bytes": 41643232,
+      "edit": "승인 원본 바이트 그대로"
+    },
+    {
+      "file": "6-3-담임선생님.glb",
+      "releaseAsset": "teacher-6-3.glb",
+      "sourceSHA256": "3ba8f6d2e273dfa259b789bf72f9d49b9ee426f288b0cfcaf77b18fb510dc520",
+      "sha256": "3ba8f6d2e273dfa259b789bf72f9d49b9ee426f288b0cfcaf77b18fb510dc520",
+      "bytes": 33434728,
+      "edit": "승인 원본 바이트 그대로"
+    },
+    {
+      "file": "6-4-담임선생님.glb",
+      "releaseAsset": "teacher-6-4.glb",
+      "sourceSHA256": "6c4da50e951a2ac5d7932cf981f41a8b505fdc5b573da2827be48be8c0e8cec0",
+      "sha256": "6c4da50e951a2ac5d7932cf981f41a8b505fdc5b573da2827be48be8c0e8cec0",
+      "bytes": 40733572,
+      "edit": "승인 원본 바이트 그대로"
+    },
+    {
+      "file": "6-5-담임선생님.glb",
+      "releaseAsset": "teacher-6-5.glb",
+      "sourceSHA256": "2885d3910d2afd166883c687cde82ee354231c5b315efcd505d28d58607548dd",
+      "sha256": "2885d3910d2afd166883c687cde82ee354231c5b315efcd505d28d58607548dd",
+      "bytes": 38608572,
+      "edit": "승인 원본 바이트 그대로"
+    },
+    {
+      "file": "6-6-담임선생님.glb",
+      "releaseAsset": "teacher-6-6.glb",
+      "sourceSHA256": "b9ad10281d3f7e7c5188c2cb09152ec2a1bf4c795d0a566c403936767ebd3973",
+      "sha256": "57ce778b86fcb300041852b18d09fa4747b14e4d2ef64a86c97545489975765c",
+      "bytes": 25752400,
+      "edit": "긴 생머리만 수정; 얼굴·의상 유지"
+    },
+    {
+      "file": "6-7-담임선생님.glb",
+      "releaseAsset": "teacher-6-7.glb",
+      "sourceSHA256": "cda929798369ab0a9e7852fadb62638e58b14587bf72d8c2dab7ef80cfe677c7",
+      "sha256": "578b950b8f1e08398e5d93db5bd1c7eb3f9a2b20d90617a883b96220b4ed8607",
+      "bytes": 27961548,
+      "edit": "이전 정장·구두 형상 활용; 새 얼굴·머리·손 유지"
+    },
+    {
+      "file": "과학선생님.glb",
+      "releaseAsset": "science.glb",
+      "sourceSHA256": "6668bf4f5dfb0e1569dd0775899a9c1076ad63f10654cb94ee67a4ad1e9a6e9c",
+      "sha256": "6668bf4f5dfb0e1569dd0775899a9c1076ad63f10654cb94ee67a4ad1e9a6e9c",
+      "bytes": 33525308,
+      "edit": "승인 원본 바이트 그대로"
+    },
+    {
+      "file": "교장선생님-귀여운.glb",
+      "releaseAsset": "principal.glb",
+      "sourceSHA256": "13ca3885e631cce7196507260146886980e383a04179c4c7c8eee19c36cf17ed",
+      "sha256": "13ca3885e631cce7196507260146886980e383a04179c4c7c8eee19c36cf17ed",
+      "bytes": 48141360,
+      "edit": "승인 원본 바이트 그대로"
+    }
+  ]
+}

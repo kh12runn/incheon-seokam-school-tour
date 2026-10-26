@@ -37,9 +37,9 @@ async page=>{
   await page.screenshot({path:'output/restored-'+check.roomId+'.png'});
   await page.evaluate(()=>teacherProbe.resume());
  }
- await page.waitForFunction(()=>schoolTour.getClassTeacherStates()[7].preparation?.processing==='worker',null,{timeout:90000});
+ await page.waitForFunction(()=>schoolTour.getClassTeacherStates()[7].preparation?.processing==='approved-original',null,{timeout:90000});
  await page.keyboard.press('v');await page.waitForFunction(()=>schoolTour.getState().mode==='overview'&&schoolTour.getClassTeacherStates().every(t=>!t.visible));
  if((await page.evaluate(()=>schoolTour.getClassTeacherStates())).some(t=>t.visible))throw Error('Teachers stayed visible in aerial view');
  await page.unroute('**/*');if(errors.length||failed.length)throw Error(JSON.stringify({errors,failed}));
- return {ok:true,checks,finalWorkerFinished:true,errors,failed};
+ return {ok:true,checks,approvedMaterialsPreserved:true,errors,failed};
 }
