@@ -2,14 +2,19 @@ import * as T from '../외부도구/three.module.js';
 // Minimal offline GLB packer. Original embedded image bytes are copied verbatim.
 // Only referenced vertices are written; no bitmap resampling or lossy geometry.
 export async function editedGLB(root,sourceURL){
- const original=await (await fetch(sourceURL)).arrayBuffer(),view=new DataView(original),length=view.getUint32(12,true),source=JSON.parse(new TextDecoder().decode(new Uint8Array(original,20,length))),binOffset=28+length;
- const json={asset:{version:'2.0',generator:'Seokam targeted mesh edit 2026-10-26',extras:{release:'teacher-models-20261025',edit:root.userData.edit}},scene:0,scenes:[{nodes:[]}],nodes:[],meshes:[],materials:[],accessors:[],bufferViews:[],buffers:[{byteLength:0}],images:[],textures:source.textures,samplers:source.samplers};
+ const sources=[];for(const url of (Array.isArray(sourceURL)?sourceURL:[sourceURL])){const response=await fetch(url);if(!response.ok)throw Error('Source GLB HTTP '+response.status);const original=await response.arrayBuffer(),length=new DataView(original).getUint32(12,true);sources.push({original,source:JSON.parse(new TextDecoder().decode(new Uint8Array(original,20,length))),binOffset:28+length});}
+ const json={asset:{version:'2.0',generator:'Seokam targeted mesh edit 2026-10-26',extras:{release:'teacher-models-20261025',edit:root.userData.edit}},scene:0,scenes:[{nodes:[]}],nodes:[],meshes:[],materials:[],accessors:[],bufferViews:[],buffers:[{byteLength:0}],images:[],textures:[],samplers:[]};
  const parts=[];let offset=0;
  const append=(bytes,target)=>{const a=bytes instanceof Uint8Array?bytes:new Uint8Array(bytes.buffer,bytes.byteOffset,bytes.byteLength),id=json.bufferViews.length;json.bufferViews.push({buffer:0,byteOffset:offset,byteLength:a.byteLength,...(target?{target}:{})});parts.push({offset,bytes:a});offset+=a.byteLength;offset=(offset+3)&~3;return id;};
- for(const img of source.images){const bv=source.bufferViews[img.bufferView];json.images.push({...img,bufferView:append(new Uint8Array(original,binOffset+(bv.byteOffset??0),bv.byteLength))});}
+ for(const entry of sources){const {original,source,binOffset}=entry,imageOffset=json.images.length,samplerOffset=json.samplers.length;entry.textureOffset=json.textures.length;
+  for(const img of source.images){const bv=source.bufferViews[img.bufferView];json.images.push({...img,bufferView:append(new Uint8Array(original,binOffset+(bv.byteOffset??0),bv.byteLength))});}
+  json.samplers.push(...(source.samplers??[]));json.textures.push(...source.textures.map(t=>({...t,source:t.source+imageOffset,...(t.sampler!==undefined?{sampler:t.sampler+samplerOffset}:{})})));
+ }
  const materialMap=new Map();
  function material(m){if(materialMap.has(m))return materialMap.get(m);let result;
-  if(m.map){const src=source.materials.find(v=>(v.name??'')===m.name);if(!src)throw Error('Original material not found: '+m.name);result=structuredClone(src);}
+  if(m.map){const entry=sources[m.userData.glbSource??0],src=entry.source.materials.find(v=>(v.name??'')===m.name);if(!src)throw Error('Original material not found: '+m.name);result=structuredClone(src);
+   const remap=v=>{for(const [key,value]of Object.entries(v)){if(value&&typeof value==='object'){if(key.endsWith('Texture')&&Number.isInteger(value.index))value.index+=entry.textureOffset;else remap(value);}}};remap(result);
+  }
   else result={name:m.name,doubleSided:m.side===T.DoubleSide,pbrMetallicRoughness:{baseColorFactor:[m.color.r,m.color.g,m.color.b,m.opacity],roughnessFactor:m.roughness,metallicFactor:m.metalness}};
   const n=json.materials.length;json.materials.push(result);materialMap.set(m,n);return n;
  }

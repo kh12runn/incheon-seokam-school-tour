@@ -21,7 +21,7 @@ function* transformGeometry(geometry,matrix){
 }
 // The approved GLBs are unrigged. Bake their original transforms, retain every
 // vertex/UV/material, then give limbs soft skin weights for a restrained walk.
-function* prepareWalkRig(model,{height=1.83,receiveShadow=true}={}){
+function* prepareWalkRig(model,{height=1.83,receiveShadow=true,continuousSleeves=false}={}){
   model.updateMatrixWorld(true);
   // Latest approved single principal has adult proportions, regardless of GLB filename.
   const scale=height/1.83;
@@ -45,7 +45,10 @@ function* prepareWalkRig(model,{height=1.83,receiveShadow=true}={}){
     for(let i=0;i<pos.count;i++){
       const x=pos.getX(i)/scale,y=pos.getY(i)/scale,side=x<0?0:1;
       let upper=0,lower=0,amount=0,bend=0;
-      const arm=smooth(.17,.25,Math.abs(x))*(1-smooth(1.41,1.53,y))*smooth(.70,.83,y);
+      // The continuous 6-7 suit includes fingers below the old wrist cutoff.
+      // Keep the entire hand on the forearm instead of blending it to the torso.
+      const lowerArm=continuousSleeves?smooth(.58,.67,y)*(smooth(.84,.95,y)+(1-smooth(.84,.95,y))*smooth(.235,.255,Math.abs(x))):smooth(.70,.83,y);
+      const arm=smooth(.17,.25,Math.abs(x))*(1-smooth(1.41,1.53,y))*lowerArm;
       if(arm>.01){upper=side?7:5;lower=upper+1;amount=arm;bend=1-smooth(1.105,1.215,y);}
       else if(y<.94){upper=side?3:1;lower=upper+1;amount=1-smooth(.80,.94,y);bend=1-smooth(.395,.525,y);}
       indices.set([0,upper,lower,0],i*4);weights.set([1-amount,amount*(1-bend),amount*bend,0],i*4);

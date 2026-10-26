@@ -1,0 +1,10 @@
+import fs from 'node:fs';
+import {createHash} from 'node:crypto';
+const root=new URL('../',import.meta.url),target=new URL('웹학교/캐릭터모델/6-7-담임선생님.glb',root),source=new URL('웹학교/캐릭터모델/검토-20261025/teacher67-suit.glb',root),bytes=fs.readFileSync(source);
+const view=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength);if(view.getUint32(0,true)!==0x46546c67)throw Error('Not GLB');
+const json=JSON.parse(bytes.subarray(20,20+view.getUint32(12,true)));if(json.asset.extras.edit!=='6-7 approved head retained; continuous principal suit, hands and dress shoes')throw Error('Unexpected model');
+const backup=new URL('모델/백업/아바타-20261026/6-7-분리정장.glb',root);if(!fs.existsSync(backup))fs.copyFileSync(target,backup);
+fs.copyFileSync(source,target);
+const manifestPath=new URL('공간자료/아바타통합-20261026.json',root),manifest=JSON.parse(fs.readFileSync(manifestPath)),entry=manifest.models.find(m=>m.file==='6-7-담임선생님.glb');
+entry.sha256=createHash('sha256').update(bytes).digest('hex');entry.bytes=bytes.length;entry.edit='기존 얼굴·머리 유지; 교장실 정장·손·구두 일체형 몸체, 손목 보행 연결 개선';entry.bodySource='교장선생님-귀여운.glb';
+fs.writeFileSync(manifestPath,JSON.stringify(manifest,null,2)+'\n');console.log({file:entry.file,bytes:entry.bytes,sha256:entry.sha256});

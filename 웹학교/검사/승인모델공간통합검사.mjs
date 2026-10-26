@@ -13,7 +13,9 @@ for(const entry of report.models){
  if(!/^6-[67]-/.test(entry.file)){assert.equal(entry.sha256,entry.sourceSHA256,'Unedited approved model remains byte-exact');models.push({file:entry.file,byteExact:true});continue;}
  const source=glb(new URL('웹학교/캐릭터모델/검토-20261025/'+entry.releaseAsset,root));
  const imageHashes=x=>x.j.images.map(im=>{const v=x.j.bufferViews[im.bufferView];return sha(x.b.subarray(x.offset+(v.byteOffset??0),x.offset+(v.byteOffset??0)+v.byteLength));});
- assert.deepEqual(imageHashes(g),imageHashes(source),'Source face/skin texture bytes unchanged');
+ const expectedImages=imageHashes(source);
+ if(entry.bodySource){const donor=glb(new URL('웹학교/캐릭터모델/'+entry.bodySource,root));expectedImages.push(...imageHashes(donor));}
+ assert.deepEqual(imageHashes(g),expectedImages,'Source face and donor body texture bytes unchanged');
  const bounds=source.j.meshes.flatMap(m=>m.primitives).map(p=>source.j.accessors[p.attributes.POSITION]),min=[0,1,2].map(c=>Math.min(...bounds.map(b=>b.min[c]))),max=[0,1,2].map(c=>Math.max(...bounds.map(b=>b.max[c]))),s=1.82/(max[1]-min[1]);
  const key=p=>p.map(v=>Math.round(v*1e4)).join(',');
  const normalize=p=>[(p[0]-(min[0]+max[0])/2)*s,(p[1]-min[1])*s,(p[2]-(min[2]+max[2])/2)*s];

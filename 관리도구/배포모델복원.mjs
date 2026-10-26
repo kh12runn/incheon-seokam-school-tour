@@ -7,9 +7,9 @@ import {Readable,Transform} from 'node:stream';
 import {pipeline} from 'node:stream/promises';
 
 // Immutable public Git objects, never credentials or mutable branch URLs.
-const sourceCommit='96a83c8033b7510ec4d57fd787260ef32b68d9b3';
 const root=process.argv[2]?path.resolve(process.argv[2]):fileURLToPath(new URL('../',import.meta.url));
 const manifest=JSON.parse(await fs.readFile(new URL('../공간자료/아바타통합-20261026.json',import.meta.url),'utf8'));
+const sourceCommit=manifest.sourceCommit;
 for(const model of manifest.models){
   if(path.basename(model.file)!==model.file||!model.file.endsWith('.glb'))throw Error('Invalid model path');
   const relative='웹학교/캐릭터모델/'+model.file,target=path.join(root,relative);
@@ -18,6 +18,7 @@ for(const model of manifest.models){
     if(hash.digest('hex')!==model.sha256)throw Error('Existing model checksum mismatch: '+model.file);
     console.log('Verified existing '+model.file);continue;
   }catch(error){if(error.code!=='ENOENT')throw error;}
+  if(!/^[a-f0-9]{40}$/.test(sourceCommit??''))throw Error('Missing immutable source commit: use 배포준비.mjs to package missing models');
   await fs.mkdir(path.dirname(target),{recursive:true});
   const temp=target+'.download';
   try{

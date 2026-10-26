@@ -55,9 +55,10 @@
       "file": "6-7-담임선생님.glb",
       "releaseAsset": "teacher-6-7.glb",
       "sourceSHA256": "cda929798369ab0a9e7852fadb62638e58b14587bf72d8c2dab7ef80cfe677c7",
-      "sha256": "578b950b8f1e08398e5d93db5bd1c7eb3f9a2b20d90617a883b96220b4ed8607",
-      "bytes": 27961548,
-      "edit": "이전 정장·구두 형상 활용; 새 얼굴·머리·손 유지"
+      "sha256": "0ee4f26139543e20f4cd7515ca8671b5ce68dd359b9349e5694ca4c4758d08bc",
+      "bytes": 54464880,
+      "edit": "기존 얼굴·머리 유지; 교장실 정장·손·구두 일체형 몸체, 손목 보행 연결 개선",
+      "bodySource": "교장선생님-귀여운.glb"
     },
     {
       "file": "과학선생님.glb",
