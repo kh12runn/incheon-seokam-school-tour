@@ -2,11 +2,13 @@ FROM node:22-alpine AS build
 WORKDIR /app
 COPY ["관리도구/웹서버.mjs", "관리도구/웹서버.mjs"]
 COPY ["관리도구/배포최적화.mjs", "관리도구/배포최적화.mjs"]
+COPY ["관리도구/배포모델복원.mjs", "관리도구/배포모델복원.mjs"]
+COPY ["공간자료/아바타통합-20261026.json", "공간자료/아바타통합-20261026.json"]
 COPY ["관리도구/관리자", "관리도구/관리자"]
 COPY ["관리자", "관리자"]
 COPY index.html ./
 COPY ["웹학교", "웹학교"]
-RUN node 관리도구/배포최적화.mjs /runtime
+RUN node 관리도구/배포모델복원.mjs && node 관리도구/배포최적화.mjs /runtime
 FROM node:22-alpine
 RUN apk add --no-cache imagemagick imagemagick-heic imagemagick-jpeg imagemagick-webp \
     && apk add --no-cache --virtual .codec-check libheif-x265 \
