@@ -1,0 +1,53 @@
+{
+  "date": "2026-11-05",
+  "scope": "기존 교실별 배치와 외형을 유지하는 렌더링·배포 용량 최적화 및 공용공간 미완성 마감",
+  "preservedInteriors": 71,
+  "quality": {
+    "sourceModelsUnchanged": true,
+    "referencedVertexBytesUnchanged": true,
+    "triangleOrderUnchanged": true,
+    "textureBytesUnchanged": true,
+    "resolutionAndShadowSettingsUnchanged": true,
+    "classroomLayoutsUnchanged": true
+  },
+  "rendering": {
+    "aerialDrawCallsBefore": 645,
+    "aerialDrawCallsAfter": 475,
+    "aerialGeometriesBefore": 423,
+    "aerialGeometriesAfter": 247,
+    "staticDetailDrawsConsolidated": 2939,
+    "note": "그리기 명령 통합이며 서로 다른 교실의 소품·배치·재질을 통일한 것이 아님. 브라우저별 GPU 차이가 있어 FPS 향상률은 확정하지 않음."
+  },
+  "assets": {
+    "modelBytesBefore": 376520748,
+    "modelBytesAfter": 343929380,
+    "unusedVerticesRemoved": 126071,
+    "deploymentBytesBeforeIncludingCompressionCopies": 978638324,
+    "deploymentBytesAfterIncludingCompressionCopies": 562411478,
+    "transferBytesBefore": 298316294,
+    "transferBytesAfter": 269166599,
+    "note": "모델·텍스처 원본은 Git에 보존. 빌드 시 무손실 파생본 생성, 동일 이미지의 중복 보관·전송과 이미 압축된 이미지의 불필요한 이중 압축 파일을 제거."
+  },
+  "finishes": {"existingSurfaces": 343, "corridorEndPanels": 40, "stairs": ["MAIN_STAIR_A", "MAIN_STAIR_B", "ANNEX_STAIR_D", "ANNEX_STAIR_E"], "collisionGeometryUnchanged": true},
+  "tests": {
+    "productionBuildAndHTTPAssets": true,
+    "losslessModelVerification": true,
+    "teacherCacheAndAsyncLoading": true,
+    "stairsWithoutJump": 234,
+    "doorCrossings": 72,
+    "doors": 77,
+    "desktopVehicleBoardDriveExit": true,
+    "webGLContextRecovery": true,
+    "mobileEmulatedJoystickAndSimultaneousLook": true,
+    "mobileEmulatedOverflow": false,
+    "physicalPhoneTested": false,
+    "browserPageErrors": [],
+    "browserFailedAssetRequests": []
+  },
+  "deployment": {
+    "status": "verified_for_deployment",
+    "currentProductionDeployment": "d234d166-bdab-4e8d-9446-1a7d8f45f188",
+    "currentProductionDate": "2026-11-04",
+    "note": "기존 운영에만 있는 교사 포털 통합로그인 서버 변경의 소스를 확보하지 못한 사실을 알림. 사용자가 현재 작업본을 기존 절차로 배포하도록 재지시함. 이 작업본은 GitHub의 기존 관리자 로그인 방식을 사용함."
+  }
+}

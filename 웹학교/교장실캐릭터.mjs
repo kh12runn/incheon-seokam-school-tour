@@ -1,6 +1,6 @@
 import * as THREE from './외부도구/three.module.js';
 import {GLTFLoader} from './외부도구/GLTFLoader.js';
-import {createPrincipalWalkRig} from './교장보행리그.mjs';
+import {createPrincipalWalkRigAsync} from './교장보행리그.mjs';
 import {createPrincipalWalk} from './교장선생님산책.mjs';
 
 // World coordinates use x/y for the floor and z for height.
@@ -33,13 +33,22 @@ function nameplate(label){
   setText(label+' · 준비 중');return {sprite,setText};
 }
 
+function releaseModel(root,keep=null){
+  const held=new Set(),items=new Set(),images=new Set();
+  const collect=(node,set)=>node?.traverse(o=>{if(!o.isMesh)return;set.add(o.geometry);if(o.skeleton)set.add(o.skeleton);for(const m of [].concat(o.material)){set.add(m);for(const value of Object.values(m))if(value?.isTexture)set.add(value);}});
+  collect(keep,held);collect(root,items);
+  for(const item of items)if(!held.has(item)){item.dispose?.();if(item.isTexture&&item.image)images.add(item.image);}
+  for(const image of images)if(![...held].some(t=>t.isTexture&&t.image===image))image.close?.();
+}
+
 export function createOfficePrincipalModels(world){
   const loader=new GLTFLoader();let loading=null;
   const characters=OFFICE_CHARACTERS.map(config=>{
     const root=new THREE.Group();root.name=config.label;root.position.set(config.position.x,config.position.z,-config.position.y);root.rotation.y=Math.PI/2;root.userData.greetingHeight=2.48;
-    const label=nameplate(config.label);root.add(label.sprite);let status='not-requested',error=null,rig=null;
+    const label=nameplate(config.label);root.add(label.sprite);let status='not-requested',error=null,rig=null,generation=0,controller=null;
     const walk=createPrincipalWalk(world,config.id);
     return {root,
+      evict(){generation++;controller?.abort();controller=null;if(rig){root.remove(rig.root);releaseModel(rig.root);rig=null;}status='not-requested';error=null;},
       getState:()=>({...walk.getState(),id:config.id,height:config.height,modelStatus:status,faceTexture:status,visible:root.visible,animation:'procedural-skinned-walk',error}),
       update(dt,player,options){
         const state=walk.update(dt,player,{...options,paused:options.paused||status!=='ready'});
@@ -48,24 +57,34 @@ export function createOfficePrincipalModels(world){
       },
       async load(attempt=0){
         if(status==='ready')return;
+        const version=++generation;controller=new AbortController();
+        const timeout=setTimeout(()=>controller?.abort(),30000);
         status='loading';error=null;label.setText(config.label+' · 불러오는 중');
         try{
-          const response=await fetch(config.url.href,{signal:AbortSignal.timeout(30000)});
+          const response=await fetch(config.url.href,{signal:controller.signal});
           if(!response.ok)throw new Error('모델 다운로드 HTTP '+response.status);
           const gltf=await loader.parseAsync(await response.arrayBuffer(),new URL('.',config.url).href);
-          rig=createPrincipalWalkRig(normalizePrincipalModel(gltf.scene,config.height));
+          if(version!==generation){releaseModel(gltf.scene);return;}
+          const built=await createPrincipalWalkRigAsync(normalizePrincipalModel(gltf.scene,config.height));
+          releaseModel(gltf.scene,built.root);
+          if(version!==generation){releaseModel(built.root);return;}
+          rig=built;
           root.add(rig.root);status='ready';label.setText(config.label);
         }catch(reason){
+          if(version!==generation)return;
           status='error';error=String(reason?.message??reason);label.setText(config.label+(attempt<2?' · 다시 불러오는 중':' · 재입장하면 다시 불러옵니다'));
           console.warn(config.label+' 모델 로드 실패',reason);
-        }
+        }finally{clearTimeout(timeout);}
       }
     };
   });
-  return {characters,load(){
+  let loadGeneration=0;
+  return {characters,evict(){loadGeneration++;characters.forEach(c=>c.evict());},load(){
     if(!loading)loading=(async()=>{
+      const version=loadGeneration;
       for(let attempt=0;attempt<3;attempt++){
         if(attempt)await new Promise(resolve=>setTimeout(resolve,2000));
+        if(version!==loadGeneration)return;
         for(const character of characters)await character.load(attempt);
         if(characters.every(character=>character.getState().modelStatus==='ready'))break;
       }

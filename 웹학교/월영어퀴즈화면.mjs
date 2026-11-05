@@ -15,7 +15,7 @@ export function createMonthQuizBubble({onAnswer,onAnswered}){
   }
   return {
     answer,isVisible:()=>!bubble.hidden,
-    hide(){bubble.hidden=true;},
+    hide(){if(!bubble.hidden)bubble.hidden=true;},
     show(state){
       get('월퀴즈문제').textContent=state.question.prompt;
       get('월퀴즈결과').textContent='';delete get('월퀴즈결과').dataset.result;
@@ -28,7 +28,7 @@ export function createMonthQuizBubble({onAnswer,onAnswered}){
       get('월퀴즈보기').replaceChildren(...buttons);
     },
     anchor(x,y,visible){
-      bubble.hidden=!visible;if(!visible)return;
+      if(bubble.hidden===visible)bubble.hidden=!visible;if(!visible)return;
       const width=bubble.offsetWidth,height=bubble.offsetHeight;
       const left=Math.max(12,Math.min(innerWidth-width-12,x-width/2));
       const top=Math.max(12,Math.min(innerHeight-height-12,y-height-12));

@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {brotliCompressSync,gzipSync,constants} from 'node:zlib';
+import {compactModel} from './모델경량화.mjs';
 const sourceRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 export const serverFiles=['관리도구/웹서버.mjs','관리도구/관리자/API.mjs','관리도구/관리자/저장소.mjs','관리도구/관리자/이미지검사.mjs','관리도구/관리자/사진변환.mjs','관리도구/관리자/이미지정책/policy.xml'];
 // Follow only files reachable by the current game. Source photos and authoring assets stay local.
@@ -31,10 +32,20 @@ export function packRuntime(output){
   output=path.resolve(output);
   if(output===sourceRoot||fs.existsSync(output))throw new Error('Build output must be a new directory: '+output);
   fs.mkdirSync(output,{recursive:true});
-  const files=runtimeFiles(),sizes={sourceBytes:0,runtimeBytes:0,compressedTransferBytes:0,sidecarBytes:0};
+  const files=runtimeFiles(),sizes={sourceBytes:0,runtimeBytes:0,compressedTransferBytes:0,sidecarBytes:0,removedUnusedVertices:0};
+  const sharedImages=new Map();
   for(const rel of [...files,...serverFiles]){
     let bytes=fs.readFileSync(path.join(sourceRoot,rel));
     if(files.includes(rel))sizes.sourceBytes+=bytes.length;
+    if(rel.endsWith('.glb')){
+      const result=compactModel(bytes,(uri,data)=>{
+        const asset=path.posix.join(path.posix.dirname(rel),uri);
+        if(!sharedImages.has(asset)){
+          const target=path.join(output,asset);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,data);sharedImages.set(asset,data.length);
+        }
+      });
+      bytes=result.bytes;sizes.removedUnusedVertices+=result.removedVertices;
+    }
     if(rel.endsWith('.json'))bytes=Buffer.from(JSON.stringify(JSON.parse(bytes)));
     const target=path.join(output,rel);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,bytes);
     if(!files.includes(rel))continue;
@@ -45,6 +56,9 @@ export function packRuntime(output){
       fs.writeFileSync(target+'.br',br);fs.writeFileSync(target+'.gz',gz);
       sizes.compressedTransferBytes+=br.length;sizes.sidecarBytes+=br.length+gz.length;
     }else sizes.compressedTransferBytes+=bytes.length;
+  }
+  for(const [rel,length] of sharedImages){
+    files.push(rel);sizes.runtimeBytes+=length;sizes.compressedTransferBytes+=length;
   }
   fs.writeFileSync(path.join(output,'배포목록.json'),JSON.stringify(files));
   return {publicFiles:files.length,...sizes,files};

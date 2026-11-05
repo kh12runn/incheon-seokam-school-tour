@@ -102,6 +102,7 @@ export function createClassTeachers(world,services={}){
   return {teachers,getStates:()=>teachers.map(t=>t.getState()),update(dt,player,mode,{paused=false}={}){
     tick+=Math.max(0,dt);
     for(const teacher of teachers){teacher.root.visible=teacher.near(player,mode);if(teacher.root.visible)teacher.update(dt,player,paused);}
+    for(const teacher of teachers){const state=teacher.getState();if(!teacher.root.visible&&state.modelStatus==='ready'&&tick-state.lastUsed>20)teacher.evict();}
     // One decode at a time, at most two cached teachers. No model downloads on
     // the aerial start screen; moving between floors cannot accumulate 8 GPUs.
     if(!busy){const next=teachers.filter(t=>t.root.visible&&t.canLoad()).sort((a,b)=>Math.abs(player.x-a.config.position.x)-Math.abs(player.x-b.config.position.x))[0];if(next){

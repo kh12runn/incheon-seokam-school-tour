@@ -8,7 +8,7 @@ fs.mkdirSync(path.join(root,'output'),{recursive:true});
 const output=fs.mkdtempSync(path.join(root,'output','production-'+commit.slice(0,12)+'-'));
 const manifest=JSON.parse(execFileSync('git',['cat-file','blob',commit+':공간자료/아바타통합-20261026.json'],{cwd:root,encoding:'utf8'}));
 const deferred=new Set(manifest.models.map(m=>'웹학교/캐릭터모델/'+m.file));
-const files=[...new Set([...runtimeFiles().filter(f=>!deferred.has(f)),...serverFiles,'관리도구/배포최적화.mjs','관리도구/배포모델복원.mjs','공간자료/아바타통합-20261026.json','Dockerfile','railway.toml','.dockerignore'])];
+const files=[...new Set([...runtimeFiles().filter(f=>!deferred.has(f)),...serverFiles,'관리도구/배포최적화.mjs','관리도구/모델경량화.mjs','관리도구/배포모델복원.mjs','공간자료/아바타통합-20261026.json','Dockerfile','railway.toml','.dockerignore'])];
 // No untracked authoring files, photos, credentials or working-copy-only edits.
 // Windows tar may decode Korean paths using the active ANSI locale. Read each
 // immutable Git blob directly, with no text decoding or filename conversion.

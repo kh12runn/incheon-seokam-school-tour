@@ -153,7 +153,8 @@ export function finishMaterial(b){
       diffuseColor.rgb*=mix(1.0,.86+.25*sand,detailFade);
       diffuseColor.rgb=mix(diffuseColor.rgb,diffuseColor.rgb*vec3(1.11,.96,.79),.18*grainNoise(uv*.6));`
       :kind==='terrazzo'?`
-      vec2 uv=vSurfacePoint.xz;
+      vec3 stoneNormal=abs(normalize(cross(dFdx(vSurfacePoint),dFdy(vSurfacePoint))));
+      vec2 uv=stoneNormal.y>.5?vSurfacePoint.xz:(stoneNormal.x>.5?vSurfacePoint.zy:vSurfacePoint.xy);
       float fleck=grainNoise(uv*180.0);
       float chips=smoothstep(.66,.84,fleck);
       float fine=mix(1.0,.79+.3*fleck,clamp(1.0-length(fwidth(uv*180.0))*.2,0.,1.));

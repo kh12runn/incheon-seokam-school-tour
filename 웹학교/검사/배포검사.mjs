@@ -6,8 +6,9 @@ import {spawn} from 'node:child_process';
 import {once} from 'node:events';
 import {fileURLToPath} from 'node:url';
 import {packRuntime} from '../../관리도구/배포최적화.mjs';
+import {verifyLossless} from './모델무손실검사.mjs';
 const root=new URL('../../',import.meta.url),port=18081;
-const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'school-deploy-test-')),output=path.join(temporary,'runtime');
+const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'school-deploy-test-')),output=process.env.SCHOOL_TEST_RUNTIME?path.resolve(process.env.SCHOOL_TEST_RUNTIME):path.join(temporary,'runtime');
 const packed=packRuntime(output);
 assert(packed.files.includes('웹학교/승인교사모델.mjs'),'Approved cartoon teacher compatibility included in production');
 assert(!packed.files.includes('웹학교/과학교사자세.mjs'),'Do not deform the new science avatar with old scan coordinates');
@@ -43,7 +44,8 @@ for(const file of packed.files.filter(file=>/\.(?:html|css|m?js|json|txt)$/.test
   textTransfer+=fs.statSync(fs.existsSync(target+'.br')?target+'.br':target).size;
 }
 assert(textTransfer<textBytes*.3,'At least 70% text transfer savings');
-const photoFiles=packed.files.filter(file=>/\.jpg$/.test(file));
+for(const rel of packed.files.filter(f=>f.endsWith('.glb')))verifyLossless(fs.readFileSync(new URL(rel,root)),fs.readFileSync(path.join(output,rel)),uri=>fs.readFileSync(path.resolve(output,path.dirname(rel),uri)));
+const photoFiles=packed.files.filter(file=>/\.jpg$/.test(file)&&!file.includes('/공유텍스처/'));
 assert.equal(photoFiles.length,2,'Only the two 6-4 photo derivatives');
 assert(photoFiles.every(file=>file.startsWith('웹학교/사진마감/6-4 교실/')));
 const child=spawn(process.execPath,[path.join(output,'관리도구/웹서버.mjs')],{env:{...process.env,PORT:String(port),SCHOOL_WEB_ROOT:output},stdio:['ignore','pipe','pipe']});

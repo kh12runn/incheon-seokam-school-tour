@@ -1,4 +1,5 @@
 import * as THREE from './외부도구/three.module.js';
+import {instanceRepeatedParts} from './반복부품통합.mjs';
 import {mergeGeometries} from './외부도구/BufferGeometryUtils.js';
 import {PARKED_CARS,CAR_DIMENSIONS} from './주차장.mjs';
 
@@ -152,16 +153,22 @@ export function parkedCarDetails(){
     const d=CAR_DIMENSIONS[car.userData.type],plane=new THREE.Mesh(new THREE.PlaneGeometry(d.width*1.35,d.length*1.12),shadowMaterial);
     plane.rotation.x=-Math.PI/2;plane.position.y=.012;car.add(plane);
   }
+  group.userData.instances=instanceRepeatedParts(group);
   return group;
 }
 
 const axisConversion=new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(1,0,0),-Math.PI/2),inverseAxis=axisConversion.clone().invert();
 export function updateDrivenCars(group,driving){
+  let dirty=false;
   for(const c of driving.cars){
     const root=group.children.find(o=>o.name===c.id),p=driving.point(c,0,0);if(!root)continue;
+    const pose=[p.x,p.y,p.z,c.body.quaternion.x,c.body.quaternion.y,c.body.quaternion.z,c.body.quaternion.w,c.door,c.steering,c.wheelSpin];
+    if(root.userData.lastPose?.every((v,i)=>v===pose[i]))continue;
+    root.userData.lastPose=pose;dirty=true;
     root.position.set(p.x,p.z,-p.y);const q=c.body.quaternion;root.quaternion.copy(axisConversion).multiply(new THREE.Quaternion(q.x,q.y,q.z,q.w)).multiply(inverseAxis);
     root.userData.door.rotation.y=c.source.type==='sports'?0:-c.door*1.1;
     root.userData.door.rotation.x=c.source.type==='sports'?c.door*1.15:0;
     for(const wheel of root.userData.wheels){wheel.rotation.y=wheel.userData.front?c.steering:0;wheel.rotation.x=-c.wheelSpin;}
   }
+  if(dirty)group.userData.instances.update();
 }
