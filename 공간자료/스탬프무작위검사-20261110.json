@@ -1,0 +1,45 @@
+{
+  "feature": "Same-difficulty randomized quiz missions",
+  "difficulty": "Unchanged: level 1 in rounds 1-2; levels 1-2 in rounds 3-4",
+  "selection": {
+    "distinctGradesPerRun": 4,
+    "distinctTeachersPerRun": 4,
+    "englishQuestions": 2,
+    "generalKnowledgeQuestions": 2,
+    "stars": 2,
+    "gifts": 2,
+    "categoryAndCollectibleOrder": "shuffled",
+    "repeatStartingGrade": false,
+    "recentQuestionTeacherRoomHistory": "bounded local-only shuffle bags",
+    "minimumTimeSeconds": 240,
+    "routeAndGradeSearchTimeScaling": "unchanged"
+  },
+  "logicTests": {
+    "passed": true,
+    "rounds": 48,
+    "physicallyTraversedRoutes": 8,
+    "differentTreasureRooms": 29,
+    "sampleTimeRangeSeconds": [330, 665],
+    "historyReloadAndPoolExhaustion": "passed",
+    "difficultyAndUniqueAnswers": "passed"
+  },
+  "desktopBrowser": {
+    "passed": true,
+    "teachersInSampleRun": ["6-7", "principal", "6-1", "6-5"],
+    "fourStampsAndRetry": "passed",
+    "wrongAnswerKeyboardMousePauseAndFreeMode": "passed",
+    "pageErrors": [],
+    "httpFailures": []
+  },
+  "productionBundleBuild": "passed",
+  "mobileBrowserEmulation": {
+    "passed": true,
+    "viewport": [390, 844],
+    "simultaneousJoystickAndLook": true,
+    "touchAnswer": true,
+    "noOverflowOrQuizOverlap": true,
+    "pageErrors": [],
+    "physicalDeviceTested": false
+  },
+  "newModelsOrTextures": 0
+}

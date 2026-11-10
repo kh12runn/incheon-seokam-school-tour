@@ -32,7 +32,7 @@ export function createMissionUI({onAnswer,onRetry,onFree,onQuestion,onResult}){
    const finished=['complete','timeout'].includes(s.phase);result.hidden=!finished;
    if(finished&&lastPhase!==s.phase){
     const best=record(s);$('미션결과제목').textContent=s.phase==='complete'?'석암초 탐험 성공!':'오늘도 멋진 탐험이었어요!';$('미션결과내용').textContent=`스탬프 ${s.stamps} / 4개 · 활동 시간 ${clock(s.elapsed)} · 다시 생각한 문제 ${s.mistakes}회`;
-    $('미션최고기록').textContent=best?'이 기기의 최고 기록 '+clock(best.seconds):'다시 도전하면 보물 위치와 문제가 달라져요.';onResult();
+    $('미션최고기록').textContent=(best?'이 기기의 최고 기록 '+clock(best.seconds)+' · ':'')+'다시 도전하면 학년·선생님·보물·문제가 새롭게 바뀌어요.';onResult();
    }lastPhase=s.phase;
   }
  };

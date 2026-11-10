@@ -172,9 +172,13 @@ function syncMissionControls(){
 function stopMission(){pendingMission=false;mission?.stop();missionUI?.hide();missionVisual.root.visible=false;syncMissionControls();}
 function beginMission(){
   if(!missionMap)return;pendingMission=false;leaveVehicle();missionUI.hide();
-  mission=createStampMission(missionMap,{speed:RUN_SPEED});mission.start();
+  if(!mission){
+    let history;try{history=JSON.parse(localStorage.getItem('석암학교-미션추첨-v1')??'null');}catch{}
+    mission=createStampMission(missionMap,{speed:RUN_SPEED,history,onHistory:next=>{try{localStorage.setItem('석암학교-미션추첨-v1',JSON.stringify(next));}catch{}}});
+  }
+  mission.start();
   monthQuiz.dismiss();monthQuizUI.hide();position={...missionMap.start};jumpMotion.reset();yaw=Math.PI/2;pitch=0;cameraReset=true;avatar.snapHeading(Math.PI+yaw);
-  syncMissionControls();void startWalk();notice('퀴즈 미션 시작! 학년별 교실에서 별을 찾아보세요.');
+  syncMissionControls();void startWalk();notice('퀴즈 미션 시작! '+mission.view().clue);
 }
 async function requestMission(){
   if(!ready||missionLoading||characterPicker.isOpen()||mode!=='overview')return;

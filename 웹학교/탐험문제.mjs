@@ -66,8 +66,11 @@ const knowledge=[
 ];
 export const MISSION_QUESTIONS=Object.freeze([...english.map((q,i)=>({id:'en-'+i,category:'영어',level:i>=18?2:1,prompt:q[0],answers:q.slice(1,5),explanation:q[5]})),...knowledge.map((q,i)=>({id:'ko-'+i,category:'상식',level:i>=18?2:1,prompt:q[0],answers:q.slice(1,5),explanation:q[5]}))]);
 export function shuffled(values,random=Math.random){const a=[...values];for(let i=a.length-1;i>0;i--){const j=Math.min(i,Math.floor(random()*(i+1)));[a[i],a[j]]=[a[j],a[i]];}return a;}
-export function pickQuestion(category,used,stage,random=Math.random){
- const pool=MISSION_QUESTIONS.filter(q=>q.category===category&&!used.has(q.id)&&(stage>1||q.level===1));
- const q=shuffled(pool,random)[0];if(!q)throw Error('사용 가능한 문제가 없습니다.');used.add(q.id);
+export function pickQuestion(category,used,stage,random=Math.random,draw){
+ // Preserve the original difficulty range: basic in rounds 1–2, up to level 2
+ // in rounds 3–4. History changes the selection, not the allowed difficulty.
+ const excluded=new Set(MISSION_QUESTIONS.filter(q=>q.category!==category||used.has(q.id)||(stage<=1&&q.level!==1)).map(q=>q.id));
+ const q=draw?draw('questions',MISSION_QUESTIONS,q=>q.id,excluded):shuffled(MISSION_QUESTIONS.filter(q=>!excluded.has(q.id)),random)[0];
+ if(!q)throw Error('사용 가능한 문제가 없습니다.');used.add(q.id);
  const choices=shuffled(q.answers,random);return{...q,choices,correct:choices.indexOf(q.answers[0])};
 }

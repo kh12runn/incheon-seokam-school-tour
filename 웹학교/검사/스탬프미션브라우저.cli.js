@@ -4,7 +4,7 @@ async page=>{
  await page.locator('#시작').filter({hasText:'자유 탐험'}).waitFor();await page.screenshot({path:'output/mission-start.png'});
  await page.locator('#퀴즈시작').click();await page.locator('#캐릭터확인').click({timeout:120000});await page.waitForFunction(()=>schoolTour.getMissionState().phase==='search',null,{timeout:120000});
  if(!await page.locator('#동층이동').isDisabled())throw Error('Teleport must be disabled');
- if(!/6학년 교실 중/.test(await page.locator('#미션목표').innerText()))throw Error('Grade-level clue missing');
+ if(!/[1-6]학년 교실 중/.test(await page.locator('#미션목표').innerText()))throw Error('Grade-level clue missing');
  const initial=await page.evaluate(()=>schoolTour.getMissionState());if(initial.limit<240)throw Error('Time is too short');
  const before=await page.evaluate(()=>schoolTour.getState().position);await page.keyboard.down('w');try{await page.waitForFunction(p=>Math.hypot(schoolTour.getState().position.x-p.x,schoolTour.getState().position.y-p.y)>.2,before,{timeout:5000});}finally{await page.keyboard.up('w');}
  const moved=await page.evaluate(p=>Math.hypot(schoolTour.getState().position.x-p.x,schoolTour.getState().position.y-p.y)>.2,before);if(!moved)throw Error('Keyboard movement failed');
@@ -26,7 +26,7 @@ async page=>{
   },teacher.id);
   await page.locator('#탐험퀴즈말풍선').waitFor({state:'visible',timeout:20000});const correct=await page.evaluate(()=>schoolTour.test.missionDebug().correct);
   if(round===1){
-   await page.locator(`[data-choice="${(correct+1)%4}"]`).click();if(!await page.locator(`[data-choice="${(correct+1)%4}"]`).isDisabled())throw Error('Wrong choice must disable');
+   await page.locator(`[data-choice="${(correct+1)%4}"]`).click();await page.waitForFunction(i=>document.querySelector(`[data-choice="${i}"]`)?.disabled,(correct+1)%4);
    await page.screenshot({path:'output/mission-quiz.png'});
    await page.keyboard.press('Escape');await page.locator('#게임메뉴').waitFor({state:'visible'});await page.locator('#메뉴닫기').click();await page.locator('#탐험퀴즈말풍선').waitFor({state:'visible'});
   }
@@ -35,6 +35,7 @@ async page=>{
  }
  await page.locator('#미션결과').waitFor({state:'visible',timeout:10000});await page.screenshot({path:'output/mission-complete.png'});
  await page.locator('#미션다시').click();await page.waitForFunction(()=>schoolTour.getMissionState().phase==='search'&&schoolTour.getMissionState().stamps===0);
+ if(await page.evaluate(()=>schoolTour.getMissionState().grade)===initial.grade)throw Error('Retry repeated the same starting grade');
  await page.keyboard.press('Escape');await page.locator('#게임메뉴').waitFor({state:'visible'});await page.locator('#전체').click();
  if(await page.evaluate(()=>schoolTour.getMissionState().active))throw Error('Mission did not stop');
  await page.locator('#시작').click();await page.locator('#걸어서선택').click();await page.waitForFunction(()=>schoolTour.getState().mode==='walk');
