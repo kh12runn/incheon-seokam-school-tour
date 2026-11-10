@@ -371,8 +371,8 @@ function pausePanel(){
   $('조준점').hidden=true;
   const title=mode==='overview'?'탐험 시작하기':'탐험 계속하기';
   $('걷기').textContent=title;$('시작').textContent=(mode==='overview'?'자유 탐험':title)+'  →';
-  $('안내표식').textContent=mode==='overview'?'나만의 학교 모험':'탐험 일시정지';
-  $('안내제목').innerHTML=mode==='overview'?'익숙한 학교,<br>새로운 모험.':'잠깐 쉬어갈까요?';
+  $('안내표식').textContent=mode==='overview'?'달리고, 찾고, 맞히는 학교 모험':'탐험 일시정지';
+  $('안내제목').innerHTML=mode==='overview'?'석암 Rock On!<br>스쿨런':'잠깐 쉬어갈까요?';
   updateCharacterLabel();
   touchControls?.sync();
 }
