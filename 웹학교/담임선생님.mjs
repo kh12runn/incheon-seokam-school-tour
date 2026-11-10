@@ -99,9 +99,9 @@ export function createClassTeachers(world,services={}){
       }
     };
   });
-  return {teachers,getStates:()=>teachers.map(t=>t.getState()),update(dt,player,mode,{paused=false}={}){
+  return {teachers,getStates:()=>teachers.map(t=>t.getState()),update(dt,player,mode,{paused=false,focusedTeacher=null}={}){
     tick+=Math.max(0,dt);
-    for(const teacher of teachers){teacher.root.visible=teacher.near(player,mode);if(teacher.root.visible)teacher.update(dt,player,paused);}
+    for(const teacher of teachers){teacher.root.visible=teacher.near(player,mode);if(teacher.root.visible)teacher.update(dt,player,paused||teacher.config.id===focusedTeacher);}
     for(const teacher of teachers){const state=teacher.getState();if(!teacher.root.visible&&state.modelStatus==='ready'&&tick-state.lastUsed>20)teacher.evict();}
     // One decode at a time, at most two cached teachers. No model downloads on
     // the aerial start screen; moving between floors cannot accumulate 8 GPUs.

@@ -12,11 +12,13 @@ const deployed=process.env.PORT!==undefined,host=deployed?'0.0.0.0':'127.0.0.1';
 const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.svg':'image/svg+xml','.glb':'model/gltf-binary','.txt':'text/plain; charset=utf-8','.blend':'application/octet-stream','.csv':'text/csv; charset=utf-8'};
 const adminAPI=createAdminAPI({root});
 const assetTags=new Map();
-function assetTag(file,stat){
+const builtTags=publicFiles&&fs.existsSync(path.join(root,'.http-etags.json'))?JSON.parse(fs.readFileSync(path.join(root,'.http-etags.json'),'utf8')):{};
+async function assetTag(file,stat){
+  const built=builtTags[path.relative(root,file).split(path.sep).join('/')];if(built)return built;
   const version=stat.size+':'+stat.mtimeMs+':'+stat.ctimeMs,previous=assetTags.get(file);
   if(previous?.version===version)return previous.tag;
-  const tag='"'+createHash('sha256').update(fs.readFileSync(file)).digest('hex')+'"';
-  assetTags.set(file,{version,tag});return tag;
+  const tag=(async()=>{const hash=createHash('sha256');for await(const chunk of fs.createReadStream(file))hash.update(chunk);return '"'+hash.digest('hex')+'"';})();
+  assetTags.set(file,{version,tag});try{return await tag;}catch(error){assetTags.delete(file);throw error;}
 }
 const server=http.createServer(async(req,res)=>{
   try{
@@ -38,7 +40,7 @@ const server=http.createServer(async(req,res)=>{
     const encoding=['br','gzip'].filter(e=>(accepted.get(e)??accepted.get('*')??0)>0&&fs.existsSync(file+(e==='br'?'.br':'.gz')))
       .sort((a,b)=>(accepted.get(b)??accepted.get('*')??0)-(accepted.get(a)??accepted.get('*')??0))[0];
     const served=encoding?file+(encoding==='br'?'.br':'.gz'):file;
-    const stat=fs.statSync(served),etag=assetTag(served,stat);
+    const stat=fs.statSync(served),etag=await assetTag(served,stat);
     if(rel.startsWith('관리자/')){res.setHeader('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' blob: data:; connect-src 'self'; object-src 'none'; base-uri 'none'; frame-ancestors 'none'; form-action 'self'");res.setHeader('Referrer-Policy','same-origin');}
     const headers={'Content-Type':types[path.extname(file)],'Cache-Control':'no-cache','Vary':'Accept-Encoding','X-Content-Type-Options':'nosniff','ETag':etag,...(encoding?{'Content-Encoding':encoding}:{})};
     // Always revalidate so deployment updates appear immediately; unchanged assets

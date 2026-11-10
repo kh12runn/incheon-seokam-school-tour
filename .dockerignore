@@ -1,5 +1,7 @@
 **
 !Dockerfile
+!package.json
+!package-lock.json
 !index.html
 !관리도구/
 !관리도구/웹서버.mjs

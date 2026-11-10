@@ -1,0 +1,11 @@
+{
+  "name": "incheon-seokam-school-tour",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node 관리도구/웹서버.mjs",
+    "build": "node 관리도구/배포최적화.mjs",
+    "test:mission": "node 웹학교/검사/스탬프미션검사.mjs"
+  },
+  "devDependencies": {"esbuild": "0.28.2"}
+}

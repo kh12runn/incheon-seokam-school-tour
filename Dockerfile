@@ -1,5 +1,7 @@
 FROM node:22-alpine AS build
 WORKDIR /app
+COPY package.json package-lock.json ./
+RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY ["관리도구/웹서버.mjs", "관리도구/웹서버.mjs"]
 COPY ["관리도구/배포최적화.mjs", "관리도구/배포최적화.mjs"]
 COPY ["관리도구/모델경량화.mjs", "관리도구/모델경량화.mjs"]

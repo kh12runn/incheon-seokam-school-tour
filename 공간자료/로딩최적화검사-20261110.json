@@ -1,0 +1,42 @@
+{
+  "implementation": [
+    "Same room-specific detail factories are loaded near the player; aerial view starts with zero of 72 room detail groups",
+    "Distant room resources are released with a 12-room mobile cache and 18-room desktop cache; nearby rooms are retained",
+    "Mobile outdoor instances use spatial batches with identical matrices, colors and geometry",
+    "Existing procedural autumn sky baked to a pixel-identical 1536x768 PNG",
+    "Game ESM graph bundled and compressed; model and texture data retain lossless validation",
+    "Build-time HTTP ETags remove large synchronous hashes on initial model requests",
+    "Student preview and gameplay reuse exact measured model normalization",
+    "Pointer-lock grant preserves held movement keys"
+  ],
+  "sourceBrowserTests": {
+    "desktopFourMissionRounds": "passed",
+    "mobileEmulation390x844DPR2": "passed",
+    "simultaneousJoystickAndCamera": "passed",
+    "touchQuizAnswer": "passed",
+    "physicalPhoneTested": false
+  },
+  "productionPackageBrowser": {
+    "passed": true,
+    "initialRequests": 11,
+    "initialRoomDetails": 0,
+    "roomDetailsRestored": ["4F_6-4", "2F_STAFF", "1F_NURSE", "3F_GRADE5_RESEARCH", "3F_BOOK_LIBRARY", "4F_GRADE2_RESEARCH", "2F_GRADE3_RESEARCH", "3F_GRADE1_RESEARCH", "4F_GRADE6_RESEARCH"],
+    "missionStarts": true,
+    "pageErrors": [],
+    "httpFailures": []
+  },
+  "regression": {
+    "skyPixelsEqual": 1179648,
+    "spatialInstanceTransformsAndColors": "identical",
+    "roomEvictionAndRestoration": "passed",
+    "sharedMaterialsPreserved": true,
+    "geometryNormalsUVTextures": "lossless build checks passed",
+    "studentHeightAndAnimations": "passed",
+    "doors": 77,
+    "stairTraversalsWithoutJump": 234,
+    "missionSimulationRounds": 48,
+    "teacherVisibility": "passed",
+    "adminAccessProtectionAndHTTPCompression": "passed"
+  },
+  "limitations": "Browser emulation is not a real-device FPS guarantee. Per-room decorations and original avatar/texture quality are retained."
+}

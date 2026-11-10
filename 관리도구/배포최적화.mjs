@@ -3,6 +3,8 @@ import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {brotliCompressSync,gzipSync,constants} from 'node:zlib';
 import {compactModel} from './모델경량화.mjs';
+import {buildSync} from 'esbuild';
+import {createHash} from 'node:crypto';
 const sourceRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 export const serverFiles=['관리도구/웹서버.mjs','관리도구/관리자/API.mjs','관리도구/관리자/저장소.mjs','관리도구/관리자/이미지검사.mjs','관리도구/관리자/사진변환.mjs','관리도구/관리자/이미지정책/policy.xml'];
 // Follow only files reachable by the current game. Source photos and authoring assets stay local.
@@ -33,10 +35,16 @@ export function packRuntime(output){
   if(output===sourceRoot||fs.existsSync(output))throw new Error('Build output must be a new directory: '+output);
   fs.mkdirSync(output,{recursive:true});
   const files=runtimeFiles(),sizes={sourceBytes:0,runtimeBytes:0,compressedTransferBytes:0,sidecarBytes:0,removedUnusedVertices:0};
+  // Keep the entry in the same directory, preserving all import.meta asset URLs.
+  // Original modules remain available for diagnostics, but the browser needs one
+  // request for game code instead of a waterfall of ~150 ES module requests.
+  const bundle=buildSync({absWorkingDir:sourceRoot,tsconfigRaw:{},entryPoints:[path.join(sourceRoot,'웹학교/게임.mjs')],bundle:true,write:false,format:'esm',platform:'browser',target:'es2022',minify:true,charset:'utf8',legalComments:'inline'}).outputFiles[0].contents;
+  const etags={};const remember=(rel,bytes)=>{etags[rel]='"'+createHash('sha256').update(bytes).digest('hex')+'"';};
   const sharedImages=new Map();
   for(const rel of [...files,...serverFiles]){
     let bytes=fs.readFileSync(path.join(sourceRoot,rel));
     if(files.includes(rel))sizes.sourceBytes+=bytes.length;
+    if(rel==='웹학교/게임.mjs')bytes=Buffer.from(bundle);
     if(rel.endsWith('.glb')){
       const result=compactModel(bytes,(uri,data)=>{
         const asset=path.posix.join(path.posix.dirname(rel),uri);
@@ -48,18 +56,22 @@ export function packRuntime(output){
     }
     if(rel.endsWith('.json'))bytes=Buffer.from(JSON.stringify(JSON.parse(bytes)));
     const target=path.join(output,rel);fs.mkdirSync(path.dirname(target),{recursive:true});fs.writeFileSync(target,bytes);
+    remember(rel,bytes);
     if(!files.includes(rel))continue;
     sizes.runtimeBytes+=bytes.length;
     // HTTP lossless compression preserves every mesh, texture and animation byte.
     if(bytes.length>512&&/\.(?:html|css|m?js|json|txt|glb)$/.test(rel)){
       const br=brotliCompressSync(bytes,{params:{[constants.BROTLI_PARAM_QUALITY]:8}}),gz=gzipSync(bytes,{level:9});
       fs.writeFileSync(target+'.br',br);fs.writeFileSync(target+'.gz',gz);
+      remember(rel+'.br',br);remember(rel+'.gz',gz);
       sizes.compressedTransferBytes+=br.length;sizes.sidecarBytes+=br.length+gz.length;
     }else sizes.compressedTransferBytes+=bytes.length;
   }
   for(const [rel,length] of sharedImages){
     files.push(rel);sizes.runtimeBytes+=length;sizes.compressedTransferBytes+=length;
+    remember(rel,fs.readFileSync(path.join(output,rel)));
   }
+  fs.writeFileSync(path.join(output,'.http-etags.json'),JSON.stringify(etags));
   fs.writeFileSync(path.join(output,'배포목록.json'),JSON.stringify(files));
   return {publicFiles:files.length,...sizes,files};
 }

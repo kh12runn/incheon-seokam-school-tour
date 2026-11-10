@@ -12,6 +12,7 @@ const MODEL_URLS=Object.freeze({
 });
 export const normalizeStudentVariant=id=>id==='boy'||id==='boy-realistic'?'boy-cute':id==='girl'||id==='girl-realistic'?'girl-cute':id;
 const loader=new GLTFLoader(),templates=new Map();
+const measurements=new WeakMap();
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 function template(id){
   if(!templates.has(id)){
@@ -71,6 +72,8 @@ const matchers={idle:/idle|standing|(^|[^0-9])0([^0-9]|$)/i,run:/run_?02|running
 
 export function normalizeStudentModel(asset,idleClip,headScale=1){
   if(headScale!==1)asset.getObjectByName('Head').scale.multiplyScalar(headScale);
+  const cached=measurements.get(idleClip)?.get(headScale);
+  if(cached){const holder=new THREE.Group();holder.add(asset);holder.scale.setScalar(cached.scale);holder.position.fromArray(cached.position);return holder;}
   asset.updateMatrixWorld(true);
   const bindBounds=new THREE.Box3().setFromObject(asset),idleBounds=new THREE.Box3();
   const measurementMixer=new THREE.AnimationMixer(asset),action=measurementMixer.clipAction(createStudentMotionClip(idleClip,asset,'idle',headScale));
@@ -88,6 +91,7 @@ export function normalizeStudentModel(asset,idleClip,headScale=1){
   if(!(height>0&&Number.isFinite(height)))throw new Error('학생 모델 높이를 계산할 수 없습니다.');
   const holder=new THREE.Group(),scale=STUDENT_HEIGHT/height;holder.add(asset);holder.scale.setScalar(scale);
   holder.position.set(-(bindBounds.min.x+bindBounds.max.x)*.5*scale,-idleBounds.min.y*scale,-(bindBounds.min.z+bindBounds.max.z)*.5*scale);
+  if(!measurements.has(idleClip))measurements.set(idleClip,new Map());measurements.get(idleClip).set(headScale,{scale,position:holder.position.toArray()});
   return holder;
 }
 

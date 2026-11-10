@@ -1,0 +1,48 @@
+{
+  "date": "2026-11-09",
+  "feature": "자유 탐험 / 퀴즈 스탬프 탐험",
+  "localPreview": "http://localhost:8080/",
+  "productionDeployed": false,
+  "logic": {
+    "passed": true,
+    "questions": 60,
+    "grades": 6,
+    "connectedRooms": 43,
+    "simulatedRounds": 48,
+    "differentTreasureRooms": 26,
+    "physicallyTraversedRoutes": 8,
+    "sampleTimeRangeSeconds": [315, 615],
+    "minimumTimeSeconds": 240,
+    "speedAndGradeSearchDistanceIncluded": true,
+    "hiddenClassroomNotDisclosed": true,
+    "menuAndModelLoadingPause": true
+  },
+  "desktopBrowser": {
+    "passed": true,
+    "fullFourStampGame": true,
+    "actualKeyboardMovementCollection": true,
+    "mouseAndNumberKeyAnswers": true,
+    "menuCloseAndResume": true,
+    "retryAndFreeModeReturn": true,
+    "runtimeErrors": []
+  },
+  "mobileBrowserEmulation": {
+    "passed": true,
+    "viewport": [390, 844],
+    "simultaneousJoystickAndLook": true,
+    "touchQuizAnswer": true,
+    "noHorizontalOverflow": true,
+    "quizDoesNotOverlapMissionHUD": true,
+    "runtimeErrors": [],
+    "physicalDeviceTested": false
+  },
+  "regressionTestsPassed": [
+    "출입문검사.mjs",
+    "교사표시복구검사.mjs",
+    "계단턱검사.mjs",
+    "게임화면검사.mjs",
+    "월영어퀴즈검사.mjs"
+  ],
+  "productionPackageTest": "passed; 공간자료/배포검사.json",
+  "newModelsOrTextures": 0
+}

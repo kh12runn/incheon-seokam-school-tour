@@ -219,8 +219,8 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
   const movingCars=colliders.filter(b=>b.vehicleId),wallsGrid=grid(colliders.filter(b=>!b.vehicleId)),floorGrid=grid(surfaces);
   const query=(map,x,y)=>map.get(Math.floor(x/CELL)+','+Math.floor(y/CELL))??[];
   const nearWalls=(x,y)=>[...query(wallsGrid,x,y),...movingCars];
-  function blocked(x,y,z){
-    return nearWalls(x,y).some(o=>!(o.stepSurface&&o.bounds[5]<=z+.34)&&o.bounds[5]>z+.09&&o.bounds[2]<z+PLAYER_HEIGHT&&(o.containsXY?o.containsXY(x,y,PLAYER_RADIUS):intersect(x,y,PLAYER_RADIUS,o.bounds)));
+  function blocked(x,y,z,ignoreDoors=false){
+    return nearWalls(x,y).some(o=>!(ignoreDoors&&o.dynamicDoor)&&!(o.stepSurface&&o.bounds[5]<=z+.34)&&o.bounds[5]>z+.09&&o.bounds[2]<z+PLAYER_HEIGHT&&(o.containsXY?o.containsXY(x,y,PLAYER_RADIUS):intersect(x,y,PLAYER_RADIUS,o.bounds)));
   }
   function support(x,y,z){
     let best=-Infinity;
@@ -230,8 +230,8 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
       if(h<=z+.34&&h>=z-.4&&h>best)best=h;
     }return best;
   }
-  function candidate(x,y,z){
-    const h=support(x,y,z);if(!Number.isFinite(h)||blocked(x,y,h))return null;
+  function candidate(x,y,z,ignoreDoors=false){
+    const h=support(x,y,z);if(!Number.isFinite(h)||blocked(x,y,h,ignoreDoors))return null;
     // Stay on solid footing; no invisible drop through a stair opening.
     for(const [dx,dy] of [[.14,0],[-.14,0],[0,.14],[0,-.14]])if(!Number.isFinite(support(x+dx,y+dy,h)))return null;
     return {x,y,z:h};
@@ -274,5 +274,7 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
     let q={...p};if(!blocked(q.x+dx,q.y,q.z))q.x+=dx;
     if(!blocked(q.x,q.y+dy,q.z))q.y+=dy;return q;
   }
-  return {data,boxes,colliders,surfaces,stairs,classroom64,classroom21,classroomsMain,classroomInteriors,uploadedAnnex,specialInteriors,officeDoor,roomDoors,teacherChairs,centralStairFinish,recyclingShelter,hallPhotoFinish,principalOffice:office,move,candidate,blocked,support,floorBelow,moveAir,roomAt,spawn:{...OUTDOOR_SPAWN}};
+  // Route estimates may plan through operable doors, but never furniture/walls.
+  // Actual player collision continues to use candidate() with doors included.
+  return {data,boxes,colliders,surfaces,stairs,classroom64,classroom21,classroomsMain,classroomInteriors,uploadedAnnex,specialInteriors,officeDoor,roomDoors,teacherChairs,centralStairFinish,recyclingShelter,hallPhotoFinish,principalOffice:office,move,candidate,navigationCandidate:(x,y,z)=>candidate(x,y,z,true),blocked,support,floorBelow,moveAir,roomAt,spawn:{...OUTDOOR_SPAWN}};
 }

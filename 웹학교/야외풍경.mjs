@@ -2,6 +2,11 @@ import * as THREE from './외부도구/three.module.js';
 import {EXTRA_TREES} from './운동장환경.mjs';
 import {finishMaterial} from './현실재질.mjs';
 
+export async function loadDaySky(){
+  const texture=await new THREE.TextureLoader().loadAsync(new URL('./텍스처/가을하늘.png',import.meta.url).href);
+  texture.colorSpace=THREE.SRGBColorSpace;texture.mapping=THREE.EquirectangularReflectionMapping;return texture;
+}
+
 // A seamless, locally generated sky bitmap. No school images leave the device.
 export function clearDaySky(){
   const canvas=document.createElement('canvas');canvas.width=1536;canvas.height=768;

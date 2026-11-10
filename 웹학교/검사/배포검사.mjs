@@ -10,6 +10,7 @@ import {verifyLossless} from './모델무손실검사.mjs';
 const root=new URL('../../',import.meta.url),port=18081;
 const temporary=fs.mkdtempSync(path.join(os.tmpdir(),'school-deploy-test-')),output=process.env.SCHOOL_TEST_RUNTIME?path.resolve(process.env.SCHOOL_TEST_RUNTIME):path.join(temporary,'runtime');
 const packed=packRuntime(output);
+for(const file of ['미션경로.mjs','스탬프미션.mjs','미션표현.mjs','미션화면.mjs','탐험문제.mjs','스탬프미션.css'])assert(packed.files.includes('웹학교/'+file),'Stamp mission runtime included: '+file);
 assert(packed.files.includes('웹학교/승인교사모델.mjs'),'Approved cartoon teacher compatibility included in production');
 assert(!packed.files.includes('웹학교/과학교사자세.mjs'),'Do not deform the new science avatar with old scan coordinates');
 for(const rel of ['관리도구/관리자/사진변환.mjs','관리도구/관리자/이미지정책/policy.xml'])assert(fs.existsSync(path.join(output,rel)),'Phone converter runtime dependency: '+rel);

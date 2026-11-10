@@ -1,6 +1,10 @@
 import * as THREE from './외부도구/three.module.js';
 import {buildWorld,EYE_HEIGHT,localPoint} from './이동물리.mjs';
-import {createClassTeachers} from './담임선생님.mjs';
+import {createClassTeachers,CLASS_TEACHERS} from './담임선생님.mjs';
+import {prepareMissionMap} from './미션경로.mjs';
+import {createStampMission} from './스탬프미션.mjs';
+import {createMissionVisual} from './미션표현.mjs';
+import {createMissionUI} from './미션화면.mjs';
 import {floorDestination} from './층별이동.mjs';
 import {surfaceKind,finishMaterial,softEnvironment,batchSurfaceColors,surfaceInstanceColor} from './현실재질.mjs';
 import {ELEVATOR,nearElevator,elevatorDestination} from './엘리베이터.mjs';
@@ -25,7 +29,7 @@ import {drivingControls} from './운전화면.mjs';
 import {supportRoomDetails} from './지원실사진표현.mjs';
 import {recyclingShelterDetails} from './분리수거장사진표현.mjs';
 import {OUTDOOR_YAW} from './운동장환경.mjs';
-import {clearDaySky,playgroundTrees,campusGroundBackdrop} from './야외풍경.mjs';
+import {loadDaySky,playgroundTrees,campusGroundBackdrop} from './야외풍경.mjs';
 import {createFootballPhysics} from './축구공물리.mjs';
 import {footballDetails} from './축구공표현.mjs';
 import {faceMonitorsTowardBoard} from './모니터방향.mjs';
@@ -44,6 +48,8 @@ import {individualLearningDetails} from './개별학습실사진표현.mjs';
 import {officeConnectingDoor} from './교장실연결문표현.mjs';
 import {roomDoorVisuals,doorControls} from './출입문표현.mjs';
 import {freezeStaticTree,batchStaticDetails} from './정적장면최적화.mjs';
+import {createRoomDetailsCache} from './공간상세로딩.mjs';
+import {partitionOutdoorInstances} from './실외공간분할.mjs';
 import {circulationFinish,circulationEndCaps} from './공용공간마감.mjs';
 import {teacherChairDetails,classroomWindowSigns} from './교사자리와창팻말표현.mjs';
 import {audioRoomDetails} from './시청각실사진표현.mjs';
@@ -68,7 +74,8 @@ catch(error){$('불러오기').textContent='3D 그래픽을 시작할 수 없습
 renderer.setPixelRatio(Math.min(devicePixelRatio,mobileGraphics?1.25:1.6));renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
 renderer.shadowMap.enabled=!mobileGraphics;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
-const scene=new THREE.Scene();scene.background=clearDaySky();scene.fog=new THREE.Fog('#cde2ed',190,350);
+const scene=new THREE.Scene();scene.background=new THREE.Color('#cde2ed');scene.fog=new THREE.Fog('#cde2ed',190,350);
+const skyReady=loadDaySky().then(texture=>{scene.background=texture;});
 scene.add(new THREE.HemisphereLight(0xe4edfa,0xb4ac91,1.35));
 scene.environment=softEnvironment(renderer);
 const interiorLight=new THREE.PointLight(0xfff3de,12,13,2);scene.add(interiorLight);
@@ -95,6 +102,9 @@ let classTeachers;
 let lobbyPrincipalNPC;
 const monthQuiz=createMonthQuiz();
 let monthQuizUI;
+let mission=null,missionMap=null,missionLoading=false,pendingMission=false,missionUI;
+const missionVisual=createMissionVisual();scene.add(missionVisual.root);
+const missionLocked=()=>!!(mission?.active()||missionUI?.isResult());
 let lobbyPrincipalState;
 const principalPositions=()=>[...(officePrincipals?.characters.map(n=>n.getState().position)??OFFICE_CHARACTERS.map(n=>n.position)),lobbyPrincipalState?.getState().position??LOBBY_PRINCIPAL_POSITION,...(classTeachers?.getStates().filter(n=>n.visible&&n.modelStatus==='ready').map(n=>n.position)??[])];
 const principalBubbles=['교장실','중앙현관'].map(name=>{
@@ -104,6 +114,7 @@ const bubblePoint=new THREE.Vector3();
 function updatePrincipalBubble(element,npc,npcPosition,offset=0){
   if(!element.hidden)element.hidden=true;
   if(driving?.phase!=='walking')return;
+  if(missionLocked())return;
   if(monthQuiz.getState().open)return;
   if(!npc?.root.visible||!principalCanGreet(position,npcPosition,{active:isPlaying()&&!document.hidden,colliders:world.colliders}))return;
   element.textContent=principalGreetingAt(new Date(),Math.floor(elapsed/7),offset);
@@ -137,7 +148,7 @@ const characterPicker=createCharacterPicker({initial:selectedCharacter??'boy-cut
   avatar.snapHeading(Math.PI+yaw);
   selectedCharacter=variant;characterChosenThisVisit=true;try{localStorage.setItem('석암학교-캐릭터',variant);}catch{}
   updateCharacterLabel();cameraReset=true;
-},onStarted(){if(pendingParking)goToParking(pendingParking);else startWalk(pickerFallback);},onClose(){pendingParking=null;if(pickerResume)startWalk();else pausePanel();}});
+},onStarted(){if(pendingMission)beginMission();else if(pendingParking)goToParking(pendingParking);else startWalk(pickerFallback);},onClose(){pendingParking=null;pendingMission=false;if(pickerResume)startWalk();else pausePanel();}});
 function openCharacterPicker(fallback=false){
   if(!ready||characterPicker.isOpen())return;
   leaveVehicle();
@@ -149,6 +160,33 @@ monthQuizUI=createMonthQuizBubble({
   onAnswer:index=>monthQuiz.answer(index),
   onAnswered(){canvas.focus({preventScroll:true});}
 });
+missionUI=createMissionUI({onAnswer:index=>{if(isPlaying()&&missionUI.isVisible()){mission.answer(index);clearInput();canvas.focus({preventScroll:true});}},
+  onRetry:beginMission,onFree:()=>{stopMission();startWalk();},
+  onQuestion(){freeLook=true;clearInput();if(document.pointerLockElement)document.exitPointerLock();},
+  onResult(){freeLook=false;dragMode=false;clearInput();if(document.pointerLockElement)document.exitPointerLock();syncMissionControls();pausePanel();}
+});
+function syncMissionControls(){
+  const blocked=missionLocked();document.body.dataset.quest=String(blocked);$('미션메뉴안내').hidden=!blocked;
+  for(const id of ['동층이동','방선택','방이동','육사이동','처음'])$(id).disabled=blocked||!ready;
+}
+function stopMission(){pendingMission=false;mission?.stop();missionUI?.hide();missionVisual.root.visible=false;syncMissionControls();}
+function beginMission(){
+  if(!missionMap)return;pendingMission=false;leaveVehicle();missionUI.hide();
+  mission=createStampMission(missionMap,{speed:RUN_SPEED});mission.start();
+  monthQuiz.dismiss();monthQuizUI.hide();position={...missionMap.start};jumpMotion.reset();yaw=Math.PI/2;pitch=0;cameraReset=true;avatar.snapHeading(Math.PI+yaw);
+  syncMissionControls();void startWalk();notice('퀴즈 미션 시작! 학년별 교실에서 별을 찾아보세요.');
+}
+async function requestMission(){
+  if(!ready||missionLoading||characterPicker.isOpen()||mode!=='overview')return;
+  missionLoading=true;$('퀴즈시작').disabled=true;$('시작').disabled=true;$('퀴즈시작').textContent='미션 경로 준비 중…';
+  try{
+    if(!missionMap)missionMap=await prepareMissionMap(world,[...CLASS_TEACHERS,...OFFICE_CHARACTERS.map(t=>({...t,id:'office-'+t.id,roomId:PRINCIPAL_ID}))],{yieldFrame:()=>new Promise(resolve=>requestAnimationFrame(resolve))});
+    pendingMission=true;pendingParking=null;
+  }catch(error){pendingMission=false;notice('미션을 준비하지 못했습니다. '+error.message);console.error(error);}
+  finally{missionLoading=false;$('퀴즈시작').disabled=false;$('시작').disabled=false;$('퀴즈시작').textContent='★ 퀴즈 미션 시작하기';}
+  if(pendingMission){if(characterChosenThisVisit)beginMission();else openCharacterPicker();}
+}
+$('퀴즈시작').addEventListener('click',requestMission);
 function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
 addEventListener('resize',resize);resize();
 function textTexture(text,background=false){
@@ -162,35 +200,33 @@ function textTexture(text,background=false){
   lines.forEach((s,i)=>ctx.fillText(s,c.width/2,44+i*68,c.width-12));
   const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;return {tex,ratio:c.width/c.height};
 }
-let connectingDoorVisual,roomDoorVisual,doorUI,staticObjects=0,batchedDetails=0;
+let connectingDoorVisual,roomDoorVisual,doorUI,roomDetailsCache,outdoorChunks,staticObjects=0,batchedDetails=0;
 function buildVisuals(){
+  roomDetailsCache=createRoomDetailsCache(scene,{capacity:mobileGraphics?12:18,compile:root=>renderer.compileAsync(root,camera,scene),onBuilt:count=>{batchedDetails+=count;}});
+  const defer=(roomId,floor,center,create,onEvict)=>roomDetailsCache.add({roomId,floor,center,create,onEvict});
   scene.add(campusGroundBackdrop());
   scene.add(campusEntranceDetails(world.boxes));
   const parkedCars=parkedCarDetails();carVisual=parkedCars;scene.add(parkedCars);visuals.push({mesh:parkedCars,floor:0,ceiling:false});
-  scene.add(playgroundTrees());footballPhysics=createFootballPhysics(world);footballVisual=footballDetails(footballPhysics);scene.add(footballVisual.group);
+  const trees=playgroundTrees();scene.add(trees);footballPhysics=createFootballPhysics(world);footballVisual=footballDetails(footballPhysics);scene.add(footballVisual.group);
   driving=createDriving(world,footballPhysics);vehicleUI=drivingControls({onAction:vehicleAction,canPlay:isPlaying});
   scene.add(teacherChairDetails(world.teacherChairs));scene.add(classroomWindowSigns(world.data));
   if(world.centralStairFinish)scene.add(centralStairDetails(world.centralStairFinish));
   if(world.recyclingShelter)scene.add(recyclingShelterDetails(world.recyclingShelter));
   for(const config of world.specialInteriors){
-    const mesh=config.photoSupport?supportRoomDetails(config):config.roomId===GRADE5_RESEARCH_ID?grade5ResearchDetails(config):INDIVIDUAL_REFERENCES[config.roomId]?individualLearningDetails(config):config.roomId===NURSE_ID?nurseRoomDetails(config):config.roomId===STAFF_ID?staffRoomDetails(config):config.roomId===AUDIO_ID?audioRoomDetails(config):config.roomId===BROADCAST_ID?broadcastRoomDetails(config):meetingRoomDetails(config);scene.add(mesh);
-    visuals.push({mesh,floor:parseInt(config.room.floor,10),interiorRoom:config.roomId,center:convert(config.spawn),ceiling:false});
+    defer(config.roomId,parseInt(config.room.floor,10),convert(config.spawn),()=>config.photoSupport?supportRoomDetails(config):config.roomId===GRADE5_RESEARCH_ID?grade5ResearchDetails(config):INDIVIDUAL_REFERENCES[config.roomId]?individualLearningDetails(config):config.roomId===NURSE_ID?nurseRoomDetails(config):config.roomId===STAFF_ID?staffRoomDetails(config):config.roomId===AUDIO_ID?audioRoomDetails(config):config.roomId===BROADCAST_ID?broadcastRoomDetails(config):meetingRoomDetails(config));
   }
   hallMirror=createHallMirror(data.floorHeight,mobileGraphics);scene.add(hallMirror);scene.add(createGateTerrain(world.boxes));
   const hallDetails=hallPhotoDetails(world.hallPhotoFinish);scene.add(hallDetails);visuals.push({mesh:hallDetails,floor:0,ceiling:false});
-  const office=createPrincipalOffice();scene.add(office);visuals.push({mesh:office,floor:2,interiorRoom:PRINCIPAL_ID,center:convert(world.principalOffice.spawn),ceiling:false});
+  defer(PRINCIPAL_ID,2,convert(world.principalOffice.spawn),createPrincipalOffice);
   connectingDoorVisual=officeConnectingDoor(world.officeDoor);scene.add(connectingDoorVisual);
   roomDoorVisual=roomDoorVisuals(world.roomDoors);scene.add(roomDoorVisual);doorUI=doorControls(doorAction);
-  const roomDetails=class64Details();scene.add(roomDetails);visuals.push({mesh:roomDetails,floor:4,ceiling:false});
-  class64PhotoFinish=roomDetails.userData.photoFinish;
+  defer(CLASS64_ID,4,convert(CLASS64_SPAWN),()=>{const mesh=class64Details();class64PhotoFinish=mesh.userData.photoFinish;return mesh;},()=>{class64PhotoFinish=null;});
   if(world.classroom21){
-    const config=world.classroom21,mesh=class21Details(config);scene.add(mesh);
-    visuals.push({mesh,floor:4,interiorRoom:config.roomId,center:convert(config.spawn),ceiling:false});
+    const config=world.classroom21;defer(config.roomId,parseInt(config.room.floor),convert(config.spawn),()=>class21Details(config));
   }
   const computerEntrance=computerEntranceDetails();scene.add(computerEntrance);visuals.push({mesh:computerEntrance,floor:4,ceiling:false});
   for(const config of [...world.classroomsMain.rooms,...world.uploadedAnnex]){
-    const mesh=mainClassroomDetails(config);scene.add(mesh);
-    visuals.push({mesh,floor:parseInt(config.room.floor),interiorRoom:config.roomId,center:convert(config.spawn),ceiling:false});
+    defer(config.roomId,parseInt(config.room.floor),convert(config.spawn),()=>mainClassroomDetails(config));
   }
   const groups=new Map(),geometry=new THREE.BoxGeometry(1,1,1),sphere=new THREE.SphereGeometry(.5,12,8);
   const exteriorBoxes=[...faceMonitorsTowardBoard(world.boxes).map(circulationFinish).map(exteriorRenderBox).filter(Boolean),...exteriorSkins(world.boxes,data),...circulationEndCaps(world.boxes,data)];
@@ -270,9 +306,10 @@ function buildVisuals(){
     const beacon=new THREE.Mesh(new THREE.OctahedronGeometry(.16),new THREE.MeshBasicMaterial({color:[0,0xffb54c,0xbd99ff,0x39d7b2,0xffdb50][floor]}));
     beacon.position.set(58,(floor-1)*3.4+1.15,-1.5);beacon.userData.floor=floor;markerGroup.add(beacon);
   }
-  const moving=new Set([avatar.root,markerGroup,carVisual,footballVisual.group,connectingDoorVisual,roomDoorVisual]);
+  const moving=new Set([avatar.root,markerGroup,carVisual,footballVisual.group,connectingDoorVisual,roomDoorVisual,missionVisual.root]);
+  outdoorChunks=partitionOutdoorInstances([trees,...visuals.filter(v=>!v.interiorRoom&&v.mesh.isInstancedMesh).map(v=>v.mesh)]);
   for(const v of visuals)if(v.interiorRoom&&v.mesh.isGroup)batchedDetails+=batchStaticDetails(v.mesh);
-  for(const root of scene.children)if(!moving.has(root)&&!root.isLight&&!root.isCamera)staticObjects+=freezeStaticTree(root);
+  for(const root of scene.children)if(!moving.has(root)&&!root.isLight&&!root.isCamera){if(root.isGroup)batchedDetails+=batchStaticDetails(root);staticObjects+=freezeStaticTree(root);}
 }
 function overviewCamera(dt){
   if(camera.fov!==76){camera.fov=76;camera.updateProjectionMatrix();}
@@ -293,10 +330,11 @@ function cameraWalk(dt){
   if(camera.fov!==68){camera.fov=68;camera.updateProjectionMatrix();}
   camera.position.copy(convert(cam));camera.lookAt(convert(target));
 }
-function isPlaying(){return mode==='walk'&&avatar.modelStatus==='ready'&&(locked||dragMode||freeLook)&&!document.hidden&&!$('게임메뉴').open&&!$('탐험방법선택').open&&!$('주차장선택').open&&!characterPicker.isOpen()&&!elevatorBusy&&!$('승강기창').open;}
+function isPlaying(){return mode==='walk'&&avatar.modelStatus==='ready'&&(locked||dragMode||freeLook)&&!document.hidden&&!missionLoading&&!missionUI?.isResult()&&!$('게임메뉴').open&&!$('탐험방법선택').open&&!$('주차장선택').open&&!characterPicker.isOpen()&&!elevatorBusy&&!$('승강기창').open;}
 function clearInput(){keys.clear();velocity={x:0,y:0};drag=null;freeLookPoint=null;touchControls?.reset();vehicleUI?.reset();avatar.cancelWave();greeting.hidden=true;}
 function leaveVehicle(){if(driving&&driving.phase!=='walking'){position=driving.cancel();avatar.setSeated(false);jumpMotion.reset();cameraReset=true;lastDriveYaw=null;}}
 function vehicleAction(){
+  if(missionLocked())return;
   if(!isPlaying())return;
   if(driving.phase==='walking'&&jumpMotion.getState().airborne){notice('착지한 뒤 자동차에 탑승해 주세요.');return;}
   const success=driving.phase==='walking'?driving.enter(position):driving.exit();
@@ -329,22 +367,23 @@ function greet(){
 }
 function pausePanel(){
   const playing=isPlaying();
-  panel.hidden=playing||$('게임메뉴').open||$('탐험방법선택').open||$('주차장선택').open;document.body.dataset.mode=mode;document.body.dataset.playing=String(playing);
+  panel.hidden=playing||missionUI?.isResult()||$('게임메뉴').open||$('탐험방법선택').open||$('주차장선택').open;document.body.dataset.mode=mode;document.body.dataset.playing=String(playing);
   $('조준점').hidden=true;
   const title=mode==='overview'?'탐험 시작하기':'탐험 계속하기';
-  $('걷기').textContent=title;$('시작').textContent=title+'  →';
+  $('걷기').textContent=title;$('시작').textContent=(mode==='overview'?'자유 탐험':title)+'  →';
   $('안내표식').textContent=mode==='overview'?'나만의 학교 모험':'탐험 일시정지';
   $('안내제목').innerHTML=mode==='overview'?'익숙한 학교,<br>새로운 모험.':'잠깐 쉬어갈까요?';
   updateCharacterLabel();
   touchControls?.sync();
 }
 function openMenu(){
-  if(!ready||characterPicker.isOpen()||$('탐험방법선택').open||$('주차장선택').open||$('승강기창').open||elevatorBusy||$('게임메뉴').open)return;
+  if(!ready||missionLoading||characterPicker.isOpen()||$('탐험방법선택').open||$('주차장선택').open||$('승강기창').open||elevatorBusy||$('게임메뉴').open)return;
   dragMode=false;freeLook=false;clearInput();if(document.pointerLockElement)document.exitPointerLock();
   $('게임메뉴').showModal();pausePanel();notice('탐험 메뉴 · 이동할 층을 선택하거나 탐험을 계속하세요.');
 }
 $('메뉴').addEventListener('click',openMenu);
 function goToParking(key){
+  if(missionLocked())return;
   pendingParking=null;
   const destination=parkingDestination(world,driving,key);
   if(!destination){pausePanel();notice('해당 주차장에 탑승 가능한 차량이 없습니다. 다른 주차장을 선택해 주세요.');return;}
@@ -353,7 +392,7 @@ function goToParking(key){
   startWalk();notice(destination.label+' 도착 · F키 또는 탑승하기 버튼으로 자동차에 타세요.');
 }
 function openExploreChoice(){
-  if(!ready||mode!=='overview'||characterPicker.isOpen())return;
+  if(!ready||missionLoading||mode!=='overview'||characterPicker.isOpen())return;
   $('게임메뉴').close();pendingParking=null;clearInput();$('탐험방법선택').showModal();pausePanel();
 }
 $('탐험방법닫기').addEventListener('click',()=>$('탐험방법선택').close());
@@ -392,6 +431,7 @@ $('게임메뉴').addEventListener('close',()=>{
   pausePanel();
 });
 async function startWalk(withoutPointerLock=false){
+  if(missionUI?.isResult()){$('게임메뉴').close();pausePanel();return;}
   if(ready&&!characterChosenThisVisit){openCharacterPicker(withoutPointerLock);return;}
   if(!ready||characterPicker.isOpen()||$('탐험방법선택').open||$('주차장선택').open||$('승강기창').open||elevatorBusy)return;
   $('게임메뉴').close();mode='walk';dragMode=false;freeLook=true;clearInput();
@@ -415,13 +455,15 @@ function lockFallback(){
   notice(touchControls?.isActive()?movementHint():'마우스를 움직여 둘러보기 · 클릭·드래그 없이 시점 이동 · ESC 메뉴');
 }
 function overview(){
+  stopMission();
   leaveVehicle();
   $('게임메뉴').close();mode='overview';dragMode=false;freeLook=false;clearInput();if(document.pointerLockElement)document.exitPointerLock();
   orbit={yaw:.75,pitch:.83,distance:150};orbitResumeAt=0;
   pausePanel();notice(touchControls?.isActive()?'학교 전체 항공뷰 · 한 손가락 회전 / 두 손가락 확대 · 탐험 시작하기':'학교 전체 항공뷰 · 드래그로 회전 / 휠로 확대 · 학교 탐험 시작하기');
 }
-function reset(){leaveVehicle();position={...world.spawn};jumpMotion.reset();yaw=OUTDOOR_YAW;pitch=0;smoothZ=position.z+EYE_HEIGHT;cameraReset=true;avatar.snapHeading(Math.PI+yaw);clearInput();notice('중앙현관 밖 구령대로 돌아왔습니다.');}
+function reset(){if(missionLocked())return;leaveVehicle();position={...world.spawn};jumpMotion.reset();yaw=OUTDOOR_YAW;pitch=0;smoothZ=position.z+EYE_HEIGHT;cameraReset=true;avatar.snapHeading(Math.PI+yaw);clearInput();notice('중앙현관 밖 구령대로 돌아왔습니다.');}
 function openElevator(){
+  if(missionLocked())return;
   if(!ready||mode!=='walk'||driving?.phase!=='walking'||elevatorBusy||!nearElevator(position,data.floorHeight))return;
   clearInput();dragMode=false;freeLook=false;if(document.pointerLockElement)document.exitPointerLock();pausePanel();
   $('승강기현재층').textContent=Math.round(position.z/data.floorHeight)+1+'층';$('승강기창').showModal();
@@ -439,11 +481,11 @@ for(const button of document.querySelectorAll('[data-elevator-floor]'))button.ad
   }finally{elevatorBusy=false;$('승강기전환').hidden=true;await startWalk();notice(button.dataset.elevatorFloor+'층 엘리베이터 앞에 도착했습니다.');}
 });
 $('걷기').addEventListener('click',()=>mode==='overview'?openExploreChoice():startWalk());$('시작').addEventListener('click',()=>mode==='overview'?openExploreChoice():startWalk());
-$('육사이동').addEventListener('click',()=>{if(!ready)return;leaveVehicle();position={...CLASS64_SPAWN};jumpMotion.reset();yaw=Math.PI/2;pitch=0;avatar.snapHeading(Math.PI+yaw);startWalk();notice('6-4 교실 · 사진을 참고한 실내 · 책상/의자 충돌 적용');});
+$('육사이동').addEventListener('click',()=>{if(!ready||missionLocked())return;leaveVehicle();position={...CLASS64_SPAWN};jumpMotion.reset();yaw=Math.PI/2;pitch=0;avatar.snapHeading(Math.PI+yaw);startWalk();notice('6-4 교실 · 사진을 참고한 실내 · 책상/의자 충돌 적용');});
 $('드래그걷기').addEventListener('click',()=>startWalk(true));$('전체').addEventListener('click',overview);
 $('처음').addEventListener('click',()=>{if(ready){reset();startWalk();}});
 $('동층이동').addEventListener('change',async e=>{
-  const value=e.target.value;e.target.value='';if(!ready||!value)return;
+  const value=e.target.value;e.target.value='';if(!ready||!value||missionLocked())return;
   const [building,floor]=value.split(':');
   const destination=floorDestination(data,building,Number(floor));if(!destination)return;
   const p=destination.point,valid=world.candidate(p.x,p.y,p.z);
@@ -454,6 +496,7 @@ $('동층이동').addEventListener('change',async e=>{
   await startWalk();notice(destination.label+' · '+movementHint());
 });
 $('방이동').addEventListener('click',()=>{
+  if(missionLocked())return;
   const room=data.rooms.find(r=>r.id===$('방선택').value);if(!room)return;
   const b=room.bounds,interior=world.classroomInteriors.find(r=>r.roomId===room.id),special=world.specialInteriors.find(r=>r.roomId===room.id);
   const p=room.id===PRINCIPAL_ID?{...world.principalOffice.spawn}:room.id===CLASS64_ID?{...CLASS64_SPAWN}:interior?{...interior.spawn}:special?{...special.spawn}:{x:(b[0]+b[1])/2,y:(b[2]+b[3])/2,z:b[4]};
@@ -465,7 +508,8 @@ document.addEventListener('pointerlockchange',()=>{
   if(locked&&touchControls?.isActive()){freeLook=true;document.exitPointerLock();return;}
   if(locked&&(mode!=='walk'||$('게임메뉴').open||characterPicker.isOpen()||$('승강기창').open||elevatorBusy)){document.exitPointerLock();return;}
   if(locked){freeLook=false;dragMode=false;}
-  clearInput();pausePanel();
+  // A delayed browser pointer-lock grant must not erase an already held W key.
+  if(!locked)clearInput();else{drag=null;freeLookPoint=null;}pausePanel();
   if(!locked&&mode==='walk'&&!dragMode&&!freeLook&&!characterPicker.isOpen()&&!$('승강기창').open&&!elevatorBusy)openMenu();
   if(locked)notice('WASD 달리기 · Space 점프 · Z 안녕~ · 마우스 시점 · ESC 정지');
   else if($('게임메뉴').open)notice('일시정지 · ESC / X / 탐험 계속하기로 재개');
@@ -477,7 +521,7 @@ function lookAround(dx,dy){
 }
 document.addEventListener('mousemove',e=>{
   if(touchControls?.isActive()||!isPlaying())return;
-  if(!locked&&e.target.closest?.('#월퀴즈말풍선')){freeLookPoint=null;return;}
+  if(!locked&&e.target.closest?.('#월퀴즈말풍선,#탐험퀴즈말풍선,#미션결과')){freeLookPoint=null;return;}
   if(locked){lookAround(e.movementX,e.movementY);return;}
   if(freeLook){
     const previous=freeLookPoint;freeLookPoint={x:e.clientX,y:e.clientY};
@@ -505,6 +549,9 @@ document.addEventListener('mouseleave',()=>freeLookPoint=null);
 canvas.addEventListener('wheel',e=>{if(mode==='overview'){orbitResumeAt=performance.now()+6000;orbit.distance=Math.max(18,Math.min(280,orbit.distance+e.deltaY*.09));e.preventDefault();}else if(isPlaying()){followDistance=Math.max(1.4,Math.min(4.8,followDistance+e.deltaY*.004));e.preventDefault();}},{passive:false});
 document.addEventListener('keydown',e=>{
   const quizKey=e.code.match(/^(?:Digit|Numpad)([1-4])$/);
+  if(quizKey&&isPlaying()&&missionUI.isVisible()){
+    e.preventDefault();if(!e.repeat)missionUI.answer(Number(quizKey[1])-1);return;
+  }
   if(quizKey&&isPlaying()&&monthQuizUI.isVisible()){
     e.preventDefault();if(!e.repeat)monthQuizUI.answer(Number(quizKey[1])-1);return;
   }
@@ -538,7 +585,8 @@ touchControls=createTouchControls({canvas,canPlay:isPlaying,getMode:()=>mode,
 const map=$('지도'),mapCtx=map.getContext('2d');
 function updateHUD(){
   if(!world)return;
-  $('승강기호출').hidden=!isPlaying()||driving?.phase!=='walking'||!nearElevator(position,data.floorHeight);
+  roomDetailsCache?.update(position,mode);
+  $('승강기호출').hidden=missionLocked()||!isPlaying()||driving?.phase!=='walking'||!nearElevator(position,data.floorHeight);
   const at=world.roomAt(position),floor=at.floor;
   const stair=world.stairs.find(s=>{const f=s.frame,dx=position.x-f.origin[0],dy=position.y-f.origin[1],u=dx*f.right[0]+dy*f.right[1],v=dx*f.inward[0]+dy*f.inward[1];return u>0&&u<f.width&&v>0&&v<f.depth;});
   const inParking=b=>position.z<.1&&position.x>=b[0]&&position.x<=b[3]&&position.y>=b[1]&&position.y<=b[4];
@@ -551,6 +599,7 @@ function updateHUD(){
   for(const m of markerGroup.children)m.visible=!visitedFloors.has(m.userData.floor);
   $('탐험진행').value=visitedRooms.size;
   for(const v of visuals)v.mesh.visible=!v.interiorRoom||(mode==='walk'&&v.floor===at.floor&&v.center.distanceTo(camera.position)<32);
+  outdoorChunks?.update(mode==='walk'&&!renderer.shadowMap.enabled);
   for(const l of labels){
     const distance=l.mesh.position.distanceTo(camera.position);
     l.mesh.visible=mode==='walk'?(distance<24&&(l.basement?at.basement:(!l.floor||l.floor===at.floor))&&!l.name.startsWith('Label_')):false;
@@ -573,7 +622,7 @@ function frame(now){
   if(document.hidden)return; // No GPU/physics work in a background browser tab.
   if(characterPicker.isOpen())return;
   world.officeDoor.update(dt,position,isPlaying());connectingDoorVisual.userData.update();
-  if(mode==='walk'&&position.z>9.8&&Math.hypot(position.x-35,position.y+3.5)<14)class64PhotoFinish.load();
+  if(mode==='walk'&&position.z>9.8&&Math.hypot(position.x-35,position.y+3.5)<14)class64PhotoFinish?.load();
   const previous={...position};
   if(isPlaying()){
     const touchMove=touchControls.getMovement();
@@ -599,10 +648,11 @@ function frame(now){
   footballPhysics.update(dt,position,previous,{active:isPlaying()&&!document.hidden,yaw,canKick:driving.phase==='walking'});footballVisual.update();
   driving.sync(isPlaying()?dt:0);updateDrivenCars(carVisual,driving);
   if(driving.phase==='driving')position=driving.seat();else if(driving.phase==='walking'||driving.phase==='approaching')lastDriveYaw=null;
-  vehicleUI.update(driving,position,isPlaying());
+  vehicleUI.update(driving,position,isPlaying()&&!missionLocked());
   roomDoorVisual.userData.update(position,mode==='walk');doorUI.update(world.roomDoors,position,isPlaying()&&driving.phase==='walking');
   scene.backgroundRotation.y=elapsed*.0006;
-  classTeachers?.update(dt,position,mode,{paused:!isPlaying()||document.hidden});
+  const missionBefore=mission?.view(),focusedTeacher=missionBefore?.phase==='quiz'&&missionBefore.nearTeacher?missionBefore.teacher.id:null;
+  classTeachers?.update(dt,position,mode,{paused:!isPlaying()||document.hidden,focusedTeacher});
   if(officeNearby&&!officePrincipals){officePrincipals=createOfficePrincipalModels(world);[principalNPC]=officePrincipals.characters;scene.add(principalNPC.root);}
   if(officeNearby&&(!officeWasNearby||principalNPC?.getState().modelStatus==='not-requested'))void officePrincipals.load();
   officeIdleSeconds=officeNearby?0:officeIdleSeconds+dt;
@@ -610,7 +660,7 @@ function frame(now){
   officeWasNearby=officeNearby;
   for(const npc of officePrincipals?.characters??[]){
     npc.root.visible=officeNearby;
-    npc.update(dt,position,{paused:!officeNearby||!isPlaying(),others:officePrincipals.characters.filter(n=>n!==npc).map(n=>n.getState().position)});
+    npc.update(dt,position,{paused:!officeNearby||!isPlaying()||focusedTeacher==='office-'+npc.getState().id,others:officePrincipals.characters.filter(n=>n!==npc).map(n=>n.getState().position)});
   }
   const lobbyNearby=mode==='walk'&&Math.abs(position.z)<1.8&&Math.hypot(position.x-47,position.y+2.8)<22;
   if(lobbyNearby&&!lobbyPrincipalNPC){lobbyPrincipalNPC=createRunnerPrincipalNPC();scene.add(lobbyPrincipalNPC.root);}
@@ -619,9 +669,17 @@ function frame(now){
     ...OFFICE_CHARACTERS.map((config,index)=>({id:'office-'+config.id,name:config.label,position:officePrincipals?.characters[index].getState().position??config.position,available:officeNearby&&officePrincipals?.characters[index].getState().modelStatus==='ready'})),
     {id:'lobby',name:'중앙현관 · 교장선생님',position:lobbyPrincipalState.getState().position,available:lobbyNearby}
   ];
-  const newQuestion=monthQuiz.update(position,quizNPCs,{active:isPlaying()&&driving.phase==='walking'&&!jumpMotion.getState().airborne,colliders:world.colliders});
+  const newQuestion=monthQuiz.update(position,quizNPCs,{active:!missionLocked()&&isPlaying()&&driving.phase==='walking'&&!jumpMotion.getState().airborne,colliders:world.colliders});
   if(newQuestion)monthQuizUI.show(newQuestion);
   if(mode==='walk'){if(['entering','driving','exiting'].includes(driving.phase))cameraDrive(dt);else cameraWalk(dt);}else overviewCamera(wallDt);
+  if(mission){
+    const npcs=[...(classTeachers?.getStates()??[]),...quizNPCs.filter(n=>n.id.startsWith('office-')).map(n=>({...n,modelStatus:n.available?'ready':'loading'}))];
+    const state=mission.tick(dt,{position,npcs,active:isPlaying(),colliders:world.colliders});
+    let anchor;const teacher=npcs.find(n=>n.id===state.teacher?.id);
+    if(teacher){bubblePoint.set(teacher.position.x,teacher.position.z+2.1,-teacher.position.y).project(camera);if(bubblePoint.z>=-1&&bubblePoint.z<=1)anchor={x:(bubblePoint.x*.5+.5)*innerWidth,y:(-bubblePoint.y*.5+.5)*innerHeight};}
+    missionUI.render(state,{playing:isPlaying(),anchor});
+    missionVisual.update(mission.collectible(),position,elapsed,mode==='walk'&&state.phase==='search');
+  }
   const quizState=monthQuiz.getState(),quizNPC=quizNPCs.find(n=>n.id===quizState.question?.npcId);
   if(quizState.open&&quizNPC){
     if(mode!=='walk'){
@@ -664,7 +722,7 @@ function frame(now){
 requestAnimationFrame(frame);
 try{
   const response=await fetch(new URL('./학교구조.json',import.meta.url));if(!response.ok)throw new Error('학교 구조 파일 '+response.status);
-  world=buildWorld(await response.json(),{interactiveDoors:true});data=world.data;position={...world.spawn};lobbyPrincipalState=createPrincipalWalk(world,'lobby');jumpMotion=createJumpMotion(world);resolveCamera=createCameraCollision([...world.colliders,...world.boxes.filter(b=>b.kind==='step')]);buildVisuals();ready=true;
+  world=buildWorld(await response.json(),{interactiveDoors:true});data=world.data;position={...world.spawn};lobbyPrincipalState=createPrincipalWalk(world,'lobby');jumpMotion=createJumpMotion(world);resolveCamera=createCameraCollision([...world.colliders,...world.boxes.filter(b=>b.kind==='step')]);buildVisuals();await skyReady;ready=true;
   for(let floor=1;floor<=4;floor++){
     const group=document.createElement('optgroup');group.label=floor+'층';
     for(const r of data.rooms.filter(r=>parseInt(r.floor)===floor&&(['classroom','special_room'].includes(r.type)||r.id==='1F_MAIN_LOBBY'))){const option=document.createElement('option');option.value=r.id;option.textContent=r.name;group.append(option);}
@@ -674,7 +732,7 @@ try{
   $('불러오기').textContent='Blender 학교 모델 준비 완료';
   // Read-only state is useful for diagnostics. Test positioning is only enabled
   // on loopback with an explicit test URL; it is not a public wall-clipping key.
-  window.schoolTour={getState:()=>({ready,mode,locked,dragMode,freeLook,touch:touchControls.getState(),graphics:{pixelRatio:renderer.getPixelRatio(),shadows:renderer.shadowMap.enabled},position:{...position},yaw,pitch,photoFinish:class64PhotoFinish.getState(),jump:jumpMotion.getState(),character:{...avatar.getState(),visible:avatar.root.visible,position:avatar.root.position.toArray()},thirdPerson:{distance:cameraDistance,requestedDistance:followDistance,blocked:cameraBlocked,camera:camera.position.toArray()},overview:{autoOrbit,orbit:{...orbit},camera:camera.position.toArray()},visitedRooms:visitedRooms.size,visitedFloors:visitedFloors.size,drawCalls:renderer.info.render.calls,menuOpen:$('게임메뉴').open})};
+  window.schoolTour={getState:()=>({ready,mode,locked,dragMode,freeLook,touch:touchControls.getState(),graphics:{pixelRatio:renderer.getPixelRatio(),shadows:renderer.shadowMap.enabled},position:{...position},yaw,pitch,photoFinish:class64PhotoFinish?.getState()??{status:'idle',loaded:0},jump:jumpMotion.getState(),character:{...avatar.getState(),visible:avatar.root.visible,position:avatar.root.position.toArray()},thirdPerson:{distance:cameraDistance,requestedDistance:followDistance,blocked:cameraBlocked,camera:camera.position.toArray()},overview:{autoOrbit,orbit:{...orbit},camera:camera.position.toArray()},visitedRooms:visitedRooms.size,visitedFloors:visitedFloors.size,drawCalls:renderer.info.render.calls,menuOpen:$('게임메뉴').open})};
   window.schoolTour.getPrincipalState=()=>principalNPC?.getState()??{position:{...OFFICE_CHARACTERS[0].position},modelStatus:'not-requested',faceTexture:'not-requested',visible:false};
   window.schoolTour.getOfficePrincipalStates=()=>officePrincipals?.characters.map(npc=>npc.getState())??OFFICE_CHARACTERS.map(config=>({id:config.id,position:{...config.position},height:config.height,modelStatus:'not-requested',visible:false}));
   classTeachers=createClassTeachers(world);for(const teacher of classTeachers.teachers)scene.add(teacher.root);
@@ -683,11 +741,12 @@ try{
   window.schoolTour.getFootballState=()=>footballPhysics.getState();
   window.schoolTour.getDrivingState=()=>driving.getState();
   window.schoolTour.getDoorState=()=>world.roomDoors.getState();
-  window.schoolTour.getPerformanceState=()=>({staticObjects,batchedDetails,physics:footballPhysics.getWorkState(),drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,shadowAutoUpdate:renderer.shadowMap.autoUpdate});
+  window.schoolTour.getPerformanceState=()=>({staticObjects,batchedDetails,details:roomDetailsCache.state(),physics:footballPhysics.getWorkState(),drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,shadowAutoUpdate:renderer.shadowMap.autoUpdate});
   window.schoolTour.getMonthQuizState=()=>monthQuiz.getState();
+  window.schoolTour.getMissionState=()=>mission?.view()??{phase:'idle',active:false};
   window.schoolTour.getLobbyPrincipalState=()=>({...lobbyPrincipalState.getState(),...(lobbyPrincipalNPC?.getState()??{}),visible:lobbyPrincipalNPC?.root.visible??false});
   if(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).has('test'))window.schoolTour.test={
-    world,data,setPosition(p){if(!world.candidate(p.x,p.y,p.z))throw new Error('Invalid test position');position={...p};jumpMotion.reset();smoothZ=p.z+EYE_HEIGHT;cameraReset=true;clearInput();},setYaw(y){yaw=y;},
+    world,data,missionDebug:()=>mission?.debug(),setPosition(p){if(!world.candidate(p.x,p.y,p.z))throw new Error('Invalid test position');position={...p};jumpMotion.reset();smoothZ=p.z+EYE_HEIGHT;cameraReset=true;clearInput();},setYaw(y){yaw=y;},
     step(dx,dy){position=world.move(position,dx,dy);return {...position};}
   };
   // Always begin with the whole campus, including old ?photo=1 bookmarks.
