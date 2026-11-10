@@ -2,7 +2,11 @@
   "date": "2026-11-09",
   "feature": "자유 탐험 / 퀴즈 스탬프 탐험",
   "localPreview": "http://localhost:8080/",
-  "productionDeployed": false,
+  "productionDeployed": true,
+  "productionUrl": "https://tour.seokam.es.kr/",
+  "productionCommit": "2092a9897af0161e6d61cdb5d1c0d7c7542dcf92",
+  "productionDeployment": "ca878e6c-0e2f-4c74-b849-47d90aa714f8",
+  "productionVerifiedDate": "2026-11-10",
   "logic": {
     "passed": true,
     "questions": 60,

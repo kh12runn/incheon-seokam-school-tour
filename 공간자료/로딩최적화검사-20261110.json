@@ -1,4 +1,22 @@
 {
+  "production": {
+    "date": "2026-11-10",
+    "url": "https://tour.seokam.es.kr/",
+    "sourceCommit": "2092a9897af0161e6d61cdb5d1c0d7c7542dcf92",
+    "deploymentId": "ca878e6c-0e2f-4c74-b849-47d90aa714f8",
+    "railwayStatus": "SUCCESS",
+    "httpHealth": 200,
+    "initialRequests": 11,
+    "initialGameModules": 1,
+    "gameBrotliBytes": 377437,
+    "etagRevalidation": 304,
+    "unauthenticatedAdmin": 401,
+    "desktopMissionAndFreeExploration": "passed",
+    "mobile390x844TouchMissionEntry": "passed",
+    "mobileHorizontalOverflow": false,
+    "browserErrors": [],
+    "httpFailures": []
+  },
   "implementation": [
     "Same room-specific detail factories are loaded near the player; aerial view starts with zero of 72 room detail groups",
     "Distant room resources are released with a 12-room mobile cache and 18-room desktop cache; nearby rooms are retained",
