@@ -1,6 +1,6 @@
 import * as THREE from './외부도구/three.module.js';
 export function centralStairDetails(config){
-  const group=new THREE.Group();group.name='행정실 맞은편 중앙계단 사진 마감';
+  const group=new THREE.Group();group.name=(config.label??'중앙계단')+' 사진 참고 마감';
   const p=a=>new THREE.Vector3(a[0],a[2],-a[1]);
   const metal=new THREE.MeshStandardMaterial({color:'#b8c2c3',metalness:.85,roughness:.24}),wood=new THREE.MeshStandardMaterial({color:'#8c6842',roughness:.4});
   const geometry=new THREE.CylinderGeometry(1,1,1,10),matrix=new THREE.Matrix4(),up=new THREE.Vector3(0,1,0);

@@ -1,0 +1,20 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import * as THREE from '../외부도구/three.module.js';
+import {createRoomDetailsCache} from '../공간상세로딩.mjs';
+import {createRenderPreparation} from '../렌더사전준비.mjs';
+const scene=new THREE.Scene(),stairs=[{frame:{origin:[0,3],right:[1,0],inward:[0,1],width:5,depth:7}}],cache=createRoomDetailsCache(scene,{capacity:6,stairs});
+for(let floor=1;floor<=4;floor++)for(const x of [3,13,23])cache.add({roomId:floor+'F-'+x,floor,center:new THREE.Vector3(x,(floor-1)*3.4,3),create:()=>new THREE.Group()});
+cache.update({x:2,y:1.5,z:0},'walk');assert.deepEqual(cache.state().prefetch,['2F-3','2F-13'],'Only two closest next-floor rooms warm before stairs');
+for(let i=0;i<300;i++){await new Promise(r=>setTimeout(r,5));if(cache.state().rooms.includes('2F-13')&&!cache.state().loading.length)break;}
+assert(cache.state().rooms.includes('2F-3'));assert(cache.state().rooms.includes('1F-3'));
+cache.update({x:2,y:1.5,z:3.4},'walk');assert(cache.state().rooms.includes('1F-3'),'Previous floor remains warm on crossing');
+cache.update({x:50,y:1.5,z:3.4},'walk');assert.equal(cache.state().prefetch.length,0,'No adjacent-floor loading away from stairs');
+const originalTarget={},calls=[],uploads=[];let target=originalTarget;
+const renderer={shadowMap:{enabled:true},getRenderTarget:()=>target,setRenderTarget:v=>{target=v;},compileAsync:async(root,camera,scene)=>{calls.push({target,root,scene});},initTexture:t=>uploads.push(t)};
+const warm=createRenderPreparation(renderer,new THREE.PerspectiveCamera(),scene),root=new THREE.Group(),texture=new THREE.Texture(),material=new THREE.MeshStandardMaterial({map:texture});
+const object=new THREE.Mesh(new THREE.BoxGeometry(),material);object.castShadow=true;root.add(object);
+await warm(root);assert.equal(calls.length,2);assert.equal(target,originalTarget,'Warm-up never leaves shadow target bound');
+assert.equal(object.parent,root);assert.equal(object.material,material);assert.equal(calls[1].root.children[0].material.depthPacking,THREE.RGBADepthPacking);assert.equal(calls[1].root.children[0].material.side,THREE.BackSide);assert.deepEqual(uploads,[texture]);
+const source=fs.readFileSync(new URL('../게임.mjs',import.meta.url),'utf8');assert(!source.includes('interiorLight.visible='),'Moving across stairs must not change shader light count');assert(source.includes('interiorLight.intensity='));
+console.log({ok:true,adjacentFloorPrefetch:2,previousFloorKept:true,unchangedMaterialsAndTextures:true,regularAndShadowProgramsPrepared:true,renderTargetRestored:true,stableLightCount:true});

@@ -37,8 +37,10 @@ export function createFootballPhysics(school,{random=Math.random,count=BALL_COUN
       x=18+random()*43;y=-22-random()*38;
       if(balls.every(b=>Math.hypot(b.position.x-x,b.position.y-y)>2))break;
     }
-    const body=new Body({mass:.43,material:rubber,shape:new Sphere(BALL_RADIUS),position:new Vec3(x,y,-.3+BALL_RADIUS+.015),linearDamping:.28,angularDamping:.3,sleepSpeedLimit:.08,sleepTimeLimit:1.2});
-    body.home={x,y};body.lastKick=-Infinity;body.kicks=0;world.addBody(body);balls.push(body);
+    const body=new Body({mass:.43,material:rubber,shape:new Sphere(BALL_RADIUS),position:new Vec3(x,y,-.3+BALL_RADIUS),linearDamping:.28,angularDamping:.3,sleepSpeedLimit:.08,sleepTimeLimit:1.2});
+    // Untouched balls already rest on the field. A kick or vehicle contact
+    // wakes them; avoid simulating a startup bounce while exploring upstairs.
+    body.home={x,y};body.lastKick=-Infinity;body.kicks=0;world.addBody(body);body.sleep();balls.push(body);
   }
   let time=0,stepAccumulator=0,physicsSteps=0,idleFrames=0,doorSyncs=0;
   function update(dt,player,previous,{active=true,yaw=0,canKick=true}={}){

@@ -43,6 +43,7 @@ export function createClassTeachers(world,services={}){
   });
   const prepare=services.prepareMaterials??prepareApprovedTeacherMaterials;
   const makeRig=services.makeRig??createPrincipalWalkRigAsync;
+  const prepareRender=services.prepareRender??(async()=>{});
   const teachers=CLASS_TEACHERS.map(config=>{
     const root=new THREE.Group();root.name=config.label;root.visible=false;
     root.position.set(config.position.x,config.position.z,-config.position.y);
@@ -81,9 +82,12 @@ export function createClassTeachers(world,services={}){
           // Keep the release's vertex tints and maps; this is not the old scan.
           const rigSource=source.clone(true);
           prepareApprovedTeacherMaterials(rigSource);resources(rigSource,owned);
-          preview=rigSource.clone(true);root.add(preview);if(label)label.visible=false;
+          const preparedPreview=rigSource.clone(true);await prepareRender(preparedPreview);
+          if(version!==generation){release(resources(preparedPreview));return;}
+          preview=preparedPreview;root.add(preview);if(label)label.visible=false;
           preparation={processing:'pending'};
           const built=await makeRig(rigSource,{height:config.height,receiveShadow:false,continuousSleeves:config.id==='teacher-6-7'});
+          await prepareRender(built.root);
           if(version!==generation){release(resources(built.root));return;}
           rig=built;resources(rig.root,owned);walk??=createTeacherWalk(world,config);
           root.add(rig.root);root.remove(preview);preview=null;status='ready';

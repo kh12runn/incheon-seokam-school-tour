@@ -49,6 +49,7 @@ import {officeConnectingDoor} from './교장실연결문표현.mjs';
 import {roomDoorVisuals,doorControls} from './출입문표현.mjs';
 import {freezeStaticTree,batchStaticDetails} from './정적장면최적화.mjs';
 import {createRoomDetailsCache} from './공간상세로딩.mjs';
+import {createRenderPreparation} from './렌더사전준비.mjs';
 import {partitionOutdoorInstances} from './실외공간분할.mjs';
 import {circulationFinish,circulationEndCaps} from './공용공간마감.mjs';
 import {teacherChairDetails,classroomWindowSigns} from './교사자리와창팻말표현.mjs';
@@ -71,6 +72,9 @@ let graphicsLost=false;
 const mobileGraphics=prefersTouch();
 try{renderer=new THREE.WebGLRenderer({canvas,antialias:!mobileGraphics,powerPreference:'high-performance'});}
 catch(error){$('불러오기').textContent='3D 그래픽을 시작할 수 없습니다.';status.textContent='Chrome 또는 Edge에서 하드웨어 가속을 켜고 다시 열어주세요.';throw error;}
+// Synchronous driver error-log queries stall first-use materials on some GPUs.
+// Keep an explicit diagnostic mode; shaders are also checked in browser tests.
+renderer.debug.checkShaderErrors=new URLSearchParams(location.search).has('shaderDebug');
 renderer.setPixelRatio(Math.min(devicePixelRatio,mobileGraphics?1.25:1.6));renderer.outputColorSpace=THREE.SRGBColorSpace;
 renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.05;
 renderer.shadowMap.enabled=!mobileGraphics;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
@@ -78,7 +82,7 @@ const scene=new THREE.Scene();scene.background=new THREE.Color('#cde2ed');scene.
 const skyReady=loadDaySky().then(texture=>{scene.background=texture;});
 scene.add(new THREE.HemisphereLight(0xe4edfa,0xb4ac91,1.35));
 scene.environment=softEnvironment(renderer);
-const interiorLight=new THREE.PointLight(0xfff3de,12,13,2);scene.add(interiorLight);
+const interiorLight=new THREE.PointLight(0xfff3de,0,13,2);scene.add(interiorLight);
 const sun=new THREE.DirectionalLight(0xfff4dd,2.7);sun.position.set(-30,90,-65);scene.add(sun);
 sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-135,right:135,top:135,bottom:-135,near:.5,far:350});
 sun.shadow.bias=-.00008;sun.shadow.normalBias=.025;
@@ -170,7 +174,7 @@ function syncMissionControls(){
   const blocked=missionLocked();document.body.dataset.quest=String(blocked);$('미션메뉴안내').hidden=!blocked;
   for(const id of ['동층이동','방선택','방이동','육사이동','처음'])$(id).disabled=blocked||!ready;
 }
-function stopMission(){pendingMission=false;mission?.stop();missionUI?.hide();missionVisual.hide();syncMissionControls();}
+function stopMission(){pendingMission=false;mission?.stop();missionUI?.hide();missionVisual.hide();avatar.setCarrying(false);syncMissionControls();}
 function missionAction(){if(!isPlaying()||!mission?.active())return;mission.interact();canvas.focus({preventScroll:true});}
 function beginMission(){
   if(!missionMap)return;pendingMission=false;leaveVehicle();missionUI.hide();
@@ -206,9 +210,10 @@ function textTexture(text,background=false){
   lines.forEach((s,i)=>ctx.fillText(s,c.width/2,44+i*68,c.width-12));
   const tex=new THREE.CanvasTexture(c);tex.colorSpace=THREE.SRGBColorSpace;return {tex,ratio:c.width/c.height};
 }
-let connectingDoorVisual,roomDoorVisual,doorUI,roomDetailsCache,outdoorChunks,staticObjects=0,batchedDetails=0;
+let connectingDoorVisual,roomDoorVisual,doorUI,roomDetailsCache,outdoorChunks,prepareRender,staticObjects=0,batchedDetails=0;
 function buildVisuals(){
-  roomDetailsCache=createRoomDetailsCache(scene,{capacity:mobileGraphics?12:18,compile:root=>renderer.compileAsync(root,camera,scene),onBuilt:count=>{batchedDetails+=count;}});
+  prepareRender=createRenderPreparation(renderer,camera,scene);
+  roomDetailsCache=createRoomDetailsCache(scene,{capacity:mobileGraphics?12:18,stairs:world.stairs,compile:root=>prepareRender(root,{textures:false}),initTexture:texture=>renderer.initTexture(texture),onBuilt:count=>{batchedDetails+=count;}});
   const defer=(roomId,floor,center,create,onEvict)=>roomDetailsCache.add({roomId,floor,center,create,onEvict});
   scene.add(campusGroundBackdrop());
   scene.add(campusEntranceDetails(world.boxes));
@@ -217,6 +222,8 @@ function buildVisuals(){
   driving=createDriving(world,footballPhysics);vehicleUI=drivingControls({onAction:vehicleAction,canPlay:isPlaying});
   scene.add(teacherChairDetails(world.teacherChairs));scene.add(classroomWindowSigns(world.data));
   if(world.centralStairFinish)scene.add(centralStairDetails(world.centralStairFinish));
+  if(world.westStairFinish)scene.add(centralStairDetails(world.westStairFinish));
+  if(world.annexStairFinish)scene.add(centralStairDetails(world.annexStairFinish));
   if(world.recyclingShelter)scene.add(recyclingShelterDetails(world.recyclingShelter));
   for(const config of world.specialInteriors){
     defer(config.roomId,parseInt(config.room.floor,10),convert(config.spawn),()=>config.photoSupport?supportRoomDetails(config):config.roomId===GRADE5_RESEARCH_ID?grade5ResearchDetails(config):INDIVIDUAL_REFERENCES[config.roomId]?individualLearningDetails(config):config.roomId===NURSE_ID?nurseRoomDetails(config):config.roomId===STAFF_ID?staffRoomDetails(config):config.roomId===AUDIO_ID?audioRoomDetails(config):config.roomId===BROADCAST_ID?broadcastRoomDetails(config):meetingRoomDetails(config));
@@ -664,7 +671,7 @@ function frame(now){
   scene.backgroundRotation.y=elapsed*.0006;
   const missionBefore=mission?.view(),focusedTeacher=missionBefore?.nearTeacher?missionBefore.teacher?.id:null;
   classTeachers?.update(dt,position,mode,{paused:!isPlaying()||document.hidden,focusedTeacher});
-  if(officeNearby&&!officePrincipals){officePrincipals=createOfficePrincipalModels(world);[principalNPC]=officePrincipals.characters;scene.add(principalNPC.root);}
+  if(officeNearby&&!officePrincipals){officePrincipals=createOfficePrincipalModels(world,{prepareRender});[principalNPC]=officePrincipals.characters;scene.add(principalNPC.root);}
   if(officeNearby&&(!officeWasNearby||principalNPC?.getState().modelStatus==='not-requested'))void officePrincipals.load();
   officeIdleSeconds=officeNearby?0:officeIdleSeconds+dt;
   if(officePrincipals&&officeIdleSeconds>20&&principalNPC?.getState().modelStatus!=='not-requested')officePrincipals.evict();
@@ -689,7 +696,7 @@ function frame(now){
     let anchor;const teacher=npcs.find(n=>n.id===state.teacher?.id);
     if(teacher){bubblePoint.set(teacher.position.x,teacher.position.z+2.1,-teacher.position.y).project(camera);if(bubblePoint.z>=-1&&bubblePoint.z<=1)anchor={x:(bubblePoint.x*.5+.5)*innerWidth,y:(-bubblePoint.y*.5+.5)*innerHeight};}
     missionUI.render(state,{playing:isPlaying(),anchor,yaw,position});
-    missionVisual.update(mission.collectible(),position,elapsed,mode==='walk',state,avatar.root,driving.phase);
+    missionVisual.update(mission.collectible(),position,elapsed,mode==='walk',state,avatar,driving.phase);
   }
   const quizState=monthQuiz.getState(),quizNPC=quizNPCs.find(n=>n.id===quizState.question?.npcId);
   if(quizState.open&&quizNPC){
@@ -718,7 +725,9 @@ function frame(now){
   }
   const hideGreeting=mode!=='walk'||!avatar.getState().waving||!isPlaying();if(greeting.hidden!==hideGreeting)greeting.hidden=hideGreeting;
   if(!greeting.hidden){const p=new THREE.Vector3(position.x,position.z+STUDENT_HEIGHT+.3,-position.y).project(camera);greeting.hidden=p.z>1||p.z< -1;greeting.style.left=(p.x*.5+.5)*innerWidth+'px';greeting.style.top=(-p.y*.5+.5)*innerHeight+'px';}
-  interiorLight.visible=mode==='walk'&&(world.roomAt(position).basement||position.y>=0&&position.y<=3);
+  // Keep the shader light count stable across corridor/stair boundaries.
+  // Zero intensity has the same appearance as hiding this non-shadow light.
+  interiorLight.intensity=mode==='walk'&&(world.roomAt(position).basement||position.y>=0&&position.y<=3)?12:0;
   interiorLight.position.copy(camera.position);interiorLight.position.y+=.65;
   if(hallMirror)hallMirror.visible=mode==='walk'&&world.roomAt(position).room?.id==='B1_MAIN_HALL';
   markerGroup.children.forEach(m=>m.rotation.y+=dt);
@@ -741,12 +750,15 @@ try{
   }
   document.querySelectorAll('button').forEach(b=>b.disabled=false);$('동층이동').disabled=false;autoOrbit=true;overview();last=performance.now();updateHUD();
   $('불러오기').textContent='Blender 학교 모델 준비 완료';
+  // Prepare already-built floor materials during the aerial view, while keeping
+  // room artwork/model downloads lazy and the start button immediately usable.
+  void prepareRender(scene,{textures:false}).catch(error=>console.warn('학교 재질 사전 준비',error));
   // Read-only state is useful for diagnostics. Test positioning is only enabled
   // on loopback with an explicit test URL; it is not a public wall-clipping key.
   window.schoolTour={getState:()=>({ready,mode,locked,dragMode,freeLook,touch:touchControls.getState(),graphics:{pixelRatio:renderer.getPixelRatio(),shadows:renderer.shadowMap.enabled},position:{...position},yaw,pitch,photoFinish:class64PhotoFinish?.getState()??{status:'idle',loaded:0},jump:jumpMotion.getState(),character:{...avatar.getState(),visible:avatar.root.visible,position:avatar.root.position.toArray()},thirdPerson:{distance:cameraDistance,requestedDistance:followDistance,blocked:cameraBlocked,camera:camera.position.toArray()},overview:{autoOrbit,orbit:{...orbit},camera:camera.position.toArray()},visitedRooms:visitedRooms.size,visitedFloors:visitedFloors.size,drawCalls:renderer.info.render.calls,menuOpen:$('게임메뉴').open})};
   window.schoolTour.getPrincipalState=()=>principalNPC?.getState()??{position:{...OFFICE_CHARACTERS[0].position},modelStatus:'not-requested',faceTexture:'not-requested',visible:false};
   window.schoolTour.getOfficePrincipalStates=()=>officePrincipals?.characters.map(npc=>npc.getState())??OFFICE_CHARACTERS.map(config=>({id:config.id,position:{...config.position},height:config.height,modelStatus:'not-requested',visible:false}));
-  classTeachers=createClassTeachers(world);for(const teacher of classTeachers.teachers)scene.add(teacher.root);
+  classTeachers=createClassTeachers(world,{prepareRender});for(const teacher of classTeachers.teachers)scene.add(teacher.root);
   window.schoolTour.getClassTeacherStates=()=>classTeachers.getStates();
   window.schoolTour.getApprovedAssets=getApprovedAssets;
   window.schoolTour.getFootballState=()=>footballPhysics.getState();

@@ -4,7 +4,7 @@ import {mergeGeometries} from './외부도구/BufferGeometryUtils.js';
 // Merge only opaque, static detail belonging to the SAME visibility root and
 // material. Transparent objects retain their individual depth sorting. No
 // vertices, normals, UVs, texture pixels or shadow flags are simplified.
-export function batchStaticDetails(root){
+function* batchDetailsSteps(root){
   root.updateMatrixWorld(true);
   const inverse=root.matrixWorld.clone().invert(),groups=new Map();
   root.traverseVisible(o=>{
@@ -19,14 +19,21 @@ export function batchStaticDetails(root){
   let removed=0;
   for(const items of groups.values()){
     if(items.length<2)continue;
-    const parts=items.map(o=>o.geometry.clone().applyMatrix4(inverse.clone().multiply(o.matrixWorld)));
+    const parts=[];for(const o of items){parts.push(o.geometry.clone().applyMatrix4(inverse.clone().multiply(o.matrixWorld)));yield;}
     const geometry=mergeGeometries(parts,false);for(const g of parts)g.dispose();
     if(!geometry)continue;
     geometry.computeBoundingSphere();const first=items[0],mesh=new THREE.Mesh(geometry,first.material);
     mesh.name='정적 세부 통합';mesh.castShadow=first.castShadow;mesh.receiveShadow=first.receiveShadow;mesh.renderOrder=first.renderOrder;mesh.layers.mask=first.layers.mask;
     for(const o of items)o.removeFromParent();root.add(mesh);removed+=items.length-1;
+    yield;
   }
   return removed;
+}
+export function batchStaticDetails(root){const steps=batchDetailsSteps(root);let result;do{result=steps.next();}while(!result.done);return result.value;}
+export async function batchStaticDetailsAsync(root,yieldWork=()=>new Promise(r=>setTimeout(r,0))){
+  const steps=batchDetailsSteps(root);let result,start=performance.now();
+  do{result=steps.next();if(!result.done&&performance.now()-start>4){await yieldWork();start=performance.now();}}while(!result.done);
+  return result.value;
 }
 
 // Preserve all vertices, textures, shadows and transforms, without recomputing

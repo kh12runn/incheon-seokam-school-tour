@@ -9,7 +9,7 @@ export function createMissionVisual(){
  gift.add(new THREE.Mesh(new THREE.BoxGeometry(.09,.63,.66),ribbon),new THREE.Mesh(new THREE.BoxGeometry(.66,.63,.09),ribbon));
  const marker=new THREE.Group(),ring=new THREE.Mesh(new THREE.TorusGeometry(2.7,.10,5,32),new THREE.MeshBasicMaterial({color:'#ffd66d'}));ring.rotation.x=Math.PI/2;marker.add(ring);
  const beacon=new THREE.Mesh(new THREE.OctahedronGeometry(.48),gold);beacon.position.y=2.8;marker.add(beacon);root.add(marker);
- const carry=gift.clone();carry.scale.setScalar(.52);carry.position.set(0,.94,.32);carry.visible=false;
+ const carry=gift.clone();carry.name='운반 상자';carry.scale.setScalar(.52);carry.visible=false;
  // A single collectible, marker and shared-material carried parcel. No assets,
  // textures, lights or physics bodies added; all other scene geometry is reused.
  return {root,hide(){root.visible=false;carry.visible=false;},update(item,position,time,visible,state={},avatar,vehiclePhase='walking'){
@@ -17,6 +17,7 @@ export function createMissionVisual(){
   if(pickup.visible){star.visible=item.kind==='별';gift.visible=!star.visible;pickup.position.set(item.x,item.z+.85+Math.sin(time*2)*.09,-item.y);pickup.rotation.y=time*.65;}
   const target=state.type==='drive'&&state.phase!=='pickup'?state.target:null;marker.visible=!!target;
   if(target){marker.position.set(target.x,target.z+.16,-target.y);ring.scale.setScalar(state.phase==='board'?.65:1);beacon.rotation.y=time;beacon.position.y=2.8+Math.sin(time*2)*.15;}
-  if(avatar&&carry.parent!==avatar)avatar.add(carry);carry.visible=visible&&!!state.cargo&&vehiclePhase==='walking';
+  const held=visible&&!!state.cargo&&vehiclePhase==='walking';avatar?.setCarrying(held);
+  const anchor=avatar?.carryAnchor;if(anchor&&carry.parent!==anchor)anchor.add(carry);carry.visible=held;
  }};
 }

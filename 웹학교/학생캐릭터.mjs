@@ -1,6 +1,7 @@
 import * as THREE from './외부도구/three.module.js';
 import {GLTFLoader} from './외부도구/GLTFLoader.js';
 import {RUN_SPEED} from './달리기모션.mjs';
+import {createCarryPose} from './학생운반모션.mjs';
 export {RUN_SPEED,gaitFoot} from './달리기모션.mjs';
 export const STUDENT_HEIGHT=1.5;
 
@@ -102,7 +103,7 @@ export function createStudent(requested='boy-cute',{lazy=false}={}){
   const root=new THREE.Group();root.name=CHARACTER_NAMES[variant];
   const materials=new Map(),actions={},seatPose=new Map();
   let asset,mixer,currentAction,currentAnimation=null,status='not-requested',error=null,disposed=false,loading,seated=false,seatBlend=0;
-  let heading=0,speed=0,blend=0,opacity=1,waveTime=0,waveHeading=0,airBlend=0,motion='대기',animationNames=[];
+  let heading=0,speed=0,blend=0,opacity=1,waveTime=0,waveHeading=0,airBlend=0,motion='대기',animationNames=[],carrying=false,carryPose;
   let resolveReady,rejectReady;
   const ready=new Promise((resolve,reject)=>{resolveReady=resolve;rejectReady=reject;});
   // Consumers still receive rejection; this prevents an unhandled rejection before awaiting.
@@ -129,7 +130,7 @@ export function createStudent(requested='boy-cute',{lazy=false}={}){
           const action=mixer.clipAction(createStudentMotionClip(clip,asset,kind,headScale));actions[kind]=action;
           if(kind==='wave'||kind==='jump'){action.setLoop(THREE.LoopOnce,1);action.clampWhenFinished=true;}
         }
-        play('idle');mixer.update(0);setOpacity(opacity);status='ready';resolveReady(api);
+        play('idle');mixer.update(0);carryPose=createCarryPose(root,asset);setOpacity(opacity);status='ready';resolveReady(api);
       }catch(reason){status='error';error=String(reason?.message??reason);rejectReady(reason);}
     })();return ready;
   }
@@ -150,17 +151,19 @@ export function createStudent(requested='boy-cute',{lazy=false}={}){
     const kind=airborne?'jump':waveTime>0?'wave':speed>.15?'run':'idle';
     play(kind);if(kind==='run'&&actions.run)actions.run.setEffectiveTimeScale(clamp(speed/RUN_SPEED,.3,1.5));
     mixer?.update(delta);
+    carryPose?.update(delta,carrying);
     motion=airborne?(verticalSpeed>0?'점프':'낙하'):waveTime>0?'인사':landing>.1?'착지':kind==='run'?'달리기':'대기';
   }
   const api={root,variant,ready,load,update,get modelStatus(){return status;},
-    wave(targetHeading=heading){waveHeading=targetHeading;waveTime=actions.wave?.getClip().duration??2.6;},cancelWave(){waveTime=0;},
+    get carryAnchor(){return carryPose?.socket??root;},setCarrying(value){carrying=!!value;if(carrying)waveTime=0;},
+    wave(targetHeading=heading){if(carrying)return;waveHeading=targetHeading;waveTime=actions.wave?.getClip().duration??2.6;},cancelWave(){waveTime=0;},
     snapHeading(value){heading=value;root.rotation.y=value;},setOpacity,setSeated(value){
       seatBlend=clamp(Number(value),0,1);value=seatBlend>0;if(value===seated)return;seated=value;speed=0;
       for(const [bone,q] of seatPose)bone.quaternion.copy(q);seatPose.clear();
       mixer?.stopAllAction();currentAction=actions.idle;currentAnimation='idle';actions.idle?.reset().setEffectiveWeight(1).play();mixer?.update(.01);
       if(seated)for(const side of ['Left','Right'])for(const part of ['UpLeg','Leg','Arm','ForeArm']){const bone=asset?.getObjectByName(side+part);if(bone)seatPose.set(bone,bone.quaternion.clone());}
     },
-    getState:()=>({variant,name:CHARACTER_NAMES[variant],heading,speed,blend,phase:currentAction?.time??0,motion,seated,waving:waveTime>0,waveBlend:currentAnimation==='wave'?1:0,airBlend,opacity,footHeights:[0,0],arms:[],modelStatus:status,error,animationNames:[...animationNames],currentAnimation,height:STUDENT_HEIGHT,headScale}),
+    getState:()=>({variant,name:CHARACTER_NAMES[variant],heading,speed,blend,phase:currentAction?.time??0,motion,seated,carrying,carryBlend:carryPose?.blend??0,waving:waveTime>0,waveBlend:currentAnimation==='wave'?1:0,airBlend,opacity,footHeights:[0,0],arms:[],modelStatus:status,error,animationNames:[...animationNames],currentAnimation,height:STUDENT_HEIGHT,headScale}),
     dispose(){disposed=true;mixer?.stopAllAction();if(asset)mixer?.uncacheRoot(asset);root.traverse(o=>{if(o.isSkinnedMesh)o.skeleton.dispose();});materials.forEach(m=>m.dispose());root.clear();if(status==='not-requested')rejectReady(new Error('학생 캐릭터가 닫혔습니다.'));}
   };
   if(!lazy)load();return api;

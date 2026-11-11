@@ -28,6 +28,7 @@ for(const mode of ['baseline','optimized']){
   physics.world.collisionMatrix=new ArrayCollisionMatrix();physics.world.collisionMatrixPrevious=new ArrayCollisionMatrix();
   physics.world.collisionMatrix.setNumObjects(physics.world.bodies.length);physics.world.collisionMatrixPrevious.setNumObjects(physics.world.bodies.length);
  }
+ for(const b of physics.balls)b.wakeUp();
  const samples=[];for(let i=0;i<100;i++){const t=performance.now();physics.update(1/60,school.spawn,school.spawn);if(i>=10)samples.push(performance.now()-t);}
  samples.sort((a,b)=>a-b);stats[mode]={bodies:physics.world.bodies.length,medianMs:samples[Math.floor(samples.length/2)],p95Ms:samples[Math.floor(samples.length*.95)],contactStorage:Object.keys(physics.world.collisionMatrix.matrix).length};
 }

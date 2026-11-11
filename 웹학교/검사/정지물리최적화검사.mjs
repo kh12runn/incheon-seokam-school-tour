@@ -16,7 +16,7 @@ for(const b of school.boxes){
  assert.equal(batched.roughness,original.roughness);assert.equal(batched.metalness,original.metalness);
  original.dispose();batched.dispose();
 }
-for(const b of physics.balls)b.sleep();
+assert(physics.balls.every(b=>b.sleepState===2),'Untouched footballs start at rest');
 const p={x:33.5,y:.66,z:10.2},positions=physics.balls.map(b=>b.position.toArray());
 for(let i=0;i<600;i++){school.roomDoors.update(1/60,p);physics.update(1/60,p,p);}
 assert.equal(physics.getWorkState().physicsSteps,0);assert.equal(physics.getWorkState().doorSyncs,0);assert.equal(physics.getWorkState().idleFrames,600);

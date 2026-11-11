@@ -41,7 +41,7 @@ function releaseModel(root,keep=null){
   for(const image of images)if(![...held].some(t=>t.isTexture&&t.image===image))image.close?.();
 }
 
-export function createOfficePrincipalModels(world){
+export function createOfficePrincipalModels(world,{prepareRender=async()=>{}}={}){
   const loader=new GLTFLoader();let loading=null;
   const characters=OFFICE_CHARACTERS.map(config=>{
     const root=new THREE.Group();root.name=config.label;root.position.set(config.position.x,config.position.z,-config.position.y);root.rotation.y=Math.PI/2;root.userData.greetingHeight=2.48;
@@ -66,6 +66,7 @@ export function createOfficePrincipalModels(world){
           const gltf=await loader.parseAsync(await response.arrayBuffer(),new URL('.',config.url).href);
           if(version!==generation){releaseModel(gltf.scene);return;}
           const built=await createPrincipalWalkRigAsync(normalizePrincipalModel(gltf.scene,config.height));
+          await prepareRender(built.root);
           releaseModel(gltf.scene,built.root);
           if(version!==generation){releaseModel(built.root);return;}
           rig=built;

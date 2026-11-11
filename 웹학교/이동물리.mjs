@@ -20,7 +20,8 @@ import {addHallPhotoFinish} from './다목적실사진배치.mjs';
 import {addGateTerrain} from './정문지형.mjs';
 import {meetingRoomInterior} from './운영위원회회의실.mjs';
 import {audioRoomInterior} from './시청각실사진배치.mjs';
-import {finishCentralStair} from './중앙계단사진마감.mjs';
+import {finishCentralStair,finishWestStair} from './중앙계단사진마감.mjs';
+import {finishAnnexToiletStair} from './별관계단마감.mjs';
 import {broadcastRoomInterior} from './방송실사진배치.mjs';
 import {addBroadcastControl} from './방송조정실배치.mjs';
 import {uploadedAnnexClassrooms} from './업로드교실배치.mjs';
@@ -57,7 +58,7 @@ function localBounds(f,u0,u1,v0,v1,z0,z1){
   const p=localPoint(f,u0,v0),q=localPoint(f,u1,v1);
   return [Math.min(p.x,q.x),Math.min(p.y,q.y),z0,Math.max(p.x,q.x),Math.max(p.y,q.y),z1];
 }
-export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,exterior=true,annexFinish=true,restrooms=true,principalOffice=true,basement=true,audioPhotos=true,centralStairPhotos=true,broadcastPhotos=true,broadcastControl=true,uploadedClassPhotos=true,additionalPhotos=true,interactiveDoors=false}={}){
+export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,exterior=true,annexFinish=true,restrooms=true,principalOffice=true,basement=true,audioPhotos=true,centralStairPhotos=true,westStairStyle=true,annexStairStyle=true,broadcastPhotos=true,broadcastControl=true,uploadedClassPhotos=true,additionalPhotos=true,interactiveDoors=false}={}){
   data=applyGroundFloorPlan(data);
   data=resizeOversizedClassrooms(data);
   if(restrooms)data=applyRestroomPlan(data);
@@ -160,6 +161,8 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
   openStairRearExit(boxes,colliders,surfaces,addBox);
   addMainRooftop(data,boxes,surfaces,addBox);
   const centralStairFinish=centralStairPhotos?finishCentralStair(boxes,colliders,stairs):null;
+  const westStairFinish=westStairStyle?finishWestStair(boxes,colliders,stairs):null;
+  const annexStairFinish=annexFinish&&annexStairStyle?finishAnnexToiletStair(boxes,stairs):null;
   if(basement)openBasementGround(boxes,colliders,surfaces,data.floorHeight);
   addPlaygroundDetails(addBox);
   addParking(addBox);
@@ -276,5 +279,5 @@ export function buildWorld(data,{class64=true,mainClassrooms=true,class21=true,e
   }
   // Route estimates may plan through operable doors, but never furniture/walls.
   // Actual player collision continues to use candidate() with doors included.
-  return {data,boxes,colliders,surfaces,stairs,classroom64,classroom21,classroomsMain,classroomInteriors,uploadedAnnex,specialInteriors,officeDoor,roomDoors,teacherChairs,centralStairFinish,recyclingShelter,hallPhotoFinish,principalOffice:office,move,candidate,navigationCandidate:(x,y,z)=>candidate(x,y,z,true),blocked,support,floorBelow,moveAir,roomAt,spawn:{...OUTDOOR_SPAWN}};
+  return {data,boxes,colliders,surfaces,stairs,classroom64,classroom21,classroomsMain,classroomInteriors,uploadedAnnex,specialInteriors,officeDoor,roomDoors,teacherChairs,centralStairFinish,westStairFinish,annexStairFinish,recyclingShelter,hallPhotoFinish,principalOffice:office,move,candidate,navigationCandidate:(x,y,z)=>candidate(x,y,z,true),blocked,support,floorBelow,moveAir,roomAt,spawn:{...OUTDOOR_SPAWN}};
 }
