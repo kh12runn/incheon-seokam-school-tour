@@ -131,6 +131,15 @@ export function createDriving(school,physics){
     }
   }
   const seatBlend=()=>phase==='driving'?1:phase==='entering'||phase==='exiting'?boardingPose(phase,timer/TRANSITION_SECONDS).seatBlend:0;
-  return {cars,nearby,enter,exit,cancel,update,sync,point,get phase(){return phase;},get active(){return active;},get error(){return error;},get seated(){return seatBlend()>.5;},get seatBlend(){return seatBlend();},seat:()=>active?seat():null,
+  function prepareMissionCar(id,p){
+    if(phase!=='walking')throw Error('하차 후 배송을 준비해 주세요.');
+    const car=cars.find(c=>c.id===id);if(!car)throw Error('배송 차량이 없습니다.');
+    resetControls(car);car.door=0;car.wheelSpin=0;
+    car.body.position.set(p.x,p.y,p.z+CENTER_HEIGHT);car.body.quaternion.setFromAxisAngle(new Vec3(0,0,1),p.yaw);
+    car.body.velocity.setZero();car.body.angularVelocity.setZero();car.body.aabbNeedsUpdate=true;car.body.wakeUp();
+    car.body.previousPosition.copy(car.body.position);car.body.interpolatedPosition.copy(car.body.position);
+    car.body.previousQuaternion.copy(car.body.quaternion);car.body.interpolatedQuaternion.copy(car.body.quaternion);sync();
+  }
+  return {cars,nearby,enter,exit,cancel,update,sync,point,prepareMissionCar,get phase(){return phase;},get active(){return active;},get error(){return error;},get seated(){return seatBlend()>.5;},get seatBlend(){return seatBlend();},seat:()=>active?seat():null,
     getState:()=>({phase,seatBlend:seatBlend(),carId:active?.id??null,speed:active?speed(active):0,yaw:active?carYaw(active):0,door:active?.door??0,error,cars:cars.map(c=>({id:c.id,position:point(c,0,0),yaw:carYaw(c)}))})};
 }

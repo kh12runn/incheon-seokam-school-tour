@@ -1,5 +1,6 @@
 import {doorLayouts} from './출입문.mjs';
 import {localPoint} from './이동물리.mjs';
+import {DELIVERY_COURSES} from './미션배송.mjs';
 const distance=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y,a.z-b.z);
 export async function prepareMissionMap(world,teachers,{yieldFrame=()=>Promise.resolve()}={}){
  const nodes=[],floors=new Map(),rooms=new Map(),cache=new Map(),fh=world.data.floorHeight;
@@ -59,6 +60,15 @@ export async function prepareMissionMap(world,teachers,{yieldFrame=()=>Promise.r
    routeTo(p){const n=nearest(p),path=[];for(let c=n;c;c=c.prev)path.unshift({x:c.x,y:c.y,z:c.z});return{length:access.length+n.dist+distance(n,p),points:[...access.points,...path.slice(1),p]};}});
   await yieldFrame();
  }
+ // Small outdoor graph, not a campus-wide grid. Both walking approaches are
+ // traced through real doors/stairs; parked mission cars do not cross them.
+ for(const course of DELIVERY_COURSES){
+  let previous=corridor(course.access[0],'MAIN');
+  for(const p of course.access.slice(1)){
+   const next=node(p);if(!link(previous,next))throw Error('배송 출입 경로 확인 실패: '+course.id+' '+JSON.stringify(p));previous=next;
+  }
+  for(const p of [course.pickup,course.drop])if(!link(previous,node(p)))throw Error('배송 장소 경로 확인 실패: '+course.id);
+ }
  for(const [key,list] of floors){list.sort((a,b)=>key.endsWith('MAIN')?a.x-b.x:a.y-b.y);for(let i=1;i<list.length;i++)if(!link(list[i-1],list[i]))throw Error('복도 경로 확인 실패: '+key+' '+i);}
  function shortest(a,b){
   if(!cache.has(a.id)){
@@ -82,9 +92,10 @@ export async function prepareMissionMap(world,teachers,{yieldFrame=()=>Promise.r
   if(!nearest)throw Error('미션 출발 경로 없음');const route=trace([p,nearest]);return{node:nearest,...route};
  }
  function route(from,roomId,target){const a=fromPoint(from),b=rooms.get(roomId);if(!b)throw Error('미션 목적지 없음');const middle=shortest(a.node,b.entry),last=b.routeTo(target);return{length:a.length+middle.length+last.length,points:[...a.points,...middle.points,...last.points]};}
+ function routeToPoint(from,target){const a=fromPoint(from),b=fromPoint(target),middle=shortest(a.node,b.node);return{length:a.length+middle.length+b.length,points:[...a.points,...middle.points,...b.points.slice().reverse()]};}
  const grades=new Map();for(const r of rooms.values()){const grade=Number(r.room.name.match(/^(\d)-/)?.[1]);if(grade){if(!grades.has(grade))grades.set(grade,[]);grades.get(grade).push(r);}}
  // Include the search across ALL rooms in a grade (even multiple floors), not
  // just the hidden room. A conservative tour provides ample exploration time.
  function searchDistance(grade){const remaining=[...grades.get(grade)];let current=remaining.shift(),length=0;while(remaining.length){remaining.sort((a,b)=>shortest(current.entry,a.entry).length-shortest(current.entry,b.entry).length);const next=remaining.shift();length+=shortest(current.entry,next.entry).length+12;current=next;}return length+12;}
- return {floorHeight:fh,start:{x:start.x,y:start.y,z:start.z},rooms,grades,teachers,route,searchDistance,shortest,nodes};
+ return {floorHeight:fh,start:{x:start.x,y:start.y,z:start.z},rooms,grades,teachers,route,routeToPoint,searchDistance,shortest,nodes};
 }

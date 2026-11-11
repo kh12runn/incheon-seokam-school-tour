@@ -161,6 +161,7 @@ monthQuizUI=createMonthQuizBubble({
   onAnswered(){canvas.focus({preventScroll:true});}
 });
 missionUI=createMissionUI({onAnswer:index=>{if(isPlaying()&&missionUI.isVisible()){mission.answer(index);clearInput();canvas.focus({preventScroll:true});}},
+  onInteract:missionAction,
   onRetry:beginMission,onFree:()=>{stopMission();startWalk();},
   onQuestion(){freeLook=true;clearInput();if(document.pointerLockElement)document.exitPointerLock();},
   onResult(){freeLook=false;dragMode=false;clearInput();if(document.pointerLockElement)document.exitPointerLock();syncMissionControls();pausePanel();}
@@ -169,12 +170,13 @@ function syncMissionControls(){
   const blocked=missionLocked();document.body.dataset.quest=String(blocked);$('미션메뉴안내').hidden=!blocked;
   for(const id of ['동층이동','방선택','방이동','육사이동','처음'])$(id).disabled=blocked||!ready;
 }
-function stopMission(){pendingMission=false;mission?.stop();missionUI?.hide();missionVisual.root.visible=false;syncMissionControls();}
+function stopMission(){pendingMission=false;mission?.stop();missionUI?.hide();missionVisual.hide();syncMissionControls();}
+function missionAction(){if(!isPlaying()||!mission?.active())return;mission.interact();canvas.focus({preventScroll:true});}
 function beginMission(){
   if(!missionMap)return;pendingMission=false;leaveVehicle();missionUI.hide();
   if(!mission){
     let history;try{history=JSON.parse(localStorage.getItem('석암학교-미션추첨-v1')??'null');}catch{}
-    mission=createStampMission(missionMap,{speed:RUN_SPEED,history,onHistory:next=>{try{localStorage.setItem('석암학교-미션추첨-v1',JSON.stringify(next));}catch{}}});
+    mission=createStampMission(missionMap,{speed:RUN_SPEED,history,onVehicle:course=>driving.prepareMissionCar(course.carId,course.launch),onHistory:next=>{try{localStorage.setItem('석암학교-미션추첨-v1',JSON.stringify(next));}catch{}}});
   }
   mission.start();
   monthQuiz.dismiss();monthQuizUI.hide();position={...missionMap.start};jumpMotion.reset();yaw=Math.PI/2;pitch=0;cameraReset=true;avatar.snapHeading(Math.PI+yaw);
@@ -338,7 +340,10 @@ function isPlaying(){return mode==='walk'&&avatar.modelStatus==='ready'&&(locked
 function clearInput(){keys.clear();velocity={x:0,y:0};drag=null;freeLookPoint=null;touchControls?.reset();vehicleUI?.reset();avatar.cancelWave();greeting.hidden=true;}
 function leaveVehicle(){if(driving&&driving.phase!=='walking'){position=driving.cancel();avatar.setSeated(false);jumpMotion.reset();cameraReset=true;lastDriveYaw=null;}}
 function vehicleAction(){
-  if(missionLocked())return;
+  if(missionLocked()){
+    const state=mission?.view();if(!state?.vehicleAllowed)return;
+    if(driving.phase==='walking'&&driving.nearby(position)?.id!==state.carId){notice('빛나는 표시가 있는 배송 차량에 탑승해 주세요.');return;}
+  }
   if(!isPlaying())return;
   if(driving.phase==='walking'&&jumpMotion.getState().airborne){notice('착지한 뒤 자동차에 탑승해 주세요.');return;}
   const success=driving.phase==='walking'?driving.enter(position):driving.exit();
@@ -525,7 +530,7 @@ function lookAround(dx,dy){
 }
 document.addEventListener('mousemove',e=>{
   if(touchControls?.isActive()||!isPlaying())return;
-  if(!locked&&e.target.closest?.('#월퀴즈말풍선,#탐험퀴즈말풍선,#미션결과')){freeLookPoint=null;return;}
+  if(!locked&&e.target.closest?.('#월퀴즈말풍선,#탐험퀴즈말풍선,#미션결과,#미션동작')){freeLookPoint=null;return;}
   if(locked){lookAround(e.movementX,e.movementY);return;}
   if(freeLook){
     const previous=freeLookPoint;freeLookPoint={x:e.clientX,y:e.clientY};
@@ -569,7 +574,7 @@ document.addEventListener('keydown',e=>{
   }
   if(e.code==='KeyZ'&&isPlaying()){e.preventDefault();if(!e.repeat)greet();}
   if(e.code==='KeyV'&&!e.repeat)overview();
-  if(e.code==='KeyR'&&!e.repeat&&ready)reset();
+  if(e.code==='KeyR'&&!e.repeat&&ready){e.preventDefault();if(missionLocked())missionAction();else reset();}
   if(e.code==='KeyE'&&!e.repeat)openElevator();
   if(e.code==='Escape'&&!e.repeat){e.preventDefault();openMenu();}
 });
@@ -652,10 +657,12 @@ function frame(now){
   footballPhysics.update(dt,position,previous,{active:isPlaying()&&!document.hidden,yaw,canKick:driving.phase==='walking'});footballVisual.update();
   driving.sync(isPlaying()?dt:0);updateDrivenCars(carVisual,driving);
   if(driving.phase==='driving')position=driving.seat();else if(driving.phase==='walking'||driving.phase==='approaching')lastDriveYaw=null;
-  vehicleUI.update(driving,position,isPlaying()&&!missionLocked());
+  const deliveryAllowed=mission?.view().vehicleAllowed;
+  document.body.dataset.questDriving=String(!!deliveryAllowed);
+  vehicleUI.update(driving,position,isPlaying()&&(!missionLocked()||deliveryAllowed));
   roomDoorVisual.userData.update(position,mode==='walk');doorUI.update(world.roomDoors,position,isPlaying()&&driving.phase==='walking');
   scene.backgroundRotation.y=elapsed*.0006;
-  const missionBefore=mission?.view(),focusedTeacher=missionBefore?.phase==='quiz'&&missionBefore.nearTeacher?missionBefore.teacher.id:null;
+  const missionBefore=mission?.view(),focusedTeacher=missionBefore?.nearTeacher?missionBefore.teacher?.id:null;
   classTeachers?.update(dt,position,mode,{paused:!isPlaying()||document.hidden,focusedTeacher});
   if(officeNearby&&!officePrincipals){officePrincipals=createOfficePrincipalModels(world);[principalNPC]=officePrincipals.characters;scene.add(principalNPC.root);}
   if(officeNearby&&(!officeWasNearby||principalNPC?.getState().modelStatus==='not-requested'))void officePrincipals.load();
@@ -678,11 +685,11 @@ function frame(now){
   if(mode==='walk'){if(['entering','driving','exiting'].includes(driving.phase))cameraDrive(dt);else cameraWalk(dt);}else overviewCamera(wallDt);
   if(mission){
     const npcs=[...(classTeachers?.getStates()??[]),...quizNPCs.filter(n=>n.id.startsWith('office-')).map(n=>({...n,modelStatus:n.available?'ready':'loading'}))];
-    const state=mission.tick(dt,{position,npcs,active:isPlaying(),colliders:world.colliders});
+    const state=mission.tick(dt,{position,npcs,active:isPlaying(),colliders:world.colliders,vehicle:driving.getState()});
     let anchor;const teacher=npcs.find(n=>n.id===state.teacher?.id);
     if(teacher){bubblePoint.set(teacher.position.x,teacher.position.z+2.1,-teacher.position.y).project(camera);if(bubblePoint.z>=-1&&bubblePoint.z<=1)anchor={x:(bubblePoint.x*.5+.5)*innerWidth,y:(-bubblePoint.y*.5+.5)*innerHeight};}
-    missionUI.render(state,{playing:isPlaying(),anchor});
-    missionVisual.update(mission.collectible(),position,elapsed,mode==='walk'&&state.phase==='search');
+    missionUI.render(state,{playing:isPlaying(),anchor,yaw,position});
+    missionVisual.update(mission.collectible(),position,elapsed,mode==='walk',state,avatar.root,driving.phase);
   }
   const quizState=monthQuiz.getState(),quizNPC=quizNPCs.find(n=>n.id===quizState.question?.npcId);
   if(quizState.open&&quizNPC){

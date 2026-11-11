@@ -32,47 +32,68 @@ for(const category of ['영어','상식'])for(const stage of [0,2]){
  for(let i=0;i<pool.length;i++){const q=pickQuestion(category,new Set(),stage,()=>0,bag.pick);assert(!seen.has(q.id),'no repeated eligible question before pool exhaustion');seen.add(q.id);assert.equal(new Set(q.choices).size,4);assert.equal(q.choices[q.correct],q.answers[0]);}
  assert(seen.has(pickQuestion(category,new Set(),stage,()=>0,bag.pick).id),'exhausted question pool renews safely');
 }
-let routeCount=0,stamps=0;const times=[],selectedRooms=new Set(),byStage=Array.from({length:4},()=>({grades:new Set(),teachers:new Set(),categories:new Set(),kinds:new Set()}));
+let routeCount=0,stamps=0;const times=[],selectedRooms=new Set(),orders=new Set();
 function traverse(points){
+ // Let pushed swing doors settle between independent route simulations.
+ for(let i=0;i<40;i++)world.roomDoors.update(.1,{x:52,y:1.75,z:0});
  let p={...points[0]};
  for(const target of points.slice(1)){
   for(let i=0;i<4000;i++){
    const dx=target.x-p.x,dy=target.y-p.y,d=Math.hypot(dx,dy);if(d<.005)break;
    const step=Math.min(d,RUN_SPEED/60),movement={x:dx/d*step,y:dy/d*step};world.roomDoors.update(1/60,p,movement);p=world.move(p,movement.x,movement.y);
-   if(i===3999)assert.fail('Unwalkable route near '+JSON.stringify({p,target}));
+   if(i===3999)assert.fail('Unwalkable route near '+JSON.stringify({p,target,doors:world.roomDoors.getState().filter(d=>d.kind==='swing'&&d.amount>0),colliders:world.colliders.filter(c=>p.x>c.bounds[0]-.4&&p.x<c.bounds[3]+.4&&p.y>c.bounds[1]-.4&&p.y<c.bounds[4]+.4&&p.z>=c.bounds[2]-.1&&p.z<c.bounds[5]).map(c=>c.name)}));
   }
   assert(Math.abs(p.z-target.z)<.08,'stair route elevation');
  }routeCount++;return p;
 }
 for(let seed=1;seed<=12;seed++){
  let value=Math.imul(seed,0x9e3779b9)>>>0;const random=()=>((value=(value*1664525+1013904223)>>>0)/4294967296),game=createStampMission(map,{speed:RUN_SPEED,random});game.start();
- const questionIds=new Set(),runGrades=new Set(),runTeachers=new Set(),categories=[],kinds=[];const firstGrade=game.view().grade;
- for(let stage=0;stage<4;stage++){
-  const debug=game.debug(),s=game.view();selectedRooms.add(debug.roomId);questionIds.add(debug.questionId);times.push(s.limit);
-  const question=MISSION_QUESTIONS.find(q=>q.id===debug.questionId);assert(question.level<=(stage<2?1:2),'original stage difficulty is preserved');
-  runGrades.add(s.grade);runTeachers.add(game.teacherTarget().id);categories.push(s.category);kinds.push(s.kind);
-  byStage[stage].grades.add(s.grade);byStage[stage].teachers.add(game.teacherTarget().id);byStage[stage].categories.add(s.category);byStage[stage].kinds.add(s.kind);
-  assert.equal(s.limit,missionTime({distance:debug.travel,searchDistance:debug.searchDistance,roomCount:s.roomCount,speed:RUN_SPEED}),'new route still receives full generous time budget');
-  assert(s.limit>=240);assert(!JSON.stringify(s).includes(debug.roomId),'hidden classroom must not leak into HUD');assert(!('item' in s));
-  assert.equal(game.answer(debug.correct).stamps,stage,'cannot answer before collection');
-  game.tick(20,{position:map.start,active:false});assert.equal(game.view().remaining,s.remaining,'menu/background pause');
-  if(seed===1){traverse(debug.routes[0]);traverse(debug.routes[1]);}
-  game.tick(.01,{position:debug.item});assert.equal(game.view().phase,'teacher');
-  const teacher=game.teacherTarget(),point=map.rooms.get(teacher.roomId).nearest(teacher.position),position={x:point.x,y:point.y,z:point.z};
-  const wait=game.view().remaining;game.tick(30,{position,npcs:[{...teacher,modelStatus:'loading'}]});assert.equal(game.view().remaining,wait,'model loading must not consume time');
-  game.tick(.01,{position,npcs:[{...teacher,position,modelStatus:'ready'}]});assert.equal(game.view().phase,'quiz');
-  const wrong=(debug.correct+1)%4;game.answer(wrong);game.answer(wrong);assert.equal(game.view().mistakes,stage+1,'same wrong choice counted once');
-  game.answer(debug.correct);game.answer(debug.correct);assert.equal(game.view().stamps,stage+1,'one stamp per mission');stamps++;
-  game.tick(3.6,{position});
+ const questionIds=new Set(),types=[],categories=[];let pos=map.start,wrongCount=0;
+ for(let stage=0;stage<12;stage++){
+  const d=game.debug(),s=game.view();types.push(s.type);times.push(s.limit);if(d.roomId)selectedRooms.add(d.roomId);
+  assert.equal(s.total,12);assert.equal(s.round,stage+1);assert(s.limit>=240);
+  assert.equal(game.answer(d.correct).stamps,stage,'cannot answer remotely');
+  assert.equal(game.interact().phase,s.phase,'cannot interact remotely');
+  game.tick(20,{position:pos,active:false});assert.equal(game.view().remaining,s.remaining,'menu pause');
+  if(seed===1)for(const route of d.routes)traverse(route);
+  if(s.type==='drive'){
+   assert(s.limit>=480);const c=d.course;pos=c.pickup;
+   game.tick(.01,{position:pos});assert.equal(game.view().phase,'pickup');game.interact();assert.equal(game.view().phase,'board');assert(game.view().cargo);
+   const vehicle=(phase,p,carId=c.carId,speed=0)=>({phase,carId,speed,cars:[{id:c.carId,position:p}]});
+   game.tick(.01,{position:c.checkpoints[0],vehicle:vehicle('walking',c.checkpoints[0])});assert.equal(game.view().checkpoint,0,'walking cannot complete a car checkpoint');
+   game.tick(.01,{position:c.checkpoints[0],vehicle:vehicle('driving',c.checkpoints[0],'wrong-car')});assert.equal(game.view().phase,'board','assigned car required');
+   game.tick(.01,{position:c.launch,vehicle:vehicle('driving',c.launch)});assert.equal(game.view().phase,'drive');
+   game.tick(.01,{position:c.checkpoints[1],vehicle:vehicle('driving',c.checkpoints[1])});assert.equal(game.view().checkpoint,0,'checkpoints are ordered');
+   for(const p of c.checkpoints)game.tick(.01,{position:p,vehicle:vehicle('driving',p)});
+   assert.equal(game.view().phase,'park');game.tick(2,{position:c.park,vehicle:vehicle('driving',c.park,c.carId,5)});assert.equal(game.view().phase,'park','must stop');
+   game.tick(1,{position:c.park,vehicle:vehicle('driving',c.park)});assert.equal(game.view().phase,'unload');
+   game.tick(.01,{position:c.drop,vehicle:vehicle('driving',c.park)});game.interact();assert.equal(game.view().stamps,stage,'must exit before delivery');
+   pos=c.drop;game.tick(.01,{position:pos,vehicle:vehicle('walking',c.park)});game.interact();
+  }else{
+   questionIds.add(d.questionId);categories.push(s.category);const q=MISSION_QUESTIONS.find(q=>q.id===d.questionId);assert(q.level<=(stage<4?1:2),'same difficulty range');
+   if(s.type==='search'){assert(!JSON.stringify(s).includes(d.roomId),'hidden room stays hidden');game.tick(.01,{position:d.item});assert.equal(game.view().phase,'teacher');}
+   if(s.type==='delivery'){game.tick(.01,{position:d.item});assert.equal(game.view().phase,'pickup','explicit pickup required');game.interact();assert.equal(game.view().phase,'teacher');assert(game.view().cargo);}
+   async function visit(t){
+    const p=map.rooms.get(t.roomId).nearest(t.position);pos={x:p.x,y:p.y,z:p.z};const before=game.view().remaining;
+    game.tick(30,{position:pos,npcs:[{...t,modelStatus:'loading'}]});assert.equal(game.view().remaining,before,'NPC loading pause');
+    game.tick(.01,{position:pos,npcs:[{...t,position:pos,modelStatus:'ready'}]});
+   }
+   if(s.type==='relay'){assert.notEqual(d.contact.id,d.teacher.id);await visit(d.contact);assert.equal(game.view().phase,'contact');game.interact();assert.equal(game.view().phase,'teacher');assert(game.view().feedback.includes(q.explanation));}
+   await visit(d.teacher);if(s.type!=='search'){assert.equal(game.view().phase,'teacher');game.interact();}assert.equal(game.view().phase,'quiz');
+   game.tick(.01,{position:map.start,npcs:[]});assert.equal(game.view().phase,'teacher','walking away dismisses question');await visit(d.teacher);if(s.type!=='search')game.interact();
+   const wrong=(d.correct+1)%4;game.answer(wrong);game.answer(wrong);wrongCount++;assert.equal(game.view().mistakes,wrongCount);
+   game.answer(d.correct);game.answer(d.correct);
+  }
+  assert.equal(game.view().stamps,stage+1,'one stamp per mission');assert.equal(game.view().cargo,null);stamps++;
+  game.tick(4.6,{position:pos});
  }
- assert.equal(game.view().phase,'complete');assert.equal(questionIds.size,4);assert.equal(runGrades.size,4);assert.equal(runTeachers.size,4);
- assert.deepEqual(categories.sort(),['상식','상식','영어','영어']);assert.deepEqual(kinds.sort(),['별','별','선물상자','선물상자']);
- game.start();assert.notEqual(game.view().grade,firstGrade,'retry starts with a different grade');assert.equal(game.view().stamps,0);game.tick(99999,{position:map.start});assert.equal(game.view().phase,'timeout');assert.equal(game.view().remaining,0);game.stop();assert.equal(game.view().phase,'idle');
+ assert.equal(game.view().phase,'complete');assert.equal(questionIds.size,9);assert.equal(categories.filter(c=>c==='영어').length,5);
+ for(let c=0;c<3;c++)assert.deepEqual(types.slice(c*4,c*4+4).sort(),['delivery','drive','relay','search']);orders.add(types.join(','));
+ game.start();assert.equal(game.view().stamps,0);game.tick(99999,{position:map.start,npcs:teachers.map(t=>({...t,modelStatus:'ready'}))});assert.equal(game.view().phase,'timeout');assert.equal(game.view().remaining,0);game.stop();assert.equal(game.view().phase,'idle');assert.equal(game.view().cargo,null);
 }
-for(const stage of byStage){assert(stage.grades.size>=3,'grade progression varies');assert(stage.teachers.size>=3,'no fixed teacher in any round');assert.equal(stage.categories.size,2);assert.equal(stage.kinds.size,2);}
+assert(orders.size>=8,'mission order varies');
 let saved;const prior=createStampMission(map,{speed:RUN_SPEED,random:()=>0,onHistory:h=>{saved=h;}});prior.start();
 const next=createStampMission(map,{speed:RUN_SPEED,random:()=>0,history:JSON.parse(JSON.stringify(saved))});next.start();
-assert.notEqual(next.view().grade,prior.view().grade,'reload changes starting grade');assert.notEqual(next.debug().questionId,prior.debug().questionId,'reload avoids previous question');assert.notEqual(next.teacherTarget().id,prior.teacherTarget().id,'reload avoids previous teacher');
-// Every treasure candidate belongs to a connected classroom aisle.
+assert.notEqual(next.view().grade,prior.view().grade,'reload changes first grade');assert.notEqual(next.debug().questionId,prior.debug().questionId,'question history persists');
 for(const r of map.rooms.values())for(const p of r.treasures)assert(world.navigationCandidate(p.x,p.y,p.z));
-console.log(JSON.stringify({ok:true,questions:60,grades:map.grades.size,connectedRooms:map.rooms.size,simulatedRoutes:routeCount,rounds:stamps,differentTreasureRooms:selectedRooms.size,stageVariety:byStage.map(s=>({grades:s.grades.size,teachers:s.teachers.size,categories:s.categories.size,kinds:s.kinds.size})),minimumSeconds:Math.min(...times),maximumSeconds:Math.max(...times),speedScaled:true,pauses:true,hiddenRoomNotDisclosed:true,historyRestored:true,difficultyPreserved:true},null,2));
+console.log(JSON.stringify({ok:true,questions:60,connectedRooms:map.rooms.size,simulatedRoutes:routeCount,rounds:stamps,differentRooms:selectedRooms.size,differentSchedules:orders.size,minimumSeconds:Math.min(...times),maximumSeconds:Math.max(...times),delivery:true,teacherRelay:true,vehicleOnlyCheckpoints:true,parkingAndUnloading:true,pause:true},null,2));
