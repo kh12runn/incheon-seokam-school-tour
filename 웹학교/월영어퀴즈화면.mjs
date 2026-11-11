@@ -1,5 +1,5 @@
 // Non-modal NPC bubble; no focus capture or pointer-lock changes.
-export function createMonthQuizBubble({onAnswer,onAnswered}){
+export function createMonthQuizBubble({onAnswer,onAnswered,onHidden}){
   const bubble=document.createElement('section');bubble.id='월퀴즈말풍선';bubble.hidden=true;
   bubble.setAttribute('aria-labelledby','월퀴즈문제');
   bubble.innerHTML=`<p id="월퀴즈문제"></p><div id="월퀴즈보기" role="group" aria-label="영어 월 이름 보기"></div><p id="월퀴즈결과" role="status" aria-live="polite"></p><small>숫자 1~4 또는 보기 터치 · 멀어지면 닫혀요</small>`;
@@ -11,11 +11,12 @@ export function createMonthQuizBubble({onAnswer,onAnswered}){
     get('월퀴즈결과').dataset.result=state.solved?'correct':'retry';
     buttons[index].dataset.result=state.solved?'correct':'wrong';buttons[index].disabled=true;
     if(state.solved)for(const button of buttons)button.disabled=true;
-    onAnswered?.();
+    onAnswered?.(state);
   }
+  function hide(){if(bubble.hidden)return;bubble.hidden=true;onHidden?.();}
   return {
     answer,isVisible:()=>!bubble.hidden,
-    hide(){if(!bubble.hidden)bubble.hidden=true;},
+    hide,
     show(state){
       get('월퀴즈문제').textContent=state.question.prompt;
       get('월퀴즈결과').textContent='';delete get('월퀴즈결과').dataset.result;
@@ -28,7 +29,7 @@ export function createMonthQuizBubble({onAnswer,onAnswered}){
       get('월퀴즈보기').replaceChildren(...buttons);
     },
     anchor(x,y,visible){
-      if(bubble.hidden===visible)bubble.hidden=!visible;if(!visible)return;
+      if(!visible){hide();return;}bubble.hidden=false;
       const width=bubble.offsetWidth,height=bubble.offsetHeight;
       const left=Math.max(12,Math.min(innerWidth-width-12,x-width/2));
       const top=Math.max(12,Math.min(innerHeight-height-12,y-height-12));

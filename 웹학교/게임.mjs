@@ -92,7 +92,7 @@ let shadowMode=null;
 let footballPhysics,footballVisual;
 let driving,carVisual,vehicleUI,lastDriveYaw=null;
 let freeLookPoint=null;
-let lookRequestSerial=0;
+let lookRequestSerial=0,lookRequestPending=false;
 let velocity={x:0,y:0},smoothZ=EYE_HEIGHT,last=performance.now(),elapsed=0,ready=false;
 let orbit={yaw:.75,pitch:.83,distance:185},drag=null;
 // Explicit user preference: always rotate immediately, independent of OS settings.
@@ -162,12 +162,14 @@ function openCharacterPicker(fallback=false){
 updateCharacterLabel();
 monthQuizUI=createMonthQuizBubble({
   onAnswer:index=>monthQuiz.answer(index),
-  onAnswered(){canvas.focus({preventScroll:true});}
+  onAnswered(state){if(state.solved)resumeInteractionLook();else canvas.focus({preventScroll:true});},
+  onHidden:resumeInteractionLook
 });
-missionUI=createMissionUI({onAnswer:index=>{if(isPlaying()&&missionUI.isVisible()){mission.answer(index);clearInput();canvas.focus({preventScroll:true});}},
+missionUI=createMissionUI({onAnswer:index=>{if(isPlaying()&&missionUI.isVisible()){const state=mission.answer(index);clearInput();canvas.focus({preventScroll:true});return state;}},
   onInteract:missionAction,
   onRetry:beginMission,onFree:()=>{stopMission();startWalk();},
   onQuestion(){freeLook=true;clearInput();if(document.pointerLockElement)document.exitPointerLock();},
+  onQuestionEnd:resumeInteractionLook,
   onResult(){freeLook=false;dragMode=false;clearInput();if(document.pointerLockElement)document.exitPointerLock();syncMissionControls();pausePanel();}
 });
 function syncMissionControls(){
@@ -175,7 +177,7 @@ function syncMissionControls(){
   for(const id of ['동층이동','방선택','방이동','육사이동','처음'])$(id).disabled=blocked||!ready;
 }
 function stopMission(){pendingMission=false;mission?.stop();missionUI?.hide();missionVisual.hide();avatar.setCarrying(false);syncMissionControls();}
-function missionAction(){if(!isPlaying()||!mission?.active())return;mission.interact();canvas.focus({preventScroll:true});}
+function missionAction(){if(!isPlaying()||!mission?.active())return;mission.interact();resumeInteractionLook();canvas.focus({preventScroll:true});}
 function beginMission(){
   if(!missionMap)return;pendingMission=false;leaveVehicle();missionUI.hide();
   if(!mission){
@@ -393,7 +395,7 @@ function pausePanel(){
   touchControls?.sync();
 }
 function openMenu(){
-  if(!ready||missionLoading||characterPicker.isOpen()||$('탐험방법선택').open||$('주차장선택').open||$('승강기창').open||elevatorBusy||$('게임메뉴').open)return;
+  if(!ready||missionLoading||missionUI?.isResult()||characterPicker.isOpen()||$('탐험방법선택').open||$('주차장선택').open||$('승강기창').open||elevatorBusy||$('게임메뉴').open)return;
   dragMode=false;freeLook=false;clearInput();if(document.pointerLockElement)document.exitPointerLock();
   $('게임메뉴').showModal();pausePanel();notice('탐험 메뉴 · 이동할 층을 선택하거나 탐험을 계속하세요.');
 }
@@ -451,20 +453,35 @@ async function startWalk(withoutPointerLock=false){
   if(ready&&!characterChosenThisVisit){openCharacterPicker(withoutPointerLock);return;}
   if(!ready||characterPicker.isOpen()||$('탐험방법선택').open||$('주차장선택').open||$('승강기창').open||elevatorBusy)return;
   $('게임메뉴').close();mode='walk';dragMode=false;freeLook=true;clearInput();
-  const request=++lookRequestSerial;
   cameraReset=true;camera.rotation.order='YXZ';smoothZ=position.z+EYE_HEIGHT;cameraWalk(.1);
   pausePanel();
   canvas.focus({preventScroll:true});
   notice(movementHint());
-  if(touchControls?.isActive()||withoutPointerLock||document.pointerLockElement===canvas)return;
+  if(withoutPointerLock)return;
+  await requestLookLock();
+}
+function canResumeLook(){
+  return ready&&mode==='walk'&&avatar.modelStatus==='ready'&&!document.hidden&&!missionLoading&&!missionUI?.isResult()&&!$('게임메뉴').open&&!$('탐험방법선택').open&&!$('주차장선택').open&&!characterPicker.isOpen()&&!$('승강기창').open&&!elevatorBusy;
+}
+function choosingMissionAnswer(){const state=mission?.view();return state?.phase==='quiz'&&state.nearTeacher;}
+async function requestLookLock(){
+  if(!canResumeLook()||choosingMissionAnswer()||touchControls?.isActive()||document.pointerLockElement===canvas||lookRequestPending)return;
+  const request=++lookRequestSerial;lookRequestPending=true;
   try{
     await canvas.requestPointerLock();
   }catch(error){
     if(request===lookRequestSerial)lockFallback();
-  }
+  }finally{lookRequestPending=false;}
+}
+function resumeInteractionLook(){
+  if(!canResumeLook()||choosingMissionAnswer())return;
+  // Keep yaw, pitch, follow distance and the camera interpolation unchanged.
+  // Free look stays live even when the browser rejects an automatic lock.
+  dragMode=false;freeLook=!locked;drag=null;freeLookPoint=null;
+  pausePanel();canvas.focus({preventScroll:true});void requestLookLock();
 }
 function lockFallback(){
-  if(mode!=='walk'||locked||dragMode||$('게임메뉴').open||characterPicker.isOpen()||$('승강기창').open||elevatorBusy)return;
+  if(!canResumeLook()||choosingMissionAnswer()||locked||dragMode)return;
   // Free look is already live while a lock request is pending. A late rejection
   // must not clear movement or require a click to resume.
   freeLook=true;pausePanel();canvas.focus({preventScroll:true});
@@ -522,11 +539,11 @@ $('방이동').addEventListener('click',()=>{
 document.addEventListener('pointerlockchange',()=>{
   locked=document.pointerLockElement===canvas;
   if(locked&&touchControls?.isActive()){freeLook=true;document.exitPointerLock();return;}
-  if(locked&&(mode!=='walk'||$('게임메뉴').open||characterPicker.isOpen()||$('승강기창').open||elevatorBusy)){document.exitPointerLock();return;}
+  if(locked&&(!canResumeLook()||choosingMissionAnswer())){if(choosingMissionAnswer())freeLook=true;document.exitPointerLock();return;}
   if(locked){freeLook=false;dragMode=false;}
   // A delayed browser pointer-lock grant must not erase an already held W key.
   if(!locked)clearInput();else{drag=null;freeLookPoint=null;}pausePanel();
-  if(!locked&&mode==='walk'&&!dragMode&&!freeLook&&!characterPicker.isOpen()&&!$('승강기창').open&&!elevatorBusy)openMenu();
+  if(!locked&&canResumeLook()&&!dragMode&&!freeLook)openMenu();
   if(locked)notice('WASD 달리기 · Space 점프 · Z 안녕~ · 마우스 시점 · ESC 정지');
   else if($('게임메뉴').open)notice('일시정지 · ESC / X / 탐험 계속하기로 재개');
 });
@@ -574,6 +591,9 @@ document.addEventListener('keydown',e=>{
   if(e.code==='Escape'&&$('게임메뉴').open){e.preventDefault();if(!e.repeat)dismissMenu();return;}
   if($('게임메뉴').open||$('탐험방법선택').open||$('주차장선택').open||$('승강기창').open||characterPicker.isOpen()||elevatorBusy)return;
   if(['INPUT','SELECT','TEXTAREA','BUTTON','SUMMARY'].includes(e.target.tagName)&&e.code!=='Escape'&&!(e.code==='KeyF'&&e.target.id==='출입문조작'))return;
+  // An automatic request after walking away can be browser-blocked. The next
+  // normal movement/action key retries, without an extra click or camera reset.
+  if(e.isTrusted&&!e.repeat&&freeLook&&/^(Key[WASDFRZ]|Arrow\w+|Space)$/.test(e.code))void requestLookLock();
   if(isPlaying()&&['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)){keys.add(e.code);e.preventDefault();}
   if(e.code==='KeyF'&&isPlaying()&&!e.repeat){e.preventDefault();if(!doorAction())vehicleAction();}
   if(e.code==='Space'&&isPlaying()){

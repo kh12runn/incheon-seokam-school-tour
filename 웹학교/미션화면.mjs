@@ -1,5 +1,5 @@
 const clock=seconds=>{const s=Math.ceil(Math.max(0,seconds));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
-export function createMissionUI({onAnswer,onRetry,onFree,onQuestion,onResult,onInteract}){
+export function createMissionUI({onAnswer,onRetry,onFree,onQuestion,onQuestionEnd,onResult,onInteract}){
  const hud=document.createElement('aside');hud.id='미션안내';hud.hidden=true;hud.innerHTML='<div class="미션윗줄"><span id="미션단계"></span><strong id="미션시간"></strong></div><progress id="미션시계" max="1" value="1" aria-label="이번 미션의 남은 시간"></progress><h2 id="미션목표"></h2><p id="미션장소"></p><div id="미션도장" aria-label="획득한 스탬프"></div><p id="미션상태" role="status"></p>';
  const bubble=document.createElement('section');bubble.id='탐험퀴즈말풍선';bubble.hidden=true;bubble.setAttribute('aria-labelledby','탐험퀴즈문제');bubble.innerHTML='<small id="탐험퀴즈선생님"></small><h2 id="탐험퀴즈문제"></h2><div id="탐험퀴즈보기" role="group" aria-label="정답 선택지"></div><p id="탐험퀴즈반응" role="status" aria-live="polite"></p><small>숫자 1~4 · 선택지 클릭 또는 터치</small>';
  const result=document.createElement('section');result.id='미션결과';result.hidden=true;result.setAttribute('aria-labelledby','미션결과제목');result.innerHTML='<span class="작은제목">나만의 학교 모험</span><h2 id="미션결과제목"></h2><p id="미션결과내용"></p><p id="미션최고기록"></p><button id="미션다시" class="primary">다시 도전하기</button><button id="미션자유">자유 탐험으로 돌아가기</button>';
@@ -7,14 +7,20 @@ export function createMissionUI({onAnswer,onRetry,onFree,onQuestion,onResult,onI
  const action=document.createElement('button');action.id='미션동작';action.type='button';action.hidden=true;action.onclick=onInteract;hud.append(action);
  document.body.append(hud,bubble,result);document.getElementById('미션다시').onclick=onRetry;document.getElementById('미션자유').onclick=onFree;
  const $=id=>document.getElementById(id);let questionKey='',lastPhase='',lastSignature='',state=null;
- function answer(i){if(bubble.hidden||!state||state.phase!=='quiz')return;onAnswer(i);}
+ function closeQuestion(resume=true){if(bubble.hidden)return;bubble.hidden=true;if(resume)onQuestionEnd?.();}
+ function answer(i){
+  if(bubble.hidden||!state||state.phase!=='quiz')return;
+  const next=onAnswer(i);
+  // Restore look within the answer click/key gesture, before the next frame.
+  if(next&&next.phase!=='quiz')closeQuestion();
+ }
  function record(s){let best=null;try{best=JSON.parse(localStorage.getItem('석암학교-스탬프최고기록-12단계-v2')??'null');if(!best||!Number.isFinite(best.seconds))best=null;if(s.phase==='complete'&&(!best||s.elapsed<best.seconds)){best={seconds:Math.round(s.elapsed),date:new Date().toISOString()};localStorage.setItem('석암학교-스탬프최고기록-12단계-v2',JSON.stringify(best));}}catch{}return best;}
  return{answer,isVisible:()=>!bubble.hidden,isResult:()=>!result.hidden,
   hide(){hud.hidden=true;bubble.hidden=true;result.hidden=true;state=null;lastPhase='';lastSignature='';questionKey='';},
   render(s,{playing,anchor,yaw=0,position}={}){
    state=s;hud.hidden=!s.active;const showing=s.phase==='quiz'&&s.nearTeacher&&playing;
-   if(showing&&bubble.hidden)onQuestion();
-   bubble.hidden=!showing;
+   if(showing&&bubble.hidden){bubble.hidden=false;onQuestion();}
+   if(!showing)closeQuestion(playing&&!['complete','timeout'].includes(s.phase));
    if(showing){
     const key=s.round+':'+s.prompt;if(key!==questionKey){questionKey=key;$('탐험퀴즈문제').textContent=s.prompt;$('탐험퀴즈선생님').textContent=s.teacher.label+' · '+s.category;
      $('탐험퀴즈보기').replaceChildren(...s.choices.map((word,i)=>{const button=document.createElement('button');button.type='button';button.dataset.choice=i;button.textContent=(i+1)+'. '+word;button.onclick=()=>answer(i);return button;}));}
