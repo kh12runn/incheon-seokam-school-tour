@@ -1,5 +1,6 @@
 import {profileFor,carName} from './차량성능.mjs';
 import {pickRaceDrivers} from './레이싱선수.mjs';
+import {createRaceAI} from './레이싱AI.mjs';
 import {PARKED_CARS,CAR_DIMENSIONS} from './주차장.mjs';
 import {TRACK,trackPoint,nearestTrack,groundHeight} from './레이싱코스.mjs';
 export {TRACK,trackPoint,nearestTrack} from './레이싱코스.mjs';
@@ -12,9 +13,10 @@ const gateCount=Math.max(20,Math.ceil(TRACK.length/12)),gateLength=TRACK.length/
 const gates=Array.from({length:gateCount},(_,i)=>trackPoint(i*gateLength));
 const laneLimit=Math.min(2.7,TRACK.width/2-2),lanes=[-laneLimit,0,laneLimit];
 const maxSteering=profile=>.46+Math.min(profile.handling,11)*.018;
-const ASSIST_STRENGTH=.30,SIDE_OVERLAP=.40;
+export const RACE_ASSIST_CONFIG=Object.freeze({speedRatio:.50,maxStrength:.55,rampRate:3.3,minSteerInput:.08});
+const SIDE_OVERLAP=.40;
 
-export function roundRules(round){const r=clamp(Math.floor(round),1,5);return {round:r,laps:3,opponents:Math.min(5,r+2),pace:[.67,.76,.85,.94,1][r-1],hazards:5+r*2};}
+export function roundRules(round){const r=clamp(Math.floor(round),1,5);return {round:r,laps:3,opponents:Math.min(5,r+2),pace:[.67,.76,.85,.90,.91][r-1],hazards:5+r*2};}
 export function raceOpponents(round,random=Math.random){
  const tiers=[['sedan','compact'],['sedan','morning','suv'],['morning','tucson','electric','rally'],['rally','sports','touring'],['sports','touring','hyper']][clamp(Math.floor(round),1,5)-1];
  const pool=PARKED_CARS.filter(c=>tiers.includes(c.variant??c.type));
@@ -32,14 +34,14 @@ export function makeObstacles(round,random=Math.random,cars=[]){
  }return items;
 }
 
-// Normal driving is entirely manual. Contact assistance only operates while
-// the driver explicitly holds forward and a steering key against an obstacle.
+// Normal driving is manual. Forward input during an actual obstruction enables
+// a short, smooth escape arc; steering input always chooses the escape side.
 export function createRace({car,opponents=[],round=1,random=Math.random}){
  const rules=roundRules(round),L=TRACK.length,drivers=pickRaceDrivers(Math.min(opponents.length,rules.opponents),random);
  const cars=[car,...opponents.slice(0,rules.opponents)].map((source,i)=>{
   const s=-8-Math.floor(i/2)*6,lane=i%2?2:-2,p=trackPoint(s,lane);
   const driver=i?drivers[i-1]:{id:'player',name:'나'};
-  return {source,id:i,name:driver.name,driverId:driver.id,driverName:driver.name,profile:profileFor(source),dimensions:CAR_DIMENSIONS[source.type],x:p.x,z:p.z,height:p.height??-.3,yaw:p.yaw,steering:0,s,lane,speed:0,sideSpeed:0,lap:0,spin:0,hit:0,hits:0,boost:1,boosting:false,finish:null,wall:0,aiLane:lane,decision:0,started:false,checkpoint:0,nextCheckpoint:0,progress:s,offTrack:false,wrongWay:false,resetSerial:0,reverseTime:0,recoveryCooldown:0,stuckTime:0,lastAdvance:s,recoveries:0,contact:0,obstacleContact:0,assistActive:false,assistReason:null,assistStrength:0,assistSpeedLimit:profileFor(source).speed*.30,passingId:null,passingLane:0};
+  return {source,id:i,name:driver.name,driverId:driver.id,driverName:driver.name,profile:profileFor(source),dimensions:CAR_DIMENSIONS[source.type],x:p.x,z:p.z,height:p.height??-.3,yaw:p.yaw,steering:0,s,lane,speed:0,sideSpeed:0,lap:0,spin:0,hit:0,hits:0,boost:1,boosting:false,finish:null,wall:0,aiLane:lane,decision:0,started:false,checkpoint:0,nextCheckpoint:0,progress:s,offTrack:false,wrongWay:false,resetSerial:0,reverseTime:0,recoveryCooldown:0,stuckTime:0,lastAdvance:s,recoveries:0,contact:0,obstacleContact:0,assistActive:false,assistReason:null,assistStrength:0,assistSpeedLimit:profileFor(source).speed*RACE_ASSIST_CONFIG.speedRatio,passingId:null,passingLane:0};
  });
  let phase='countdown',countdown=3,time=0,paused=false,obstacles=makeObstacles(round,random,cars),generation=1,accumulator=0;
  const player=cars[0];
@@ -80,54 +82,13 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
   c.nextCheckpoint=(c.nextCheckpoint+1)%gateCount;c.lap=Math.floor(c.checkpoint/gateCount);
   if(c.lap>=rules.laps){c.finish=time-dt+dt*t;c.speed=0;c.progress=rules.laps*L;}
  }
- function aiInput(c){
-  const p=c.profile,at=trackPoint(c.s),lookAhead=clamp(3.5+Math.abs(c.speed)*.24,4,10);
-  c.decision-=1/120;c.recoveryCooldown=Math.max(0,c.recoveryCooldown-1/120);
-  if(c.decision<=0){
-   c.decision=.25+random()*.18;
-   const scores=lanes.map(l=>{
-    let score=-Math.abs(l-c.aiLane)*.22-Math.abs(l)*.03;
-    for(const o of obstacles){const gap=mod(o.s-c.s,L);if(gap<27&&Math.abs(o.lane-l)<1.8)score-=32-gap;}
-    for(const other of cars)if(other!==c){const gap=mod(other.s-c.s,L);if(gap<12&&Math.abs(other.lane-l)<2)score-=15-gap;}
-    return score+random()*.12;
-   });c.aiLane=lanes[scores.indexOf(Math.max(...scores))];
-  }
-  let narrow=at.width<=7;
-  for(let d=3;d<=22;d+=3)if(trackPoint(c.s+d).width<=7)narrow=true;
-  let passing=c.passingId===null?null:cars[c.passingId];
-  if(passing){const gap=mod(passing.s-c.s+L/2,L)-L/2;if(passing.finish!==null||gap<-6||gap>16||Math.abs(passing.speed)>Math.max(4,p.speed*.30+1)){passing=null;c.passingId=null;}}
-  if(!passing&&time>2){
-   const stopped=cars.filter(other=>other!==c&&other.finish===null&&Math.abs(other.speed)<2).map(other=>({other,gap:mod(other.s-c.s+L/2,L)-L/2})).filter(({other,gap})=>gap>-1&&gap<12&&Math.abs(other.lane-c.lane)<2.4).sort((a,b)=>a.gap-b.gap)[0];
-   if(stopped){passing=stopped.other;c.passingId=passing.id;const sign=passing.lane>.15?-1:passing.lane<-.15?1:c.lane>=0?1:-1;c.passingLane=sign*(at.width/2-c.dimensions.width/2-.14);}
-  }
-  const ahead=trackPoint(c.s+lookAhead),limit=passing?Math.max(0,Math.min(at.width,ahead.width)/2-c.dimensions.width/2-.14):narrow?0:Math.min(Math.abs(ahead.curve)>.08?.65:3,Math.max(0,(ahead.width??TRACK.width)/2-2)),target=trackPoint(c.s+lookAhead,clamp(passing?c.passingLane:c.aiLane,-limit,limit)),dx=target.x-c.x,dz=target.z-c.z,distance=Math.max(2,Math.hypot(dx,dz)),error=angle(Math.atan2(-dx,-dz)-c.yaw);
-  const steering=Math.atan(2*c.dimensions.wheelbase*Math.sin(error)/distance)/maxSteering(p);
-  let curve=Math.abs(at.curve||0);
-  for(let d=3;d<=Math.max(12,c.speed*1.15);d+=3)curve=Math.max(curve,Math.abs(trackPoint(c.s+d).curve||0));
-  const pace=rules.pace*(.975+(c.id%3)*.0125),corner=curve>.002?Math.sqrt(p.grip*.48/curve):p.speed;
-  let desired=Math.min(p.speed*pace,corner*pace);desired*=clamp(1-Math.abs(error)*.45,.35,1);
-  if(passing)desired=Math.min(desired,p.speed*.30);
-  for(const other of cars)if(other!==c&&other.finish===null){
-   if(passing===other)continue;
-   const signed=mod(other.s-c.s+L/2,L)-L/2,gap=mod(other.s-c.s,L),merging=narrow||curve>.002;
-   // Enter narrow passages and bends one at a time. Side-by-side rivals must
-   // yield before both turn towards the same central lane.
-   if(merging&&signed>-1&&signed<8&&(signed>.4||c.id>other.id))desired=Math.min(desired,Math.max(0,other.speed)+Math.max(-5,(signed-5.4)*1.8));
-   else if(gap<7&&Math.abs(other.lane-c.lane)<1.7)desired=Math.min(desired,Math.max(0,other.speed)+Math.max(0,gap-4.8)*1.6);
-  }
-  desired=Math.max(0,desired);
-  // If blocked by another car or boundary, reverse briefly under AI control.
-  if(c.reverseTime>0){c.reverseTime-=1/120;return {throttle:-.45,steer:clamp(angle(at.yaw-c.yaw)*2,-1,1),brake:false,boost:false};}
-  if(c.wall>0&&Math.abs(c.speed)<.3&&c.recoveryCooldown<=0){c.aiLane=0;c.decision=2;return {throttle:.30,steer:Math.abs(steering)>.2?clamp(-steering,-1,1):c.lane>0?-1:1,brake:false,boost:false};}
-  let steeringInput=clamp(-steering,-1,1);
-  if(passing&&c.contact>0&&Math.abs(c.speed)<2&&Math.abs(clamp(c.passingLane,-limit,limit)-c.lane)>.12)steeringInput=Math.sign(c.passingLane-c.lane)*Math.max(.5,Math.abs(steeringInput));
-  return {throttle:desired/p.speed,steer:steeringInput,brake:c.speed>desired+1.5,boost:rules.round>=3&&c.boost>.55&&curve<.006&&Math.abs(error)<.12};
- }
+ const aiInput=createRaceAI({cars,obstacles:()=>obstacles,rules,random,time:()=>time});
  function moveCar(c,dt,input){
   const p=c.profile,throttle=clamp(Number(input.throttle)||0,-1,1),brake=!!input.brake,steer=clamp(Number(input.steer)||0,-1,1),oldX=c.x,oldZ=c.z,oldYaw=c.yaw;
   c.assistReason=c.wall>0?'boundary':c.obstacleContact>0?'obstacle':c.contact>0?'traffic':null;
-  c.assistActive=!!c.assistReason&&throttle>0&&!brake&&Math.abs(steer)>.10;
-  c.assistStrength=c.assistActive?Math.min(ASSIST_STRENGTH,c.assistStrength+dt*1.5):0;
+  c.assistActive=!!c.assistReason&&throttle>0&&!brake;
+  c.assistSpeedLimit=p.speed*RACE_ASSIST_CONFIG.speedRatio;
+  c.assistStrength=c.assistActive?Math.min(RACE_ASSIST_CONFIG.maxStrength,c.assistStrength+dt*RACE_ASSIST_CONFIG.rampRate):0;
   if(!c.assistActive)c.assistReason=null;
   c.boosting=!c.assistActive&&!!input.boost&&c.boost>.01&&throttle>0&&!brake&&c.speed>3;c.boost=clamp(c.boost+dt*(c.boosting?-.32:.085),0,1);
   const desired=brake?0:c.assistActive?c.assistSpeedLimit:throttle*(throttle<0?p.speed*.38:p.speed*(c.boosting?p.boost:1)),before=c.speed,opposed=c.speed*desired<0;
@@ -136,20 +97,31 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
   if(c.assistActive)c.speed=clamp(c.speed,0,c.assistSpeedLimit);
   let assistedSteer=steer;
   if(c.assistActive){
-   const wall=boundaryContact(c,c.x,c.z,c.yaw);let correction=steer;
+   const manual=Math.abs(steer)>RACE_ASSIST_CONFIG.minSteerInput,at=trackPoint(c.s),wall=boundaryContact(c,c.x,c.z,c.yaw);let correction=steer;
    if(c.assistReason==='boundary'&&wall.overlap>-.3){
-    // Pick the wall tangent on the side the user is turning towards. This
-    // supports either escape direction without snapping to the course heading.
+    // With no steering key, choose the tangent which points along the course.
+    // A steering key instead picks its own side, including a deliberate U-turn.
     const tangent=[{x:-wall.nz,z:wall.nx},{x:wall.nz,z:-wall.nx}];
-    const choice=tangent.map(t=>({...t,error:angle(Math.atan2(-t.x,-t.z)-c.yaw)})).sort((a,b)=>((Math.sign(a.error)===-Math.sign(steer)?0:4)+Math.abs(a.error))-((Math.sign(b.error)===-Math.sign(steer)?0:4)+Math.abs(b.error)))[0];
-    correction=clamp(-choice.error*1.5,-1,1);
+    const choice=tangent.map(t=>({...t,error:angle(Math.atan2(-t.x,-t.z)-c.yaw)})).sort((a,b)=>manual?((Math.sign(a.error)===-Math.sign(steer)?0:4)+Math.abs(a.error))-((Math.sign(b.error)===-Math.sign(steer)?0:4)+Math.abs(b.error)):(b.x*at.tx+b.z*at.tz)-(a.x*at.tx+a.z*at.tz))[0];
+    correction=clamp(-choice.error*2.0,-1,1);
+   }else if(!manual){
+    let target=trackPoint(c.s+5);
+    if(c.assistReason==='traffic'||c.assistReason==='obstacle'){
+     const blockers=c.assistReason==='traffic'?cars.filter(other=>other!==c&&other.finish===null):obstacles;
+     const nearest=blockers.map(other=>({other,d:Math.hypot(other.x-c.x,other.z-c.z)})).sort((a,b)=>a.d-b.d)[0]?.other;
+     const otherLane=nearest?nearestTrack(nearest.x,nearest.z,c.s).lane:0,limit=Math.max(0,Math.min(at.width,target.width)/2-c.dimensions.width/2-.16),side=otherLane>.15?-1:otherLane<-.15?1:c.lane>=0?1:-1;
+     target=trackPoint(c.s+5,side*limit);
+    }
+    correction=clamp(-angle(Math.atan2(c.x-target.x,c.z-target.z)-c.yaw)*2,-1,1);
    }
+   // The automatic contribution cannot reverse an explicit steering command.
+   if(manual&&Math.sign(correction)!==Math.sign(steer))correction=0;
    assistedSteer=steer*(1-c.assistStrength)+correction*c.assistStrength;
   }
   // A stopped bumper still gets a low-speed steering arc during deliberate
   // escape input; normal, brake and no-input states retain manual dynamics.
   const targetSteering=-assistedSteer*maxSteering(p);c.steering+=clamp(targetSteering-c.steering,-2.8*dt,2.8*dt);
-  const average=c.assistActive?Math.min(c.assistSpeedLimit,Math.max((before+c.speed)*.5,c.assistSpeedLimit*c.assistStrength/ASSIST_STRENGTH)):(before+c.speed)*.5,yawRate=average/c.dimensions.wheelbase*Math.tan(c.steering),gripRate=p.grip/Math.max(2,Math.abs(average));
+  const average=c.assistActive?Math.min(c.assistSpeedLimit,Math.max((before+c.speed)*.5,c.assistSpeedLimit*c.assistStrength/RACE_ASSIST_CONFIG.maxStrength)):(before+c.speed)*.5,yawRate=average/c.dimensions.wheelbase*Math.tan(c.steering),gripRate=p.grip/Math.max(2,Math.abs(average));
   c.yaw=angle(c.yaw+clamp(yawRate,-gripRate,gripRate)*dt);
   const travel=average*dt,dx=-Math.sin(c.yaw)*travel,dz=-Math.cos(c.yaw)*travel;let fraction=1,slide=null;
   const nextOverlap=penetration(c,oldX+dx,oldZ+dz,c.yaw);
@@ -167,7 +139,7 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
    }
   }
   c.x=slide?.x??oldX+dx*fraction;c.z=slide?.z??oldZ+dz*fraction;c.spin+=Math.hypot(c.x-oldX,c.z-oldZ)*Math.sign(travel)/.325;
-  for(const o of obstacles){const ox=o.x-c.x,oz=o.z-c.z,forward=ox*(-Math.sin(c.yaw))+oz*(-Math.cos(c.yaw)),side=ox*Math.cos(c.yaw)-oz*Math.sin(c.yaw);if(Math.abs(forward)<c.dimensions.length/2+.4&&Math.abs(side)<c.dimensions.width/2+.4){damage(c,p.resilience);c.obstacleContact=.4;}}
+  for(const o of obstacles){const ox=o.x-c.x,oz=o.z-c.z,forward=ox*(-Math.sin(c.yaw))+oz*(-Math.cos(c.yaw)),side=ox*Math.cos(c.yaw)-oz*Math.sin(c.yaw);if(Math.abs(forward)<c.dimensions.length/2+.4&&Math.abs(side)<c.dimensions.width/2+.4){const blocking=forward>-.5&&Math.abs(side)<c.dimensions.width*.45;damage(c,blocking?p.resilience:.97);if(blocking)c.obstacleContact=.4;}}
   project(c);gateCrossing(c,oldX,oldZ,dt);
  }
  function carContact(a,b){
@@ -208,8 +180,8 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
    const a=cars[i],b=cars[j];if(a.finish!==null||b.finish!==null)continue;
    const contact=carContact(a,b);
    if(contact){
-    a.contact=b.contact=.35;
     if(contact.soft){a.speed*=Math.exp(-dt*.7);b.speed*=Math.exp(-dt*.7);continue;}
+    a.contact=b.contact=.35;
     damage(a,.72,.6);damage(b,.72,.6);
     const canA=inside(a,a.x-contact.nx*contact.push,a.z-contact.nz*contact.push,a.yaw),canB=inside(b,b.x+contact.nx*contact.push,b.z+contact.nz*contact.push,b.yaw);
     for(const [c,sign] of [[a,-1],[b,1]]){
