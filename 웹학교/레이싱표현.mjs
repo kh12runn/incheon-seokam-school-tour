@@ -4,6 +4,7 @@ import {parkedCarDetails} from './자동차표현.mjs';
 import {RACE_PASSAGES,getRaceCourse} from './레이싱코스.mjs';
 import {createRaceDriver} from './레이싱운전자.mjs';
 import {createRaceTeachers} from './레이싱교사.mjs';
+import {createBoostFlames} from './레이싱부스트효과.mjs';
 
 export function disposeRaceTree(root,environment,preserveMaterials=new Set()){
  const geometries=new Set(),materials=new Set(),textures=new Set();
@@ -14,6 +15,7 @@ export function createRaceVisual(scene,{getDriver}={}){
  const root=new THREE.Group();root.name='운동장 가상 레이싱 트랙';root.position.y=.18;root.visible=false;scene.add(root);
  const driver=createRaceDriver(getDriver);
  const teachers=createRaceTeachers(scene);
+ const boostFlames=createBoostFlames(root);
  const ground=p=>(p.height??-.30)-root.position.y;
  const mats={white:new THREE.MeshStandardMaterial({color:0xf5f0e4,roughness:.88}),orange:new THREE.MeshStandardMaterial({color:0xe57632,roughness:.84}),dark:new THREE.MeshStandardMaterial({color:0x172530,roughness:.68})};
  // Only powder markings overlay the school's existing dirt. No replacement ground.
@@ -108,7 +110,7 @@ export function createRaceVisual(scene,{getDriver}={}){
   for(const mesh of obstacleBatches.values()){mesh.visible=mesh.count>0;mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();}
  }
  let fleet=null,preview=null,previewSource=null,lastGeneration=0,lastReset=0;const target=new THREE.Vector3(),look=new THREE.Vector3(),smoothLook=new THREE.Vector3();let cameraReady=false,cameraYaw=0;
- function clearCars({keepTeacherCache=false}={}){driver.release();teachers.clear({keepCache:keepTeacherCache});if(fleet){disposeRaceTree(fleet,scene.environment);fleet=null;}if(preview){disposeRaceTree(preview,scene.environment);preview=null;}}
+ function clearCars({keepTeacherCache=false}={}){boostFlames.clear();driver.release();teachers.clear({keepCache:keepTeacherCache});if(fleet){disposeRaceTree(fleet,scene.environment);fleet=null;}if(preview){disposeRaceTree(preview,scene.environment);preview=null;}}
  function garage(car,nextCourse){setCourse(nextCourse);if(!preview||previewSource!==car){clearCars();previewSource=car;preview=parkedCarDetails({cars:[{...car,x:43,y:-50,z:-.42,yaw:0}],instanced:false,environment:scene.environment});root.add(preview);cameraReady=false;}root.visible=true;obstacles.visible=false;}
  function start(race){setCourse(race.course);clearCars({keepTeacherCache:true});fleet=parkedCarDetails({cars:race.cars.map(c=>({...c.source,id:'race-'+c.id,x:0,y:0,z:0,yaw:0})),environment:scene.environment});root.add(fleet);fleet.traverse(o=>{o.castShadow=false;});teachers.start(race.cars);lastGeneration=-1;cameraReady=false;obstacles.visible=true;root.visible=true;}
  function update(race,dt,camera,elapsed,currentState){
@@ -119,6 +121,7 @@ export function createRaceVisual(scene,{getDriver}={}){
   if(lastGeneration!==state.generation){lastGeneration=state.generation;obstaclePool.forEach(({item,chair,books},i)=>{const o=race.obstacles[i];item.visible=!!o;if(!o)return;const p=trackPoint(o.s,o.lane);item.position.set(p.x,ground(p)+.06,p.z);item.rotation.y=p.yaw+o.angle;chair.visible=o.kind==='chair';books.visible=!chair.visible;});updateObstacleBatches();}
   for(const c of race.cars){const obj=fleet.getObjectByName('race-'+c.id),height=c.height??trackPoint(c.s).height??-.30,speed=Math.abs(c.speed),finished=c.id&&c.finish!=null;obj.visible=!finished;obj.scale.setScalar(finished?0:1);obj.position.set(c.x,height-root.position.y+.02+Math.sin(c.spin*2)*Math.min(.012,speed*.0005),c.z);obj.rotation.order='YXZ';obj.rotation.set(c.pitch??0,c.yaw,THREE.MathUtils.clamp(c.steering*c.speed*.006,-.055,.055));for(const wheel of obj.userData.wheels){wheel.rotation.x=-c.spin;wheel.rotation.y=wheel.userData.front?c.steering:0;}}
   fleet.userData.instances.update();
+  boostFlames.update(race.cars,fleet,dt,elapsed,state);
   driver.update(fleet.getObjectByName('race-'+race.player.id),race.player.source,state.paused?0:dt);
   teachers.update(race.cars,fleet,camera);
   const c=race.player,speed=Math.abs(c.speed),height=c.height??trackPoint(c.s).height??-.30;
@@ -140,5 +143,5 @@ export function createRaceVisual(scene,{getDriver}={}){
   for(const b of RACE_PASSAGES)if(camera.position.x>b.minX&&camera.position.x<b.maxX&&camera.position.z>b.minZ&&camera.position.z<b.maxZ)camera.position.y=Math.min(camera.position.y,b.ceiling-.25);
   camera.lookAt(smoothLook);const fov=62+speed*.22+(c.boosting?4:0);if(Math.abs(camera.fov-fov)>.02){camera.fov=fov;camera.updateProjectionMatrix();}
  }
- return {root,garage,start,update,setCourse,teacherState:teachers.getState,hide(){root.visible=false;clearCars();},dispose(){clearCars();teachers.dispose();disposeRaceTree(root,scene.environment);if(!trackLayer){courseMaterials.forEach(m=>m.dispose());chalkMap.dispose();}}};
+ return {root,garage,start,update,setCourse,teacherState:teachers.getState,boostState:boostFlames.getState,hide(){root.visible=false;clearCars();},dispose(){clearCars();boostFlames.dispose();teachers.dispose();disposeRaceTree(root,scene.environment);if(!trackLayer){courseMaterials.forEach(m=>m.dispose());chalkMap.dispose();}}};
 }

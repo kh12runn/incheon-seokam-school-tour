@@ -21,3 +21,42 @@ body[data-mode=race] #시작안내,body[data-mode=race] .게임헤더,body[data-
 #레이스덮개 .레이스결과기준{font-size:11px;line-height:1.6;color:#91afbf;margin:13px 0}
 #레이스코스안내{display:grid;gap:5px;margin:-2px 0 14px;padding:12px 14px;border-left:3px solid #d4bb7a;border-radius:3px 9px 9px 3px;background:#24445180;line-height:1.5}#레이스코스이름{font-size:14px;color:#f0d797}#레이스코스설명{font-size:12px;color:#c3d7df}#레이스코스정보{font-size:11px;color:#9ebdca}#레이스덮개 #레이스다음코스{padding:11px 13px;border-left:3px solid #d4bb7a;background:#294b5480;color:#f1dcad;white-space:pre-line}#레이스코스길이{max-width:min(320px,80vw);letter-spacing:.01em}
 @media(max-width:700px){#레이스덮개{padding:10px}#레이스덮개>section{padding:20px 14px;max-height:94dvh}#레이스결과표 table{font-size:11px}#레이스결과표 th,#레이스결과표 td{padding:10px 4px}.레이스선수표식{width:24px;height:24px;font-size:9px;margin-right:5px}.레이스선수>span:last-child{width:calc(100% - 29px)}#레이스덮개 h2{font-size:23px}}
+
+/* Boost remains readable against both bright dirt and the darker school passage. */
+.레이스계기{width:226px;box-sizing:border-box;padding:14px 18px;background:#0c2333ed;border-color:#7495a8}
+.레이스속도줄{white-space:nowrap;margin-bottom:12px}
+.부스트계기{border-top:1px solid #7697aa66;padding-top:11px;text-align:left}
+.부스트제목{display:flex;align-items:center;justify-content:space-between;color:#ffe59b;font-size:16px;font-weight:800}
+#레이스부스트잔량{font-variant-numeric:tabular-nums;font-size:17px;color:#fff5d1}
+#레이스부스트{display:block;appearance:none;-webkit-appearance:none;box-sizing:border-box;width:100%;height:22px;margin:9px 0 11px;border:1px solid #ffdc81;border-radius:6px;overflow:hidden;background:#061321;accent-color:#ffc25c}
+#레이스부스트::-webkit-progress-bar{background:#061321;border-radius:4px}
+#레이스부스트::-webkit-progress-value{background:linear-gradient(90deg,#e79b34,#ffd874,#fff1b3);border-radius:4px}
+#레이스부스트::-moz-progress-bar{background:linear-gradient(90deg,#e79b34,#ffd874,#fff1b3);border-radius:4px}
+.부스트키{display:flex;align-items:center;gap:9px;white-space:nowrap}
+.부스트키 kbd,.레이스키안내 kbd{font-family:inherit;font-size:17px;font-weight:900;line-height:1.1;display:inline-block;padding:6px 11px;border:1px solid #ffe2a0;border-bottom-width:3px;border-radius:6px;background:#ffda83;color:#182b36;box-shadow:0 2px 8px #0005}
+.레이스계기 .부스트키 span{font-size:13px;letter-spacing:0;color:#fff4d2}
+#레이스부스트상태{display:block;margin:7px 0 0;font-size:11px;color:#bbd4df}
+.부스트계기[data-boost=active] .부스트제목,.부스트계기[data-boost=active] #레이스부스트상태{color:#8beaff}
+.부스트계기[data-boost=active] #레이스부스트{border-color:#9ceaff;box-shadow:0 0 14px #43beff66}
+.부스트계기[data-boost=active] #레이스부스트::-webkit-progress-value{background:linear-gradient(90deg,#1a9ed1,#79e3ff,#efffff)}
+.부스트계기[data-boost=active] #레이스부스트::-moz-progress-bar{background:linear-gradient(90deg,#1a9ed1,#79e3ff,#efffff)}
+.레이스키안내{position:absolute;bottom:max(25px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);padding:10px 15px;border:1px solid #7792a466;border-radius:12px;background:#0c2333ed;box-shadow:0 4px 18px #0003;white-space:nowrap;font-size:14px;color:#f5f7f9}
+.키보드조작{display:flex;align-items:center;gap:8px}.키보드조작 i{font-style:normal;margin:0 3px;color:#91acbb}.레이스키안내 kbd{font-size:14px;padding:5px 8px}.터치조작안내{display:none}
+@media(pointer:fine) and (min-width:701px) and (max-width:900px){.레이스계기{width:196px;right:18px;padding:12px 14px}#레이스트랙지도{width:150px;height:90px}.레이스키안내{font-size:12px;padding:9px}.레이스키안내 kbd{font-size:13px;padding:5px 7px}}
+@media(pointer:coarse),(max-width:700px){
+ .레이스계기{width:166px;right:12px;bottom:164px;padding:10px 12px}.레이스속도줄{margin-bottom:7px}.레이스계기 strong{font-size:35px}.부스트계기{padding-top:7px}
+ .부스트제목{font-size:14px}#레이스부스트잔량{font-size:15px}#레이스부스트{height:19px;margin:7px 0}
+ .부스트키{gap:7px}.부스트키 kbd{font-size:13px;padding:4px 8px}.레이스계기 .부스트키 span{font-size:10px}#레이스부스트상태{font-size:10px;margin-top:6px}
+ body[data-touch=true] .부스트키::before{content:'부스트 버튼';display:inline-block;padding:5px 7px;border-radius:5px;background:#ffda83;color:#182b36;font-size:11px;font-weight:900}
+ .레이스터치{bottom:max(48px,calc(env(safe-area-inset-bottom) + 38px))}#레이스트랙지도{width:126px;height:76px;bottom:160px}
+ .레이스키안내{bottom:max(7px,env(safe-area-inset-bottom));padding:8px 11px;font-size:11px;max-width:calc(100vw - 24px);box-sizing:border-box}
+ .키보드조작{display:none}.터치조작안내{display:block}
+ #레이싱 .레이스페달 [data-race-hold=boost]{color:#fff1b9;background:#80551ce8;border-color:#ffcd6d}
+ #레이싱 .레이스페달 [data-race-hold=boost].눌림{background:#72dcfa;color:#092a3c;border-color:#c6f5ff}
+ #레이싱 .레이스페달 [data-race-hold=brake]{font-size:10px;white-space:nowrap}
+}
+@media(pointer:coarse) and (orientation:landscape){
+ .레이스계기{bottom:150px;width:166px;padding:7px 11px}.레이스속도줄{display:flex;align-items:baseline;justify-content:flex-end;margin-bottom:4px}.레이스계기 strong{font-size:26px}
+ .부스트계기{padding-top:5px}#레이스부스트{height:16px;margin:5px 0}.부스트키 kbd{font-size:12px;padding:3px 7px}#레이스부스트상태{display:none}
+ .레이스터치{bottom:max(45px,calc(env(safe-area-inset-bottom) + 36px))}#레이스트랙지도{bottom:148px;width:112px;height:67px}
+}
