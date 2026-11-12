@@ -28,6 +28,7 @@ import {createDriving} from './운전물리.mjs';
 import {drivingControls} from './운전화면.mjs';
 import {createSchoolProgress} from './스쿨런저장.mjs';
 import {createMiniRacing} from './레이싱.mjs';
+import {createRacePassages} from './레이싱통로.mjs';
 import {canUseCar,stampsFor} from './차량성능.mjs';
 import {supportRoomDetails} from './지원실사진표현.mjs';
 import {recyclingShelterDetails} from './분리수거장사진표현.mjs';
@@ -96,7 +97,7 @@ let footballPhysics,footballVisual;
 let driving,carVisual,vehicleUI,lastDriveYaw=null;
 let progressStorage;try{progressStorage=localStorage;}catch{}
 const schoolProgress=createSchoolProgress(progressStorage);
-let miniRacing=null;
+let miniRacing=null,racePassages=null;
 const raceHiddenScenery=[];
 function updateStampLabel(){const p=schoolProgress.view();$('레이싱소개').textContent=`누적 스탬프 ${p.stamps}개 · 차량 18대 수집에 도전!\n스탬프 24개부터 스포츠카 해금`+(p.saved?'':' · 기록 저장 불가');}
 updateStampLabel();
@@ -210,14 +211,15 @@ async function requestMission(){
 $('퀴즈시작').addEventListener('click',requestMission);
 $('레이싱시작').addEventListener('click',()=>{
   if(!ready||mode!=='overview'||missionLoading)return;
-  if(!miniRacing)miniRacing=createMiniRacing({scene,camera,progress:schoolProgress,onShadow:()=>{renderer.shadowMap.needsUpdate=true;},onEnter(){
+  if(!miniRacing)miniRacing=createMiniRacing({scene,camera,progress:schoolProgress,getDriver:()=>avatar,onShadow:()=>{renderer.shadowMap.needsUpdate=true;},onEnter(){
     stopMission();leaveVehicle();clearInput();monthQuiz.dismiss();monthQuizUI.hide();
     mode='race';dragMode=false;freeLook=false;drag=null;if(document.pointerLockElement)document.exitPointerLock();
     updateHUD();document.body.dataset.mode='race';document.body.dataset.playing='false';panel.hidden=true;
-    avatar.root.visible=false;markerGroup.visible=false;footballVisual.group.visible=false;carVisual.visible=false;interiorLight.intensity=0;
+    avatar.root.visible=false;avatar.root.userData.raceOnly=true;markerGroup.visible=false;footballVisual.group.visible=false;carVisual.visible=false;interiorLight.intensity=0;
+    if(!racePassages)racePassages=createRacePassages(scene);racePassages.open();
     for(const object of raceHiddenScenery)object.visible=false;
     renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;
-  },onExit(){camera.clearViewOffset();markerGroup.visible=true;footballVisual.group.visible=true;carVisual.visible=true;for(const object of raceHiddenScenery)object.visible=true;overview();updateHUD();updateStampLabel();renderer.shadowMap.needsUpdate=true;}});
+  },onExit(){racePassages?.close();avatar.setSeated(0);avatar.root.rotation.x=avatar.root.rotation.z=0;avatar.root.visible=false;camera.clearViewOffset();markerGroup.visible=true;footballVisual.group.visible=true;carVisual.visible=true;for(const object of raceHiddenScenery)object.visible=true;overview();updateHUD();updateStampLabel();renderer.shadowMap.needsUpdate=true;}});
   miniRacing.open();
 });
 function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
@@ -814,6 +816,7 @@ try{
   window.schoolTour.getMonthQuizState=()=>monthQuiz.getState();
   window.schoolTour.getMissionState=()=>mission?.view()??{phase:'idle',active:false};
   window.schoolTour.getRacingState=()=>miniRacing?.getState()??{phase:'idle',progress:schoolProgress.view()};
+  window.schoolTour.getRacePassageState=()=>racePassages?.getState()??{open:false};
   window.schoolTour.getLobbyPrincipalState=()=>({...lobbyPrincipalState.getState(),...(lobbyPrincipalNPC?.getState()??{}),visible:lobbyPrincipalNPC?.root.visible??false});
   if(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).has('test'))window.schoolTour.test={
     world,data,missionDebug:()=>mission?.debug(),raceDebug:()=>miniRacing?.debug(),setPosition(p){if(!world.candidate(p.x,p.y,p.z))throw new Error('Invalid test position');position={...p};jumpMotion.reset();smoothZ=p.z+EYE_HEIGHT;cameraReset=true;clearInput();},setYaw(y){yaw=y;},

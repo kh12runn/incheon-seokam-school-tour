@@ -1,0 +1,16 @@
+import assert from 'node:assert/strict';
+import * as THREE from '../외부도구/three.module.js';
+import {createRacePassages} from '../레이싱통로.mjs';
+const scene=new THREE.Scene(),originalDepth=new THREE.MeshDepthMaterial();
+const wall=new THREE.Mesh(new THREE.BoxGeometry(3,3,1),new THREE.MeshStandardMaterial());wall.position.set(48,1,0);wall.castShadow=true;wall.customDepthMaterial=originalDepth;scene.add(wall);
+const avatar=new THREE.Group();avatar.userData.raceOnly=true;const skin=new THREE.MeshStandardMaterial();avatar.add(new THREE.Mesh(new THREE.BoxGeometry(),skin));avatar.position.set(48,1,0);scene.add(avatar);
+const outside=new THREE.Mesh(new THREE.BoxGeometry(),new THREE.MeshStandardMaterial());outside.position.set(100,1,100);scene.add(outside);
+scene.updateMatrixWorld(true);const originalSkinHook=skin.onBeforeCompile,originalOutsideHook=outside.material.onBeforeCompile,geometry=wall.geometry,transform=wall.matrix.clone();
+const passage=createRacePassages(scene);assert.equal(passage.getState().open,false);passage.open();
+assert.equal(passage.getState().open,true);assert.equal(skin.onBeforeCompile,originalSkinHook);assert.equal(outside.material.onBeforeCompile,originalOutsideHook);
+const shader={uniforms:{},vertexShader:'#include <project_vertex>',fragmentShader:'void main() { gl_FragColor=vec4(1.0); }'};wall.material.onBeforeCompile(shader,{});
+assert.equal(shader.uniforms.racePassageOpen.value,1);assert.match(shader.vertexShader,/instanceMatrix/);assert.match(shader.fragmentShader,/discard/);
+const count=passage.getState().changedMaterials,key=wall.material.customProgramCacheKey();passage.close();assert.equal(shader.uniforms.racePassageOpen.value,0);assert.equal(wall.customDepthMaterial,originalDepth);assert.equal(wall.geometry,geometry);assert.ok(wall.matrix.equals(transform));
+passage.open();assert.equal(shader.uniforms.racePassageOpen.value,1);assert.equal(passage.getState().changedMaterials,count);assert.equal(wall.material.customProgramCacheKey(),key);passage.close();
+const floor=scene.getObjectByName('레이싱 임시 연결 통로');assert.equal(floor.visible,false);assert.ok(floor.children.every(mesh=>mesh.geometry.attributes.normal.getY(0)>.9));
+console.log({ok:true,restoresOriginalGeometry:true,sharedAvatarExcluded:true,shadowsRestored:true,repeatEntryStable:true});

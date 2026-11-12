@@ -8,10 +8,11 @@ async main=>{
  const gas=await center('[data-race-hold=gas]'),right=await center('[data-race-hold=right]');
  await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{id:1,...gas}]});await page.waitForFunction(()=>schoolTour.getRacingState().speed>5,null,{timeout:30000});
  const a=await page.evaluate(()=>schoolTour.getRacingState());
- await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{id:1,...gas},{id:2,...right}]});await page.waitForFunction(a=>{const b=schoolTour.getRacingState();return b.cars[0].s>a.cars[0].s+.05&&b.cars[0].lane>a.cars[0].lane+.15;},a,{timeout:15000});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
- const b=await page.evaluate(()=>schoolTour.getRacingState());if(b.cars[0].s<=a.cars[0].s||b.cars[0].lane<=a.cars[0].lane)throw Error('Two-finger throttle/steering failed');
+ await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{id:1,...gas},{id:2,...right}]});await page.waitForFunction(a=>{const b=schoolTour.getRacingState(),p=b.cars[0],q=a.cars[0];return Math.hypot(p.x-q.x,p.z-q.z)>.1&&Math.abs(Math.atan2(Math.sin(p.yaw-q.yaw),Math.cos(p.yaw-q.yaw)))>.15;},a,{timeout:15000});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+ const b=await page.evaluate(()=>schoolTour.getRacingState());if(Math.hypot(b.cars[0].x-a.cars[0].x,b.cars[0].z-a.cars[0].z)<.1)throw Error('Two-finger throttle/steering failed');
+ await page.locator('#레이스복귀').tap();const reverse=await center('[data-race-hold=reverse]');await cdp.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{id:3,...reverse}]});await page.waitForFunction(()=>schoolTour.getRacingState().speed<-.5,null,{timeout:15000});await cdp.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
  await page.screenshot({path:'output/race-mobile-driving.png'});await page.locator('#레이스일시정지').tap();const t=await page.evaluate(()=>schoolTour.getRacingState().time);await page.waitForTimeout(500);if(t!==await page.evaluate(()=>schoolTour.getRacingState().time))throw Error('Pause failed');await page.locator('#레이스다음').tap();
- await page.setViewportSize({width:844,height:390});await page.screenshot({path:'output/race-mobile-landscape.png'});await page.locator('#레이스종료').tap();if(await page.evaluate(()=>schoolTour.getState().mode)!=='overview')throw Error('Exit failed');
- if(errors.length)throw Error(errors.join('\n'));return {ok:true,multitouch:true,pause:true,landscape:true,errors};
+ await page.setViewportSize({width:844,height:390});await page.screenshot({path:'output/race-mobile-landscape.png'});if(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth))throw Error('Horizontal overflow');await page.locator('#레이스종료').tap();if(await page.evaluate(()=>schoolTour.getState().mode)!=='overview'||await page.evaluate(()=>schoolTour.getRacePassageState().open))throw Error('Exit failed');
+ if(errors.length)throw Error(errors.join('\n'));return {ok:true,multitouch:true,reverse:true,pause:true,landscape:true,errors};
  }finally{await context.close();}
 }

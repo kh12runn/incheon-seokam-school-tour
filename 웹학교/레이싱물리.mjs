@@ -1,21 +1,19 @@
-import {profileFor} from './차량성능.mjs';
-import {PARKED_CARS} from './주차장.mjs';
-// The full course stays on the flat dirt strip (world z 42..69), clear of
-// the entrance slope at the west and the shelters along the south pavement.
-export const TRACK=Object.freeze({cx:41,cz:55.3,half:26.5,radius:7.3,width:11,length:106+14.6*Math.PI});
+import {profileFor,carName} from './차량성능.mjs';
+import {pickRaceDrivers} from './레이싱선수.mjs';
+import {PARKED_CARS,CAR_DIMENSIONS} from './주차장.mjs';
+import {TRACK,trackPoint,nearestTrack,groundHeight} from './레이싱코스.mjs';
+export {TRACK,trackPoint,nearestTrack} from './레이싱코스.mjs';
+
 export const ROUND_COUNT=5;
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 export const mod=(x,m)=>(x%m+m)%m;
-export function trackPoint(distance,lane=0){
- // Leave the entire starting grid on the straight, including the last AI row.
- const t=TRACK,L=2*t.half,A=Math.PI*t.radius,s=mod(distance+24,t.length);let x,z,tx,tz,curve=0;
- if(s<L){x=t.cx-t.half+s;z=t.cz+t.radius;tx=1;tz=0;}
- else if(s<L+A){const a=Math.PI/2-(s-L)/t.radius;x=t.cx+t.half+Math.cos(a)*t.radius;z=t.cz+Math.sin(a)*t.radius;tx=Math.sin(a);tz=-Math.cos(a);curve=1/t.radius;}
- else if(s<2*L+A){x=t.cx+t.half-(s-L-A);z=t.cz-t.radius;tx=-1;tz=0;}
- else{const a=-Math.PI/2-(s-2*L-A)/t.radius;x=t.cx-t.half+Math.cos(a)*t.radius;z=t.cz+Math.sin(a)*t.radius;tx=Math.sin(a);tz=-Math.cos(a);curve=1/t.radius;}
- return {x:x-tz*lane,z:z+tx*lane,tx,tz,curve,yaw:Math.atan2(-tx,-tz)};
-}
-export function roundRules(round){const r=clamp(Math.floor(round),1,5);return {round:r,laps:[2,3,3,4,5][r-1],opponents:Math.min(5,r+2),pace:[.77,.86,.94,.98,1][r-1],hazards:5+r*2};}
+const angle=x=>Math.atan2(Math.sin(x),Math.cos(x));
+const gateCount=Math.max(20,Math.ceil(TRACK.length/12)),gateLength=TRACK.length/gateCount;
+const gates=Array.from({length:gateCount},(_,i)=>trackPoint(i*gateLength));
+const laneLimit=Math.min(2.7,TRACK.width/2-2),lanes=[-laneLimit,0,laneLimit];
+const maxSteering=profile=>.46+Math.min(profile.handling,11)*.018;
+
+export function roundRules(round){const r=clamp(Math.floor(round),1,5);return {round:r,laps:3,opponents:Math.min(5,r+2),pace:[.67,.76,.85,.94,1][r-1],hazards:5+r*2};}
 export function raceOpponents(round,random=Math.random){
  const tiers=[['sedan','compact'],['sedan','morning','suv'],['morning','tucson','electric','rally'],['rally','sports','touring'],['sports','touring','hyper']][clamp(Math.floor(round),1,5)-1];
  const pool=PARKED_CARS.filter(c=>tiers.includes(c.variant??c.type));
@@ -25,69 +23,168 @@ export function raceOpponents(round,random=Math.random){
 export function makeObstacles(round,random=Math.random,cars=[]){
  const count=roundRules(round).hazards,items=[],L=TRACK.length;
  for(let i=0;i<count;i++){
-  const s=mod(18+(i+.35+random()*.3)*(L-30)/count,L);
-  if(cars.some(c=>Math.abs(mod(s-c.s+L/2,L)-L/2)<13))continue;
-  // One obstacle per cross section always leaves at least two passing lanes.
-  items.push({id:i,s,lane:[-3.2,0,3.2][Math.floor(random()*3)],kind:random()<.5?'books':'chair',angle:(random()-.5)*.6});
+  const s=mod(24+(i+.35+random()*.3)*(L-42)/count,L);
+  if(cars.some(c=>Math.abs(mod(s-c.s+L/2,L)-L/2)<15))continue;
+  const at=trackPoint(s);if((at.width??TRACK.width)<=7)continue;
+  const limit=Math.min(laneLimit,(at.width??TRACK.width)/2-1.7),lane=[-limit,0,limit][Math.floor(random()*3)],p=trackPoint(s,lane);
+  items.push({id:i,s,lane,x:p.x,z:p.z,kind:random()<.5?'books':'chair',angle:(random()-.5)*.6});
  }return items;
 }
-export function createRace({car,opponents,round=1,random=Math.random}){
- const rules=roundRules(round),L=TRACK.length;
- const cars=[car,...opponents.slice(0,rules.opponents)].map((source,i)=>({source,id:i,name:i?'AI '+i:'나',profile:profileFor(source),s:-8-Math.floor(i/2)*6,lane:i%2?2:-2,speed:0,sideSpeed:0,lap:0,spin:0,hit:0,hits:0,boost:1,boosting:false,finish:null,wall:0,aiLane:i%2?2:-2,decision:0}));
- let phase='countdown',countdown=3,time=0,paused=false,obstacles=makeObstacles(round,random,cars),generation=1,finishCount=0,accumulator=0;
- const player=cars[0],target=rules.laps*L;
- function damage(c,resistance,amount=.45){if(c.hit>0)return;c.speed*=resistance;c.hit=amount;c.hits++;}
+
+// The track measures progress and supplies physical boundaries. It NEVER sets
+// a player's heading, forward speed or position to follow the centerline.
+export function createRace({car,opponents=[],round=1,random=Math.random}){
+ const rules=roundRules(round),L=TRACK.length,drivers=pickRaceDrivers(Math.min(opponents.length,rules.opponents),random);
+ const cars=[car,...opponents.slice(0,rules.opponents)].map((source,i)=>{
+  const s=-8-Math.floor(i/2)*6,lane=i%2?2:-2,p=trackPoint(s,lane);
+  const driver=i?drivers[i-1]:{id:'player',name:'나'};
+  return {source,id:i,name:driver.name,driverId:driver.id,driverName:driver.name,profile:profileFor(source),dimensions:CAR_DIMENSIONS[source.type],x:p.x,z:p.z,height:p.height??-.3,yaw:p.yaw,steering:0,s,lane,speed:0,sideSpeed:0,lap:0,spin:0,hit:0,hits:0,boost:1,boosting:false,finish:null,wall:0,aiLane:lane,decision:0,started:false,checkpoint:0,nextCheckpoint:0,progress:s,offTrack:false,wrongWay:false,resetSerial:0,reverseTime:0,recoveryCooldown:0,stuckTime:0,lastAdvance:s,recoveries:0};
+ });
+ let phase='countdown',countdown=3,time=0,paused=false,obstacles=makeObstacles(round,random,cars),generation=1,accumulator=0;
+ const player=cars[0];
+ function damage(c,resistance,duration=.45){if(c.hit>0)return;c.speed*=resistance;c.hit=duration;c.hits++;}
+ function project(c){
+  const p=nearestTrack(c.x,c.z,c.s),delta=mod(p.s-mod(c.s,L)+L/2,L)-L/2;
+  c.s+=delta;c.lane=p.lane;c.height=groundHeight(c.x,c.z);
+  const fx=-Math.sin(c.yaw),fz=-Math.cos(c.yaw),axle=c.dimensions.wheelbase/2;
+  c.pitch=Math.atan2(groundHeight(c.x+fx*axle,c.z+fz*axle)-groundHeight(c.x-fx*axle,c.z-fz*axle),axle*2);
+  const heading=-Math.sin(c.yaw)*p.tx-Math.cos(c.yaw)*p.tz;
+  c.wrongWay=Math.abs(c.speed)>.3?c.speed*heading<-.3:heading<-.25;
+  c.offTrack=Math.abs(p.lane)>(p.width??TRACK.width)/2-1.25;
+  // Only the sector after the last verified gate contributes to ranking.
+  if(c.started){const last=mod((c.nextCheckpoint-1)*gateLength,L),section=mod(p.s-last+L/2,L)-L/2;c.progress=c.checkpoint*gateLength+clamp(section,-gateLength,gateLength);}
+  else c.progress=-Math.min(30,mod(-p.s,L));
+  return p;
+ }
+ function penetration(c,x,z,yaw){
+  const halfW=c.dimensions.width/2+.12,halfL=c.dimensions.length/2-.18,fx=-Math.sin(yaw),fz=-Math.cos(yaw);
+  let overlap=-Infinity;
+  for(const along of [-halfL,0,halfL]){
+   const p=nearestTrack(x+fx*along,z+fz*along,c.s);
+   overlap=Math.max(overlap,p.distance-((p.width??TRACK.width)/2-halfW));
+  }return overlap;
+ }
+ const inside=(c,x,z,yaw)=>penetration(c,x,z,yaw)<=0;
+ function gateCrossing(c,oldX,oldZ,dt){
+  const g=gates[c.nextCheckpoint],a=(oldX-g.x)*g.tx+(oldZ-g.z)*g.tz,b=(c.x-g.x)*g.tx+(c.z-g.z)*g.tz;
+  if(a>0||b<=0||b<=a)return;
+  const t=clamp(-a/(b-a),0,1),x=oldX+(c.x-oldX)*t-g.x,z=oldZ+(c.z-oldZ)*t-g.z;
+  if(Math.abs(x*(-g.tz)+z*g.tx)>(g.width??TRACK.width)/2)return;
+  if(!c.started){c.started=true;c.checkpoint=0;}else c.checkpoint++;
+  c.nextCheckpoint=(c.nextCheckpoint+1)%gateCount;c.lap=Math.floor(c.checkpoint/gateCount);
+  if(c.lap>=rules.laps){c.finish=time-dt+dt*t;c.speed=0;c.progress=rules.laps*L;}
+ }
+ function aiInput(c){
+  const p=c.profile,at=trackPoint(c.s),lookAhead=clamp(3.5+Math.abs(c.speed)*.24,4,10);
+  c.decision-=1/120;c.recoveryCooldown=Math.max(0,c.recoveryCooldown-1/120);
+  if(c.decision<=0){
+   c.decision=.25+random()*.18;
+   const scores=lanes.map(l=>{
+    let score=-Math.abs(l-c.aiLane)*.22-Math.abs(l)*.03;
+    for(const o of obstacles){const gap=mod(o.s-c.s,L);if(gap<27&&Math.abs(o.lane-l)<1.8)score-=32-gap;}
+    for(const other of cars)if(other!==c){const gap=mod(other.s-c.s,L);if(gap<12&&Math.abs(other.lane-l)<2)score-=15-gap;}
+    return score+random()*.12;
+   });c.aiLane=lanes[scores.indexOf(Math.max(...scores))];
+  }
+  let narrow=at.width<=7;
+  for(let d=3;d<=22;d+=3)if(trackPoint(c.s+d).width<=7)narrow=true;
+  const ahead=trackPoint(c.s+lookAhead),limit=narrow?0:Math.min(Math.abs(ahead.curve)>.08?.65:3,Math.max(0,(ahead.width??TRACK.width)/2-2)),target=trackPoint(c.s+lookAhead,clamp(c.aiLane,-limit,limit)),dx=target.x-c.x,dz=target.z-c.z,distance=Math.max(2,Math.hypot(dx,dz)),error=angle(Math.atan2(-dx,-dz)-c.yaw);
+  const steering=Math.atan(2*c.dimensions.wheelbase*Math.sin(error)/distance)/maxSteering(p);
+  let curve=Math.abs(at.curve||0);
+  for(let d=3;d<=Math.max(12,c.speed*1.15);d+=3)curve=Math.max(curve,Math.abs(trackPoint(c.s+d).curve||0));
+  const pace=rules.pace*(.975+(c.id%3)*.0125),corner=curve>.002?Math.sqrt(p.grip*.48/curve):p.speed;
+  let desired=Math.min(p.speed*pace,corner*pace);desired*=clamp(1-Math.abs(error)*.45,.35,1);
+  for(const other of cars)if(other!==c&&other.finish===null){
+   const signed=mod(other.s-c.s+L/2,L)-L/2,gap=mod(other.s-c.s,L),merging=narrow||curve>.002;
+   // Enter narrow passages and bends one at a time. Side-by-side rivals must
+   // yield before both turn towards the same central lane.
+   if(merging&&signed>-1&&signed<8&&(signed>.4||c.id>other.id))desired=Math.min(desired,Math.max(0,other.speed)+Math.max(-5,(signed-5.4)*1.8));
+   else if(gap<7&&Math.abs(other.lane-c.lane)<1.7)desired=Math.min(desired,Math.max(0,other.speed)+Math.max(0,gap-4.8)*1.6);
+  }
+  desired=Math.max(0,desired);
+  // If blocked by another car or boundary, reverse briefly under AI control.
+  if(c.reverseTime>0){c.reverseTime-=1/120;return {throttle:-.45,steer:clamp(angle(at.yaw-c.yaw)*2,-1,1),brake:false,boost:false};}
+  if(c.wall>0&&Math.abs(c.speed)<.3&&c.recoveryCooldown<=0){c.reverseTime=.85;c.recoveryCooldown=3;c.aiLane=0;c.decision=4;return {throttle:-.45,steer:0,brake:false,boost:false};}
+  return {throttle:desired/p.speed,steer:clamp(-steering,-1,1),brake:c.speed>desired+1.5,boost:rules.round>=3&&c.boost>.55&&curve<.006&&Math.abs(error)<.12};
+ }
+ function moveCar(c,dt,input){
+  const p=c.profile,throttle=clamp(Number(input.throttle)||0,-1,1),brake=!!input.brake,steer=clamp(Number(input.steer)||0,-1,1),oldX=c.x,oldZ=c.z,oldYaw=c.yaw;
+  c.boosting=!!input.boost&&c.boost>.01&&throttle>0&&!brake&&c.speed>3;c.boost=clamp(c.boost+dt*(c.boosting?-.32:.085),0,1);
+  const desired=brake?0:throttle*(throttle<0?p.speed*.38:p.speed*(c.boosting?p.boost:1)),before=c.speed,opposed=c.speed*desired<0;
+  const accel=brake||opposed?p.brake:Math.abs(desired)<Math.abs(c.speed)?(throttle===0?3.2:8):Math.abs(c.speed)<6?p.launch:p.accel;
+  c.speed+=clamp(desired-c.speed,-accel*dt,accel*dt);
+  // A/D changes the steering rack. With zero steering there is no track-aware yaw.
+  const targetSteering=-steer*maxSteering(p);c.steering+=clamp(targetSteering-c.steering,-2.8*dt,2.8*dt);
+  const average=(before+c.speed)*.5,yawRate=average/c.dimensions.wheelbase*Math.tan(c.steering),gripRate=p.grip/Math.max(2,Math.abs(average));
+  c.yaw=angle(c.yaw+clamp(yawRate,-gripRate,gripRate)*dt);
+  const travel=average*dt,dx=-Math.sin(c.yaw)*travel,dz=-Math.cos(c.yaw)*travel;let fraction=1;
+  const nextOverlap=penetration(c,oldX+dx,oldZ+dz,c.yaw);
+  if(nextOverlap>0){
+   const oldOverlap=penetration(c,oldX,oldZ,oldYaw),allowed=Math.max(0,oldOverlap-.00001),valid=(x,z,yaw)=>penetration(c,x,z,yaw)<=allowed;
+   if(nextOverlap>allowed){
+    let lo=0,hi=1;for(let i=0;i<7;i++){const mid=(lo+hi)/2;if(valid(oldX+dx*mid,oldZ+dz*mid,c.yaw))lo=mid;else hi=mid;}fraction=lo;
+    if(c.wall<=0){damage(c,.10,.28);c.wall=.6;}c.speed=0;
+    if(fraction===0&&!valid(oldX,oldZ,c.yaw))c.yaw=oldYaw;
+   }
+  }
+  c.x=oldX+dx*fraction;c.z=oldZ+dz*fraction;c.spin+=travel*fraction/.325;
+  for(const o of obstacles){const ox=o.x-c.x,oz=o.z-c.z,forward=ox*(-Math.sin(c.yaw))+oz*(-Math.cos(c.yaw)),side=ox*Math.cos(c.yaw)-oz*Math.sin(c.yaw);if(Math.abs(forward)<c.dimensions.length/2+.4&&Math.abs(side)<c.dimensions.width/2+.4)damage(c,p.resilience);}
+  project(c);gateCrossing(c,oldX,oldZ,dt);
+ }
+ function carContact(a,b){
+  const dx=b.x-a.x,dz=b.z-a.z;if(dx*dx+dz*dz>36)return null;
+  const segment=c=>{const d=(c.dimensions.length-c.dimensions.width)/2,fx=-Math.sin(c.yaw)*d,fz=-Math.cos(c.yaw)*d;return [[c.x-fx,c.z-fz],[c.x+fx,c.z+fz]];},A=segment(a),B=segment(b);
+  let best={d:Infinity,nx:0,nz:0};
+  function consider(point,line,sign){const vx=line[1][0]-line[0][0],vz=line[1][1]-line[0][1],t=clamp(((point[0]-line[0][0])*vx+(point[1]-line[0][1])*vz)/(vx*vx+vz*vz),0,1),x=(line[0][0]+vx*t-point[0])*sign,z=(line[0][1]+vz*t-point[1])*sign,d=Math.hypot(x,z);if(d<best.d)best={d,nx:x/Math.max(d,.001),nz:z/Math.max(d,.001)};}
+  for(const point of A)consider(point,B,1);for(const point of B)consider(point,A,-1);
+  const ax=A[1][0]-A[0][0],az=A[1][1]-A[0][1],bx=B[1][0]-B[0][0],bz=B[1][1]-B[0][1],cross=ax*bz-az*bx;
+  if(Math.abs(cross)>.0001){const qx=B[0][0]-A[0][0],qz=B[0][1]-A[0][1],t=(qx*bz-qz*bx)/cross,u=(qx*az-qz*ax)/cross;if(t>=0&&t<=1&&u>=0&&u<=1){const length=Math.max(.001,Math.hypot(dx,dz));best={d:0,nx:dx/length,nz:dz/length};}}
+  const minimum=(a.dimensions.width+b.dimensions.width)/2+.04;return best.d<minimum?{...best,push:Math.min(.20,(minimum-best.d)*.52)}:null;
+ }
+ function recoverOpponent(c){
+  // AI-only recovery from a six-second traffic jam. Keep every verified gate
+  // and all elapsed time, rewind behind the blockage, and never overlap cars.
+  if(c.id===0)return false;
+  const base=c.started?Math.min(c.s-4,c.checkpoint*gateLength+.7):-8-Math.floor(c.id/2)*6;
+  for(const back of [0,4,8,12]){
+   const s=base-back,p=trackPoint(s),limit=Math.min(2,p.width/2-c.dimensions.width/2-.5);
+   for(const lane of [0,-limit,limit]){
+    const spot=trackPoint(s,lane);
+    if(!inside(c,spot.x,spot.z,spot.yaw)||cars.some(other=>other!==c&&Math.hypot(other.x-spot.x,other.z-spot.z)<6))continue;
+    Object.assign(c,{x:spot.x,z:spot.z,height:spot.height,yaw:spot.yaw,s,lane,speed:0,steering:0,wall:0,hit:1,reverseTime:0,recoveryCooldown:3,stuckTime:0,lastAdvance:s,aiLane:0,decision:2,resetSerial:c.resetSerial+1,recoveries:c.recoveries+1});project(c);return true;
+   }
+  }
+  return false;
+ }
  function step(dt,input){
   if(phase==='countdown'){countdown-=dt;if(countdown<=0){countdown=0;phase='racing';}return;}
-  if(phase!=='racing')return;
-  time+=dt;
-  for(const c of cars){
-   if(c.finish!==null)continue;
-   const p=c.profile,at=trackPoint(c.s),ai=c.id>0;c.hit=Math.max(0,c.hit-dt);c.wall=Math.max(0,c.wall-dt);
-   let throttle=clamp(input.throttle||0,0,1),brake=!!input.brake,steer=clamp(input.steer||0,-1,1),boost=!!input.boost;
-   if(ai){
-    throttle=1;brake=false;c.decision-=dt;
-    if(c.decision<=0){
-     c.decision=.22+random()*.16;
-     const lanes=[-3.2,0,3.2],scores=lanes.map(l=>{
-      let score=-Math.abs(l-c.lane)*.3;
-      for(const o of obstacles){const gap=mod(o.s-c.s,L);if(gap<22&&Math.abs(o.lane-l)<2)score-=35-gap;}
-      for(const o of cars)if(o!==c){const gap=mod(o.s-c.s,L);if(gap<10&&Math.abs(o.lane-l)<2.2)score-=15-gap;}
-      return score+random()*.8;
-     });c.aiLane=lanes[scores.indexOf(Math.max(...scores))];
-    }
-    steer=clamp((c.aiLane-c.lane)*1.5,-1,1);boost=rules.round>=3&&c.boost>.55&&!at.curve&&mod(c.s,L)>10;
-   }
-   c.boosting=boost&&c.boost>.01&&throttle>0&&!brake&&c.speed>3;
-   c.boost=clamp(c.boost+dt*(c.boosting?-.32:.085),0,1);
-   const pace=ai?rules.pace*(.97+(c.id%3)*.015):1;
-   const corner=at.curve?p.grip+(Math.max(0,c.lane)*.24):p.speed;
-   const max=Math.min(p.speed,corner)*pace*(c.boosting?p.boost:1);
-   const before=c.speed,desired=brake?0:throttle*max;
-   const acceleration=brake?p.brake:desired<c.speed?5:c.speed<6?p.launch:p.accel;
-   c.speed+=clamp(desired-c.speed,-acceleration*dt,acceleration*dt);
-   const lateral=steer*p.handling*clamp(c.speed/6,0,1);
-   c.sideSpeed+=(lateral-c.sideSpeed)*(1-Math.exp(-dt*10));c.lane+=c.sideSpeed*dt;
-   const bound=TRACK.width/2-1.5;
-   if(Math.abs(c.lane)>bound){c.lane=clamp(c.lane,-bound,bound);c.sideSpeed=0;if(c.wall<=0){damage(c,.77,.28);c.wall=.6;}}
-   const travel=(before+c.speed)*.5*dt/(1+at.curve*c.lane),oldS=c.s;c.s+=travel;c.spin+=travel/.325;
-   for(const o of obstacles){const gap=mod(o.s-oldS,L);if(gap<=travel+1.75&&Math.abs(c.lane-o.lane)<1.45)damage(c,p.resilience);}
-   c.lap=Math.max(c.lap,Math.floor(Math.max(0,c.s)/L));
-   if(c.s>=target){c.finish=time-dt+dt*clamp((target-oldS)/Math.max(.001,travel),0,1);c.s=target;c.speed=0;finishCount++;}
-  }
-  // Contact changes both cars' pace, never teleports them through a barrier.
+  if(phase!=='racing')return;time+=dt;
+  for(const c of cars){if(c.finish!==null)continue;c.hit=Math.max(0,c.hit-dt);c.wall=Math.max(0,c.wall-dt);moveCar(c,dt,c.id?aiInput(c):input);}
   for(let i=0;i<cars.length;i++)for(let j=i+1;j<cars.length;j++){
    const a=cars[i],b=cars[j];if(a.finish!==null||b.finish!==null)continue;
-   if(Math.abs(mod(a.s-b.s+L/2,L)-L/2)<3.8&&Math.abs(a.lane-b.lane)<1.8){
-    damage(a,.80,.7);damage(b,.80,.7);const side=a.lane<=b.lane?-1:1;a.lane=clamp(a.lane+side*.04,-4,4);b.lane=clamp(b.lane-side*.04,-4,4);
+   const contact=carContact(a,b);
+   if(contact){damage(a,.73,.6);damage(b,.73,.6);
+    for(const [c,sign] of [[a,-1],[b,1]]){const oldX=c.x,oldZ=c.z,x=c.x+contact.nx*contact.push*sign,z=c.z+contact.nz*contact.push*sign;if(inside(c,x,z,c.yaw)){c.x=x;c.z=z;project(c);gateCrossing(c,oldX,oldZ,dt);}}
    }
+  }
+  for(const c of cars.slice(1))if(c.finish===null){
+   if(c.s>c.lastAdvance+.7){c.lastAdvance=c.s;c.stuckTime=0;}else c.stuckTime+=dt;
+   if(c.stuckTime>6&&(Math.abs(c.speed)<1||c.wall>0||c.wrongWay))recoverOpponent(c);
   }
   if(player.lap>=generation&&player.finish===null){obstacles=makeObstacles(round,random,cars);generation=player.lap+1;}
   if(player.finish!==null)phase='finished';
  }
- function standings(){return [...cars].sort((a,b)=>a.finish!==null&&b.finish!==null?a.finish-b.finish:a.finish!==null?-1:b.finish!==null?1:b.s-a.s);}
- function view(){const order=standings();return {phase,paused,countdown,round:rules.round,laps:rules.laps,lap:Math.min(rules.laps,player.lap+1),rank:order.indexOf(player)+1,total:cars.length,time,won:phase==='finished'&&order[0]===player,speed:player.speed,boost:player.boost,hits:player.hits,generation,standings:order.map(c=>({id:c.id,name:c.name,finished:c.finish!==null,time:c.finish,progress:c.s})),cars:cars.map(c=>({id:c.id,s:c.s,lane:c.lane,speed:c.speed,lap:c.lap,finish:c.finish}))};}
- return {cars,player,rules,get obstacles(){return obstacles;},view,
+ function standings(){return [...cars].sort((a,b)=>a.finish!==null&&b.finish!==null?a.finish-b.finish:a.finish!==null?-1:b.finish!==null?1:b.progress-a.progress);}
+ function view(){const order=standings();return {phase,paused,countdown,round:rules.round,laps:rules.laps,lap:Math.min(rules.laps,player.lap+1),rank:order.indexOf(player)+1,total:cars.length,time,won:phase==='finished'&&order[0]===player,speed:player.speed,boost:player.boost,hits:player.hits,generation,offTrack:player.offTrack,wrongWay:player.wrongWay,checkpoint:player.checkpoint,nextCheckpoint:player.nextCheckpoint,checkpointsPerLap:gateCount,standings:order.map(c=>({id:c.id,name:c.name,driverId:c.driverId,driverName:c.driverName,carName:carName(c.source),carId:c.source.id,finished:c.finish!==null,time:c.finish,progress:c.progress})),cars:cars.map(c=>({id:c.id,x:c.x,z:c.z,height:c.height,yaw:c.yaw,steering:c.steering,s:c.s,lane:c.lane,speed:c.speed,lap:c.lap,finish:c.finish,progress:c.progress,checkpoint:c.checkpoint,nextCheckpoint:c.nextCheckpoint}))};}
+ function resetCar(){
+  if(paused||phase!=='racing'||player.finish!==null)return false;
+  const s=player.started?(player.checkpoint*gateLength+1):-8;
+  // Recovery is an explicit driver action; it cannot advance the next gate.
+  const candidates=lanes.map(l=>({lane:l,p:trackPoint(s,l)})).filter(({p})=>inside(player,p.x,p.z,p.yaw)&&cars.slice(1).every(c=>Math.hypot(c.x-p.x,c.z-p.z)>5));
+  const choice=candidates.sort((a,b)=>Math.abs(a.lane)-Math.abs(b.lane))[0];if(!choice)return false;
+  Object.assign(player,{x:choice.p.x,z:choice.p.z,height:choice.p.height??-.3,yaw:choice.p.yaw,s,lane:choice.lane,speed:0,steering:0,sideSpeed:0,wall:0,hit:.8,boosting:false,offTrack:false,wrongWay:false,resetSerial:player.resetSerial+1});project(player);return true;
+ }
+ return {cars,player,rules,get obstacles(){return obstacles;},view,resetCar,
   pause(value=true){paused=value;accumulator=0;},
   update(seconds,input={}){if(paused)return view();accumulator+=clamp(seconds,0,.25);while(accumulator>=1/120){step(1/120,input);accumulator-=1/120;}return view();}};
 }
