@@ -1,0 +1,8 @@
+async page=>{
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));await page.setViewportSize({width:1365,height:900});await page.goto('http://127.0.0.1:8080/?test=1');await page.waitForFunction(()=>window.schoolTour?.getState().ready,null,{timeout:240000});
+ await page.locator('#레이싱시작').click();await page.locator('#레이스출발').click();await page.waitForFunction(()=>schoolTour.getRacingState().phase==='racing');
+ await page.evaluate(async()=>{const {trackPoint}=await import('/웹학교/레이싱물리.mjs'),r=schoolTour.test.raceDebug();for(const [index,s] of [[0,126],[1,120]]){const c=r.cars[index],p=trackPoint(s);Object.assign(c,{x:p.x,z:p.z,yaw:p.yaw,height:p.height,s,lane:0,speed:0,steering:0,wall:0,hit:0,contact:0,started:true,checkpoint:10,nextCheckpoint:11,stuckTime:0,lastAdvance:s,passingId:null});}for(const c of r.cars.slice(2))c.finish=0;r.obstacles.splice(0);});
+ await page.keyboard.down('Space');await page.waitForFunction(()=>{const r=schoolTour.test.raceDebug();return Math.abs(r.cars[1].s-r.player.s)<2;},null,{timeout:60000});await page.screenshot({path:'output/race-assist-passing.png'});
+ await page.waitForFunction(()=>{const r=schoolTour.test.raceDebug();return r.cars[1].s>r.player.s+6;},null,{timeout:60000});
+ const state=await page.evaluate(()=>{const r=schoolTour.test.raceDebug();return {player:r.player.s,opponent:r.cars[1].s,recoveries:r.cars[1].recoveries,lap:r.cars[1].lap};});await page.keyboard.up('Space');await page.locator('#레이스종료').click();if(state.recoveries!==0||errors.length)throw Error(JSON.stringify({state,errors}));return {ok:true,stationaryPlayerPassed:true,...state,errors};
+}
