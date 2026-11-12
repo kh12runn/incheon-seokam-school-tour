@@ -521,7 +521,7 @@ function overview(){
 }
 function reset(){if(missionLocked())return;leaveVehicle();position={...world.spawn};jumpMotion.reset();yaw=OUTDOOR_YAW;pitch=0;smoothZ=position.z+EYE_HEIGHT;cameraReset=true;avatar.snapHeading(Math.PI+yaw);clearInput();notice('중앙현관 밖 구령대로 돌아왔습니다.');}
 function openElevator(){
-  if(missionLocked())return;
+  if(missionUI?.isResult()||missionLoading)return;
   if(!ready||mode!=='walk'||driving?.phase!=='walking'||elevatorBusy||!nearElevator(position,data.floorHeight))return;
   clearInput();dragMode=false;freeLook=false;if(document.pointerLockElement)document.exitPointerLock();pausePanel();
   $('승강기현재층').textContent=Math.round(position.z/data.floorHeight)+1+'층';$('승강기창').showModal();
@@ -649,7 +649,7 @@ const map=$('지도'),mapCtx=map.getContext('2d');
 function updateHUD(){
   if(!world)return;
   roomDetailsCache?.update(position,mode);
-  $('승강기호출').hidden=missionLocked()||!isPlaying()||driving?.phase!=='walking'||!nearElevator(position,data.floorHeight);
+  $('승강기호출').hidden=!isPlaying()||driving?.phase!=='walking'||!nearElevator(position,data.floorHeight);
   const at=world.roomAt(position),floor=at.floor;
   const stair=world.stairs.find(s=>{const f=s.frame,dx=position.x-f.origin[0],dy=position.y-f.origin[1],u=dx*f.right[0]+dy*f.right[1],v=dx*f.inward[0]+dy*f.inward[1];return u>0&&u<f.width&&v>0&&v<f.depth;});
   const inParking=b=>position.z<.1&&position.x>=b[0]&&position.x<=b[3]&&position.y>=b[1]&&position.y<=b[4];

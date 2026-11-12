@@ -19,4 +19,5 @@ body[data-mode=race] #시작안내,body[data-mode=race] .게임헤더,body[data-
 #레이스결과표 [data-player=true] .레이스선수표식{background:#e4c773;color:#263d3b}
 .레이스기록셀{font-variant-numeric:tabular-nums;white-space:nowrap}
 #레이스덮개 .레이스결과기준{font-size:11px;line-height:1.6;color:#91afbf;margin:13px 0}
+#레이스코스안내{display:grid;gap:5px;margin:-2px 0 14px;padding:12px 14px;border-left:3px solid #d4bb7a;border-radius:3px 9px 9px 3px;background:#24445180;line-height:1.5}#레이스코스이름{font-size:14px;color:#f0d797}#레이스코스설명{font-size:12px;color:#c3d7df}#레이스코스정보{font-size:11px;color:#9ebdca}#레이스덮개 #레이스다음코스{padding:11px 13px;border-left:3px solid #d4bb7a;background:#294b5480;color:#f1dcad;white-space:pre-line}#레이스코스길이{max-width:min(320px,80vw);letter-spacing:.01em}
 @media(max-width:700px){#레이스덮개{padding:10px}#레이스덮개>section{padding:20px 14px;max-height:94dvh}#레이스결과표 table{font-size:11px}#레이스결과표 th,#레이스결과표 td{padding:10px 4px}.레이스선수표식{width:24px;height:24px;font-size:9px;margin-right:5px}.레이스선수>span:last-child{width:calc(100% - 29px)}#레이스덮개 h2{font-size:23px}}

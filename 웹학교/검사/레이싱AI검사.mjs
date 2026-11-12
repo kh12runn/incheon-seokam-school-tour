@@ -1,26 +1,32 @@
 import assert from 'node:assert/strict';
 import {createRaceAI} from '../레이싱AI.mjs';
 import {createRace,raceOpponents,roundRules,trackPoint} from '../레이싱물리.mjs';
+import {getRaceCourse} from '../레이싱코스.mjs';
 import {PARKED_CARS} from '../주차장.mjs';
 
-// Same track, cars, fixed obstacle seed, parked player and 30 Hz updates measured
-// before extraction. Times are seconds for all AI to complete three full laps.
+// Measured directly from commit e5fc7b9, with a parked player, the original
+// 427.796 m course and 30 Hz updates. Only round 1 still uses identical geometry;
+// the other rows are historical context, not apples-to-apples speed assertions.
 const BASELINE=[
- {round:1,seed:42,times:[223.3956,229.8212,229.2337],hits:[12,17,13],recoveries:0},
- {round:1,seed:87,times:[209.5919,212.3078,219.0706],hits:[10,9,13],recoveries:1},
- {round:3,seed:42,times:[164.1737,167.1397,171.3353,173.7038,171.8752],hits:[9,12,20,14,21],recoveries:0},
- {round:3,seed:87,times:[160.5722,167.3461,163.3652,170.6670,166.8829],hits:[24,30,18,25,26],recoveries:0},
- {round:5,seed:42,times:[122.5268,130.3972,127.0476,128.6113,124.7923],hits:[20,23,22,16,22],recoveries:0},
- {round:5,seed:87,times:[120.6967,126.2622,128.1601,134.8253,122.0989],hits:[10,10,9,10,9],recoveries:0},
+ {round:1,seed:42,average:175.2297408682451},
+ {round:1,seed:87,average:180.69776548506016},
+ {round:2,seed:42,average:164.24714594430515},
+ {round:2,seed:87,average:166.06907526693954},
+ {round:3,seed:42,average:140.88880195474235},
+ {round:3,seed:87,average:146.65172481715788},
+ {round:4,seed:42,average:126.44178557521825},
+ {round:4,seed:87,average:118.75886458951443},
+ {round:5,seed:42,average:117.5622148837947},
+ {round:5,seed:87,average:117.6340925602852},
 ];
 const rng=initial=>{let seed=initial;return ()=>((seed=Math.imul(seed,1664525)+1013904223>>>0)/4294967296);};
 const mean=items=>items.reduce((sum,n)=>sum+n,0)/items.length;
-function place(c,s,lane=0,speed=0){const p=trackPoint(s,lane);Object.assign(c,{x:p.x,z:p.z,s,lane,speed,yaw:p.yaw});}
-function decisionFixture(round=3){
+function place(c,s,lane=0,speed=0,course=getRaceCourse(1)){const p=course.trackPoint(s,lane);Object.assign(c,{x:p.x,z:p.z,s,lane,speed,yaw:p.yaw});}
+function decisionFixture(round=3,course=getRaceCourse(1)){
  const random=rng(42),race=createRace({car:PARKED_CARS[0],opponents:[PARKED_CARS[1]],round,random});
  const c=race.cars[1],other=race.player,obstacles=[];let now=5;
  place(c,8,0,11);place(other,65,0,8);
- const ai=createRaceAI({cars:race.cars,obstacles:()=>obstacles,rules:roundRules(round),random,time:()=>now});
+ const ai=createRaceAI({cars:race.cars,obstacles:()=>obstacles,rules:roundRules(round),course,random,time:()=>now});
  return {race,c,other,obstacles,ai,advance(seconds){now+=seconds;}};
 }
 
@@ -65,27 +71,44 @@ function decisionFixture(round=3){
  const a=decisionFixture(),b=decisionFixture();b.other.lap=9;b.other.progress=99999;
  assert.deepEqual(a.ai(a.c),b.ai(b.c),'No player-rank rubber banding');
 }
+for(let round=1;round<=5;round++){
+ const course=getRaceCourse(round),fixture=decisionFixture(round,course);
+ const signs=new Set();
+ for(let s=0;s<course.length;s+=1){
+  const at=course.trackPoint(s),ahead=course.trackPoint(s+6);
+  if(Math.abs(at.curve)<.04||at.curve*ahead.curve<=0)continue;
+  const sign=Math.sign(at.curve);if(signs.has(sign))continue;
+  place(fixture.c,s,0,5,course);fixture.other.finish=0;fixture.advance(1);
+  const input=fixture.ai(fixture.c);
+  assert.equal(Math.sign(input.steer),-sign,`${course.id}: steering must follow actual signed curvature`);
+  signs.add(sign);
+ }
+ assert.equal(signs.size,2,`${course.id}: exercise both left and right corners`);
+}
 {
  const random=rng(42),suv=PARKED_CARS.find(c=>c.type==='suv');assert.ok(suv);
  const race=createRace({car:PARKED_CARS[0],opponents:[suv],round:3,random});
  for(let i=0;i<190;i++)race.update(1/60,{brake:true});race.obstacles.splice(0);
- const player=race.player,ai=race.cars[1];place(player,126);place(ai,120);let passed=false,maxOverlap=0;
+ const course=race.course;let entrance;
+ for(let s=20;s<course.length-30;s++)if([0,6,12,18].every(d=>{const p=course.trackPoint(s+d);return p.width===5&&Math.abs(p.curve)<.001;})){entrance=s;break;}
+ assert.ok(Number.isFinite(entrance),'Find a real 5m straight in the selected course');
+ const player=race.player,ai=race.cars[1];place(player,entrance+6,0,0,course);place(ai,entrance,0,0,course);let passed=false,maxOverlap=0;
  // Sample the rotating body centerlines, rather than measuring separation along
  // the road axes (which overstates overlap while one car is changing lanes).
  const sample=(c,t)=>{const d=(c.dimensions.length-c.dimensions.width)*(t-.5);return {x:c.x-Math.sin(c.yaw)*d,z:c.z-Math.cos(c.yaw)*d};};
  for(let i=0;i<60*22;i++){
-  place(player,126);race.update(1/60,{brake:true});
+  place(player,entrance+6,0,0,course);race.update(1/60,{brake:true});
   if(Math.hypot(ai.x-player.x,ai.z-player.z)<6){
    let separation=Infinity;
    for(let a=0;a<=40;a++)for(let b=0;b<=40;b++){const p=sample(player,a/40),q=sample(ai,b/40);separation=Math.min(separation,Math.hypot(p.x-q.x,p.z-q.z));}
    maxOverlap=Math.max(maxOverlap,(player.dimensions.width+ai.dimensions.width)/2-separation);
   }
-  if(ai.s>132)passed=true;
+  if(ai.s>entrance+12)passed=true;
  }
  assert.ok(passed,'A full-size SUV must pass the stopped sedan in the 5m lobby');
  assert.ok(maxOverlap<.52,`SUV passing must retain shallow body overlap: ${maxOverlap}`);
  assert.equal(ai.recoveries,0,'SUV passing must not rely on recovery teleportation');
- console.log(JSON.stringify({narrowSUVPass:true,maxBodyOverlap:+maxOverlap.toFixed(4),advance:+(ai.s-120).toFixed(1)}));
+ console.log(JSON.stringify({narrowSUVPass:true,maxBodyOverlap:+maxOverlap.toFixed(4),advance:+(ai.s-entrance).toFixed(1)}));
 }
 console.log('AI decisions: obstacle anticipation, moving-car overtake, lane commitment, safe merge, input-only control, bounded perception, no rubber banding passed.');
 
@@ -108,10 +131,10 @@ if(!process.argv.includes('--quick')){
   assert.ok(rivals.every(c=>c.finish!==null&&c.lap===3),`Every AI must finish three laps: ${round}/${seed}`);
   assert.ok(rivals.every(c=>c.recoveries<=2),`No persistent AI traffic jam: ${round}/${seed}`);
   assert.ok(jam.slice(1).every(seconds=>seconds<20),'Opponents must not remain stationary for long');
-  const average=mean(rivals.map(c=>c.finish)),previous=mean(baseline.times);
-  if(round===1)assert.ok(average<previous*.90,'Opening races need visible movement improvement');
-  report.push({round,seed,baselineAverage:+previous.toFixed(1),average:+average.toFixed(1),improvementPercent:+((1-average/previous)*100).toFixed(1),overtakes,cars:rivals.map(c=>({id:c.id,time:+c.finish.toFixed(1),laps:c.lap,hits:c.hits,recoveries:c.recoveries,stuckSeconds:+jam[c.id].toFixed(1)}))});
+  const average=mean(rivals.map(c=>c.finish)),previous=baseline.average;
+  if(round===1)assert.ok(average<previous*.97,'The same opening course must improve on e5fc7b9');
+  report.push({round,seed,course:race.course.id,length:+race.course.length.toFixed(2),baselineAverage:+previous.toFixed(1),sameCourse:round===1,average:+average.toFixed(1),overtakes,cars:rivals.map(c=>({id:c.id,time:+c.finish.toFixed(1),laps:c.lap,hits:c.hits,recoveries:c.recoveries,stuckSeconds:+jam[c.id].toFixed(1)}))});
  }
  assert.ok(report.some(r=>r.overtakes>0),'Real race positions should change through passing');
- console.log(JSON.stringify({ok:true,baseline:'previous inline AI',report},null,2));
+ console.log(JSON.stringify({ok:true,baseline:'e5fc7b9',report},null,2));
 }

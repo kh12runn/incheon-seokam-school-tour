@@ -4,8 +4,9 @@ import {TRACK,trackPoint} from '../레이싱물리.mjs';
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 const angle=x=>Math.atan2(Math.sin(x),Math.cos(x));
 const controls=new WeakMap();
-export function driverInput(race,{digital=false}={}){
- const c=race.player,p=c.profile,L=TRACK.length,lanes=[-2.6,0,2.6];
+export function driverInput(race,{digital=false,skill='normal'}={}){
+ const course=race.course??{...TRACK,trackPoint},point=course.trackPoint;
+ const c=race.player,p=c.profile,L=course.length,lanes=[-2.6,0,2.6];
  let memory=controls.get(race);if(!memory){memory={lane:c.lane,reverse:0,nextReverse:0};controls.set(race,memory);}
  const time=race.view().time;
  if(c.wall>0&&Math.abs(c.speed)<.3&&time>memory.nextReverse){memory.reverse=time+.85;memory.nextReverse=time+3;memory.recovery=time+5;}
@@ -15,13 +16,20 @@ export function driverInput(race,{digital=false}={}){
   for(const other of race.cars.slice(1))if(other.finish===null){const gap=((other.s-c.s)%L+L)%L;if(gap<12&&Math.abs(l-other.lane)<2.2)score+=18-gap;}
   return score;
  });memory.lane=time<memory.recovery?0:lanes[scores.indexOf(Math.min(...scores))];
- let narrow=trackPoint(c.s).width<=7;
- for(let d=3;d<=22;d+=3)if(trackPoint(c.s+d).width<=7)narrow=true;
- const ahead=clamp(3.5+Math.abs(c.speed)*.24,4,10),section=trackPoint(c.s+ahead),limit=narrow?0:Math.min(Math.abs(section.curve)>.08?.65:3,Math.max(0,(section.width??TRACK.width)/2-2)),target=trackPoint(c.s+ahead,clamp(memory.lane,-limit,limit)),dx=target.x-c.x,dz=target.z-c.z,error=angle(Math.atan2(-dx,-dz)-c.yaw),distance=Math.max(2,Math.hypot(dx,dz));
+ let narrow=point(c.s).width<=7;
+ for(let d=3;d<=22;d+=3)if(point(c.s+d).width<=7)narrow=true;
+ const ahead=clamp(3.5+Math.abs(c.speed)*.24,4,10),section=point(c.s+ahead),limit=narrow?0:Math.min(Math.abs(section.curve)>.08?.65:3,Math.max(0,(section.width??course.width)/2-2)),target=point(c.s+ahead,clamp(memory.lane,-limit,limit)),dx=target.x-c.x,dz=target.z-c.z,error=angle(Math.atan2(-dx,-dz)-c.yaw),distance=Math.max(2,Math.hypot(dx,dz));
  const rack=Math.atan2(2*c.dimensions.wheelbase*Math.sin(error),distance),rackLimit=.46+Math.min(p.handling,11)*.018;
- let steer=clamp(-rack/rackLimit,-1,1),curve=Math.abs(trackPoint(c.s).curve||0);
- for(let d=3;d<=Math.max(13,c.speed*1.25);d+=3)curve=Math.max(curve,Math.abs(trackPoint(c.s+d).curve||0));
- let desired=Math.min(p.speed,curve>.002?Math.sqrt(p.grip*.50/curve):p.speed)*clamp(1-Math.abs(error)*.4,.35,1);
+ let steer=clamp(-rack/rackLimit,-1,1),curve=Math.abs(point(c.s).curve||0);
+ for(let d=3;d<=Math.max(13,c.speed*1.25);d+=3)curve=Math.max(curve,Math.abs(point(c.s+d).curve||0));
+ let desired;
+ if(skill==='expert'){
+  // A practiced driver carries more corner speed and brakes at the corner,
+  // rather than lifting for every bend visible far along a clear straight.
+  desired=p.speed;
+  for(let d=0;d<=Math.max(18,c.speed*1.2);d+=2){const curvature=Math.abs(point(c.s+d).curve);if(curvature>.002)desired=Math.min(desired,Math.sqrt(p.grip*.68/curvature+2*p.brake*.55*Math.max(0,d-3.5)));}
+  desired*=clamp(1-Math.abs(error)*.4,.35,1);
+ }else desired=Math.min(p.speed,curve>.002?Math.sqrt(p.grip*.50/curve):p.speed)*clamp(1-Math.abs(error)*.4,.35,1);
  for(const other of race.cars.slice(1))if(other.finish===null){const gap=((other.s-c.s)%L+L)%L;if(gap<7&&Math.abs(other.lane-c.lane)<1.7)desired=Math.min(desired,Math.max(0,other.speed)+Math.max(0,gap-4.8)*1.6);}
  let throttle=desired/p.speed,brake=c.speed>desired+.75;
  if(digital){

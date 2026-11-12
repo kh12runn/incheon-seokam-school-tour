@@ -30,12 +30,13 @@ const manualStartYaw=r.player.yaw;for(let i=0;i<45;i++)r.update(1/60,{throttle:1
 const reverse=createRace({car:source,opponents:[],random});ready(reverse);for(let i=0;i<600;i++)reverse.update(1/60,{throttle:-1});assert.equal(reverse.player.lap,0);assert.equal(reverse.player.started,false);
 // Starting immediately before the finish without intermediate gates is not a lap.
 const cheat=createRace({car:source,opponents:[],random});ready(cheat);cheat.player.started=true;cheat.player.nextCheckpoint=1;const pose=trackPoint(TRACK.length-.6);Object.assign(cheat.player,{x:pose.x,z:pose.z,yaw:pose.yaw,s:TRACK.length-.6,lane:0,speed:3});for(let i=0;i<45;i++)cheat.update(1/60,{throttle:1});assert.equal(cheat.player.lap,0);assert.equal(cheat.player.checkpoint,0);
-for(let i=0;i<50;i++){const obs=makeObstacles(5,random,r.cars);for(const o of obs){assert.ok(r.cars.every(c=>Math.abs(((o.s-c.s+TRACK.length*1.5)%TRACK.length)-TRACK.length/2)>=15));assert.ok(Number.isFinite(o.x)&&Number.isFinite(o.z));}assert.ok(obs.length<=15);}
-function drive(round,{fps=60,car=source,digital=false,randomSeed=87}={}){
+const obstacleRace=createRace({round:5,car:source,opponents,random}),obstacleLength=obstacleRace.course.length;
+for(let i=0;i<50;i++){const obs=makeObstacles(5,random,obstacleRace.cars);for(const o of obs){assert.ok(obstacleRace.cars.every(c=>Math.abs(((o.s-c.s+obstacleLength*1.5)%obstacleLength)-obstacleLength/2)>=15));assert.ok(Number.isFinite(o.x)&&Number.isFinite(o.z));const p=obstacleRace.course.trackPoint(o.s,o.lane);assert.ok(Math.hypot(p.x-o.x,p.z-o.z)<1e-8);}assert.ok(obs.length<=15);}
+function drive(round,{fps=60,car=source,digital=false,randomSeed=87,skill='normal'}={}){
  seed=randomSeed;const race=createRace({car,opponents:raceOpponents(round,random),round,random});let count=0,maxGeneration=0;
  while(race.view().phase!=='finished'&&count++<fps*220){
   const previous=race.cars.map(c=>({recoveries:c.recoveries,s:c.s,checkpoint:c.checkpoint}));
-  race.update(1/fps,driverInput(race,{digital}));maxGeneration=Math.max(maxGeneration,race.view().generation);
+  race.update(1/fps,driverInput(race,{digital,skill}));maxGeneration=Math.max(maxGeneration,race.view().generation);
   for(const c of race.cars)if(c.recoveries!==previous[c.id].recoveries){
    assert.notEqual(c.id,0,'The player must never be recovered automatically');assert.equal(c.checkpoint,previous[c.id].checkpoint,'AI recovery cannot award checkpoints');assert.ok(c.s<previous[c.id].s,'AI recovery must rewind');assert.ok(race.cars.every(other=>other===c||Math.hypot(c.x-other.x,c.z-other.z)>5.5),'AI recovery must not overlap other cars');
   }
@@ -43,8 +44,8 @@ function drive(round,{fps=60,car=source,digital=false,randomSeed=87}={}){
  const state=race.view();assert.equal(state.phase,'finished','Driver cannot finish: '+JSON.stringify({round,digital,time:state.time,cars:state.cars.map(c=>({id:c.id,s:c.s,speed:c.speed,lap:c.lap,checkpoint:c.checkpoint}))}));assert.equal(race.player.lap,3);assert.equal(maxGeneration,3);assert.ok(race.player.checkpoint>=state.checkpointsPerLap*3);assert.ok(race.cars.slice(1).every(c=>c.checkpoint>=state.checkpointsPerLap),'Every opponent must drive at least one complete lap, not remain stuck');return state;
 }
 const results=[1,2,3,4,5].map(round=>drive(round));assert.ok(results[0].won,'Beginner round must be winnable with a basic car and manual steering');assert.ok(!results[4].won,'Starter car should struggle against final-round rivals');
-const champion=drive(5,{car:PARKED_CARS.find(c=>c.variant==='champion')});assert.ok(champion.won,'Top car should reward the same driving with victory');assert.ok(champion.time<results[4].time*.85);
+const champion=drive(5,{car:PARKED_CARS.find(c=>c.variant==='champion'),skill:'expert'});assert.ok(champion.won,'Top car and practiced manual cornering must make the final beatable');assert.ok(champion.time<results[4].time*.85);
 const keyboard=drive(1,{digital:true});assert.ok(keyboard.won,'Normal keyboard inputs must complete the beginner round');
-const traffic=drive(5,{car:PARKED_CARS.find(c=>c.variant==='champion'),randomSeed:42});assert.ok(traffic.won,'A different obstacle seed must not permanently jam the central merge');
+const traffic=drive(5,{car:PARKED_CARS.find(c=>c.variant==='champion'),randomSeed:42,skill:'expert'});assert.ok(traffic.won,'A different obstacle seed must not permanently jam the central merge');
 const positions=[];for(const fps of [30,60,144]){const race=createRace({car:source,opponents:[],random});for(let i=0;i<fps*6;i++)race.update(1/fps,{throttle:1,steer:.2});positions.push({x:race.player.x,z:race.player.z,yaw:race.player.yaw});}for(const v of positions.slice(1))assert.ok(Math.hypot(v.x-positions[0].x,v.z-positions[0].z)<.15);
 console.log(JSON.stringify({ok:true,manualSteering:true,manualOpenLane:true,contactEscapeAssist:true,reverse:true,orderedCheckpoints:true,courseMeters:TRACK.length,cars:PARKED_CARS.length,unlockSteps:[...new Set(PARKED_CARS.map(stampsFor))].sort((a,b)=>a-b),positions,keyboard:{rank:keyboard.rank,time:keyboard.time},championFinal:{rank:champion.rank,time:champion.time},rounds:results.map(r=>({round:r.round,rank:r.rank,laps:r.laps,time:r.time.toFixed(1),hits:r.hits}))},null,2));

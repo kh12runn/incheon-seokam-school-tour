@@ -1,15 +1,17 @@
-import {TRACK,trackPoint} from './레이싱코스.mjs';
+import {TRACK,trackPoint as originalTrackPoint} from './레이싱코스.mjs';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const angle=v=>Math.atan2(Math.sin(v),Math.cos(v));
 const mod=(v,m)=>(v%m+m)%m;
-const signedGap=(a,b)=>mod(a-b+TRACK.length/2,TRACK.length)-TRACK.length/2;
 const rackLimit=p=>.46+Math.min(p.handling,11)*.018;
 
 // Only normal throttle/steering/brake controls are returned. No position, speed,
 // lap, progress or checkpoint is written, and no player's rank changes AI pace.
 // Strategic perception is 4.5–5.5 Hz; steering follows the body every physics step.
-export function createRaceAI({cars,obstacles,rules,random=Math.random,time=()=>0}){
+export function createRaceAI({cars,obstacles,rules,course,random=Math.random,time=()=>0}){
+ const trackPoint=course?.trackPoint??originalTrackPoint,L=course?.length??TRACK.length;
+ const signedGap=(a,b)=>mod(a-b+L/2,L)-L/2;
+ const level=clamp((rules.round-1)/4,0,1),cornerUse=.57+level*.13;
  const memories=new WeakMap();
  const memoryFor=c=>{
   let memory=memories.get(c);
@@ -18,11 +20,11 @@ export function createRaceAI({cars,obstacles,rules,random=Math.random,time=()=>0
  };
  function perceive(c,m,now){
   m.next=now+.18+random()*.04;m.decisions++;m.originS=c.s;
-  const p=c.profile,speed=Math.max(0,c.speed),horizon=clamp(15+speed*.85,18,36),at=trackPoint(c.s);
-  const look=[];for(let d=0;d<=horizon;d+=3){const point=trackPoint(c.s+d);look.push({d,width:point.width,curve:point.curve});}
+  const p=c.profile,speed=Math.max(0,c.speed),horizon=clamp(17+speed*1.1,23,48),at=trackPoint(c.s);
+  const look=[];for(let d=0;d<=horizon;d+=2.5){const point=trackPoint(c.s+d);look.push({d,width:point.width,curve:point.curve});}
   m.look=look;
   const nearby=cars.filter(other=>other!==c&&other.finish===null).map(other=>({car:other,gap:signedGap(other.s,c.s)})).filter(o=>o.gap>-12&&o.gap<horizon+8);
-  const threats=obstacles().map(o=>({...o,gap:mod(o.s-c.s,TRACK.length)})).filter(o=>o.gap<horizon+5);
+  const threats=obstacles().map(o=>({...o,gap:mod(o.s-c.s,L)})).filter(o=>o.gap<horizon+5);
   const ahead=trackPoint(c.s+clamp(4+speed*.25,5,10)),halfW=c.dimensions.width/2;
   const narrow=Math.min(at.width,ahead.width)<=7;
   let target=m.targetId===null?null:nearby.find(o=>o.car.id===m.targetId);
@@ -52,7 +54,14 @@ export function createRaceAI({cars,obstacles,rules,random=Math.random,time=()=>0
     // Don't merge into a car alongside or approaching quickly from behind.
     if(o.gap>-9&&o.gap<4&&clearance<safe)cost+=45*(safe-clearance);
     if(o===target&&clearance<safe)cost+=60*(safe-clearance);
+    const intended=o.car.aiPlan?.lane;
+    if(Number.isFinite(intended)&&o.gap>-4&&o.gap<18&&Math.abs(lane-intended)<safe&&Math.abs(intended-o.car.lane)>.3)
+     cost+=(safe-Math.abs(lane-intended))*12;
    }
+   // A late lane change on an inner bend reduces the usable turning radius.
+   // Prefer the clear outer line, but let obstacle/traffic clearance take priority.
+   for(const point of look)if(point.d<Math.max(10,speed*.65)&&point.curve*lane<0)
+    cost+=Math.abs(point.curve*lane)*3.2;
    // Keep a narrow merge lane early, unless overtaking a genuinely stopped car.
    const entrance=look.find(q=>q.width<=7);
    if(entrance&&entrance.d<15&&!target)cost+=Math.abs(lane)*(15-entrance.d)*.25;
@@ -78,21 +87,21 @@ export function createRaceAI({cars,obstacles,rules,random=Math.random,time=()=>0
   const limit=Math.max(0,Math.min(at.width,ahead.width)/2-c.dimensions.width/2-margin),lane=clamp(m.lane,-limit,limit);
   const target=trackPoint(c.s+lookAhead,lane),dx=target.x-c.x,dz=target.z-c.z,distance=Math.max(2,Math.hypot(dx,dz)),error=angle(Math.atan2(-dx,-dz)-c.yaw);
   let steer=clamp(-Math.atan(2*c.dimensions.wheelbase*Math.sin(error)/distance)/rackLimit(p),-1,1);
-  const pace=Math.min(1.01,rules.pace+.025+m.paceOffset),base=p.speed*pace;
+  const pace=Math.min(1,rules.pace+.025+m.paceOffset),base=p.speed*pace;
   const advanced=signedGap(c.s,m.originS),obstacleGap=m.obstacleGap-advanced;
   let desired=base;
   const currentCurve=Math.abs(at.curve/(1+at.curve*lane));
-  if(currentCurve>.002)desired=Math.min(desired,Math.sqrt(p.grip*.49/currentCurve)*pace);
+  if(currentCurve>.002)desired=Math.min(desired,Math.sqrt(p.grip*cornerUse/currentCurve)*pace);
   for(const sample of m.look){
    const remaining=sample.d-advanced;if(remaining<-3)continue;
    const curve=Math.abs(sample.curve/(1+sample.curve*lane));
    if(curve<.002)continue;
-   const corner=Math.sqrt(p.grip*.49/curve)*pace;
+   const corner=Math.sqrt(p.grip*cornerUse/curve)*pace;
    // Brake for the corner at its actual distance, rather than crawling through
    // a long straight just because a bend is visible 20 m ahead.
-   desired=Math.min(desired,Math.sqrt(corner*corner+2*p.brake*.45*Math.max(0,remaining-3.5)));
+   desired=Math.min(desired,Math.sqrt(corner*corner+2*p.brake*(.48+level*.10)*Math.max(0,remaining-3.8)));
   }
-  desired*=clamp(1-Math.abs(error)*.42,.32,1);
+  desired*=clamp(1-Math.abs(error)*(.36-level*.08),.36,1);
   if(obstacleGap<11&&Math.abs(lane-c.lane)>.5)desired=Math.min(desired,Math.max(3.5,(obstacleGap-2)*1.5));
   const passing=m.targetId===null?null:cars.find(other=>other.id===m.targetId&&other.finish===null);
   if(passing&&at.width<=7)desired=Math.min(desired,p.speed*.37);

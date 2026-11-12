@@ -5,8 +5,8 @@ const TAU=Math.PI*2;
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 const mod=(value,divisor)=>(value%divisor+divisor)%divisor;
 const smooth=value=>{const t=clamp(value,0,1);return t*t*(3-2*t);};
-const segments=[];
-let length=0;
+function buildSegments(layout='outer'){
+ const segments=[];let length=0;
 function line(x0,z0,x1,z1,width=10,zone='운동장'){
  const dx=x1-x0,dz=z1-z0,size=Math.hypot(dx,dz);
  segments.push({kind:'line',x0,z0,dx,dz,size,start:length,width,zone});length+=size;
@@ -16,12 +16,19 @@ function arc(cx,cz,radius,angle,sweep,width=10,zone='운동장'){
  segments.push({kind:'arc',cx,cz,radius,angle,sweep,size,start:length,width,zone});length+=size;
 }
 const transition=(from,to)=>(t)=>from+(to-from)*smooth(t);
+function wave(x0,z0,x1,z1,amplitude,zone){
+ const dx=x1-x0,dz=z1-z0,chord=Math.hypot(dx,dz),segment={kind:'wave',x0,z0,dx,dz,nx:-dz/chord,nz:dx/chord,amplitude,zone,width:t=>10-2*Math.sin(Math.PI*t)**2,start:length,distances:[0]};
+ let previous=waveRaw(segment,0),size=0;
+ for(let i=1;i<=256;i++){const p=waveRaw(segment,i/256);size+=Math.hypot(p.x-previous.x,p.z-previous.z);segment.distances.push(size);previous=p;}
+ segment.size=size;segments.push(segment);length+=size;
+}
 // A long, unobstructed southern straight holds the entire starting grid.
-line(36,63.5,71,63.5);
-arc(71,55.5,8,Math.PI/2,-Math.PI/2);
-line(79,55.5,79,35);
-arc(71,35,8,0,-Math.PI/2);
-line(71,27,56,27);
+const east=layout==='inner'?70:79,bend=east-8;
+if(layout==='slalom')wave(36,63.5,71,63.5,-5.5,'운동장 남쪽 S 코너');else line(36,63.5,bend,63.5);
+arc(bend,55.5,8,Math.PI/2,-Math.PI/2);
+if(layout==='slalom')wave(east,55.5,east,35,-2.3,'운동장 동쪽 S 코너');else line(east,55.5,east,35);
+arc(bend,35,8,0,-Math.PI/2);
+line(bend,27,56,27);
 arc(56,19,8,Math.PI/2,Math.PI/2,transition(10,5),'중앙현관 진입');
 line(48,19,48,-12,5,'중앙현관 나가는 길');
 arc(56,-12,8,Math.PI,Math.PI/2,transition(5,8),'후문 주차장 진입');
@@ -40,6 +47,21 @@ arc(32,39.5,8,0,Math.PI/2,10,'운동장 서쪽');
 line(32,47.5,6,47.5);
 arc(6,55.5,8,-Math.PI/2,-Math.PI);
 line(6,63.5,36,63.5);
+return {segments,length};
+}
+
+// Smooth analytic waves use a small arc-length table, not one mesh or object
+// per sample. Projection uses bounded Newton iteration to keep physics cheap.
+function waveRaw(segment,u){
+ const angle=TAU*u,offset=segment.amplitude*(1-Math.cos(angle))/2,velocity=segment.amplitude*Math.PI*Math.sin(angle),acceleration=segment.amplitude*2*Math.PI*Math.PI*Math.cos(angle);
+ return {x:segment.x0+segment.dx*u+segment.nx*offset,z:segment.z0+segment.dz*u+segment.nz*offset,dx:segment.dx+segment.nx*velocity,dz:segment.dz+segment.nz*velocity,ddx:segment.nx*acceleration,ddz:segment.nz*acceleration};
+}
+function waveU(segment,t){
+ const target=t*segment.size,table=segment.distances;let lo=0,hi=256;
+ while(lo+1<hi){const mid=(lo+hi)>>1;if(table[mid]<target)lo=mid;else hi=mid;}
+ return (lo+(target-table[lo])/Math.max(.00001,table[hi]-table[lo]))/256;
+}
+function waveT(segment,u){const position=clamp(u,0,1)*256,index=Math.min(255,Math.floor(position)),a=segment.distances[index],b=segment.distances[index+1];return (a+(b-a)*(position-index))/segment.size;}
 
 // Building ceiling height is separate from the outside approach. Consumers can
 // hide intersecting first-floor render pieces only while a race is active.
@@ -74,6 +96,9 @@ function geometry(segment,t){
  if(segment.kind==='line'){
   x=segment.x0+segment.dx*t;z=segment.z0+segment.dz*t;
   tx=segment.dx/segment.size;tz=segment.dz/segment.size;
+ }else if(segment.kind==='wave'){
+  const p=waveRaw(segment,waveU(segment,t)),speed=Math.hypot(p.dx,p.dz);
+  x=p.x;z=p.z;tx=p.dx/speed;tz=p.dz/speed;curve=-(p.dx*p.ddz-p.dz*p.ddx)/(speed**3);
  }else{
   const angle=segment.angle+segment.sweep*t,direction=Math.sign(segment.sweep);
   x=segment.cx+Math.cos(angle)*segment.radius;z=segment.cz+Math.sin(angle)*segment.radius;
@@ -81,12 +106,14 @@ function geometry(segment,t){
  }
  return {x,z,tx,tz,nx:-tz,nz:tx,curve,width:typeof segment.width==='function'?segment.width(t):segment.width,zone:segment.zone};
 }
+function makeCourse({id,name,description,layout}){
+ const {segments,length}=buildSegments(layout);
 function segmentAt(distance){
  const s=mod(distance,length);let lo=0,hi=segments.length-1;
  while(lo<hi){const mid=(lo+hi)>>1;if(s>=segments[mid].start+segments[mid].size)lo=mid+1;else hi=mid;}
  return {segment:segments[lo],s};
 }
-export function trackPoint(distance,lane=0){
+function trackPoint(distance,lane=0){
  const {segment,s}=segmentAt(distance),p=geometry(segment,(s-segment.start)/segment.size);
  p.x+=p.nx*lane;p.z+=p.nz*lane;
  return {...p,s,lane,height:groundHeight(p.x,p.z),yaw:Math.atan2(-p.tx,-p.tz)};
@@ -94,7 +121,7 @@ export function trackPoint(distance,lane=0){
 // Project onto a short arc-length window when progress is supplied. Two nearby
 // central lanes run in opposite directions: a global-nearest projection would
 // otherwise jump to the return branch and award progress before the rear loop.
-export function nearestTrack(x,z,hint){
+function nearestTrack(x,z,hint){
  const local=Number.isFinite(hint),center=local?mod(hint,length):0,window=42;
  let best=null,bestDistance=Infinity;
  for(const segment of segments){
@@ -105,7 +132,12 @@ export function nearestTrack(x,z,hint){
    if(lower>upper)continue;
    let t;
    if(segment.kind==='line')t=clamp(((x-segment.x0)*segment.dx+(z-segment.z0)*segment.dz)/(segment.size*segment.size),lower,upper);
-   else{
+   else if(segment.kind==='wave'){
+    const minU=waveU(segment,lower),maxU=waveU(segment,upper),square=segment.dx**2+segment.dz**2;
+    let u=clamp(((x-segment.x0)*segment.dx+(z-segment.z0)*segment.dz)/square,minU,maxU);
+    for(let i=0;i<6;i++){const p=waveRaw(segment,u),numerator=(p.x-x)*p.dx+(p.z-z)*p.dz,denominator=p.dx*p.dx+p.dz*p.dz+(p.x-x)*p.ddx+(p.z-z)*p.ddz;if(Math.abs(denominator)<.001)break;u=clamp(u-numerator/denominator,minU,maxU);}
+    t=clamp(waveT(segment,u),lower,upper);
+   }else{
     const angle=Math.atan2(z-segment.cz,x-segment.cx),sweep=Math.abs(segment.sweep);
     const travelled=mod((angle-segment.angle)*Math.sign(segment.sweep),TAU);
     if(travelled<=sweep)t=clamp(travelled/sweep,lower,upper);
@@ -130,5 +162,22 @@ for(const segment of segments)for(let i=0;i<=64;i++){
   bounds.minX=Math.min(bounds.minX,x);bounds.maxX=Math.max(bounds.maxX,x);bounds.minZ=Math.min(bounds.minZ,z);bounds.maxZ=Math.max(bounds.maxZ,z);
  }
 }
-export const TRACK=Object.freeze({name:'운동장 · 중앙현관 · 후문 주차장',width:10,length,bounds:Object.freeze(bounds),height:-.30});
-export const COURSE_SECTIONS=Object.freeze(segments.map(s=>Object.freeze({start:s.start,length:s.size,zone:s.zone})));
+ const sections=Object.freeze(segments.map(s=>Object.freeze({start:s.start,length:s.size,zone:s.zone})));
+ return Object.freeze({id,name,description,width:10,length,bounds:Object.freeze(bounds),height:-.30,trackPoint,nearestTrack,sections,direction:1,layout});
+}
+function reversedCourse(base,{id,name,description}){
+ function trackPoint(distance,lane=0){const p=base.trackPoint(-distance,-lane);return {...p,s:mod(distance,base.length),lane,tx:-p.tx,tz:-p.tz,nx:-p.nx,nz:-p.nz,curve:-p.curve,yaw:Math.atan2(p.tx,p.tz)};}
+ function nearestTrack(x,z,hint){const p=base.nearestTrack(x,z,Number.isFinite(hint)?-hint:undefined);return {...p,s:mod(-p.s,base.length),lane:-p.lane,tx:-p.tx,tz:-p.tz,nx:-p.nx,nz:-p.nz,curve:-p.curve,yaw:Math.atan2(p.tx,p.tz)};}
+ const sections=Object.freeze([...base.sections].reverse().map(section=>Object.freeze({...section,start:mod(base.length-section.start-section.length,base.length)})).sort((a,b)=>a.start-b.start));
+ return Object.freeze({...base,id,name,description,trackPoint,nearestTrack,sections,direction:-1});
+}
+const outer=makeCourse({id:'playground-outer',name:'운동장 외곽 순환',description:'넓은 운동장을 돌아 중앙현관과 후문 주차장까지 달려요.',layout:'outer'});
+const inner=makeCourse({id:'playground-inner',name:'운동장 안쪽 순환',description:'동쪽 코스가 안쪽으로 바뀌어요. 짧아진 직선 뒤 코너를 준비하세요.',layout:'inner'});
+const slalom=makeCourse({id:'playground-slalom',name:'운동장 S 코너',description:'운동장 남쪽과 동쪽의 S 코너에서 조향과 제동을 겨뤄요.',layout:'slalom'});
+export const RACE_COURSES=Object.freeze([outer,inner,slalom,reversedCourse(inner,{id:'playground-inner-reverse',name:'안쪽 순환 역방향',description:'익숙한 안쪽 코스를 반대로 달려요. 현관 진입 순서도 달라져요.'}),reversedCourse(slalom,{id:'playground-slalom-reverse',name:'S 코너 역방향 결승',description:'역방향 S 코너와 주차장 긴 직선을 모두 이겨 내는 결승 코스예요.'})]);
+export function getRaceCourse(round=1){return RACE_COURSES[clamp(Math.floor(Number(round)||1),1,RACE_COURSES.length)-1];}
+// Compatibility exports retain round one for existing school diagnostics.
+export const TRACK=outer;
+export const trackPoint=(distance,lane=0)=>outer.trackPoint(distance,lane);
+export const nearestTrack=(x,z,hint)=>outer.nearestTrack(x,z,hint);
+export const COURSE_SECTIONS=outer.sections;

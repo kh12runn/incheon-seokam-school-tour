@@ -2,28 +2,26 @@ import {profileFor,carName} from './차량성능.mjs';
 import {pickRaceDrivers} from './레이싱선수.mjs';
 import {createRaceAI} from './레이싱AI.mjs';
 import {PARKED_CARS,CAR_DIMENSIONS} from './주차장.mjs';
-import {TRACK,trackPoint,nearestTrack,groundHeight} from './레이싱코스.mjs';
-export {TRACK,trackPoint,nearestTrack} from './레이싱코스.mjs';
+import {getRaceCourse,groundHeight} from './레이싱코스.mjs';
+export {TRACK,trackPoint,nearestTrack,getRaceCourse} from './레이싱코스.mjs';
 
 export const ROUND_COUNT=5;
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 export const mod=(x,m)=>(x%m+m)%m;
 const angle=x=>Math.atan2(Math.sin(x),Math.cos(x));
-const gateCount=Math.max(20,Math.ceil(TRACK.length/12)),gateLength=TRACK.length/gateCount;
-const gates=Array.from({length:gateCount},(_,i)=>trackPoint(i*gateLength));
-const laneLimit=Math.min(2.7,TRACK.width/2-2),lanes=[-laneLimit,0,laneLimit];
 const maxSteering=profile=>.46+Math.min(profile.handling,11)*.018;
 export const RACE_ASSIST_CONFIG=Object.freeze({speedRatio:.50,maxStrength:.55,rampRate:3.3,minSteerInput:.08});
 const SIDE_OVERLAP=.40;
 
-export function roundRules(round){const r=clamp(Math.floor(round),1,5);return {round:r,laps:3,opponents:Math.min(5,r+2),pace:[.67,.76,.85,.90,.91][r-1],hazards:5+r*2};}
+export function roundRules(round){const r=clamp(Math.floor(round),1,5);return {round:r,laps:3,opponents:Math.min(5,r+2),pace:[.70,.78,.86,.91,.94][r-1],hazards:5+r*2};}
 export function raceOpponents(round,random=Math.random){
  const tiers=[['sedan','compact'],['sedan','morning','suv'],['morning','tucson','electric','rally'],['rally','sports','touring'],['sports','touring','hyper']][clamp(Math.floor(round),1,5)-1];
  const pool=PARKED_CARS.filter(c=>tiers.includes(c.variant??c.type));
  for(let i=pool.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
  return Array.from({length:roundRules(round).opponents},(_,i)=>pool[i%pool.length]);
 }
-export function makeObstacles(round,random=Math.random,cars=[]){
+export function makeObstacles(round,random=Math.random,cars=[],course=getRaceCourse(round)){
+ const TRACK=course,trackPoint=course.trackPoint,laneLimit=Math.min(2.7,course.width/2-2);
  const count=roundRules(round).hazards,items=[],L=TRACK.length;
  for(let i=0;i<count;i++){
   const s=mod(24+(i+.35+random()*.3)*(L-42)/count,L);
@@ -37,13 +35,17 @@ export function makeObstacles(round,random=Math.random,cars=[]){
 // Normal driving is manual. Forward input during an actual obstruction enables
 // a short, smooth escape arc; steering input always chooses the escape side.
 export function createRace({car,opponents=[],round=1,random=Math.random}){
- const rules=roundRules(round),L=TRACK.length,drivers=pickRaceDrivers(Math.min(opponents.length,rules.opponents),random);
+ const course=getRaceCourse(round),TRACK=course,{trackPoint,nearestTrack}=course;
+ const gateCount=Math.max(20,Math.ceil(course.length/12)),gateLength=course.length/gateCount;
+ const gates=Array.from({length:gateCount},(_,i)=>trackPoint(i*gateLength));
+ const laneLimit=Math.min(2.7,course.width/2-2),lanes=[-laneLimit,0,laneLimit];
+ const rules=roundRules(round),L=course.length,drivers=pickRaceDrivers(Math.min(opponents.length,rules.opponents),random);
  const cars=[car,...opponents.slice(0,rules.opponents)].map((source,i)=>{
   const s=-8-Math.floor(i/2)*6,lane=i%2?2:-2,p=trackPoint(s,lane);
   const driver=i?drivers[i-1]:{id:'player',name:'나'};
   return {source,id:i,name:driver.name,driverId:driver.id,driverName:driver.name,profile:profileFor(source),dimensions:CAR_DIMENSIONS[source.type],x:p.x,z:p.z,height:p.height??-.3,yaw:p.yaw,steering:0,s,lane,speed:0,sideSpeed:0,lap:0,spin:0,hit:0,hits:0,boost:1,boosting:false,finish:null,wall:0,aiLane:lane,decision:0,started:false,checkpoint:0,nextCheckpoint:0,progress:s,offTrack:false,wrongWay:false,resetSerial:0,reverseTime:0,recoveryCooldown:0,stuckTime:0,lastAdvance:s,recoveries:0,contact:0,obstacleContact:0,assistActive:false,assistReason:null,assistStrength:0,assistSpeedLimit:profileFor(source).speed*RACE_ASSIST_CONFIG.speedRatio,passingId:null,passingLane:0};
  });
- let phase='countdown',countdown=3,time=0,paused=false,obstacles=makeObstacles(round,random,cars),generation=1,accumulator=0;
+ let phase='countdown',countdown=3,time=0,paused=false,obstacles=makeObstacles(round,random,cars,course),generation=1,accumulator=0;
  const player=cars[0];
  function damage(c,resistance,duration=.45){if(c.hit>0)return;c.speed*=resistance;c.hit=duration;c.hits++;}
  function project(c){
@@ -82,7 +84,7 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
   c.nextCheckpoint=(c.nextCheckpoint+1)%gateCount;c.lap=Math.floor(c.checkpoint/gateCount);
   if(c.lap>=rules.laps){c.finish=time-dt+dt*t;c.speed=0;c.progress=rules.laps*L;}
  }
- const aiInput=createRaceAI({cars,obstacles:()=>obstacles,rules,random,time:()=>time});
+ const aiInput=createRaceAI({course,cars,obstacles:()=>obstacles,rules,random,time:()=>time});
  function moveCar(c,dt,input){
   const p=c.profile,throttle=clamp(Number(input.throttle)||0,-1,1),brake=!!input.brake,steer=clamp(Number(input.steer)||0,-1,1),oldX=c.x,oldZ=c.z,oldYaw=c.yaw;
   c.assistReason=c.wall>0?'boundary':c.obstacleContact>0?'obstacle':c.contact>0?'traffic':null;
@@ -194,11 +196,11 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
    if(c.s>c.lastAdvance+.7){c.lastAdvance=c.s;c.stuckTime=0;}else c.stuckTime+=dt;
    if(c.stuckTime>6&&(Math.abs(c.speed)<1||c.wall>0||c.wrongWay))recoverOpponent(c);
   }
-  if(player.lap>=generation&&player.finish===null){obstacles=makeObstacles(round,random,cars);generation=player.lap+1;}
+  if(player.lap>=generation&&player.finish===null){obstacles=makeObstacles(round,random,cars,course);generation=player.lap+1;}
   if(player.finish!==null)phase='finished';
  }
  function standings(){return [...cars].sort((a,b)=>a.finish!==null&&b.finish!==null?a.finish-b.finish:a.finish!==null?-1:b.finish!==null?1:b.progress-a.progress);}
- function view(){const order=standings();return {phase,paused,countdown,round:rules.round,laps:rules.laps,lap:Math.min(rules.laps,player.lap+1),rank:order.indexOf(player)+1,total:cars.length,time,won:phase==='finished'&&order[0]===player,speed:player.speed,boost:player.boost,assistActive:player.assistActive,assistReason:player.assistReason,assistStrength:player.assistStrength,assistSpeedLimit:player.assistSpeedLimit,hits:player.hits,generation,offTrack:player.offTrack,wrongWay:player.wrongWay,checkpoint:player.checkpoint,nextCheckpoint:player.nextCheckpoint,checkpointsPerLap:gateCount,standings:order.map(c=>({id:c.id,name:c.name,driverId:c.driverId,driverName:c.driverName,carName:carName(c.source),carId:c.source.id,finished:c.finish!==null,time:c.finish,progress:c.progress})),cars:cars.map(c=>({id:c.id,x:c.x,z:c.z,height:c.height,yaw:c.yaw,steering:c.steering,s:c.s,lane:c.lane,speed:c.speed,lap:c.lap,finish:c.finish,progress:c.progress,checkpoint:c.checkpoint,nextCheckpoint:c.nextCheckpoint}))};}
+ function view(){const order=standings();return {course:{id:course.id,name:course.name,length:course.length,direction:course.direction},phase,paused,countdown,round:rules.round,laps:rules.laps,lap:Math.min(rules.laps,player.lap+1),rank:order.indexOf(player)+1,total:cars.length,time,won:phase==='finished'&&order[0]===player,speed:player.speed,boost:player.boost,assistActive:player.assistActive,assistReason:player.assistReason,assistStrength:player.assistStrength,assistSpeedLimit:player.assistSpeedLimit,hits:player.hits,generation,offTrack:player.offTrack,wrongWay:player.wrongWay,checkpoint:player.checkpoint,nextCheckpoint:player.nextCheckpoint,checkpointsPerLap:gateCount,standings:order.map(c=>({id:c.id,name:c.name,driverId:c.driverId,driverName:c.driverName,carName:carName(c.source),carId:c.source.id,finished:c.finish!==null,time:c.finish,progress:c.progress})),cars:cars.map(c=>({id:c.id,x:c.x,z:c.z,height:c.height,yaw:c.yaw,steering:c.steering,s:c.s,lane:c.lane,speed:c.speed,lap:c.lap,finish:c.finish,progress:c.progress,checkpoint:c.checkpoint,nextCheckpoint:c.nextCheckpoint}))};}
  function resetCar(){
   if(paused||phase!=='racing'||player.finish!==null)return false;
   const s=player.started?(player.checkpoint*gateLength+1):-8;
@@ -207,7 +209,7 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
   const choice=candidates.sort((a,b)=>Math.abs(a.lane)-Math.abs(b.lane))[0];if(!choice)return false;
   Object.assign(player,{x:choice.p.x,z:choice.p.z,height:choice.p.height??-.3,yaw:choice.p.yaw,s,lane:choice.lane,speed:0,steering:0,sideSpeed:0,wall:0,hit:.8,boosting:false,offTrack:false,wrongWay:false,contact:0,obstacleContact:0,assistActive:false,assistReason:null,assistStrength:0,resetSerial:player.resetSerial+1});project(player);return true;
  }
- return {cars,player,rules,get obstacles(){return obstacles;},view,resetCar,
+ return {course,cars,player,rules,get obstacles(){return obstacles;},view,resetCar,
   pause(value=true){paused=value;accumulator=0;},
   update(seconds,input={}){if(paused)return view();accumulator+=clamp(seconds,0,.25);while(accumulator>=1/120){step(1/120,input);accumulator-=1/120;}return view();}};
 }

@@ -1,0 +1,1301 @@
+{
+  "checkedAt": "2026-11-12",
+  "catalogSha": "8d88fc5b7c95930e618a38ec8f992e41babe84b2",
+  "catalogSpaces": 73,
+  "catalogPhotos": 752,
+  "remoteCatalogStatusUsedAsProof": false,
+  "originalPhotosPublished": false,
+  "productionInspected": false,
+  "scope": "현재 로컬 런타임과 최신 비공개 업로드 카탈로그의 연결 점검; 사진과 화면의 전수 시각 일치 판정은 아님",
+  "summary": {
+    "uploadedSpacesWithNoRuntimeImplementation": 0,
+    "additionalMissingPhotoSpaces": 8,
+    "legacyOwnerDeferredPhotoCount": 14,
+    "detailRenderConfigurationsChecked": 72,
+    "detailGenerationErrors": 0,
+    "emptyDetailGroups": 0,
+    "detailOutsideTargetRoom": 0,
+    "missingWorldVisualLinks": 0,
+    "missingWorldCollisionLinks": 0
+  },
+  "method": [
+    "buildWorld를 실제 실행하여 교실·특별실·이름이 바뀐 공간의 연결 확인",
+    "게임.mjs의 상대 import 연결망 158개 모듈에서 사진 근거와 호출 경로 추적",
+    "게임과 동일한 상세 생성 함수 72개 실행, 메시 생성·공간 교차·시각 박스·충돌체 확인",
+    "상세 생성은 Node의 no-op Canvas로 기하 구조만 검사; 실제 텍스처 픽셀 또는 화면 시각 검사는 미실시",
+    "사진 ID가 없는 구버전은 사진 개수와 공간별 관찰 특징·실제 배치가 연결됐는지 확인; 원격 approved 상태만으로 구현 완료 처리하지 않음"
+  ],
+  "rooms": [
+    {
+      "sourceRoomId": "1F_3-4",
+      "name": "3-4 교실",
+      "targetRoomId": "1F_3-4",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 43,
+      "worldVisualBoxes": 556,
+      "worldColliders": 108,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "2F_AUDIO_VISUAL",
+      "name": "시청각실",
+      "targetRoomId": "2F_AUDIO_VISUAL",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 93,
+      "worldVisualBoxes": 509,
+      "worldColliders": 164,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "custom_0e69f826066f4770a69c3895f3f58fb9",
+      "name": "쓰레기장",
+      "targetRoomId": "EXT_RECYCLING",
+      "uploadedPhotos": 5,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "world.recyclingShelter 및 recyclingShelterDetails에 연결"
+      ],
+      "runtimeModule": "웹학교/분리수거장사진배치.mjs"
+    },
+    {
+      "sourceRoomId": "4F_MAIN_STAIR_A",
+      "name": "4F 본관 계단 A",
+      "targetRoomId": "4F_MAIN_STAIR_B",
+      "uploadedPhotos": 9,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "업로드 폴더 A의 사진은 사용자 지시에 따라 행정실 쪽 중앙계단 B에 반영",
+        "finishCentralStair → world.centralStairFinish → centralStairDetails 연결"
+      ],
+      "runtimeModule": "웹학교/중앙계단사진마감.mjs"
+    },
+    {
+      "sourceRoomId": "3F_MAIN_STAIR_A",
+      "name": "3F 본관 계단 A",
+      "targetRoomId": "3F_MAIN_STAIR_B",
+      "uploadedPhotos": 7,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "업로드 폴더 A의 사진은 사용자 지시에 따라 행정실 쪽 중앙계단 B에 반영",
+        "finishCentralStair → world.centralStairFinish → centralStairDetails 연결"
+      ],
+      "runtimeModule": "웹학교/중앙계단사진마감.mjs"
+    },
+    {
+      "sourceRoomId": "2F_OPERATIONS_MEETING",
+      "name": "학교운영위원회 회의실",
+      "targetRoomId": "2F_OPERATIONS_MEETING",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 66,
+      "worldVisualBoxes": 268,
+      "worldColliders": 57,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "2F_MAIN_STAIR_A",
+      "name": "2F 본관 계단 A",
+      "targetRoomId": "2F_MAIN_STAIR_B",
+      "uploadedPhotos": 10,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "업로드 폴더 A의 사진은 사용자 지시에 따라 행정실 쪽 중앙계단 B에 반영",
+        "finishCentralStair → world.centralStairFinish → centralStairDetails 연결"
+      ],
+      "runtimeModule": "웹학교/중앙계단사진마감.mjs"
+    },
+    {
+      "sourceRoomId": "2F_BROADCAST",
+      "name": "방송실(교원회의실)",
+      "targetRoomId": "2F_BROADCAST",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 158,
+      "worldVisualBoxes": 449,
+      "worldColliders": 83,
+      "detailGeometryIntersectsRoom": true,
+      "runtimeModule": "웹학교/방송실사진배치.mjs, 웹학교/방송조정실배치.mjs"
+    },
+    {
+      "sourceRoomId": "1F_MAIN_STAIR_A",
+      "name": "1F 본관 계단 A",
+      "targetRoomId": "1F_MAIN_STAIR_B",
+      "uploadedPhotos": 21,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "업로드 폴더 A의 사진은 사용자 지시에 따라 행정실 쪽 중앙계단 B에 반영",
+        "finishCentralStair → world.centralStairFinish → centralStairDetails 연결"
+      ],
+      "runtimeModule": "웹학교/중앙계단사진마감.mjs"
+    },
+    {
+      "sourceRoomId": "1F_NURSE",
+      "name": "보건실",
+      "targetRoomId": "1F_NURSE",
+      "uploadedPhotos": 43,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 18,
+      "worldVisualBoxes": 205,
+      "worldColliders": 62,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "1F_3-1",
+      "name": "3-1 교실",
+      "targetRoomId": "1F_3-1",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 25,
+      "worldVisualBoxes": 518,
+      "worldColliders": 94,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "1F_3-2",
+      "name": "3-2 교실",
+      "targetRoomId": "1F_3-2",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 26,
+      "worldVisualBoxes": 516,
+      "worldColliders": 96,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "4F_6-2",
+      "name": "6-2 교실",
+      "targetRoomId": "4F_6-2",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 26,
+      "worldVisualBoxes": 521,
+      "worldColliders": 98,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "1F_3-3",
+      "name": "3-3 교실",
+      "targetRoomId": "1F_3-3",
+      "uploadedPhotos": 9,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 26,
+      "worldVisualBoxes": 518,
+      "worldColliders": 96,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "4F_6-5",
+      "name": "6-5 교실",
+      "targetRoomId": "4F_6-5",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 35,
+      "worldVisualBoxes": 521,
+      "worldColliders": 98,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "4F_6-1",
+      "name": "6-1 교실",
+      "targetRoomId": "4F_6-1",
+      "uploadedPhotos": 5,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 25,
+      "worldVisualBoxes": 507,
+      "worldColliders": 97,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "4F_6-7",
+      "name": "6-7 교실",
+      "targetRoomId": "4F_6-7",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 26,
+      "worldVisualBoxes": 514,
+      "worldColliders": 97,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "3F_5-1",
+      "name": "5-1 교실",
+      "targetRoomId": "3F_5-1",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 25,
+      "worldVisualBoxes": 513,
+      "worldColliders": 93,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "3F_5-2",
+      "name": "5-2 교실",
+      "targetRoomId": "3F_5-2",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 25,
+      "worldVisualBoxes": 514,
+      "worldColliders": 95,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "2F_STAFF",
+      "name": "교무실",
+      "targetRoomId": "2F_STAFF",
+      "uploadedPhotos": 12,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 357,
+      "worldVisualBoxes": 964,
+      "worldColliders": 105,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "1F_INDIVIDUAL_5",
+      "name": "개별학습실5",
+      "targetRoomId": "1F_INDIVIDUAL_5",
+      "uploadedPhotos": 12,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 73,
+      "worldVisualBoxes": 129,
+      "worldColliders": 57,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "1F_INDIVIDUAL_4",
+      "name": "개별학습실4",
+      "targetRoomId": "1F_INDIVIDUAL_4",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 77,
+      "worldVisualBoxes": 264,
+      "worldColliders": 68,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "4F_GRADE6_RESEARCH",
+      "name": "6학년 연수실",
+      "targetRoomId": "4F_GRADE6_RESEARCH",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 107,
+      "worldVisualBoxes": 362,
+      "worldColliders": 56,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "4F_4-1",
+      "name": "4-1 교실",
+      "targetRoomId": "4F_4-1",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 27,
+      "worldVisualBoxes": 516,
+      "worldColliders": 95,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "4F_4-2",
+      "name": "4-2 교실",
+      "targetRoomId": "4F_4-2",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 29,
+      "worldVisualBoxes": 560,
+      "worldColliders": 132,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "4F_2-2",
+      "name": "2-2 교실",
+      "targetRoomId": "4F_2-2",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 26,
+      "worldVisualBoxes": 441,
+      "worldColliders": 78,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "4F_2-3",
+      "name": "2-3 교실",
+      "targetRoomId": "4F_2-3",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 26,
+      "worldVisualBoxes": 447,
+      "worldColliders": 78,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "4F_COMPUTER",
+      "name": "컴퓨터실",
+      "targetRoomId": "4F_COMPUTER",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 153,
+      "worldVisualBoxes": 250,
+      "worldColliders": 134,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "2F_KOREAN_CLASS",
+      "name": "한국어학급",
+      "targetRoomId": "2F_BROADCAST",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조",
+        "사용자 확인에 따라 한국어학급 폴더의 사진은 방송실 옆 조정실에 반영; 실제 한국어학급 사진으로 분류하지 않음"
+      ],
+      "detailMeshes": 158,
+      "worldVisualBoxes": 449,
+      "worldColliders": 83,
+      "detailGeometryIntersectsRoom": true,
+      "runtimeModule": "웹학교/방송실사진배치.mjs, 웹학교/방송조정실배치.mjs"
+    },
+    {
+      "sourceRoomId": "OTHER_MISC",
+      "name": "기타",
+      "targetRoomId": null,
+      "uploadedPhotos": 100,
+      "status": "mixed-implemented-and-owner-deferred",
+      "proof": [
+        "야외 65장(운동장 2·정문 1·정문길 26·주차장 17·후문길 9·구령대 10)과 도서관 내부 21장 연결",
+        "3-4반과 여자 화장실 사이 14장은 기존 점검의 사용자 보류 상태 유지"
+      ],
+      "implementedPhotoCount": 86,
+      "ownerDeferredPhotoCount": 14
+    },
+    {
+      "sourceRoomId": "4F_6-3",
+      "name": "6-3 교실",
+      "targetRoomId": "4F_6-3",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 25,
+      "worldVisualBoxes": 568,
+      "worldColliders": 96,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "3F_5-3",
+      "name": "5-3 교실",
+      "targetRoomId": "3F_5-3",
+      "uploadedPhotos": 9,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 25,
+      "worldVisualBoxes": 555,
+      "worldColliders": 99,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "3F_5-6",
+      "name": "5-6 교실",
+      "targetRoomId": "3F_5-6",
+      "uploadedPhotos": 9,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 30,
+      "worldVisualBoxes": 573,
+      "worldColliders": 99,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "3F_GRADE5_RESEARCH",
+      "name": "5학년 연수실",
+      "targetRoomId": "3F_GRADE5_RESEARCH",
+      "uploadedPhotos": 7,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 100,
+      "worldVisualBoxes": 617,
+      "worldColliders": 41,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "3F_4-6",
+      "name": "4-6 교실",
+      "targetRoomId": "3F_4-6",
+      "uploadedPhotos": 8,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 27,
+      "worldVisualBoxes": 607,
+      "worldColliders": 134,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "3F_4-5",
+      "name": "4-5 교실",
+      "targetRoomId": "3F_4-5",
+      "uploadedPhotos": 8,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 25,
+      "worldVisualBoxes": 547,
+      "worldColliders": 95,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "3F_5-4",
+      "name": "5-4 교실",
+      "targetRoomId": "3F_5-4",
+      "uploadedPhotos": 9,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 26,
+      "worldVisualBoxes": 568,
+      "worldColliders": 96,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "2F_3-5",
+      "name": "3-5 교실",
+      "targetRoomId": "2F_3-5",
+      "uploadedPhotos": 10,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 25,
+      "worldVisualBoxes": 548,
+      "worldColliders": 89,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "1F_ADMIN",
+      "name": "행정실",
+      "targetRoomId": "1F_ADMIN",
+      "uploadedPhotos": 8,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 71,
+      "worldVisualBoxes": 548,
+      "worldColliders": 43,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "2F_CARE_DREAM_HOPE",
+      "name": "돌봄교실(꿈희망)",
+      "targetRoomId": "2F_CARE_DREAM_HOPE",
+      "uploadedPhotos": 8,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 90,
+      "worldVisualBoxes": 335,
+      "worldColliders": 77,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "2F_CARE_DREAM_WISH",
+      "name": "돌봄교실(꿈소망)",
+      "targetRoomId": "2F_CARE_DREAM_WISH",
+      "uploadedPhotos": 8,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 17,
+      "worldVisualBoxes": 315,
+      "worldColliders": 78,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "2F_CARE_DREAM_LOVE",
+      "name": "돌봄교실(꿈사랑)",
+      "targetRoomId": "2F_CARE_DREAM_LOVE",
+      "uploadedPhotos": 8,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 29,
+      "worldVisualBoxes": 297,
+      "worldColliders": 68,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "1F_PRINTING",
+      "name": "발간실",
+      "targetRoomId": "1F_PRINTING",
+      "uploadedPhotos": 7,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 18,
+      "worldVisualBoxes": 144,
+      "worldColliders": 26,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "1F_NIGHT_DUTY",
+      "name": "숙직실",
+      "targetRoomId": "1F_NIGHT_DUTY",
+      "uploadedPhotos": 7,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 52,
+      "worldVisualBoxes": 263,
+      "worldColliders": 37,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "1F_STORAGE_1",
+      "name": "창고 1",
+      "targetRoomId": "1F_STORAGE_1",
+      "uploadedPhotos": 7,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 116,
+      "worldVisualBoxes": 338,
+      "worldColliders": 25,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "1F_MEAL_CART_STORAGE",
+      "name": "배식차보관실",
+      "targetRoomId": "1F_MEAL_CART_STORAGE",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 4,
+      "worldVisualBoxes": 188,
+      "worldColliders": 51,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "custom_2e406f7fc9c04811a92910bac20efbb8",
+      "name": "과학실",
+      "targetRoomId": "2F_SCIENCE",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 74,
+      "worldVisualBoxes": 384,
+      "worldColliders": 116,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "3F_GRADE1_RESEARCH",
+      "name": "1학년 연수실",
+      "targetRoomId": "3F_GRADE1_RESEARCH",
+      "uploadedPhotos": 8,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 84,
+      "worldVisualBoxes": 171,
+      "worldColliders": 53,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "custom_852e6a5c10904a9ca5e29816f603f6be",
+      "name": "지능형 과학실",
+      "targetRoomId": "2F_INTELLIGENT_SCIENCE",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 90,
+      "worldVisualBoxes": 204,
+      "worldColliders": 86,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "3F_INDIVIDUAL_3",
+      "name": "개별학습실3",
+      "targetRoomId": "3F_INDIVIDUAL_3",
+      "uploadedPhotos": 8,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 56,
+      "worldVisualBoxes": 132,
+      "worldColliders": 62,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "2F_INDIVIDUAL_1",
+      "name": "개별학습실1",
+      "targetRoomId": "2F_INDIVIDUAL_1",
+      "uploadedPhotos": 8,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 72,
+      "worldVisualBoxes": 211,
+      "worldColliders": 68,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "4F_KINDERGARTEN",
+      "name": "까치방",
+      "targetRoomId": "4F_KINDERGARTEN",
+      "uploadedPhotos": 22,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 49,
+      "worldVisualBoxes": 231,
+      "worldColliders": 56,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "3F_5-5",
+      "name": "5-5 교실",
+      "targetRoomId": "3F_5-5",
+      "uploadedPhotos": 10,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 27,
+      "worldVisualBoxes": 543,
+      "worldColliders": 92,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "1F_MULTIPURPOSE",
+      "name": "다목적실",
+      "targetRoomId": "B1_MAIN_HALL",
+      "uploadedPhotos": 15,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 9,
+      "worldVisualBoxes": 607,
+      "worldColliders": 59,
+      "detailGeometryIntersectsRoom": true,
+      "runtimeModule": "웹학교/다목적실사진배치.mjs"
+    },
+    {
+      "sourceRoomId": "1F_MAIN_LOBBY",
+      "name": "중앙현관",
+      "targetRoomId": "1F_MAIN_LOBBY",
+      "uploadedPhotos": 15,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 1,
+      "worldVisualBoxes": 101,
+      "worldColliders": 22,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "3F_COUNSELING",
+      "name": "상담실",
+      "targetRoomId": "3F_COUNSELING",
+      "uploadedPhotos": 27,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 69,
+      "worldVisualBoxes": 243,
+      "worldColliders": 79,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "2F_GRADE3_RESEARCH",
+      "name": "3학년 연수실",
+      "targetRoomId": "2F_GRADE3_RESEARCH",
+      "uploadedPhotos": 9,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 140,
+      "worldVisualBoxes": 262,
+      "worldColliders": 36,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "2F_INDIVIDUAL_2",
+      "name": "개별학습실2",
+      "targetRoomId": "2F_INDIVIDUAL_2",
+      "uploadedPhotos": 8,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 91,
+      "worldVisualBoxes": 234,
+      "worldColliders": 69,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "4F_4-4",
+      "name": "4-4 교실",
+      "targetRoomId": "4F_4-4",
+      "uploadedPhotos": 9,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 26,
+      "worldVisualBoxes": 464,
+      "worldColliders": 80,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "2F_2-6",
+      "name": "2-6 교실",
+      "targetRoomId": "2F_2-6",
+      "uploadedPhotos": 10,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 27,
+      "worldVisualBoxes": 535,
+      "worldColliders": 85,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "1F_1-5",
+      "name": "1-5 교실",
+      "targetRoomId": "1F_1-5",
+      "uploadedPhotos": 10,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 26,
+      "worldVisualBoxes": 459,
+      "worldColliders": 79,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "1F_1-4",
+      "name": "1-4 교실",
+      "targetRoomId": "1F_1-4",
+      "uploadedPhotos": 8,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 27,
+      "worldVisualBoxes": 529,
+      "worldColliders": 86,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "1F_1-6",
+      "name": "1-6 교실",
+      "targetRoomId": "1F_1-6",
+      "uploadedPhotos": 10,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 26,
+      "worldVisualBoxes": 460,
+      "worldColliders": 79,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "2F_1-1",
+      "name": "1-1 교실",
+      "targetRoomId": "2F_1-1",
+      "uploadedPhotos": 9,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 26,
+      "worldVisualBoxes": 544,
+      "worldColliders": 86,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "3F_4-7",
+      "name": "4-7 교실",
+      "targetRoomId": "3F_4-7",
+      "uploadedPhotos": 9,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 26,
+      "worldVisualBoxes": 468,
+      "worldColliders": 81,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "3F_4-8",
+      "name": "4-8 교실",
+      "targetRoomId": "3F_4-8",
+      "uploadedPhotos": 8,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "기존 사진 개수·관찰 특징·공간별 모델 연결 대조 (사진 ID가 없는 구버전 포함)"
+      ],
+      "detailMeshes": 28,
+      "worldVisualBoxes": 464,
+      "worldColliders": 78,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "4F_GRADE2_RESEARCH",
+      "name": "2학년 연수실",
+      "targetRoomId": "4F_GRADE2_RESEARCH",
+      "uploadedPhotos": 9,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 101,
+      "worldVisualBoxes": 277,
+      "worldColliders": 45,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "2F_3-6",
+      "name": "3-6 교실",
+      "targetRoomId": "2F_3-6",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 26,
+      "worldVisualBoxes": 537,
+      "worldColliders": 86,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "3F_2-5",
+      "name": "2-5 교실",
+      "targetRoomId": "3F_2-5",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 27,
+      "worldVisualBoxes": 485,
+      "worldColliders": 80,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "2F_3-7",
+      "name": "3-7 교실",
+      "targetRoomId": "2F_3-7",
+      "uploadedPhotos": 6,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 26,
+      "worldVisualBoxes": 470,
+      "worldColliders": 81,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "custom_62bd284c95074790a9a33fe8ac6321c3",
+      "name": "급식실",
+      "targetRoomId": "1F_CAFETERIA",
+      "uploadedPhotos": 18,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 10,
+      "worldVisualBoxes": 154,
+      "worldColliders": 92,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "2F_1-2",
+      "name": "1-2 교실",
+      "targetRoomId": "2F_1-2",
+      "uploadedPhotos": 9,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 26,
+      "worldVisualBoxes": 491,
+      "worldColliders": 89,
+      "detailGeometryIntersectsRoom": true
+    },
+    {
+      "sourceRoomId": "3F_2-4",
+      "name": "2-4 교실",
+      "targetRoomId": "3F_2-4",
+      "uploadedPhotos": 11,
+      "status": "photo-guided-runtime-linked",
+      "proof": [
+        "buildWorld 공간 설정 및 실제 상세 메시 생성 확인",
+        "실제 공간의 시각 박스·충돌체 연결 확인",
+        "사진 ID 근거와 런타임 설정 대조"
+      ],
+      "detailMeshes": 26,
+      "worldVisualBoxes": 478,
+      "worldColliders": 89,
+      "detailGeometryIntersectsRoom": true
+    }
+  ],
+  "notPhotoGuided": [
+    {
+      "roomId": "1F_1-3",
+      "name": "1-3 교실",
+      "status": "기본만",
+      "uploadedPhotos": 0,
+      "evidence": "별관 일반교실 기본 구조·공통 장치만 존재; 사진 관찰 배치 없음",
+      "nextAction": "해당 공간의 사진 또는 기존 사진 위치 확인 후 공간별 실내 구현"
+    },
+    {
+      "roomId": "3F_5-7",
+      "name": "5-7 교실",
+      "status": "기본만",
+      "uploadedPhotos": 0,
+      "evidence": "6-4 기반 임시 배치; profile.photoStatus=awaiting",
+      "nextAction": "해당 공간의 사진 또는 기존 사진 위치 확인 후 공간별 실내 구현"
+    },
+    {
+      "roomId": "4F_4-3",
+      "name": "4-3 교실",
+      "status": "기본만",
+      "uploadedPhotos": 0,
+      "evidence": "방향 변경을 적용한 6-4 기반 임시 배치; profile.photoStatus=awaiting",
+      "nextAction": "해당 공간의 사진 또는 기존 사진 위치 확인 후 공간별 실내 구현"
+    },
+    {
+      "roomId": "1F_STORAGE_2",
+      "name": "창고 2",
+      "status": "사진없음",
+      "uploadedPhotos": 0,
+      "evidence": "사진 기반 전용 실내 설정 없음",
+      "nextAction": "해당 공간의 사진 또는 기존 사진 위치 확인 후 공간별 실내 구현"
+    },
+    {
+      "roomId": "2F_KOREAN_CLASS",
+      "name": "한국어학급",
+      "status": "사진없음",
+      "uploadedPhotos": 0,
+      "evidence": "같은 이름의 업로드는 방송조정실로 확인됨; 실제 한국어학급 사진 미확인",
+      "nextAction": "해당 공간의 사진 또는 기존 사진 위치 확인 후 공간별 실내 구현"
+    },
+    {
+      "roomId": "2F_SCIENCE_PREP",
+      "name": "과학준비실",
+      "status": "사진없음",
+      "uploadedPhotos": 0,
+      "evidence": "사진 기반 전용 실내 설정 없음",
+      "nextAction": "해당 공간의 사진 또는 기존 사진 위치 확인 후 공간별 실내 구현"
+    },
+    {
+      "roomId": "1F_COOKING",
+      "name": "조리실",
+      "status": "사진없음",
+      "uploadedPhotos": 0,
+      "evidence": "통합된 공간 기본 구조만 존재; 급식실 사진을 조리실 전용 사진으로 간주하지 않음",
+      "nextAction": "해당 공간의 사진 또는 기존 사진 위치 확인 후 공간별 실내 구현"
+    },
+    {
+      "roomId": "4F_GRADE4_RESEARCH",
+      "name": "4학년 연수실",
+      "status": "사진없음",
+      "uploadedPhotos": 0,
+      "evidence": "사진 기반 전용 실내 설정 없음; 업로드 자료에서 이 공간으로 확정할 사진 미확인",
+      "nextAction": "해당 공간의 사진 또는 기존 사진 위치 확인 후 공간별 실내 구현"
+    }
+  ],
+  "sharedFinishes": [
+    {
+      "spaces": "본관 1~3층 복도",
+      "status": "공통 사진 마감",
+      "basis": "본관 4층 복도 사진을 참고해 확장 적용; 각 층의 전용 사진 반영과 구분"
+    },
+    {
+      "spaces": "별관 1~3층 복도",
+      "status": "공통 사진 마감",
+      "basis": "별관 4층 복도 사진 5장을 참고해 확장 적용"
+    },
+    {
+      "spaces": "6-7 쪽 계단 및 별관 화장실 옆 계단",
+      "status": "주변 마감 반영",
+      "basis": "중앙계단 또는 별관 벽·바닥과 맞춘 마감; 공간별 사진 재현과 구분"
+    },
+    {
+      "spaces": "본관·별관·지하 화장실",
+      "status": "기본 내부 구현",
+      "basis": "사용자 설명에 따른 세면대·변기·칸막이; 공간별 실사 사진 미확인"
+    }
+  ],
+  "legacyPhotoImplementations": [
+    {
+      "roomId": "4F_6-4",
+      "name": "6-4 교실",
+      "basis": "기존 두 장의 사진 마감과 전용 모델"
+    },
+    {
+      "roomId": "4F_6-6",
+      "name": "6-6 교실",
+      "basis": "기존 휴대폰 사진 6장의 관찰 배치"
+    },
+    {
+      "roomId": "4F_2-1",
+      "name": "2-1 교실",
+      "basis": "기존 전용 사진 배치 및 컴퓨터실 입구 마감"
+    },
+    {
+      "roomId": "2F_PRINCIPAL",
+      "name": "교장실",
+      "basis": "기존 360 참고의 전용 모델; 상세 생성과 공간 연결 확인"
+    }
+  ],
+  "deferred": [
+    {
+      "sourceRoomId": "OTHER_MISC",
+      "description": "3-4반과 여자 화장실 사이",
+      "photoCount": 14,
+      "status": "기존 사용자 보류",
+      "note": "기존 20261006 점검에서 partial-deferred-by-owner. 이번 점검에서 새 위치를 추정하거나 구현 완료 처리하지 않음"
+    },
+    {
+      "feature": "360 보기",
+      "status": "사용자 보류"
+    }
+  ]
+}

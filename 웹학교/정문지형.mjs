@@ -6,6 +6,28 @@ import {addGatePhotoDetails} from './야외사진세부.mjs';
 export function gateGroundHeight(x,y,base=-3.4,cap=-.3){
   return Math.min(cap,base+Math.max(0,x+2)*(cap-base)/34+Math.max(0,-y-14)*(cap-base)/26);
 }
+export const FIELD_PARKING_APRON=Object.freeze({left:-16,right:-9.5,bottom:-68,top:-46,low:-.6,high:-.18});
+const smooth=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);};
+function addFieldParkingApron(boxes,surfaces){
+  // The 42 cm play-area lip used to meet the car bumper before its front
+  // wheels reached the heightfield slope. Grade only this parking exit, using
+  // the same visible triangles for walking and the vehicle terrain sampler.
+  const a=FIELD_PARKING_APRON,xs=[a.left,-15,-14,-13,-12,-11,-10,a.right],ys=[a.bottom,-66.5,-47.5,a.top];
+  const height=(x,y)=>{
+    const side=smooth((y-a.bottom)/1.5)*smooth((a.top-y)/1.5);
+    const rise=(a.high-a.low)*smooth((x-a.left)/4),settle=x> -12?.12*smooth((x+12)/2.5):0;
+    return a.low+(rise-settle)*side;
+  };
+  for(let i=0;i<xs.length-1;i++)for(let j=0;j<ys.length-1;j++){
+    const x0=xs[i],x1=xs[i+1],y0=ys[j],y1=ys[j+1],heights=[[x0,y0],[x1,y0],[x1,y1],[x0,y1]].map(([x,y])=>height(x,y));
+    const bounds=[x0,y0,a.low-.12,x1,y1,Math.max(...heights)],name=`정문 주차장 차량 진출 경사로 ${i} ${j}`;
+    boxes.push({name,bounds,heights,shape:'terrain',kind:'finish',floor:0,color:[.61,.52,.41],material:'soil'});
+    surfaces.push({name,bounds,height:(x,y)=>{
+      const u=(x-x0)/(x1-x0),v=(y-y0)/(y1-y0),[h0,h1,h2,h3]=heights;
+      return u>=v?h0+u*(h1-h0)+v*(h2-h1):h0+u*(h2-h3)+v*(h3-h0);
+    }});
+  }
+}
 export function addGateTerrain(boxes,colliders,surfaces,floorHeight){
   const base=-floorHeight,cut=[-23.5,-42,-10,34,-7,.05];
   for(const list of [boxes,colliders,surfaces]){
@@ -43,4 +65,5 @@ export function addGateTerrain(boxes,colliders,surfaces,floorHeight){
     if(low<a[2]-.05)add('기존 시설 기초 '+b.name,[a[0],a[1],low-.1,a[3],a[4],a[2]],b.color);
   }
   addGatePhotoDetails(boxes,colliders,surfaces,base);
+  addFieldParkingApron(boxes,surfaces);
 }

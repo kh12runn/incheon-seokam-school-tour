@@ -14,7 +14,10 @@ export function createDriving(school,physics,{canEnter=()=>true,lockedMessage=()
   physics.enableDrivingTerrain();const material=new Material('car');
   physics.world.addContactMaterial(new ContactMaterial(material,physics.groundMaterial,{friction:.35,restitution:.03}));
   const cars=PARKED_CARS.map(source=>{
-    const d=CAR_DIMENSIONS[source.type],body=new Body({mass:0,material,position:new Vec3(source.x,source.y,source.z+CENTER_HEIGHT),linearDamping:.05,angularDamping:.5});
+    const ground=school.floorBelow?.(source.x,source.y,.6,{ignoreVehicles:true,ignoreDoors:true}),base=Number.isFinite(ground)?Math.max(source.z,ground):source.z;
+    // Several collection cars stand on the raised play-area edge. Start their
+    // chassis above that actual surface instead of partly inside the terrain.
+    const d=CAR_DIMENSIONS[source.type],body=new Body({mass:0,material,position:new Vec3(source.x,source.y,base+CENTER_HEIGHT),linearDamping:.05,angularDamping:.5});
     body.addShape(new Box(new Vec3(d.width*.48,d.length*.48,.25)));
     const sports=source.type==='sports';
     // Every car starts/stops instantly, so soften pitch/roll torque for all
