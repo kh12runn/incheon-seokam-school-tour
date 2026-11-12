@@ -64,7 +64,8 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
  function penetration(c,x,z,yaw){
   const halfW=c.dimensions.width/2+.12,halfL=c.dimensions.length/2-.18,fx=-Math.sin(yaw),fz=-Math.cos(yaw);
   let overlap=-Infinity;
-  for(const along of [-halfL,0,halfL]){
+  for(let index=-1;index<=1;index++){
+   const along=index===0?0:index*halfL;
    const p=nearestTrack(x+fx*along,z+fz*along,c.s);
    overlap=Math.max(overlap,p.distance-((p.width??TRACK.width)/2-halfW));
   }return overlap;
@@ -72,7 +73,7 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
  const inside=(c,x,z,yaw)=>penetration(c,x,z,yaw)<=0;
  function boundaryContact(c,x,z,yaw){
   const halfW=c.dimensions.width/2+.12,halfL=c.dimensions.length/2-.18,fx=-Math.sin(yaw),fz=-Math.cos(yaw);let worst={overlap:-Infinity,nx:0,nz:0};
-  for(const along of [-halfL,0,halfL]){const sx=x+fx*along,sz=z+fz*along,p=nearestTrack(sx,sz,c.s),overlap=p.distance-p.width/2+halfW;if(overlap>worst.overlap)worst={overlap,nx:(sx-p.x)/Math.max(.001,p.distance),nz:(sz-p.z)/Math.max(.001,p.distance)};}
+  for(let index=-1;index<=1;index++){const along=index===0?0:index*halfL,sx=x+fx*along,sz=z+fz*along,p=nearestTrack(sx,sz,c.s),overlap=p.distance-p.width/2+halfW;if(overlap>worst.overlap)worst={overlap,nx:(sx-p.x)/Math.max(.001,p.distance),nz:(sz-p.z)/Math.max(.001,p.distance)};}
   return worst;
  }
  function gateCrossing(c,oldX,oldZ,dt){
@@ -192,7 +193,7 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
     }
    }
   }
-  for(const c of cars.slice(1))if(c.finish===null){
+  for(let index=1;index<cars.length;index++){const c=cars[index];if(c.finish!==null)continue;
    if(c.s>c.lastAdvance+.7){c.lastAdvance=c.s;c.stuckTime=0;}else c.stuckTime+=dt;
    if(c.stuckTime>6&&(Math.abs(c.speed)<1||c.wall>0||c.wrongWay))recoverOpponent(c);
   }

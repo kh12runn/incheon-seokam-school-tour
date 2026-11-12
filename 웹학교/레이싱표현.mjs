@@ -87,16 +87,36 @@ export function createRaceVisual(scene,{getDriver}={}){
   for(let j=0;j<4;j++){const book=new THREE.Group();book.position.y=.07+j*.13;book.rotation.y=j%2?.24:-.13;books.add(book);piece(book,paper,0,0,0,.80,.10,.55);for(const y of [-.058,.058])piece(book,covers[j%3],0,y,0,.86,.018,.59);piece(book,covers[j%3],-.42,0,0,.025,.13,.59);}
   item.visible=false;obstaclePool.push({item,chair,books});
  }
+ // Preserve every original book/chair part and material, but submit six GPU
+ // batches instead of a draw call for each tiny part. Transforms change per lap.
+ const obstacleBatches=new Map(),obstacleMatrix=new THREE.Matrix4(),itemInverse=new THREE.Matrix4();
+ for(const material of [wood,metal,paper,...covers]){
+  const mesh=new THREE.InstancedMesh(unit,material,16*12);mesh.name='장애물 반복 부품';mesh.castShadow=true;mesh.receiveShadow=true;mesh.count=0;obstacles.add(mesh);
+  obstacleBatches.set(material,mesh);
+ }
+ for(const entry of obstaclePool){
+  entry.item.updateMatrixWorld(true);itemInverse.copy(entry.item.matrixWorld).invert();entry.parts=[];
+  for(const [kind,group] of [['chair',entry.chair],['books',entry.books]]){
+   group.traverse(o=>{if(o.isMesh)entry.parts.push({kind,material:o.material,matrix:new THREE.Matrix4().multiplyMatrices(itemInverse,o.matrixWorld)});});group.clear();
+  }
+ }
+ function updateObstacleBatches(){
+  for(const mesh of obstacleBatches.values())mesh.count=0;
+  for(const entry of obstaclePool){if(!entry.item.visible)continue;entry.item.updateMatrix();
+   for(const part of entry.parts){if((part.kind==='chair')!==entry.chair.visible)continue;const mesh=obstacleBatches.get(part.material);obstacleMatrix.multiplyMatrices(entry.item.matrix,part.matrix);mesh.setMatrixAt(mesh.count++,obstacleMatrix);}
+  }
+  for(const mesh of obstacleBatches.values()){mesh.visible=mesh.count>0;mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();}
+ }
  let fleet=null,preview=null,previewSource=null,lastGeneration=0,lastReset=0;const target=new THREE.Vector3(),look=new THREE.Vector3(),smoothLook=new THREE.Vector3();let cameraReady=false,cameraYaw=0;
  function clearCars({keepTeacherCache=false}={}){driver.release();teachers.clear({keepCache:keepTeacherCache});if(fleet){disposeRaceTree(fleet,scene.environment);fleet=null;}if(preview){disposeRaceTree(preview,scene.environment);preview=null;}}
  function garage(car,nextCourse){setCourse(nextCourse);if(!preview||previewSource!==car){clearCars();previewSource=car;preview=parkedCarDetails({cars:[{...car,x:43,y:-50,z:-.42,yaw:0}],instanced:false,environment:scene.environment});root.add(preview);cameraReady=false;}root.visible=true;obstacles.visible=false;}
  function start(race){setCourse(race.course);clearCars({keepTeacherCache:true});fleet=parkedCarDetails({cars:race.cars.map(c=>({...c.source,id:'race-'+c.id,x:0,y:0,z:0,yaw:0})),environment:scene.environment});root.add(fleet);fleet.traverse(o=>{o.castShadow=false;});teachers.start(race.cars);lastGeneration=-1;cameraReady=false;obstacles.visible=true;root.visible=true;}
- function update(race,dt,camera,elapsed){
+ function update(race,dt,camera,elapsed,currentState){
   if(!race){if(preview){const car=preview.children[0];car.rotation.y=Math.PI+elapsed*.14;driver.update(car,previewSource,dt);const portrait=innerHeight>innerWidth&&innerWidth<=700;camera.position.set(portrait?54.7:49.5,portrait?4.8:2.9,portrait?61.9:56.6);camera.lookAt(43,.48,50);camera.fov=37;if(!portrait)camera.setViewOffset(innerWidth,innerHeight,innerWidth*.17,0,innerWidth,innerHeight);else camera.setViewOffset(innerWidth,innerHeight,0,innerHeight*.25,innerWidth,innerHeight);camera.updateProjectionMatrix();}return;}
   if(camera.view?.enabled)camera.clearViewOffset();
   const trackPoint=race.course.trackPoint;
-  const state=race.view();
-  if(lastGeneration!==state.generation){lastGeneration=state.generation;obstaclePool.forEach(({item,chair,books},i)=>{const o=race.obstacles[i];item.visible=!!o;if(!o)return;const p=trackPoint(o.s,o.lane);item.position.set(p.x,ground(p)+.06,p.z);item.rotation.y=p.yaw+o.angle;chair.visible=o.kind==='chair';books.visible=!chair.visible;});}
+  const state=currentState??race.view();
+  if(lastGeneration!==state.generation){lastGeneration=state.generation;obstaclePool.forEach(({item,chair,books},i)=>{const o=race.obstacles[i];item.visible=!!o;if(!o)return;const p=trackPoint(o.s,o.lane);item.position.set(p.x,ground(p)+.06,p.z);item.rotation.y=p.yaw+o.angle;chair.visible=o.kind==='chair';books.visible=!chair.visible;});updateObstacleBatches();}
   for(const c of race.cars){const obj=fleet.getObjectByName('race-'+c.id),height=c.height??trackPoint(c.s).height??-.30,speed=Math.abs(c.speed),finished=c.id&&c.finish!=null;obj.visible=!finished;obj.scale.setScalar(finished?0:1);obj.position.set(c.x,height-root.position.y+.02+Math.sin(c.spin*2)*Math.min(.012,speed*.0005),c.z);obj.rotation.order='YXZ';obj.rotation.set(c.pitch??0,c.yaw,THREE.MathUtils.clamp(c.steering*c.speed*.006,-.055,.055));for(const wheel of obj.userData.wheels){wheel.rotation.x=-c.spin;wheel.rotation.y=wheel.userData.front?c.steering:0;}}
   fleet.userData.instances.update();
   driver.update(fleet.getObjectByName('race-'+race.player.id),race.player.source,state.paused?0:dt);

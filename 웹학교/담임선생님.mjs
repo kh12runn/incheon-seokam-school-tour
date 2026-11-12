@@ -2,7 +2,7 @@ import * as THREE from './외부도구/three.module.js';
 import {GLTFLoader} from './외부도구/GLTFLoader.js';
 import {normalizePrincipalModel} from './교장실캐릭터.mjs';
 import {createPrincipalWalkRigAsync} from './교장보행리그.mjs';
-import {createTeacherWalk} from './선생님교실산책.mjs';
+import {createTeacherWalkAsync} from './선생님교실산책.mjs';
 import {prepareApprovedTeacherMaterials,TEACHER_MODEL_RELEASE} from './승인교사모델.mjs';
 
 // Recover only the collaborator's models, not their older copy of the school.
@@ -89,7 +89,12 @@ export function createClassTeachers(world,services={}){
           const built=await makeRig(rigSource,{height:config.height,receiveShadow:false,continuousSleeves:config.id==='teacher-6-7'});
           await prepareRender(built.root);
           if(version!==generation){release(resources(built.root));return;}
-          rig=built;resources(rig.root,owned);walk??=createTeacherWalk(world,config);
+          // Keep the visible preview while collision-safe navigation is prepared
+          // in short slices. Never block classroom entry with a full graph build.
+          rig=built;resources(rig.root,owned);
+          const preparedWalk=walk??await createTeacherWalkAsync(world,config);
+          if(version!==generation)return;
+          walk=preparedWalk;
           root.add(rig.root);root.remove(preview);preview=null;status='ready';
           // Finishing remains independent of loading/visibility. The approved
           // release needs no old scanned-face atlas processing.

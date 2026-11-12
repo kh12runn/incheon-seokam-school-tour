@@ -85,7 +85,9 @@ export function createRaceAI({cars,obstacles,rules,course,random=Math.random,tim
   const lookAhead=clamp(3.5+Math.abs(c.speed)*.24,4,10),ahead=trackPoint(c.s+lookAhead);
   const margin=m.targetId!==null&&Math.min(at.width,ahead.width)<=7?.14:.25;
   const limit=Math.max(0,Math.min(at.width,ahead.width)/2-c.dimensions.width/2-margin),lane=clamp(m.lane,-limit,limit);
-  const target=trackPoint(c.s+lookAhead,lane),dx=target.x-c.x,dz=target.z-c.z,distance=Math.max(2,Math.hypot(dx,dz)),error=angle(Math.atan2(-dx,-dz)-c.yaw);
+  // The centreline sample already contains the exact lateral normal. Reuse it
+  // instead of evaluating the same analytic segment a second time per step.
+  const dx=ahead.x+ahead.nx*lane-c.x,dz=ahead.z+ahead.nz*lane-c.z,distance=Math.max(2,Math.hypot(dx,dz)),error=angle(Math.atan2(-dx,-dz)-c.yaw);
   let steer=clamp(-Math.atan(2*c.dimensions.wheelbase*Math.sin(error)/distance)/rackLimit(p),-1,1);
   const pace=Math.min(1,rules.pace+.025+m.paceOffset),base=p.speed*pace;
   const advanced=signedGap(c.s,m.originS),obstacleGap=m.obstacleGap-advanced;

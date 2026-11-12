@@ -7,6 +7,12 @@ export function createMissionUI({onAnswer,onRetry,onFree,onQuestion,onQuestionEn
  const action=document.createElement('button');action.id='미션동작';action.type='button';action.hidden=true;action.onclick=onInteract;hud.append(action);
  document.body.append(hud,bubble,result);document.getElementById('미션다시').onclick=onRetry;document.getElementById('미션자유').onclick=onFree;
  const $=id=>document.getElementById(id);let questionKey='',lastPhase='',lastSignature='',state=null;
+ const setText=(element,text)=>{if(element.textContent!==text)element.textContent=text;};
+ // Layout measurements arrive after layout, rather than forcing one immediately
+ // after changing the quiz text on every animation frame.
+ let bubbleWidth=360,bubbleHeight=260,hudBottom=190;
+ const sizeObserver=new ResizeObserver(entries=>{for(const entry of entries){if(entry.target===bubble){if(entry.contentRect.width){bubbleWidth=bubble.offsetWidth;bubbleHeight=bubble.offsetHeight;}}else hudBottom=hud.getBoundingClientRect().bottom;}});
+ sizeObserver.observe(bubble);sizeObserver.observe(hud);
  function closeQuestion(resume=true){if(bubble.hidden)return;bubble.hidden=true;if(resume)onQuestionEnd?.();}
  function answer(i){
   if(bubble.hidden||!state||state.phase!=='quiz')return;
@@ -24,14 +30,14 @@ export function createMissionUI({onAnswer,onRetry,onFree,onQuestion,onQuestionEn
    if(showing){
     const key=s.round+':'+s.prompt;if(key!==questionKey){questionKey=key;$('탐험퀴즈문제').textContent=s.prompt;$('탐험퀴즈선생님').textContent=s.teacher.label+' · '+s.category;
      $('탐험퀴즈보기').replaceChildren(...s.choices.map((word,i)=>{const button=document.createElement('button');button.type='button';button.dataset.choice=i;button.textContent=(i+1)+'. '+word;button.onclick=()=>answer(i);return button;}));}
-    for(const b of $('탐험퀴즈보기').children){b.disabled=s.wrong.includes(Number(b.dataset.choice));b.dataset.wrong=String(b.disabled);}
-    $('탐험퀴즈반응').textContent=s.feedback;
-    const w=bubble.offsetWidth,h=bubble.offsetHeight,low=Math.min(innerHeight-h-12,innerWidth<=600?hud.getBoundingClientRect().bottom+12:190),x=innerHeight<=560&&innerWidth>600?Math.max(280+w/2,anchor?.x??innerWidth/2):anchor?.x??innerWidth/2,y=anchor?.y??innerHeight*.55;
+    for(const b of $('탐험퀴즈보기').children){const wrong=s.wrong.includes(Number(b.dataset.choice));if(b.disabled!==wrong)b.disabled=wrong;if(b.dataset.wrong!==String(wrong))b.dataset.wrong=String(wrong);}
+    setText($('탐험퀴즈반응'),s.feedback);
+    const w=bubbleWidth,h=bubbleHeight,low=Math.min(innerHeight-h-12,innerWidth<=600?hudBottom+12:190),x=innerHeight<=560&&innerWidth>600?Math.max(280+w/2,anchor?.x??innerWidth/2):anchor?.x??innerWidth/2,y=anchor?.y??innerHeight*.55;
     bubble.style.left=Math.max(12,Math.min(innerWidth-w-12,x-w/2))+'px';bubble.style.top=Math.max(Math.max(12,low),Math.min(innerHeight-h-12,y-h-18))+'px';
    }
    guide.hidden=!s.target;action.hidden=!s.action||!playing;
-   if(s.target&&position){const angle=Math.atan2(-(s.target.x-position.x),s.target.y-position.y)-yaw,relative=Math.atan2(Math.sin(angle),Math.cos(angle));guide.textContent=(Math.abs(relative)<.4?'↑ 앞쪽':Math.abs(relative)>2.7?'↓ 뒤쪽':relative<0?'→ 오른쪽':'← 왼쪽')+` · ${s.target.label} ${s.target.distance}m`;}
-   action.textContent='R · '+s.action;
+   if(s.target&&position){const angle=Math.atan2(-(s.target.x-position.x),s.target.y-position.y)-yaw,relative=Math.atan2(Math.sin(angle),Math.cos(angle));setText(guide,(Math.abs(relative)<.4?'↑ 앞쪽':Math.abs(relative)>2.7?'↓ 뒤쪽':relative<0?'→ 오른쪽':'← 왼쪽')+` · ${s.target.label} ${s.target.distance}m`);}
+   setText(action,'R · '+s.action);
    const signature=[s.phase,s.round,s.stamps,Math.ceil(s.remaining),playing,s.waiting,s.feedback,s.checkpoint,s.cargo].join('|');
    if(signature!==lastSignature){
     $('미션단계').textContent=`${s.round} / ${s.total} · ${s.title} · ${s.chapter}/3장`;$('미션시간').textContent=clock(s.remaining);$('미션시계').value=s.remaining/Math.max(1,s.limit);
