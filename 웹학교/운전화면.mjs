@@ -1,3 +1,4 @@
+import {carName} from './차량성능.mjs';
 export function drivingControls({onAction,canPlay}){
   const root=document.getElementById('차량조작'),action=document.getElementById('차량탑승'),label=document.getElementById('차량동작'),brake=document.getElementById('차량브레이크'),speed=document.getElementById('차량속도');
   let held=false;
@@ -9,7 +10,8 @@ export function drivingControls({onAction,canPlay}){
   function update(driving,position,playing){
     const state=driving.getState(),nearby=driving.nearby(position),walking=state.phase==='walking',transit=['approaching','entering','exiting'].includes(state.phase);
     root.hidden=!playing||walking&&!nearby;action.disabled=transit;
-    label.textContent=walking?'탑승하기':state.phase==='driving'?'내리기':state.phase==='exiting'?'하차 중':'탑승 중';
+    const locked=walking&&nearby&&!driving.canEnter(nearby);action.disabled=transit||locked;
+    label.textContent=walking&&nearby?(locked?carName(nearby.source)+' · '+driving.lockedMessage(nearby):carName(nearby.source)+' · 탑승하기'):state.phase==='driving'?'내리기':state.phase==='exiting'?'하차 중':'탑승 중';
     brake.hidden=walking||transit;speed.hidden=walking||transit;speed.value=Math.round(Math.abs(state.speed)*3.6)+' km/h';
     document.body.dataset.driving=String(!walking);brake.classList.toggle('누르는중',held);
   }

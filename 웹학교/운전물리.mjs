@@ -1,6 +1,7 @@
 import {Body,Box,Vec3,RaycastVehicle,Material,ContactMaterial} from './외부도구/cannon-es.mjs';
 import {PARKED_CARS,CAR_DIMENSIONS} from './주차장.mjs';
 import {RUN_SPEED} from './달리기모션.mjs';
+import {profileFor} from './차량성능.mjs';
 const CENTER_HEIGHT=.52;
 const TRANSITION_SECONDS=1.35;
 const smooth=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);};
@@ -9,7 +10,7 @@ export function boardingPose(phase,progress){
   return {travel,seatBlend:phase==='entering'?travel:1-travel,door:t<.22?smooth(t/.22):t>.78?1-smooth((t-.78)/.22):1};
 }
 export const DRIVING_TUNING=Object.freeze({forwardSpeed:RUN_SPEED*3,reverseSpeed:RUN_SPEED*2,brakeForce:140,inputDeadzone:.08});
-export function createDriving(school,physics){
+export function createDriving(school,physics,{canEnter=()=>true,lockedMessage=()=> '스탬프를 모으면 탈 수 있는 차량입니다.'}={}){
   physics.enableDrivingTerrain();const material=new Material('car');
   physics.world.addContactMaterial(new ContactMaterial(material,physics.groundMaterial,{friction:.35,restitution:.03}));
   const cars=PARKED_CARS.map(source=>{
@@ -29,7 +30,8 @@ export function createDriving(school,physics){
     });
     const proxy=school.colliders.find(b=>b.vehicleId===source.id);
     if(proxy)proxy.containsXY=(x,y,r)=>{const p=body.pointToLocalFrame(new Vec3(x,y,body.position.z));return Math.hypot(Math.max(0,Math.abs(p.x)-d.width/2),Math.max(0,Math.abs(p.y)-d.length/2))<r;};
-    return {id:source.id,source,d,body,vehicle,proxy,tuning:DRIVING_TUNING,door:0,steering:0,wheelSpin:0};
+    const p=profileFor(source),tuning={...DRIVING_TUNING,forwardSpeed:DRIVING_TUNING.forwardSpeed*p.speed/20,accel:p.accel,launch:p.launch,handling:p.handling/5.6};
+    return {id:source.id,source,d,body,vehicle,proxy,tuning,door:0,steering:0,wheelSpin:0};
   });
   let phase='walking',active=null,route=[],timer=0,transitionFrom=null,transitionTo=null,error='';
   const point=(car,x,y,z=0)=>{const p=car.body.pointToWorldFrame(new Vec3(x,y,z-CENTER_HEIGHT));return {x:p.x,y:p.y,z:p.z};};
@@ -49,7 +51,7 @@ export function createDriving(school,physics){
     return cars.filter(c=>Math.abs(c.body.position.z-CENTER_HEIGHT-player.z)<.7&&Math.hypot(c.body.position.x-player.x,c.body.position.y-player.y)<3.2).sort((a,b)=>a.body.position.distanceTo(new Vec3(player.x,player.y,player.z))-b.body.position.distanceTo(new Vec3(player.x,player.y,player.z)))[0]??null;
   }
   function enter(player){
-    const car=nearby(player);if(!car)return false;const path=entryPath(car,player);
+    const car=nearby(player);if(!car)return false;if(!canEnter(car.source)){error=lockedMessage(car.source);return false;}const path=entryPath(car,player);
     if(!path){error='운전석 쪽 통로가 막혀 있습니다.';return false;}
     active=car;route=path;phase='approaching';timer=0;error='';return true;
   }
@@ -96,16 +98,18 @@ export function createDriving(school,physics){
       }
     }else if(phase==='driving'){
       const car=active,tuning=car.tuning,forward=Math.max(-1,Math.min(1,input.forward||0)),right=Math.max(-1,Math.min(1,input.right||0));
-      // Fixed-speed arcade movement. Touch and keys select direction, with no
-      // accumulated engine force, acceleration curve or sports-only boost.
+      // Short, model-specific launch ramp. Releasing controls still stops the
+      // car immediately, keeping school parking and delivery manoeuvres easy.
       const target=input.brake?0:forward>tuning.inputDeadzone?tuning.forwardSpeed:forward< -tuning.inputDeadzone?-tuning.reverseSpeed:0;
       car.parkingBrake=target===0;
       if(target!==0)car.body.wakeUp();
       if(car.vehicle.numWheelsOnGround>=2||target===0){
         const heading=carYaw(car);
-        car.body.velocity.x=-Math.sin(heading)*target;car.body.velocity.y=Math.cos(heading)*target;
+        const current=speed(car),rate=Math.abs(current)<5?tuning.launch:tuning.accel;
+        const next=target===0?0:current+Math.max(-rate*dt,Math.min(rate*dt,target-current));
+        car.body.velocity.x=-Math.sin(heading)*next;car.body.velocity.y=Math.cos(heading)*next;
       }
-      car.steering+=(-right*(.48/(1+Math.abs(target)*.10))-car.steering)*(1-Math.exp(-dt*7));
+      car.steering+=(-right*(.48/(1+Math.abs(speed(car))*.10))*Math.min(1.3,tuning.handling)-car.steering)*(1-Math.exp(-dt*7));
       for(let i=0;i<4;i++){
         car.vehicle.setSteeringValue(i<2?car.steering:0,i);
         car.vehicle.applyEngineForce(0,i);car.vehicle.setBrake(car.parkingBrake?tuning.brakeForce:0,i);
@@ -140,6 +144,6 @@ export function createDriving(school,physics){
     car.body.previousPosition.copy(car.body.position);car.body.interpolatedPosition.copy(car.body.position);
     car.body.previousQuaternion.copy(car.body.quaternion);car.body.interpolatedQuaternion.copy(car.body.quaternion);sync();
   }
-  return {cars,nearby,enter,exit,cancel,update,sync,point,prepareMissionCar,get phase(){return phase;},get active(){return active;},get error(){return error;},get seated(){return seatBlend()>.5;},get seatBlend(){return seatBlend();},seat:()=>active?seat():null,
+  return {cars,nearby,enter,exit,cancel,update,sync,point,prepareMissionCar,canEnter:car=>canEnter(car.source),lockedMessage:car=>lockedMessage(car.source),get phase(){return phase;},get active(){return active;},get error(){return error;},get seated(){return seatBlend()>.5;},get seatBlend(){return seatBlend();},seat:()=>active?seat():null,
     getState:()=>({phase,seatBlend:seatBlend(),carId:active?.id??null,speed:active?speed(active):0,yaw:active?carYaw(active):0,door:active?.door??0,error,cars:cars.map(c=>({id:c.id,position:point(c,0,0),yaw:carYaw(c)}))})};
 }

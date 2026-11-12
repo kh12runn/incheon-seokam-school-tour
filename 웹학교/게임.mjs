@@ -26,6 +26,9 @@ import {parkingDestination} from './주차장이동.mjs';
 import {parkedCarDetails,updateDrivenCars} from './자동차표현.mjs';
 import {createDriving} from './운전물리.mjs';
 import {drivingControls} from './운전화면.mjs';
+import {createSchoolProgress} from './스쿨런저장.mjs';
+import {createMiniRacing} from './레이싱.mjs';
+import {canUseCar,stampsFor} from './차량성능.mjs';
 import {supportRoomDetails} from './지원실사진표현.mjs';
 import {recyclingShelterDetails} from './분리수거장사진표현.mjs';
 import {OUTDOOR_YAW} from './운동장환경.mjs';
@@ -91,6 +94,12 @@ let data,world,position,mode='overview',locked=false,dragMode=false,freeLook=fal
 let shadowMode=null;
 let footballPhysics,footballVisual;
 let driving,carVisual,vehicleUI,lastDriveYaw=null;
+let progressStorage;try{progressStorage=localStorage;}catch{}
+const schoolProgress=createSchoolProgress(progressStorage);
+let miniRacing=null;
+const raceHiddenScenery=[];
+function updateStampLabel(){const p=schoolProgress.view();$('레이싱소개').textContent=`누적 스탬프 ${p.stamps}개 · 차량 18대 수집에 도전!\n스탬프 24개부터 스포츠카 해금`+(p.saved?'':' · 기록 저장 불가');}
+updateStampLabel();
 let freeLookPoint=null;
 let lookRequestSerial=0,lookRequestPending=false;
 let velocity={x:0,y:0},smoothZ=EYE_HEIGHT,last=performance.now(),elapsed=0,ready=false;
@@ -182,7 +191,7 @@ function beginMission(){
   if(!missionMap)return;pendingMission=false;leaveVehicle();missionUI.hide();
   if(!mission){
     let history;try{history=JSON.parse(localStorage.getItem('석암학교-미션추첨-v1')??'null');}catch{}
-    mission=createStampMission(missionMap,{speed:RUN_SPEED,history,onVehicle:course=>driving.prepareMissionCar(course.carId,course.launch),onHistory:next=>{try{localStorage.setItem('석암학교-미션추첨-v1',JSON.stringify(next));}catch{}}});
+    mission=createStampMission(missionMap,{speed:RUN_SPEED,history,onStamp:()=>{schoolProgress.stamp(crypto.randomUUID());updateStampLabel();},onVehicle:course=>driving.prepareMissionCar(course.carId,course.launch),onHistory:next=>{try{localStorage.setItem('석암학교-미션추첨-v1',JSON.stringify(next));}catch{}}});
   }
   mission.start();
   monthQuiz.dismiss();monthQuizUI.hide();position={...missionMap.start};jumpMotion.reset();yaw=Math.PI/2;pitch=0;cameraReset=true;avatar.snapHeading(Math.PI+yaw);
@@ -199,6 +208,18 @@ async function requestMission(){
   if(pendingMission){if(characterChosenThisVisit)beginMission();else openCharacterPicker();}
 }
 $('퀴즈시작').addEventListener('click',requestMission);
+$('레이싱시작').addEventListener('click',()=>{
+  if(!ready||mode!=='overview'||missionLoading)return;
+  if(!miniRacing)miniRacing=createMiniRacing({scene,camera,progress:schoolProgress,onShadow:()=>{renderer.shadowMap.needsUpdate=true;},onEnter(){
+    stopMission();leaveVehicle();clearInput();monthQuiz.dismiss();monthQuizUI.hide();
+    mode='race';dragMode=false;freeLook=false;drag=null;if(document.pointerLockElement)document.exitPointerLock();
+    updateHUD();document.body.dataset.mode='race';document.body.dataset.playing='false';panel.hidden=true;
+    avatar.root.visible=false;markerGroup.visible=false;footballVisual.group.visible=false;carVisual.visible=false;interiorLight.intensity=0;
+    for(const object of raceHiddenScenery)object.visible=false;
+    renderer.shadowMap.autoUpdate=false;renderer.shadowMap.needsUpdate=true;
+  },onExit(){camera.clearViewOffset();markerGroup.visible=true;footballVisual.group.visible=true;carVisual.visible=true;for(const object of raceHiddenScenery)object.visible=true;overview();updateHUD();updateStampLabel();renderer.shadowMap.needsUpdate=true;}});
+  miniRacing.open();
+});
 function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
 addEventListener('resize',resize);resize();
 function textTexture(text,background=false){
@@ -219,9 +240,9 @@ function buildVisuals(){
   const defer=(roomId,floor,center,create,onEvict)=>roomDetailsCache.add({roomId,floor,center,create,onEvict});
   scene.add(campusGroundBackdrop());
   scene.add(campusEntranceDetails(world.boxes));
-  const parkedCars=parkedCarDetails();carVisual=parkedCars;scene.add(parkedCars);visuals.push({mesh:parkedCars,floor:0,ceiling:false});
-  const trees=playgroundTrees();scene.add(trees);footballPhysics=createFootballPhysics(world);footballVisual=footballDetails(footballPhysics);scene.add(footballVisual.group);
-  driving=createDriving(world,footballPhysics);vehicleUI=drivingControls({onAction:vehicleAction,canPlay:isPlaying});
+  const parkedCars=parkedCarDetails({environment:scene.environment});carVisual=parkedCars;scene.add(parkedCars);visuals.push({mesh:parkedCars,floor:0,ceiling:false});
+  const trees=playgroundTrees();scene.add(trees);raceHiddenScenery.push(trees);footballPhysics=createFootballPhysics(world);footballVisual=footballDetails(footballPhysics);scene.add(footballVisual.group);
+  driving=createDriving(world,footballPhysics,{canEnter:car=>canUseCar(car,schoolProgress.view().stamps),lockedMessage:car=>`이 차량은 스탬프 ${stampsFor(car)}개로 해금돼요. 현재 ${schoolProgress.view().stamps}개입니다.`});vehicleUI=drivingControls({onAction:vehicleAction,canPlay:isPlaying});
   scene.add(teacherChairDetails(world.teacherChairs));scene.add(classroomWindowSigns(world.data));
   if(world.centralStairFinish)scene.add(centralStairDetails(world.centralStairFinish));
   if(world.westStairFinish)scene.add(centralStairDetails(world.westStairFinish));
@@ -247,7 +268,8 @@ function buildVisuals(){
   const exteriorBoxes=[...faceMonitorsTowardBoard(world.boxes).map(circulationFinish).map(exteriorRenderBox).filter(Boolean),...exteriorSkins(world.boxes,data),...circulationEndCaps(world.boxes,data)];
   for(const b of exteriorBoxes){
     if(b.shape==='terrain'||b.renderInDetails)continue;
-    const groupKey=(batchSurfaceColors(b)?'instance':b.color.join(','))+'|'+b.floor+'|'+(b.kind==='ceiling'?'ceiling':'normal')+'|'+surfaceKind(b)+'|'+(b.interiorRoom??'')+'|'+(b.shape??'box');
+    const raceHidden=b.floor===0&&/골대|골망|나무|수관|가로수|Tree|tree|흰 경기장/.test(b.name);
+    const groupKey=(batchSurfaceColors(b)?'instance':b.color.join(','))+'|'+b.floor+'|'+(b.kind==='ceiling'?'ceiling':'normal')+'|'+surfaceKind(b)+'|'+(b.interiorRoom??'')+'|'+(b.shape??'box')+'|'+raceHidden;
     if(!groups.has(groupKey))groups.set(groupKey,[]);groups.get(groupKey).push(b);
   }
   const matrix=new THREE.Matrix4(),quaternion=new THREE.Quaternion();
@@ -263,6 +285,7 @@ function buildVisuals(){
     });
     if(colored)mesh.instanceColor.needsUpdate=true;
     mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();scene.add(mesh);
+    if(items[0].floor===0&&/골대|골망|나무|수관|가로수|Tree|tree|흰 경기장/.test(items[0].name))raceHiddenScenery.push(mesh);
     const interiorRoom=items[0].interiorRoom,config=[...world.classroomInteriors,...world.specialInteriors].find(r=>r.roomId===interiorRoom);
     const roomBounds=data.rooms.find(r=>r.id===interiorRoom)?.bounds;
     const center=config?convert(config.spawn):roomBounds?convert({x:(roomBounds[0]+roomBounds[1])/2,y:(roomBounds[2]+roomBounds[3])/2,z:roomBounds[4]}):null;
@@ -566,6 +589,7 @@ document.addEventListener('mousemove',e=>{
   }
 });
 canvas.addEventListener('pointerdown',e=>{
+  if(mode==='race')return;
   if(e.pointerType!=='mouse'||touchControls?.isActive())return;
   if(freeLook&&isPlaying()){startWalk();return;}
   if(locked)return;orbitResumeAt=performance.now()+6000;drag={x:e.clientX,y:e.clientY};canvas.setPointerCapture(e.pointerId);canvas.focus();
@@ -581,6 +605,7 @@ canvas.addEventListener('pointerup',()=>drag=null);canvas.addEventListener('poin
 document.addEventListener('mouseleave',()=>freeLookPoint=null);
 canvas.addEventListener('wheel',e=>{if(mode==='overview'){orbitResumeAt=performance.now()+6000;orbit.distance=Math.max(18,Math.min(280,orbit.distance+e.deltaY*.09));e.preventDefault();}else if(isPlaying()){followDistance=Math.max(1.4,Math.min(4.8,followDistance+e.deltaY*.004));e.preventDefault();}},{passive:false});
 document.addEventListener('keydown',e=>{
+  if(mode==='race')return;
   const quizKey=e.code.match(/^(?:Digit|Numpad)([1-4])$/);
   if(quizKey&&isPlaying()&&missionUI.isVisible()){
     e.preventDefault();if(!e.repeat)missionUI.answer(Number(quizKey[1])-1);return;
@@ -656,6 +681,7 @@ function frame(now){
   requestAnimationFrame(frame);const wallDt=Math.min((now-last)/1000,1),dt=Math.min(wallDt,.1);last=now;elapsed+=dt;
   if(!ready||graphicsLost)return;
   if(document.hidden)return; // No GPU/physics work in a background browser tab.
+  if(mode==='race'){miniRacing?.update(dt);renderer.render(scene,camera);return;}
   if(characterPicker.isOpen())return;
   world.officeDoor.update(dt,position,isPlaying());connectingDoorVisual.userData.update();
   if(mode==='walk'&&position.z>9.8&&Math.hypot(position.x-35,position.y+3.5)<14)class64PhotoFinish?.load();
@@ -787,9 +813,10 @@ try{
   window.schoolTour.getPerformanceState=()=>({staticObjects,batchedDetails,details:roomDetailsCache.state(),physics:footballPhysics.getWorkState(),drawCalls:renderer.info.render.calls,triangles:renderer.info.render.triangles,geometries:renderer.info.memory.geometries,textures:renderer.info.memory.textures,shadowAutoUpdate:renderer.shadowMap.autoUpdate});
   window.schoolTour.getMonthQuizState=()=>monthQuiz.getState();
   window.schoolTour.getMissionState=()=>mission?.view()??{phase:'idle',active:false};
+  window.schoolTour.getRacingState=()=>miniRacing?.getState()??{phase:'idle',progress:schoolProgress.view()};
   window.schoolTour.getLobbyPrincipalState=()=>({...lobbyPrincipalState.getState(),...(lobbyPrincipalNPC?.getState()??{}),visible:lobbyPrincipalNPC?.root.visible??false});
   if(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).has('test'))window.schoolTour.test={
-    world,data,missionDebug:()=>mission?.debug(),setPosition(p){if(!world.candidate(p.x,p.y,p.z))throw new Error('Invalid test position');position={...p};jumpMotion.reset();smoothZ=p.z+EYE_HEIGHT;cameraReset=true;clearInput();},setYaw(y){yaw=y;},
+    world,data,missionDebug:()=>mission?.debug(),raceDebug:()=>miniRacing?.debug(),setPosition(p){if(!world.candidate(p.x,p.y,p.z))throw new Error('Invalid test position');position={...p};jumpMotion.reset();smoothZ=p.z+EYE_HEIGHT;cameraReset=true;clearInput();},setYaw(y){yaw=y;},
     step(dx,dy){position=world.move(position,dx,dy);return {...position};}
   };
   // Always begin with the whole campus, including old ?photo=1 bookmarks.

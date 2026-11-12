@@ -32,7 +32,7 @@ for(const category of ['영어','상식'])for(const stage of [0,2]){
  for(let i=0;i<pool.length;i++){const q=pickQuestion(category,new Set(),stage,()=>0,bag.pick);assert(!seen.has(q.id),'no repeated eligible question before pool exhaustion');seen.add(q.id);assert.equal(new Set(q.choices).size,4);assert.equal(q.choices[q.correct],q.answers[0]);}
  assert(seen.has(pickQuestion(category,new Set(),stage,()=>0,bag.pick).id),'exhausted question pool renews safely');
 }
-let routeCount=0,stamps=0;const times=[],selectedRooms=new Set(),orders=new Set();
+let routeCount=0,stamps=0,awarded=0;const times=[],selectedRooms=new Set(),orders=new Set();
 function traverse(points){
  // Let pushed swing doors settle between independent route simulations.
  for(let i=0;i<40;i++)world.roomDoors.update(.1,{x:52,y:1.75,z:0});
@@ -47,7 +47,7 @@ function traverse(points){
  }routeCount++;return p;
 }
 for(let seed=1;seed<=12;seed++){
- let value=Math.imul(seed,0x9e3779b9)>>>0;const random=()=>((value=(value*1664525+1013904223)>>>0)/4294967296),game=createStampMission(map,{speed:RUN_SPEED,random});game.start();
+ let value=Math.imul(seed,0x9e3779b9)>>>0;const random=()=>((value=(value*1664525+1013904223)>>>0)/4294967296),game=createStampMission(map,{speed:RUN_SPEED,random,onStamp:()=>awarded++});game.start();
  const questionIds=new Set(),types=[],categories=[];let pos=map.start,wrongCount=0;
  for(let stage=0;stage<12;stage++){
   const d=game.debug(),s=game.view();types.push(s.type);times.push(s.limit);if(d.roomId)selectedRooms.add(d.roomId);
@@ -91,7 +91,7 @@ for(let seed=1;seed<=12;seed++){
  for(let c=0;c<3;c++)assert.deepEqual(types.slice(c*4,c*4+4).sort(),['delivery','drive','relay','search']);orders.add(types.join(','));
  game.start();assert.equal(game.view().stamps,0);game.tick(99999,{position:map.start,npcs:teachers.map(t=>({...t,modelStatus:'ready'}))});assert.equal(game.view().phase,'timeout');assert.equal(game.view().remaining,0);game.stop();assert.equal(game.view().phase,'idle');assert.equal(game.view().cargo,null);
 }
-assert(orders.size>=8,'mission order varies');
+assert(orders.size>=8,'mission order varies');assert.equal(awarded,144,'One persistent award per completed task; none for repeated answers, timeout or restart');
 let saved;const prior=createStampMission(map,{speed:RUN_SPEED,random:()=>0,onHistory:h=>{saved=h;}});prior.start();
 const next=createStampMission(map,{speed:RUN_SPEED,random:()=>0,history:JSON.parse(JSON.stringify(saved))});next.start();
 assert.notEqual(next.view().grade,prior.view().grade,'reload changes first grade');assert.notEqual(next.debug().questionId,prior.debug().questionId,'question history persists');

@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="./웹학교/월영어퀴즈.css">
   <link rel="stylesheet" href="./웹학교/운전.css">
   <link rel="stylesheet" href="./웹학교/스탬프미션.css">
+  <link rel="stylesheet" href="./웹학교/레이싱.css">
   <title>석암 Rock On! 스쿨런</title>
   <meta name="description" content="달리고, 찾고, 맞히는 신나는 학교 한 바퀴! 석암 Rock On! 스쿨런에서 석암초등학교를 자유롭게 탐험하고 보물찾기와 선생님 퀴즈에 도전하세요.">
   <meta property="og:title" content="석암 Rock On! 스쿨런">
@@ -29,6 +30,8 @@
     <p id="캐릭터상태">탐험 시작 후 남학생 / 여학생을 선택하세요</p>
     <button id="시작" class="primary" disabled>자유 탐험 <span aria-hidden="true">→</span></button>
     <button id="퀴즈시작" disabled>★ 퀴즈 미션 시작하기</button>
+    <button id="레이싱시작" disabled>🏁 미니레이싱 · 나의 차고</button>
+    <p id="레이싱소개">운동장 서킷에서 AI와 레이스!<br>스탬프를 모아 경차부터 슈퍼카까지 해금하세요.</p>
     <p id="퀴즈소개">보물 찾기 · 물건 배달 · 선생님 대화 · 차량 배송<br>매번 순서가 달라지는 12단계 스쿨런!<br>미션마다 최소 4분 · 차량 배송은 최소 8분</p>
     <div class="차량키요약 PC설명" aria-label="자동차 조작 키">
       <span><kbd>F</kbd> 탑승 · 하차</span><span><kbd>Space</kbd> 브레이크</span>
@@ -47,7 +50,7 @@
     <p>선택한 주차장의 차량 옆으로 이동합니다.<br>도착하면 F키 또는 ‘탑승하기’ 버튼을 누르세요.</p>
     <div class="주차장선택줄"><button data-parking="front">정문 주차장</button><button data-parking="rear">후문 주차장</button></div>
     <button id="탐험방법뒤로">← 탐험 방법 다시 선택</button>
-    <p>모든 자동차: 전진은 아바타 이동 속도의 3배 · 후진은 2배<br>가속 없이 바로 이동하고, 조작을 놓으면 정지합니다.</p>
+    <p>차마다 속도·출발·코너링이 달라요. 스탬프를 모으면 더 많은 차를 탈 수 있어요.<br>미니레이싱 차고에서 차량 성능과 해금 조건을 확인하세요.</p>
   </dialog>
   <dialog id="게임메뉴" aria-labelledby="메뉴제목">
     <div class="창제목"><div><span class="작은제목">잠깐 쉬어가기</span><h2 id="메뉴제목">탐험 메뉴</h2></div><button id="메뉴닫기" class="닫기" aria-label="메뉴 닫기">×</button></div>

@@ -16,12 +16,12 @@ for(const source of PARKED_CARS)for(const fps of [20,30,60,144]){
  const step=(input,frames=1)=>{for(let i=0;i<frames;i++){p=driving.update(1/fps,p,input);accumulator+=1/fps;while(accumulator>=1/120-1e-9){world.step(1/120);accumulator-=1/120;}driving.sync(1/fps);if(driving.phase==='driving')p=driving.seat();}};
  step({},fps*3);assert.equal(driving.phase,'driving');
  const sample=(input,want)=>{
-   step(input);assert(Math.abs(driving.getState().speed-want)<.35,`${source.id} ${fps}fps immediate speed: ${driving.getState().speed}, wanted ${want}`);
-   step(input,fps);assert(Math.abs(driving.getState().speed-want)<.35,'No acceleration ramp');
-   assert(car.vehicle.wheelInfos.every(w=>w.engineForce===0),'No engine acceleration');
+   step(input,fps*6);assert(Math.abs(driving.getState().speed-want)<.6,`${source.id} ${fps}fps settled speed: ${driving.getState().speed}, wanted ${want}`);
+   assert(car.vehicle.wheelInfos.every(w=>w.engineForce===0),'Controlled velocity must not accumulate engine force');
  };
- sample({forward:1},RUN_SPEED*3);assert.equal(driving.exit(),false,'No exit while moving');
- sample({forward:-1},-RUN_SPEED*2);sample({forward:.2},RUN_SPEED*3);sample({forward:-.2},-RUN_SPEED*2);
+ step({forward:1});assert(driving.getState().speed<car.tuning.forwardSpeed,'Starts with a bounded launch ramp');
+ sample({forward:1},car.tuning.forwardSpeed);assert.equal(driving.exit(),false,'No exit while moving');
+ sample({forward:-1},-RUN_SPEED*2);sample({forward:.2},car.tuning.forwardSpeed);sample({forward:-.2},-RUN_SPEED*2);
  sample({forward:1,brake:true},0);sample({forward:0},0);sample({forward:.02},0);
  step({forward:1});const saved=car.body.velocity.clone();driving.update(1/fps,p,{forward:-1},{playing:false});assert.deepEqual(car.body.velocity,saved,'Paused input ignored');
  const heading=driving.getState().yaw;step({forward:1,right:.7},fps*2);assert(Math.abs(driving.getState().yaw-heading)>.08,'Steering retained');
@@ -32,6 +32,6 @@ for(const source of PARKED_CARS)for(const fps of [20,30,60,144]){
  car.body.position.set(0,-8,car.body.position.z);car.body.quaternion.setFromAxisAngle(new Vec3(0,0,1),0);car.body.velocity.setZero();car.body.angularVelocity.setZero();car.body.aabbNeedsUpdate=true;
  world.addBody(new Body({mass:0,material:groundMaterial,shape:new Box(new Vec3(20,.25,3)),position:new Vec3(0,4,2)}));
  step({forward:1},fps*2);assert(car.body.position.y<4-car.d.length*.4,'Solid wall still blocks driving');
- checks.push({car:source.id,fps,instantForward:true,instantReverse:true,noAcceleration:true,collision:true});
+ checks.push({car:source.id,fps,launch:true,modelSpeed:car.tuning.forwardSpeed,collision:true});
 }
 console.log({ok:true,cases:checks.length,cars:PARKED_CARS.length,avatarMps:RUN_SPEED,forwardMps:DRIVING_TUNING.forwardSpeed,reverseMps:DRIVING_TUNING.reverseSpeed});

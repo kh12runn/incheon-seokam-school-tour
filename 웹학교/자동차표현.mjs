@@ -4,21 +4,21 @@ import {mergeGeometries} from './외부도구/BufferGeometryUtils.js';
 import {PARKED_CARS,CAR_DIMENSIONS} from './주차장.mjs';
 
 // Photo-guided generic road cars, not scans or exact branded models.
-export function parkedCarDetails(){
+export function parkedCarDetails({cars=PARKED_CARS,instanced=true,environment=null}={}){
   const group=new THREE.Group();group.name='정문 운동장 및 후문 차량';
   const canvas=document.createElement('canvas');canvas.width=512;canvas.height=256;
   const ctx=canvas.getContext('2d'),sky=ctx.createLinearGradient(0,0,0,256);
   sky.addColorStop(0,'#8cabba');sky.addColorStop(.48,'#e8eee8');sky.addColorStop(.52,'#919b91');sky.addColorStop(1,'#596158');ctx.fillStyle=sky;ctx.fillRect(0,0,512,256);
   for(let i=0;i<12;i++){ctx.fillStyle=i%2?'#a7b6b9':'#d8ddda';ctx.fillRect(i*47,78+(i%3)*8,24,50);}
-  const env=new THREE.CanvasTexture(canvas);env.mapping=THREE.EquirectangularReflectionMapping;env.colorSpace=THREE.SRGBColorSpace;
+  const env=environment??new THREE.CanvasTexture(canvas);if(!environment){env.mapping=THREE.EquirectangularReflectionMapping;env.colorSpace=THREE.SRGBColorSpace;}
   const mat=(color,metalness=0,roughness=.7)=>new THREE.MeshStandardMaterial({color,metalness,roughness,envMap:env,envMapIntensity:.7});
   const rubber=mat('#161b1d',0,.91),trim=mat('#242a2d',.2,.5),chrome=mat('#aeb9bd',.9,.22),glass=mat('#243942',.48,.17),lamp=mat('#c7d9dc',.45,.17),red=mat('#861f23',.3,.22);
   const sportsTrim=mat('#10161c',.7,.22),sportsChrome=mat('#d7e3e9',1,.10),sportsGlass=mat('#142d40',.65,.085);
   sportsGlass.transparent=true;sportsGlass.opacity=.76;sportsGlass.depthWrite=false;sportsGlass.envMapIntensity=1.5;
-  const sportsLED=new THREE.MeshStandardMaterial({color:'#e1f8ff',emissive:'#93ddff',emissiveIntensity:2.5,roughness:.12});
-  const sportsTail=new THREE.MeshStandardMaterial({color:'#ff324b',emissive:'#ef102b',emissiveIntensity:2.1,roughness:.18});
+  const sportsLED=new THREE.MeshStandardMaterial({color:'#e1f8ff',emissive:'#b9e6ff',emissiveIntensity:.8,roughness:.12});
+  const sportsTail=new THREE.MeshStandardMaterial({color:'#b9162c',emissive:'#b9001a',emissiveIntensity:.45,roughness:.18});
   const caliper=mat('#f44327',.45,.22);
-  glass.transparent=true;glass.opacity=.32;glass.depthWrite=false;
+  glass.transparent=true;glass.opacity=.72;glass.depthWrite=false;
   const boxGeometry=new THREE.BoxGeometry(1,1,1);
   function mesh(root,g,m,p=[0,0,0]){const o=new THREE.Mesh(g,m);o.position.set(...p);o.castShadow=true;o.receiveShadow=true;root.add(o);return o;}
   function box(root,m,p,s){const o=mesh(root,boxGeometry,m,p);o.scale.set(...s);return o;}
@@ -44,13 +44,13 @@ export function parkedCarDetails(){
     for(let i=1;i<N-1;i++){indices.push(0,i+1,i);const s=(rings.length-1)*N;indices.push(s,s+i,s+i+1);}
     const g=new THREE.BufferGeometry();g.setAttribute('position',new THREE.Float32BufferAttribute(points,3));g.setIndex(indices);g.computeVertexNormals();return mesh(root,g,m);
   }
-  for(const car of PARKED_CARS){
+  for(const car of cars){
     const d=CAR_DIMENSIONS[car.type],suv=car.type==='suv',compact=car.type==='compact',sports=car.type==='sports',root=new THREE.Group();root.name=car.id;root.userData={...car};group.add(root);
     root.position.set(car.x,car.z,-car.y);root.rotation.y=car.yaw;
-    const L=d.length/2,W=d.width/2,H=d.height,axle=d.wheelbase/2,R=suv?.365:compact?.29:.325,shoulder=sports?.72:suv?.99:.86;
-    const paint=new THREE.MeshPhysicalMaterial({color:car.color,metalness:sports?.8:.55,roughness:sports?.14:.28,clearcoat:1,clearcoatRoughness:sports?.055:.17,iridescence:sports?.2:0,iridescenceIOR:1.3,iridescenceThicknessRange:[120,240],envMap:env,envMapIntensity:sports?1.65:.8});
+    const L=d.length/2,W=d.width/2,H=d.height,axle=d.wheelbase/2,R=suv?.365:compact?.29:.325,shoulder=sports?.72:suv?1.06:compact?.98:.86;
+    const paint=new THREE.MeshPhysicalMaterial({color:car.color,metalness:sports?.55:.28,roughness:sports?.23:.32,clearcoat:1,clearcoatRoughness:.12,envMap:env,envMapIntensity:sports?.95:.65});
     const glazing=sports?sportsGlass:glass;
-    const roofFront=sports?-.12:compact?-.65:-.55,roofRear=sports?.65:suv?1.43:compact?.92:.80,windFront=compact?-1.15:-1.25,rearBottom=sports?1.4:suv?1.85:compact?1.45:1.56;
+    const roofFront=sports?-.12:compact?-.65:-.55,roofRear=sports?.65:suv?1.43:compact?1.04:.80,windFront=compact?-1.15:-1.25,rearBottom=sports?1.4:suv?2.15:compact?1.71:1.56;
     const bodyRings=sports?[[-L,.68*W,.25,.43],[-L+.12,.90*W,.22,.51],[-L+.42,W,.26,.65],[-axle,W,.28,.75],[-.5,.97*W,.26,.72],[.35,.98*W,.26,.75],[axle,1.03*W,.29,.80],[L-.15,.96*W,.29,.74],[L,.85*W,.32,.68]]:[[-L,.77*W,.37,shoulder-.16],[-L+.14,.94*W,.30,shoulder-.07],[-L+.42,W,.32,shoulder],[-axle,W,.33,shoulder+.02],[0,W,.31,shoulder],[axle,W,.33,shoulder],[L-.16,.96*W,.33,shoulder-.08],[L,.80*W,.40,shoulder-.13]];
     loft(root,bodyRings,paint,true,[windFront,.1]);
     box(root,trim,[0,.27,0],[d.width-.19,.15,d.length-.35]);
@@ -77,6 +77,7 @@ export function parkedCarDetails(){
       for(const z of [-axle,axle]){
         const wheel=new THREE.Group();wheel.position.set(side*(W-.018),R,z);wheel.userData.front=z<0;wheel.rotation.order='YXZ';root.add(wheel);root.userData.wheels.push(wheel);
         const tyre=mesh(wheel,new THREE.CylinderGeometry(R,R,.235,32),rubber);tyre.rotation.z=Math.PI/2;
+        for(const x of [-.09,.09]){const shoulderRing=mesh(wheel,new THREE.TorusGeometry(R-.035,.035,8,32),rubber,[x,0,0]);shoulderRing.rotation.y=Math.PI/2;}
         const rim=mesh(wheel,new THREE.CylinderGeometry(R*(sports?.80:.70),R*(sports?.80:.70),.247,32),sports?sportsChrome:chrome);rim.rotation.z=Math.PI/2;
         const inner=mesh(wheel,new THREE.CylinderGeometry(R*(sports?.71:.59),R*(sports?.71:.59),.255,32),sports?sportsTrim:trim);inner.rotation.z=Math.PI/2;
         if(sports)box(root,caliper,[side*(W+.08),R+.04,z+.13],[.04,.21,.085]);
@@ -86,24 +87,80 @@ export function parkedCarDetails(){
         }
         const hub=mesh(wheel,new THREE.CylinderGeometry(.057,.057,.275,16),chrome);hub.rotation.z=Math.PI/2;
         const arch=mesh(root,new THREE.TorusGeometry(R+.05,.035,6,24,Math.PI),suv?trim:paint,[side*(W+.012),R,z]);arch.rotation.set(0,Math.PI/2,0);
-        for(let i=0;i<24;i++){const a=i*Math.PI/12;const tread=box(wheel,trim,[0,Math.cos(a)*(R+.002),Math.sin(a)*(R+.002)],[.19,.008,.023]);tread.rotation.x=-a;}
+        for(const x of [-.065,.065]){const groove=mesh(wheel,new THREE.TorusGeometry(R+.001,.002,4,32),trim,[x,0,0]);groove.rotation.y=Math.PI/2;}
       }
       box(root,trim,[side*(W+.012),.36,0],[.04,.07,1.8]);
       const lightY=shoulder-.24;
-      if(!sports){
+      if(!sports&&!['morning','tucson','electric'].includes(car.variant)){
       quad(root,trim,[[side*W*.38,lightY-.015,-L-.012],[side*W*.92,lightY+.025,-L+.095],[side*W*.89,lightY+.145,-L+.115],[side*W*.38,lightY+.11,-L-.01]]);
       quad(root,lamp,[[side*W*.41,lightY,-L-.018],[side*W*.88,lightY+.035,-L+.075],[side*W*.86,lightY+.125,-L+.087],[side*W*.41,lightY+.085,-L-.018]]);
       tube(root,[side*W*.42,lightY+.022,-L-.023],[side*W*.85,lightY+.055,-L+.059],.008,lamp);
       quad(root,red,[[side*W*.35,shoulder-.25,L+.012],[side*W*.92,shoulder-.22,L-.11],[side*W*.91,shoulder-.12,L-.115],[side*W*.35,shoulder-.15,L+.012]]);
       }
     }
-    if(!sports){
+    if(!sports&&!['morning','tucson','electric'].includes(car.variant)){
       box(root,trim,[0,.51,-L-.008],[d.width*.68,.19,.05]);
       for(let i=0;i<5;i++)box(root,chrome,[0,.44+i*.031,-L-.037],[d.width*.59,.008,.008]);
+      for(const s of [-1,1])box(root,sportsTail,[s*W*.51,shoulder-.18,L+.024],[W*.44,.093,.018]);
     }
     for(const z of sports?[L+.015]:[-L-.042,L+.015]){box(root,trim,[0,.48,z],[.49,.135,.012]);box(root,lamp,[0,.48,z+(z<0?-.007:.007)],[.45,.10,.012]);}
     for(const x of [-.23,.23])tube(root,[x,shoulder+.02,windFront-.025],[x+.20,shoulder+.05,windFront+.04],.011,trim);
     if(suv)for(const x of [-W*.69,W*.69])tube(root,[x,H+.025,-.30],[x,H+.025,1.20],.022,chrome);
+    // Model-specific silhouettes, lamp signatures and faceted grille surfaces.
+    // These are compact game interpretations of the reference cars.
+    if(car.variant==='morning'){
+      box(root,trim,[0,.57,-L-.025],[1.22,.32,.06]);
+      tube(root,[-.61,.91,-L+.025],[.61,.91,-L+.025],.018,sportsLED);
+      for(const s of [-1,1]){
+        box(root,trim,[s*.61,.77,-L+.025],[.22,.35,.06]);
+        tube(root,[s*.67,.92,-L],[s*.67,.65,-L],.023,sportsLED);
+        tube(root,[s*.67,.65,-L],[s*.51,.65,-L],.018,sportsLED);
+        box(root,lamp,[s*.57,.77,-L-.018],[.09,.13,.02]);
+        tube(root,[s*.65,.65,L-.03],[s*.65,.91,L-.09],.024,sportsTail);
+        tube(root,[s*.65,.91,L-.09],[s*.35,.91,L-.09],.019,sportsTail);
+      }
+      tube(root,[-.64,.91,L-.09],[.64,.91,L-.09],.011,sportsTail);
+      box(root,trim,[0,1.47,roofRear+.04],[1.3,.05,.16]);
+    }
+    if(car.variant==='tucson'){
+      box(root,sportsTrim,[0,.78,-L-.025],[1.65,.42,.055]);
+      for(let row=0;row<3;row++)for(let col=0;col<10;col++){
+        const x=-.76+col*.168,y=.64+row*.135,lit=(col<2||col>7)&&row>0;
+        quad(root,lit?sportsLED:chrome,[[x-.072,y,-L-.065],[x+.065,y,-L-.065],[x+.09,y+.085,-L-.045],[x-.05,y+.085,-L-.045]]);
+      }
+      for(const s of [-1,1]){
+        box(root,trim,[s*.78,.46,-L+.02],[.25,.19,.07]);box(root,lamp,[s*.78,.48,-L-.022],[.17,.055,.025]);
+        tube(root,[s*.30,.96,L-.015],[s*.50,.74,L+.01],.026,sportsTail);
+        tube(root,[s*.60,.96,L-.015],[s*.76,.74,L-.04],.026,sportsTail);
+        quad(root,paint,[[s*(W+.006),.51,-.85],[s*(W+.018),.92,-.42],[s*(W+.012),.56,.9],[s*(W+.015),.47,.15]]);
+      }
+      tube(root,[-.78,.96,L-.02],[.78,.96,L-.02],.015,sportsTail);
+      box(root,chrome,[0,.30,-L-.02],[1.3,.10,.08]);box(root,chrome,[0,.30,L],[1.3,.10,.08]);
+      box(root,trim,[0,H-.01,roofRear+.1],[1.47,.055,.27]);
+    }
+    if(car.variant==='electric'){
+      for(const s of [-1,1])for(let j=0;j<6;j++)box(root,sportsLED,[s*(.30+j*.08),.74,-L-.01],[.052,.057,.025]);
+      tube(root,[-.72,.73,L+.02],[.72,.73,L+.02],.018,sportsTail);
+      box(root,trim,[0,.41,-L-.015],[1.35,.10,.035]);
+    }
+    if(car.variant==='rally'){
+      for(const s of [-1,1]){box(root,lamp,[s*.16,shoulder+.027,-1.63],[.105,.012,.87]);tube(root,[s*.6,.70,L-.24],[s*.6,1.02,L-.24],.025,trim);}
+      box(root,sportsTrim,[0,1.05,L-.24],[1.68,.055,.32]);
+    }
+    if(['touring','hyper','champion'].includes(car.variant)){
+      for(const side of [-1,1]){
+        const accent=car.variant==='champion'?chrome:car.variant==='hyper'?sportsLED:trim;
+        tube(root,[side*.18,.525,-L+.10],[side*.24,.75,-.75],.012,accent);
+        tube(root,[side*(W+.026),.39,-.8],[side*(W+.026),.39,.85],.015,accent);
+        if(car.variant!=='touring')box(root,trim,[side*.53,.82,1.42],[.22,.09,.48]);
+      }
+    }
+    // Thin seals, bonnet creases, lower sill and brake discs keep highlights
+    // readable without applying a large photo atlas or adding dynamic lights.
+    for(const s of [-1,1]){
+      tube(root,[s*W*.48,shoulder-.10,-L+.18],[s*W*.64,shoulder+.025,windFront],.006,paint);
+      for(const z of [-axle,axle]){const disc=mesh(root,new THREE.CylinderGeometry(R*.62,R*.62,.012,24),chrome,[s*(W+.125),R,z]);disc.rotation.z=Math.PI/2;}
+    }
     if(sports){
       // Lightweight Lamborghini-inspired wedge, Y lights, side intakes and wing.
       // Code-native geometry, no heavy external model or photo texture needed.
@@ -153,7 +210,8 @@ export function parkedCarDetails(){
     const d=CAR_DIMENSIONS[car.userData.type],plane=new THREE.Mesh(new THREE.PlaneGeometry(d.width*1.35,d.length*1.12),shadowMaterial);
     plane.rotation.x=-Math.PI/2;plane.position.y=.012;car.add(plane);
   }
-  group.userData.instances=instanceRepeatedParts(group);
+  group.userData.instances=instanced?instanceRepeatedParts(group):{update(){}};
+  group.userData.ownedEnvironment=environment?null:env;
   return group;
 }
 

@@ -7,12 +7,20 @@ export const PARKED_CARS=[
   ...[[2,'sedan','#c0c6c6'],[6,'suv','#30373b'],[10,'sedan','#727a7c'],[13,'compact','#e1e5e3']].map(([bay,type,color])=>({id:'rear-'+bay,x:13+(bay+.5)*2.75,y:21.4,z:-.58,yaw:Math.PI,type,color,lot:'rear',estimated:true})),
   {id:'field-lamborghini',x:-18.5,y:-71.625,z:-.58,yaw:-Math.PI/2,type:'sports',color:'#c3e52f',lot:'field',label:'람보르기니 스타일 스포츠카'},
   {id:'rear-lamborghini',x:14.375,y:21.4,z:-.58,yaw:Math.PI,type:'sports',color:'#f0b42a',lot:'rear',label:'람보르기니 스타일 스포츠카'},
+  {id:'field-morning',x:-11.4,y:-73.5,z:-.58,yaw:-Math.PI/2,type:'compact',variant:'morning',color:'#bee1d9',lot:'field',label:'모닝 스타일 경차'},
+  {id:'field-tucson',x:-11.4,y:-68.5,z:-.58,yaw:-Math.PI/2,type:'suv',variant:'tucson',color:'#6e8190',lot:'field',label:'투싼 스타일 SUV'},
+  {id:'field-electric',x:-11.4,y:-63.5,z:-.58,yaw:-Math.PI/2,type:'sedan',variant:'electric',color:'#dee6ec',lot:'field',label:'일렉트릭 GT'},
+  {id:'field-rally',x:-11.4,y:-58.5,z:-.58,yaw:-Math.PI/2,type:'sedan',variant:'rally',color:'#3169ab',lot:'field',label:'랠리 세단'},
+  {id:'field-touring',x:-11.4,y:-53.5,z:-.58,yaw:-Math.PI/2,type:'sports',variant:'touring',color:'#aa253c',lot:'field',label:'스포츠 투어러'},
+  {id:'field-hyper',x:-11.4,y:-48.5,z:-.58,yaw:-Math.PI/2,type:'sports',variant:'hyper',color:'#17a8aa',lot:'field',label:'오로라 하이퍼카'},
+  {id:'field-champion',x:-11.4,y:-43.5,z:-.58,yaw:-Math.PI/2,type:'sports',variant:'champion',color:'#d5aa55',lot:'field',label:'석암 챔피언 에디션'},
 ];
 export const CAR_DIMENSIONS={sports:{width:1.93,length:4.52,height:1.18,wheelbase:2.62},sedan:{width:1.83,length:4.72,height:1.46,wheelbase:2.76},suv:{width:1.9,length:4.72,height:1.72,wheelbase:2.76},compact:{width:1.62,length:3.6,height:1.5,wheelbase:2.38}};
 export function addParking(addBox){
   const add=(name,bounds,color,solid=false)=>addBox(name,bounds,color,solid?'wall':'finish',0);
   add('주차장 흙 바닥',PARKING.bounds,[.61,.52,.41]).material='soil';
   add('주차장 뒤 경계석',[-22,-76,-.6,-21.85,-42,-.44],[.57,.58,.55],true);
+  for(let i=0;i<7;i++){const y=-73.5+i*5;for(const offset of [-1.65,1.65])add('수집 차량 주차선 '+i+' '+offset,[-13.85,y+offset,-.576,-9.02,y+offset+.07,-.566],[.89,.90,.87]);}
   add('후문 주차장 아스팔트',REAR_PARKING.bounds,[.23,.245,.25]).material='asphalt';
   add('후문 주차장 진입로',[-22,12,-.6,10,18.3,-.58],[.23,.245,.25]).material='asphalt';
   for(let i=0;i<=REAR_PARKING.spaces;i++){

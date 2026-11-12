@@ -11,7 +11,7 @@ export function missionTime({distance,searchDistance=0,roomCount=0,speed}){
  if(!Number.isFinite(speed)||speed<=0)throw Error('이동 속도가 필요합니다.');
  return Math.ceil(Math.max(240,(distance+searchDistance)/speed*4+roomCount*15+60)/5)*5;
 }
-export function createStampMission(map,{speed,random=Math.random,history,onHistory,onVehicle}={}){
+export function createStampMission(map,{speed,random=Math.random,history,onHistory,onVehicle,onStamp}={}){
  let phase='idle',index=0,round=null,remaining=0,elapsed=0,stamps=0,mistakes=0,feedback='',reward=0,nearTeacher=false,waiting=false,playing=false;
  let latestPosition=map.start,roundExit=map.start,latestVehicle={phase:'walking'},canInteract=false,checkpoint=0,parked=0,cargo=false;
  let schedule=[],used=new Set(),usedTeachers=new Set(),usedGrades=new Set(),lastCourse=null;
@@ -53,7 +53,7 @@ export function createStampMission(map,{speed,random=Math.random,history,onHisto
   remaining=round.limit;nearTeacher=false;waiting=false;canInteract=false;feedback='';
   onHistory?.({...draws.snapshot(),firstGrade:previousFirstGrade});
  }
- function complete(){roundExit={...latestPosition};stamps++;phase='reward';reward=4.5;canInteract=false;cargo=false;feedback='참 잘했어요! 스탬프를 받았어요.'+(round.question?' '+round.question.explanation:' 안전하게 배송을 마쳤어요!');}
+ function complete(){roundExit={...latestPosition};stamps++;onStamp?.();phase='reward';reward=4.5;canInteract=false;cargo=false;feedback='참 잘했어요! 스탬프를 받았어요.'+(round.question?' '+round.question.explanation:' 안전하게 배송을 마쳤어요!');}
  function pointTarget(){
   if(!round)return null;
   if(phase==='pickup')return round.item;
