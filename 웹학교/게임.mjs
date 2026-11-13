@@ -214,7 +214,7 @@ async function requestMission(){
 $('퀴즈시작').addEventListener('click',requestMission);
 $('레이싱시작').addEventListener('click',()=>{
   if(!ready||mode!=='overview'||missionLoading)return;
-  if(!miniRacing)miniRacing=createMiniRacing({scene,camera,progress:schoolProgress,getDriver:()=>avatar,onMission:requestMission,onShadow:()=>{renderer.shadowMap.needsUpdate=true;},onEnter(){
+  if(!miniRacing)miniRacing=createMiniRacing({scene,camera,progress:schoolProgress,getDriver:()=>avatar,onMission:requestMission,onCourse:course=>racePassages?.select(course),onShadow:()=>{renderer.shadowMap.needsUpdate=true;},onEnter(){
     stopMission();leaveVehicle();clearInput();monthQuiz.dismiss();monthQuizUI.hide();
     mode='race';dragMode=false;freeLook=false;drag=null;if(document.pointerLockElement)document.exitPointerLock();
     updateHUD();document.body.dataset.mode='race';document.body.dataset.playing='false';panel.hidden=true;

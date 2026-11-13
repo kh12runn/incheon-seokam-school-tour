@@ -28,7 +28,7 @@ export function makeObstacles(round,random=Math.random,cars=[],course=getRaceCou
   if(cars.some(c=>Math.abs(mod(s-c.s+L/2,L)-L/2)<15))continue;
   const at=trackPoint(s);if((at.width??TRACK.width)<=7)continue;
   const limit=Math.min(laneLimit,(at.width??TRACK.width)/2-1.7),lane=[-limit,0,limit][Math.floor(random()*3)],p=trackPoint(s,lane);
-  items.push({id:i,s,lane,x:p.x,z:p.z,kind:random()<.5?'books':'chair',angle:(random()-.5)*.6});
+  items.push({id:i,s,lane,x:p.x,z:p.z,height:p.height,kind:random()<.5?'books':'chair',angle:(random()-.5)*.6});
  }return items;
 }
 
@@ -78,6 +78,7 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
  }
  function gateCrossing(c,oldX,oldZ,dt){
   const g=gates[c.nextCheckpoint],a=(oldX-g.x)*g.tx+(oldZ-g.z)*g.tz,b=(c.x-g.x)*g.tx+(c.z-g.z)*g.tz;
+  if(Math.abs(c.height-g.height)>2.5)return;
   if(a>0||b<=0||b<=a)return;
   const t=clamp(-a/(b-a),0,1),x=oldX+(c.x-oldX)*t-g.x,z=oldZ+(c.z-oldZ)*t-g.z;
   if(Math.abs(x*(-g.tz)+z*g.tx)>(g.width??TRACK.width)/2)return;
@@ -142,10 +143,11 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
    }
   }
   c.x=slide?.x??oldX+dx*fraction;c.z=slide?.z??oldZ+dz*fraction;c.spin+=Math.hypot(c.x-oldX,c.z-oldZ)*Math.sign(travel)/.325;
-  for(const o of obstacles){const ox=o.x-c.x,oz=o.z-c.z,forward=ox*(-Math.sin(c.yaw))+oz*(-Math.cos(c.yaw)),side=ox*Math.cos(c.yaw)-oz*Math.sin(c.yaw);if(Math.abs(forward)<c.dimensions.length/2+.4&&Math.abs(side)<c.dimensions.width/2+.4){const blocking=forward>-.5&&Math.abs(side)<c.dimensions.width*.45;damage(c,blocking?p.resilience:.97);if(blocking)c.obstacleContact=.4;}}
+  for(const o of obstacles){if(Math.abs((o.height??c.height)-c.height)>2.3)continue;const ox=o.x-c.x,oz=o.z-c.z,forward=ox*(-Math.sin(c.yaw))+oz*(-Math.cos(c.yaw)),side=ox*Math.cos(c.yaw)-oz*Math.sin(c.yaw);if(Math.abs(forward)<c.dimensions.length/2+.4&&Math.abs(side)<c.dimensions.width/2+.4){const blocking=forward>-.5&&Math.abs(side)<c.dimensions.width*.45;damage(c,blocking?p.resilience:.97);if(blocking)c.obstacleContact=.4;}}
   project(c);gateCrossing(c,oldX,oldZ,dt);
  }
  function carContact(a,b){
+  if(Math.abs(a.height-b.height)>2.3)return null;
   const dx=b.x-a.x,dz=b.z-a.z;if(dx*dx+dz*dz>36)return null;
   const segment=c=>{const d=(c.dimensions.length-c.dimensions.width)/2,fx=-Math.sin(c.yaw)*d,fz=-Math.cos(c.yaw)*d;return [[c.x-fx,c.z-fz],[c.x+fx,c.z+fz]];},A=segment(a),B=segment(b);
   let best={d:Infinity,nx:0,nz:0};
@@ -169,7 +171,7 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
    const s=base-back,p=trackPoint(s),limit=Math.min(2,p.width/2-c.dimensions.width/2-.5);
    for(const lane of [0,-limit,limit]){
     const spot=trackPoint(s,lane);
-    if(!inside(c,spot.x,spot.z,spot.yaw)||cars.some(other=>other!==c&&Math.hypot(other.x-spot.x,other.z-spot.z)<6))continue;
+    if(!inside(c,spot.x,spot.z,spot.yaw)||cars.some(other=>other!==c&&Math.abs(other.height-spot.height)<2.3&&Math.hypot(other.x-spot.x,other.z-spot.z)<6))continue;
     Object.assign(c,{x:spot.x,z:spot.z,height:spot.height,yaw:spot.yaw,s,lane,speed:0,steering:0,wall:0,hit:1,reverseTime:0,recoveryCooldown:3,stuckTime:0,lastAdvance:s,aiLane:0,decision:2,contact:0,obstacleContact:0,assistActive:false,assistReason:null,assistStrength:0,passingId:null,resetSerial:c.resetSerial+1,recoveries:c.recoveries+1});project(c);return true;
    }
   }
@@ -206,7 +208,7 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
   if(paused||phase!=='racing'||player.finish!==null)return false;
   const s=player.started?(player.checkpoint*gateLength+1):-8;
   // Recovery is an explicit driver action; it cannot advance the next gate.
-  const candidates=lanes.map(l=>({lane:l,p:trackPoint(s,l)})).filter(({p})=>inside(player,p.x,p.z,p.yaw)&&cars.slice(1).every(c=>Math.hypot(c.x-p.x,c.z-p.z)>5));
+  const candidates=lanes.map(l=>({lane:l,p:trackPoint(s,l)})).filter(({p})=>inside(player,p.x,p.z,p.yaw)&&cars.slice(1).every(c=>Math.abs(c.height-p.height)>2.3||Math.hypot(c.x-p.x,c.z-p.z)>5));
   const choice=candidates.sort((a,b)=>Math.abs(a.lane)-Math.abs(b.lane))[0];if(!choice)return false;
   Object.assign(player,{x:choice.p.x,z:choice.p.z,height:choice.p.height??-.3,yaw:choice.p.yaw,s,lane:choice.lane,speed:0,steering:0,sideSpeed:0,wall:0,hit:.8,boosting:false,offTrack:false,wrongWay:false,contact:0,obstacleContact:0,assistActive:false,assistReason:null,assistStrength:0,resetSerial:player.resetSerial+1});project(player);return true;
  }

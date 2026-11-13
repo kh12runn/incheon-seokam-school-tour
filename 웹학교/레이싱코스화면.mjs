@@ -12,6 +12,7 @@ export function createCourseHub({host,progress,onSelect,onStart,onGarage,onMissi
   root.style.setProperty('--코스색',c.color);[...tabs.children].forEach((b,i)=>{b.setAttribute('aria-selected',String(i+1===round));b.querySelector('span').textContent=i<record.bestRound?'★ 클리어':i===record.bestRound?'도전 가능':'🔒 미리보기';});
   root.querySelector('.코스번호').textContent=`ROUND ${round} / 5 · ${c.tag}`;root.querySelector('.코스제목').textContent=c.name;root.querySelector('.코스설명').textContent=c.description;
   root.querySelector('.코스수치').textContent=`한 바퀴 ${Math.round(c.length)}m   ·   3바퀴   ·   난이도 ${'★'.repeat(round)}`;
+  root.querySelector('.코스구경 span').textContent=c.underground?'청록 점선은 지하 구간 · 드래그로 학교 안팎 둘러보기':'잠긴 코스도 마음껏 둘러보세요 · 드래그로 회전';
   root.querySelector('.코스해금안내').textContent=unlocked?'1위로 완주하고 다음 무대를 열어보세요!':`🔒 이전 라운드를 클리어해주세요. 라운드 ${round-1}에서 1위로 완주하면 열려요.`;
   const button=root.querySelector('.코스출발');button.disabled=!unlocked;button.textContent=unlocked?'이 코스에서 기록에 도전 →':'이전 라운드를 클리어해주세요';
   root.querySelector('.코스기록목표').textContent=record.bestTimes?.[round]?`나의 최고 기록 ${raceTime(record.bestTimes[round])} · 이번엔 더 빠르게!`:'이 코스에 나의 첫 기록을 남겨보세요.';
