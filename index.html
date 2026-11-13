@@ -5,6 +5,8 @@
   <link rel="icon" href="data:,">
   <link rel="stylesheet" href="./웹학교/캐릭터.css">
   <link rel="stylesheet" href="./웹학교/게임화면.css">
+  <link rel="stylesheet" href="./웹학교/접속자수.css">
+  <script type="module" src="./웹학교/접속자수.mjs"></script>
   <link rel="stylesheet" href="./웹학교/모바일조작.css">
   <link rel="stylesheet" href="./웹학교/NPC말풍선.css">
   <link rel="stylesheet" href="./웹학교/월영어퀴즈.css">
@@ -22,7 +24,7 @@
   <canvas id="화면" tabindex="0" aria-label="키보드·마우스 또는 터치 조이스틱으로 탐험하는 학교 3D 화면"></canvas>
   <div class="화면음영" aria-hidden="true"></div>
   <header class="게임헤더">
-    <div class="학교표식" aria-label="석암 Rock On! 스쿨런"><span class="학교문장" aria-hidden="true">석암</span><div><span class="작은제목">석암 Rock On!</span><strong>스쿨런</strong></div></div>
+    <div class="학교표식" aria-label="석암 Rock On! 스쿨런"><span class="학교문장" aria-hidden="true">석암</span><div><span class="작은제목">석암 Rock On!</span><strong>스쿨런</strong><div id="접속자수" role="status" aria-label="접속 수 확인 중"><span>TODAY <b data-visitors="today">—</b></span><span>TOTAL <b data-visitors="total">—</b></span></div></div></div>
     <div class="헤더동작"><a class="관리자링크" href="./관리자/index.html" target="_blank" rel="noopener">관리자</a><button id="메뉴" class="메뉴버튼" aria-haspopup="dialog" disabled><span aria-hidden="true">☰</span> 메뉴 <kbd>Esc</kbd></button></div>
   </header>
   <section id="시작안내" aria-labelledby="안내제목">

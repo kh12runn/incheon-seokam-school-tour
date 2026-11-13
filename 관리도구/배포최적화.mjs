@@ -6,7 +6,7 @@ import {compactModel} from './모델경량화.mjs';
 import {buildSync} from 'esbuild';
 import {createHash} from 'node:crypto';
 const sourceRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
-export const serverFiles=['관리도구/웹서버.mjs','관리도구/레이싱기록.mjs','관리도구/서버시작.mjs','관리도구/관리자/API.mjs','관리도구/관리자/저장소.mjs','관리도구/관리자/이미지검사.mjs','관리도구/관리자/사진변환.mjs','관리도구/관리자/이미지정책/policy.xml'];
+export const serverFiles=['관리도구/웹서버.mjs','관리도구/레이싱기록.mjs','관리도구/접속기록.mjs','관리도구/서버시작.mjs','관리도구/관리자/API.mjs','관리도구/관리자/저장소.mjs','관리도구/관리자/이미지검사.mjs','관리도구/관리자/사진변환.mjs','관리도구/관리자/이미지정책/policy.xml'];
 // Follow only files reachable by the current game. Source photos and authoring assets stay local.
 export function runtimeFiles(){
   const files=new Set(),queue=['index.html','웹학교/외부도구/저작권.txt','웹학교/외부도구/cannon-es-LICENSE.txt','웹학교/외부도구/lucide-LICENSE.txt'];

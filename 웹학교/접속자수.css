@@ -1,0 +1,4 @@
+#접속자수{display:flex;align-items:center;gap:12px;margin-top:5px;color:#e1e8ec;font-size:8px;line-height:1;letter-spacing:.6px;white-space:nowrap;text-shadow:0 1px 5px #10252e,0 1px 2px #10252e}
+#접속자수 span{display:flex;align-items:baseline;gap:5px}#접속자수 b{color:#fff1bf;font-size:11px;font-variant-numeric:tabular-nums;letter-spacing:0}
+body:not([data-mode=overview]) #접속자수{display:none}
+@media(max-width:600px){#접속자수{gap:8px;margin-top:1px;font-size:7px;letter-spacing:.3px}#접속자수 span{gap:3px}#접속자수 b{font-size:10px}}

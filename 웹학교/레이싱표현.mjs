@@ -11,7 +11,7 @@ import {createRaceStarter} from './레이싱출발심판.mjs';
 
 export function disposeRaceTree(root,environment,preserveMaterials=new Set()){
  const geometries=new Set(),materials=new Set(),textures=new Set();
- root.traverse(o=>{if(o.geometry)geometries.add(o.geometry);for(const m of [].concat(o.material??[])){if(preserveMaterials.has(m))continue;materials.add(m);for(const v of Object.values(m))if(v?.isTexture&&v!==environment)textures.add(v);}});
+ root.traverse(o=>{if(o.geometry)geometries.add(o.geometry);for(const m of [].concat(o.material??[])){if(preserveMaterials.has(m))continue;materials.add(m);for(const v of Object.values(m))if(v?.isTexture&&v!==environment&&!v.userData.sharedVehicleEnvironment)textures.add(v);}});
  geometries.forEach(g=>g.dispose());materials.forEach(m=>m.dispose());textures.forEach(t=>t.dispose());root.removeFromParent();
 }
 export function createRaceVisual(scene,{getDriver}={}){

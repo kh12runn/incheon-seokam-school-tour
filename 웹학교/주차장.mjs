@@ -13,7 +13,7 @@ export const PARKED_CARS=[
   {id:'field-rally',x:-11.4,y:-58.5,z:-.58,yaw:-Math.PI/2,type:'sedan',variant:'rally',color:'#3169ab',lot:'field',label:'랠리 세단'},
   {id:'field-touring',x:-11.4,y:-53.5,z:-.58,yaw:-Math.PI/2,type:'sports',variant:'touring',color:'#aa253c',lot:'field',label:'스포츠 투어러'},
   {id:'field-hyper',x:-11.4,y:-48.5,z:-.58,yaw:-Math.PI/2,type:'sports',variant:'hyper',color:'#17a8aa',lot:'field',label:'오로라 하이퍼카'},
-  {id:'field-champion',x:-11.4,y:-43.5,z:-.58,yaw:-Math.PI/2,type:'sports',variant:'champion',color:'#d5aa55',lot:'field',label:'석암 챔피언 에디션'},
+  {id:'field-champion',x:-11.4,y:-43.5,z:-.58,yaw:-Math.PI/2,type:'sports',variant:'champion',color:'#3d106f',lot:'field',label:'석암 챔피언 에디션'},
 ];
 export const CAR_DIMENSIONS={sports:{width:1.93,length:4.52,height:1.18,wheelbase:2.62},sedan:{width:1.83,length:4.72,height:1.46,wheelbase:2.76},suv:{width:1.9,length:4.72,height:1.72,wheelbase:2.76},compact:{width:1.62,length:3.6,height:1.5,wheelbase:2.38}};
 export function addParking(addBox){

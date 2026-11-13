@@ -6,6 +6,7 @@ import {spawn} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {createAdminAPI} from './관리자/API.mjs';
 import {createRaceRecords} from './레이싱기록.mjs';
+import {createVisitorRecords} from './접속기록.mjs';
 const root=path.resolve(process.env.SCHOOL_WEB_ROOT??path.join(path.dirname(fileURLToPath(import.meta.url)),'..'));
 const manifest=path.join(root,'배포목록.json');
 const publicFiles=fs.existsSync(manifest)?new Set(JSON.parse(fs.readFileSync(manifest,'utf8'))):null;
@@ -13,6 +14,7 @@ const deployed=process.env.PORT!==undefined,host=deployed?'0.0.0.0':'127.0.0.1';
 const types={'.html':'text/html; charset=utf-8','.css':'text/css; charset=utf-8','.js':'text/javascript; charset=utf-8','.mjs':'text/javascript; charset=utf-8','.json':'application/json; charset=utf-8','.png':'image/png','.webp':'image/webp','.jpg':'image/jpeg','.svg':'image/svg+xml','.glb':'model/gltf-binary','.txt':'text/plain; charset=utf-8','.blend':'application/octet-stream','.csv':'text/csv; charset=utf-8'};
 const adminAPI=createAdminAPI({root});
 const raceRecords=createRaceRecords({filename:process.env.RACE_DATA_DIR?path.join(process.env.RACE_DATA_DIR,'records.sqlite'):process.env.NODE_ENV==='production'?undefined:path.join(root,'output','race-data','records.sqlite'),production:process.env.NODE_ENV==='production'});
+const visitorRecords=createVisitorRecords({filename:process.env.VISITOR_DATA_DIR?path.join(process.env.VISITOR_DATA_DIR,'visitors.sqlite'):process.env.NODE_ENV==='production'?undefined:path.join(root,'output','visitor-data','visitors.sqlite'),production:process.env.NODE_ENV==='production'});
 const assetTags=new Map();
 const builtTags=publicFiles&&fs.existsSync(path.join(root,'.http-etags.json'))?JSON.parse(fs.readFileSync(path.join(root,'.http-etags.json'),'utf8')):{};
 async function assetTag(file,stat){
@@ -24,6 +26,7 @@ async function assetTag(file,stat){
 }
 const server=http.createServer(async(req,res)=>{
   try{
+    if(await visitorRecords(req,res))return;
     if(await raceRecords(req,res))return;
     if(await adminAPI(req,res))return;
     if(!['GET','HEAD'].includes(req.method)){res.writeHead(405);res.end();return;}
