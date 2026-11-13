@@ -11,9 +11,14 @@ export function createSchoolProgress(storage){
  if(state.courseVersion!==COURSE_VERSION){state.bestTimes={};state.courseVersion=COURSE_VERSION;}
  state.bestTimes=Object.fromEntries(Object.entries(state.bestTimes??{}).filter(([key,value])=>/^[1-5]$/.test(key)&&Number.isFinite(value)&&value>0));
  function save(){try{if(!storage)throw Error();storage.setItem(PROGRESS_KEY,JSON.stringify(state));saved=true;}catch{saved=false;}}
+ function completeRace(round,rank){
+  if(!Number.isInteger(round)||round<1||round>5||!Number.isInteger(rank)||rank<1||rank>3)return false;
+  if(rank===1)state.wins++;
+  state.bestRound=Math.max(state.bestRound,round);save();return true;
+ }
  save();
  return {view:()=>({...state,awards:undefined,sportsUnlocked:state.stamps>=SPORTS_STAMPS,saved}),
   stamp(id){if(typeof id!=='string'||!id||state.awards.includes(id))return false;state.awards.push(id);state.awards=state.awards.slice(-128);state.stamps++;save();return true;},
   record(round,seconds){const old=state.bestTimes[round]??null;if(!Number.isInteger(round)||round<1||round>5||!Number.isFinite(seconds)||seconds<=0)return {improved:false,previous:old};const improved=old===null||seconds<old;if(improved){state.bestTimes[round]=seconds;save();}return {improved,previous:old,best:state.bestTimes[round]};},
-  win(round){state.wins++;state.bestRound=Math.max(state.bestRound,Math.min(5,round));save();}};
+  completeRace,win(round){return completeRace(round,1);}};
 }
