@@ -18,14 +18,16 @@ export function createRaceDriver(getDriver=()=>null){
   // Loading cannot reveal the avatar after leaving the race: only this
   // synchronous frame path changes visibility or the seated pose.
   if(avatar.modelStatus!=='ready'){avatar.root.visible=false;return;}
-  if(!seated){avatar.cancelWave?.();avatar.setCarrying?.(false);avatar.setSeated(1);avatar.setOpacity(1);seated=true;}
+  if(!seated){avatar.cancelWave?.();avatar.setCarrying?.(false);avatar.setOpacity(1);seated=true;}
+  avatar.setSeated(1,source.type);
   carObject.updateWorldMatrix(true,false);
   // Same offsets as free-driving seat(), converted from its +Y forward
   // physics coordinates to the renderer's -Z forward coordinates.
-  seat.set(-.36,source.type==='sports'?-.43:-.10,-.15);carObject.localToWorld(seat);
+  seat.set(-.36,0,.15);carObject.localToWorld(seat);
   carObject.getWorldQuaternion(rotation);rotation.multiply(faceForward);
+  avatar.root.position.copy(seat);avatar.root.quaternion.copy(rotation);
   avatar.snapHeading(carObject.rotation.y+Math.PI);avatar.update(Math.max(0,dt));
-  avatar.root.position.copy(seat);avatar.root.quaternion.copy(rotation);avatar.root.visible=true;
+  avatar.root.quaternion.copy(rotation);avatar.root.visible=true;
  }
  return {update,release};
 }

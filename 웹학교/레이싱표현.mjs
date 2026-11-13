@@ -41,6 +41,7 @@ export function createRaceVisual(scene,{getDriver}={}){
  let course=null,trackLayer=null,mapPreview=false,previewTurn=0,previewZoom=1,previewTilt=.78,manualUntil=0,previewClock=0,previewInside=false,viewCamera=null,originalFar=500,originalNear=.045;
  function setCourse(next=getRaceCourse(1)){
  raceAtmosphere();
+ if(trackLayer)trackLayer.visible=true;
  if(course===next)return false;
  if(trackLayer)disposeRaceTree(trackLayer,scene.environment,courseMaterials);
  course=next;const TRACK=course,trackPoint=course.trackPoint;
@@ -119,7 +120,9 @@ export function createRaceVisual(scene,{getDriver}={}){
  }
  let fleet=null,preview=null,previewSource=null,lastGeneration=0,lastReset=0;const target=new THREE.Vector3(),look=new THREE.Vector3(),smoothLook=new THREE.Vector3();let cameraReady=false,cameraYaw=0;
  function clearCars({keepTeacherCache=false}={}){starter.hide();boostFlames.clear();driver.release();teachers.clear({keepCache:keepTeacherCache});if(fleet){disposeRaceTree(fleet,scene.environment);fleet=null;}if(preview){disposeRaceTree(preview,scene.environment);preview=null;}}
- function garage(car,nextCourse){mapPreview=false;setCourse(nextCourse);if(!preview||previewSource!==car){clearCars();previewSource=car;preview=parkedCarDetails({cars:[{...car,x:43,y:-50,z:-.42,yaw:0}],instanced:false,environment:scene.environment});root.add(preview);cameraReady=false;}preview.visible=true;root.visible=true;obstacles.visible=false;}
+ // Display on the school's dirt surface (world Y=-.30), independently of
+ // elevated roads. Courses 3/4 cross this spot and used to cut through tyres.
+ function garage(car,nextCourse){mapPreview=false;setCourse(nextCourse);trackLayer.visible=false;if(!preview||previewSource!==car){clearCars();previewSource=car;preview=parkedCarDetails({cars:[{...car,x:43,y:-50,z:-.30-root.position.y+.004,yaw:0}],instanced:false,environment:scene.environment});root.add(preview);cameraReady=false;}preview.visible=true;root.visible=true;obstacles.visible=false;}
  function previewCourse(next){setCourse(next);mapPreview=true;previewClock=0;previewZoom=1;previewTurn=0;previewTilt=.78;manualUntil=0;clearCars({keepTeacherCache:true});root.visible=true;obstacles.visible=false;cameraReady=false;}
  function start(race){setCourse(race.course);clearCars({keepTeacherCache:true});fleet=parkedCarDetails({cars:race.cars.map(c=>({...c.source,id:'race-'+c.id,x:0,y:0,z:0,yaw:0})),environment:scene.environment});root.add(fleet);fleet.traverse(o=>{o.castShadow=false;});teachers.start(race.cars);starter.show(race.course);lastGeneration=-1;cameraReady=false;obstacles.visible=true;root.visible=true;}
  function update(race,dt,camera,elapsed,currentState){

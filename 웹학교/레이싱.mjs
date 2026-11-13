@@ -44,7 +44,7 @@ export function createMiniRacing({scene,camera,progress,onEnter,onExit,onShadow,
  }
  function selectedCourse(){return getRaceCourse(Number(el('레이스라운드').value)||round);}
  function roundLabel(n){return `라운드 ${n} · ${getRaceCourse(n).name}`;}
- function showCourse(){const course=selectedCourse();onCourse?.(course);el('레이스코스이름').textContent=course.name;el('레이스코스설명').textContent=course.description;el('레이스코스정보').textContent=`한 바퀴 ${Math.round(course.length)}m · ${roundRules(Number(el('레이스라운드').value)||round).laps}바퀴`;visual.garage(selected,course);prepareMap(course);onShadow?.();}
+ function showCourse(){const course=selectedCourse();onCourse?.(getRaceCourse(1));el('레이스코스이름').textContent=course.name;el('레이스코스설명').textContent=course.description;el('레이스코스정보').textContent=`한 바퀴 ${Math.round(course.length)}m · ${roundRules(Number(el('레이스라운드').value)||round).laps}바퀴`;visual.garage(selected,course);prepareMap(course);onShadow?.();}
  function garage(){hub.show(false);recordEntry.hide();recordRun=null;race=null;lastResult=false;resetInput();silence();cover.hidden=true;el('레이스차고').hidden=false;el('레이스HUD').hidden=true;el('레이스일시정지').hidden=true;root.dataset.stage='garage';
   const picker=el('레이스라운드');picker.replaceChildren();for(let i=1;i<=ROUND_COUNT;i++){const opt=document.createElement('option');opt.value=i;opt.textContent=roundLabel(i);picker.append(opt);}picker.value=String(Math.min(round,picker.options.length));showSelection();
  }

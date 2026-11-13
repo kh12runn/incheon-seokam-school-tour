@@ -24,6 +24,9 @@ for(let pass=0;pass<2;pass++)for(let round=1;round<=5;round++){
  if(changing){for(const geo of previousGeometries)geo.addEventListener('dispose',()=>{disposedGeometry++;thisDisposal++;});old.getObjectByName('코스 출발 현수막').material.map.addEventListener('dispose',()=>disposedBanners++);}
  visual.garage(car,course);
  const track=visual.root.getObjectByName('라운드별 분필 코스');
+ assert.equal(track.visible,false,'garage never intersects preview tyres with an elevated road');
+ preview.updateWorldMatrix(true,true);
+ for(const wheel of preview.userData.wheels){const bounds=new THREE.Box3().setFromObject(wheel);assert(Math.abs(bounds.min.y-(-.30))<.006,'tyre tread touches the school ground');}
  assert.equal(visual.root.userData.courseId,course.id);
  assert.equal(visual.root.userData.courseLength,course.length);
  assert.equal(visual.root.children.filter(o=>o.name==='라운드별 분필 코스').length,1,'one current course group');
@@ -48,6 +51,7 @@ assert(disposedBanners>=9,'previous banner texture released');
 const camera=new THREE.PerspectiveCamera();
 for(let round=1;round<=5;round++){
  const race=createRace({car,opponents:[],round,seed:17});visual.start(race);visual.update(race,.016,camera,0);
+ assert.equal(visual.root.getObjectByName('라운드별 분필 코스').visible,true,'race restores the selected road');
  assert.equal(visual.root.userData.courseId,race.course.id);
  for(const [i,o] of race.obstacles.entries()){
   const item=pool.children[i],p=race.course.trackPoint(o.s,o.lane),world=new THREE.Vector3();item.getWorldPosition(world);

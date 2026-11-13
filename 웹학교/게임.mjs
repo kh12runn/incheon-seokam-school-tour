@@ -777,7 +777,7 @@ function frame(now){
   if(mode==='walk'){
     const dx=position.x-previous.x,dy=position.y-previous.y,baseZ=position.z;
     const vehicleTransition=driving.phase==='entering'||driving.phase==='exiting';
-    avatar.setSeated(driving.seatBlend);
+    avatar.setSeated(driving.seatBlend,driving.active?.source.type);
     if(vehicleTransition){const h=avatar.getState().heading,target=Math.PI+driving.getState().yaw;avatar.snapHeading(h+Math.atan2(Math.sin(target-h),Math.cos(target-h))*(1-Math.exp(-dt*9)));}
     else if(driving.seated)avatar.snapHeading(Math.PI+driving.getState().yaw);
     avatar.root.position.set(position.x,baseZ,-position.y);

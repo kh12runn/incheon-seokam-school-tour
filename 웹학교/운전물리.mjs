@@ -58,9 +58,8 @@ export function createDriving(school,physics,{canEnter=()=>true,lockedMessage=()
     if(!path){error='운전석 쪽 통로가 막혀 있습니다.';return false;}
     active=car;route=path;phase='approaching';timer=0;error='';return true;
   }
-  // Lower the avatar's root to fit the low coupe roof; the seated hips remain
-  // above the cushion instead of leaving a standing-height head through it.
-  const seat=()=>point(active,-.36,.15,active.source.type==='sports'?-.43:-.10);
+  // The seated rig fits the cushion/footwell; keep its root at tyre height.
+  const seat=()=>point(active,-.36,-.15,0);
   function resetControls(car){
     car.parkingBrake=false;car.steering=0;car.body.force.setZero();car.body.torque.setZero();
     for(let i=0;i<4;i++){car.vehicle.applyEngineForce(0,i);car.vehicle.setBrake(0,i);car.vehicle.setSteeringValue(0,i);}
