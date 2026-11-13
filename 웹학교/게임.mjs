@@ -10,6 +10,7 @@ import {surfaceKind,finishMaterial,softEnvironment,batchSurfaceColors,surfaceIns
 import {ELEVATOR,nearElevator,elevatorDestination} from './엘리베이터.mjs';
 import {shoeCabinets} from './사진참고마감.mjs';
 import {createStudent,CHARACTER_NAMES,RUN_SPEED,STUDENT_HEIGHT} from './학생캐릭터.mjs';
+import {explorationSpeed} from './탐험달리기.mjs';
 import {createCharacterPicker} from './캐릭터선택.mjs';
 import {createCameraCollision,thirdPersonDesired} from './삼인칭카메라.mjs';
 import {createJumpMotion} from './점프물리.mjs';
@@ -40,7 +41,7 @@ import {footballDetails} from './축구공표현.mjs';
 import {faceMonitorsTowardBoard} from './모니터방향.mjs';
 import {createTouchControls,prefersTouch} from './모바일조작.mjs';
 import {PRINCIPAL_ID} from './교장실배치.mjs';
-import {createPrincipalOffice} from './교장실표현.mjs';
+import {createPrincipalOffice,createPrincipalOfficeLights} from './교장실표현.mjs';
 import {meetingRoomDetails} from './운영위원회회의실표현.mjs';
 import {staffRoomDetails} from './교무실사진표현.mjs';
 import {STAFF_ID} from './교무실사진배치.mjs';
@@ -88,6 +89,10 @@ const skyReady=loadDaySky().then(texture=>{scene.background=texture;});
 scene.add(new THREE.HemisphereLight(0xe4edfa,0xb4ac91,1.35));
 scene.environment=softEnvironment(renderer);
 const interiorLight=new THREE.PointLight(0xfff3de,0,13,2);scene.add(interiorLight);
+// Keep the light count fixed. Hiding/evicting the office used to recompile every
+// school material (1 ↔ 3 point lights) on each 2F landing, causing long freezes.
+const officeLighting=createPrincipalOfficeLights();scene.add(officeLighting);
+for(const light of officeLighting.children)light.intensity=0;
 const sun=new THREE.DirectionalLight(0xfff4dd,2.7);sun.position.set(-30,90,-65);scene.add(sun);
 sun.castShadow=true;sun.shadow.mapSize.set(2048,2048);Object.assign(sun.shadow.camera,{left:-135,right:135,top:135,bottom:-135,near:.5,far:350});
 sun.shadow.bias=-.00008;sun.shadow.normalBias=.025;
@@ -160,6 +165,10 @@ const characterPicker=createCharacterPicker({initial:selectedCharacter??'boy-cut
     const next=createStudent(variant);try{await next.ready;}catch(error){next.dispose();throw error;}
     scene.remove(avatar.root);avatar.dispose();avatar=next;scene.add(avatar.root);avatar.snapHeading(Math.PI+yaw);
   }else await avatar.load();
+  // Finish the selected student's skin/hair/shadow shaders while the picker is
+  // still open, rather than during the first staircase/corridor movement.
+  avatar.setOpacity(.5);await prepareRender(avatar.root);
+  avatar.setOpacity(1);await prepareRender(avatar.root);
   avatar.snapHeading(Math.PI+yaw);
   selectedCharacter=variant;characterChosenThisVisit=true;try{localStorage.setItem('석암학교-캐릭터',variant);}catch{}
   updateCharacterLabel();cameraReset=true;
@@ -260,7 +269,7 @@ function buildVisuals(){
   }
   hallMirror=createHallMirror(data.floorHeight,mobileGraphics);scene.add(hallMirror);scene.add(createGateTerrain(world.boxes));
   const hallDetails=hallPhotoDetails(world.hallPhotoFinish);scene.add(hallDetails);visuals.push({mesh:hallDetails,floor:0,ceiling:false});
-  defer(PRINCIPAL_ID,2,convert(world.principalOffice.spawn),createPrincipalOffice);
+  defer(PRINCIPAL_ID,2,convert(world.principalOffice.spawn),()=>createPrincipalOffice({lights:false}));
   connectingDoorVisual=officeConnectingDoor(world.officeDoor);scene.add(connectingDoorVisual);
   roomDoorVisual=roomDoorVisuals(world.roomDoors);scene.add(roomDoorVisual);doorUI=doorControls(doorAction);
   defer(CLASS64_ID,4,convert(CLASS64_SPAWN),()=>{const mesh=class64Details();class64PhotoFinish=mesh.userData.photoFinish;return mesh;},()=>{class64PhotoFinish=null;});
@@ -626,7 +635,7 @@ document.addEventListener('keydown',e=>{
   // An automatic request after walking away can be browser-blocked. The next
   // normal movement/action key retries, without an extra click or camera reset.
   if(e.isTrusted&&!e.repeat&&freeLook&&/^(Key[WASDFRZ]|Arrow\w+|Space)$/.test(e.code))void requestLookLock();
-  if(isPlaying()&&['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight'].includes(e.code)){keys.add(e.code);e.preventDefault();}
+  if(isPlaying()&&['KeyW','KeyA','KeyS','KeyD','ArrowUp','ArrowDown','ArrowLeft','ArrowRight','ShiftLeft','ShiftRight'].includes(e.code)){keys.add(e.code);e.preventDefault();}
   if(e.code==='KeyF'&&isPlaying()&&!e.repeat){e.preventDefault();if(!doorAction())vehicleAction();}
   if(e.code==='Space'&&isPlaying()){
     e.preventDefault();if(driving.phase==='driving')keys.add('Space');else if(!e.repeat)jump();
@@ -654,6 +663,7 @@ const map=$('지도'),mapCtx=map.getContext('2d');
 function updateHUD(){
   if(!world)return;
   roomDetailsCache?.update(position,mode);
+  for(const light of officeLighting.children)light.intensity=roomDetailsCache?.isVisible(PRINCIPAL_ID)?7:0;
   $('승강기호출').hidden=!isPlaying()||driving?.phase!=='walking'||!nearElevator(position,data.floorHeight);
   const at=world.roomAt(position),floor=at.floor;
   const stair=world.stairs.find(s=>{const f=s.frame,dx=position.x-f.origin[0],dy=position.y-f.origin[1],u=dx*f.right[0]+dy*f.right[1],v=dx*f.inward[0]+dy*f.inward[1];return u>0&&u<f.width&&v>0&&v<f.depth;});
@@ -700,7 +710,7 @@ function frame(now){
       position=driving.update(dt,position,{forward,right,brake:keys.has('Space')||vehicleUI.brake});
     }else{
     const length=Math.hypot(forward,right);if(length){forward/=length;right/=length;}
-    const speed=RUN_SPEED;
+    const speed=explorationSpeed(forward,keys.has('ShiftLeft')||keys.has('ShiftRight'));
     const dx=(-Math.sin(yaw)*forward+Math.cos(yaw)*right)*speed,dy=(Math.cos(yaw)*forward+Math.sin(yaw)*right)*speed;
     const a=1-Math.exp(-dt*14);velocity.x+=(dx-velocity.x)*a;velocity.y+=(dy-velocity.y)*a;
     if(length&&avatar.getState().waving)avatar.cancelWave();
@@ -734,8 +744,8 @@ function frame(now){
     npc.update(dt,position,{paused:!officeNearby||!isPlaying()||focusedTeacher==='office-'+npc.getState().id,others:officePrincipals.characters.filter(n=>n!==npc).map(n=>n.getState().position)});
   }
   const lobbyNearby=mode==='walk'&&Math.abs(position.z)<1.8&&Math.hypot(position.x-47,position.y+2.8)<22;
-  if(lobbyNearby&&!lobbyPrincipalNPC){lobbyPrincipalNPC=createRunnerPrincipalNPC();scene.add(lobbyPrincipalNPC.root);}
-  if(lobbyPrincipalNPC){lobbyPrincipalNPC.root.visible=lobbyNearby;const npcState=lobbyPrincipalState.update(dt,position,{paused:!lobbyNearby||!isPlaying()||document.hidden});lobbyPrincipalNPC.update(isPlaying()&&!document.hidden?dt:0,npcState);}
+  if(lobbyNearby&&!lobbyPrincipalNPC){lobbyPrincipalNPC=createRunnerPrincipalNPC({prepareRender});scene.add(lobbyPrincipalNPC.root);}
+  if(lobbyPrincipalNPC){lobbyPrincipalNPC.root.visible=lobbyNearby&&lobbyPrincipalNPC.getState().renderReady;const npcState=lobbyPrincipalState.update(dt,position,{paused:!lobbyNearby||!isPlaying()||document.hidden});lobbyPrincipalNPC.update(isPlaying()&&!document.hidden?dt:0,npcState);}
   const quizNPCs=[
     ...OFFICE_CHARACTERS.map((config,index)=>({id:'office-'+config.id,name:config.label,position:officePrincipals?.characters[index].getState().position??config.position,available:officeNearby&&officePrincipals?.characters[index].getState().modelStatus==='ready'})),
     {id:'lobby',name:'중앙현관 · 교장선생님',position:lobbyPrincipalState.getState().position,available:lobbyNearby}
@@ -824,7 +834,7 @@ try{
   window.schoolTour.getRacePassageState=()=>racePassages?.getState()??{open:false};
   window.schoolTour.getLobbyPrincipalState=()=>({...lobbyPrincipalState.getState(),...(lobbyPrincipalNPC?.getState()??{}),visible:lobbyPrincipalNPC?.root.visible??false});
   if(['127.0.0.1','localhost'].includes(location.hostname)&&new URLSearchParams(location.search).has('test'))window.schoolTour.test={
-    world,data,missionDebug:()=>mission?.debug(),raceDebug:()=>miniRacing?.debug(),setPosition(p){if(!world.candidate(p.x,p.y,p.z))throw new Error('Invalid test position');position={...p};jumpMotion.reset();smoothZ=p.z+EYE_HEIGHT;cameraReset=true;clearInput();},setYaw(y){yaw=y;},
+    world,data,renderer,scene,camera,prepareRender,missionDebug:()=>mission?.debug(),raceDebug:()=>miniRacing?.debug(),setPosition(p){if(!world.candidate(p.x,p.y,p.z))throw new Error('Invalid test position');position={...p};jumpMotion.reset();smoothZ=p.z+EYE_HEIGHT;cameraReset=true;clearInput();},setYaw(y){yaw=y;},
     step(dx,dy){position=world.move(position,dx,dy);return {...position};}
   };
   // Always begin with the whole campus, including old ?photo=1 bookmarks.

@@ -1,6 +1,7 @@
 import * as THREE from './외부도구/three.module.js';
 import {mergeGeometries} from './외부도구/BufferGeometryUtils.js';
 import {parkedCarDetails} from './자동차표현.mjs';
+import {updateCarEffects} from './차량배기스파크.mjs';
 import {RACE_PASSAGES,getRaceCourse} from './레이싱코스.mjs';
 import {createRaceDriver} from './레이싱운전자.mjs';
 import {createRaceTeachers} from './레이싱교사.mjs';
@@ -140,13 +141,14 @@ export function createRaceVisual(scene,{getDriver}={}){
    if(!cameraReady){camera.position.copy(target);smoothLook.copy(look);cameraReady=true;}else{camera.position.lerp(target,1-Math.exp(-dt*2));smoothLook.lerp(look,1-Math.exp(-dt*2));}
    camera.lookAt(smoothLook);camera.fov=55;camera.setViewOffset(innerWidth,innerHeight,portrait?0:-innerWidth*.08,innerHeight*(portrait?.12:.015),innerWidth,innerHeight);camera.updateProjectionMatrix();return;
   }
-  if(!race){if(preview){const car=preview.children[0];car.rotation.y=Math.PI+elapsed*.14;driver.update(car,previewSource,dt);const portrait=innerHeight>innerWidth&&innerWidth<=700;camera.position.set(portrait?54.7:49.5,portrait?4.8:2.9,portrait?61.9:56.6);camera.lookAt(43,.48,50);camera.fov=37;if(!portrait)camera.setViewOffset(innerWidth,innerHeight,innerWidth*.17,0,innerWidth,innerHeight);else camera.setViewOffset(innerWidth,innerHeight,0,innerHeight*.25,innerWidth,innerHeight);camera.updateProjectionMatrix();}return;}
+  if(!race){if(preview){const car=preview.children[0];car.rotation.y=Math.PI+elapsed*.14;updateCarEffects(car,elapsed);driver.update(car,previewSource,dt);const portrait=innerHeight>innerWidth&&innerWidth<=700;camera.position.set(portrait?54.7:49.5,portrait?4.8:2.9,portrait?61.9:56.6);camera.lookAt(43,.48,50);camera.fov=37;if(!portrait)camera.setViewOffset(innerWidth,innerHeight,innerWidth*.17,0,innerWidth,innerHeight);else camera.setViewOffset(innerWidth,innerHeight,0,innerHeight*.25,innerWidth,innerHeight);camera.updateProjectionMatrix();}return;}
   if(camera.view?.enabled)camera.clearViewOffset();
   const trackPoint=race.course.trackPoint;
   const state=currentState??race.view();
   starter.update(state);
   if(lastGeneration!==state.generation){lastGeneration=state.generation;obstaclePool.forEach(({item,chair,books},i)=>{const o=race.obstacles[i];item.visible=!!o;if(!o)return;const p=trackPoint(o.s,o.lane);item.position.set(p.x,ground(p)+.06,p.z);item.rotation.y=p.yaw+o.angle;chair.visible=o.kind==='chair';books.visible=!chair.visible;});updateObstacleBatches();}
   for(const c of race.cars){const obj=fleet.getObjectByName('race-'+c.id),height=c.height??trackPoint(c.s).height??-.30,speed=Math.abs(c.speed),finished=c.id&&c.finish!=null;obj.visible=!finished;obj.scale.setScalar(finished?0:1);obj.position.set(c.x,height-root.position.y+.02+Math.sin(c.spin*2)*Math.min(.012,speed*.0005),c.z);obj.rotation.order='YXZ';obj.rotation.set(c.pitch??0,c.yaw,THREE.MathUtils.clamp(c.steering*c.speed*.006,-.055,.055));for(const wheel of obj.userData.wheels){wheel.rotation.x=-c.spin;wheel.rotation.y=wheel.userData.front?c.steering:0;}}
+  for(const obj of fleet.children)if(obj.visible)updateCarEffects(obj,elapsed);
   fleet.userData.instances.update();
   boostFlames.update(race.cars,fleet,dt,elapsed,state);
   driver.update(fleet.getObjectByName('race-'+race.player.id),race.player.source,state.paused?0:dt);

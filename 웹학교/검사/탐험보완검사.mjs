@@ -1,0 +1,23 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {explorationSpeed} from '../탐험달리기.mjs';
+import {RUN_SPEED} from '../달리기모션.mjs';
+import {buildWorld} from '../이동물리.mjs';
+import {createJumpMotion} from '../점프물리.mjs';
+import {UPLOADED_CLASSROOM_PROFILES} from '../업로드교실관찰.mjs';
+import {createRace,coneBoundaryFootprint} from '../레이싱물리.mjs';
+import {PARKED_CARS} from '../주차장.mjs';
+const world=buildWorld(JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),{interactiveDoors:true});
+const run=shift=>{let p={x:40,y:1.5,z:0};const jump=createJumpMotion(world);for(let i=0;i<120;i++)p=jump.step(p,explorationSpeed(1,shift)/60,0,1/60);return p.x-40;};
+assert(Math.abs(run(true)/run(false)-1.5)<1e-6);
+assert.equal(explorationSpeed(-1,true),RUN_SPEED);assert.equal(explorationSpeed(0,true),RUN_SPEED);
+const room=world.uploadedAnnex.find(r=>r.roomId==='1F_1-3');assert(room);assert.equal(room.profile.photoStatus,'provisional');assert.equal(room.photoCount,0);assert(!UPLOADED_CLASSROOM_PROFILES['1F_1-3']);
+assert(room.boxes.some(b=>b.name.includes('칠판')));assert(room.boxes.some(b=>b.name.includes('사물함')));assert(room.desks.length>0);assert(world.candidate(room.spawn.x,room.spawn.y,room.spawn.z));
+assert(room.colliders.some(c=>c.name.includes('책상')));
+const race=createRace({car:PARKED_CARS[0],opponents:[],random:()=>.4});race.obstacles.splice(0);for(let i=0;i<190;i++)race.update(1/60,{});
+const d=race.player.dimensions,foot=coneBoundaryFootprint(d);assert.equal(foot.halfW/(d.width/2+.12),.7);assert.equal(foot.halfL/(d.length/2-.18),.7);
+// A shallow graze that used to hit the cone-line envelope can keep moving.
+const t=race.course.trackPoint(10),lane=t.width/2-foot.halfW-.03,p=race.course.trackPoint(10,lane);
+Object.assign(race.player,{x:p.x,z:p.z,height:p.height,s:10,lane,yaw:p.yaw,speed:3});
+race.update(1/120,{throttle:1});assert.equal(race.player.hits,0);assert(race.player.speed>3);
+console.log({ok:true,sprintRatio:run(true)/run(false),class13:'provisional furnished classroom',coneEnvelope:.7,shallowGrazePasses:true});

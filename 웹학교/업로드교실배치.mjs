@@ -1,8 +1,14 @@
 import {UPLOADED_CLASSROOM_PROFILES} from './업로드교실관찰.mjs';
 import {class21Interior} from './이학년일반.mjs';
 const rgb=h=>[1,3,5].map(i=>parseInt(h.slice(i,i+2),16)/255);
+// Owner requested an interim grade-one room until its own photos arrive.
+// Keep this outside the photo-observation registry: it is not a reviewed photo.
+export const PROVISIONAL_ANNEX_PROFILES={
+ '1F_1-3':{...UPLOADED_CLASSROOM_PROFILES['1F_1-4'],roomId:'1F_1-3',referenceRoom:'1F_1-4',theme:'새싹과 무지개 교실',back:'flower-rings',extras:['corridor-white-cabinet','window-bookcase','rear-cupboard'],photoStatus:'provisional',photoCount:0,count:0,sourceRevision:null,revision:null,reviewedAt:null,observedFeatures:[],features:[],sourceRoomId:null,notes:'1학년 공통 배치 참고 · 1-3 새 사진 확인 후 개별 수정'}
+};
+const classroomProfile=id=>UPLOADED_CLASSROOM_PROFILES[id]??PROVISIONAL_ANNEX_PROFILES[id];
 export function applyUploadedClassroom(config){
-  const observed=UPLOADED_CLASSROOM_PROFILES[config.roomId];if(!observed)return config;
+  const observed=classroomProfile(config.roomId);if(!observed)return config;
   const profile={...observed,...config.profile},room=config.room,frame=config.frame,floor=parseInt(room.floor),annex=room.building==='ANNEX';
   const replace=/사물함|뒤 게시판|공기청정기|중앙 화이트보드|높은 청소함|낮은 청소함|청소도구|책장| 사진 책 |정리바구니|교구 바구니| 실내 책가방| 충돌 책가방/;
   const boxes=config.boxes.filter(b=>!replace.test(b.name)&&!(profile.roomId==='4F_4-4'&&/흰 롤블라인드/.test(b.name))).map(b=>{
@@ -182,7 +188,7 @@ export function applyUploadedClassroom(config){
 }
 
 export function uploadedAnnexClassrooms(data){
-  return data.rooms.filter(r=>r.building==='ANNEX'&&UPLOADED_CLASSROOM_PROFILES[r.id]).map(room=>{
+  return data.rooms.filter(r=>r.building==='ANNEX'&&classroomProfile(r.id)).map(room=>{
     const [x0,x1,y0,y1,z]=room.bounds;
     const templateLength=y1-y0>7?y1-y0:6.75;
     const base=class21Interior({rooms:[{...room,id:'4F_2-1'}]},{length:templateLength});
@@ -195,7 +201,7 @@ export function uploadedAnnexClassrooms(data){
       return {...b,bounds,name:b.name.replace(/^2-1/,room.name),spaceId:room.id,interiorRoom:room.id,floor:parseInt(room.floor)};
     };
     const frame={width:y1-y0,depth:x1-x0,z,point:(x,y,h=0)=>base.point(x*(y1-y0)/10,-y*(x1-x0)/7,h)};
-    const config={...base,roomId:room.id,room,frame,profile:UPLOADED_CLASSROOM_PROFILES[room.id],boxes:base.boxes.map(convert),colliders:base.colliders.map(convert),entry:{x:x1+1.5,y:base.spawn.y,z},yaw:0};
+    const config={...base,roomId:room.id,room,frame,profile:classroomProfile(room.id),boxes:base.boxes.map(convert),colliders:base.colliders.map(convert),entry:{x:x1+1.5,y:base.spawn.y,z},yaw:0};
     return applyUploadedClassroom(config);
   });
 }

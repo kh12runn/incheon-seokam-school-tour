@@ -3,6 +3,7 @@ import fs from 'node:fs';
 import * as THREE from '../외부도구/three.module.js';
 import {createRoomDetailsCache} from '../공간상세로딩.mjs';
 import {createRenderPreparation} from '../렌더사전준비.mjs';
+import {createPrincipalOfficeLights} from '../교장실표현.mjs';
 const scene=new THREE.Scene(),stairs=[{frame:{origin:[0,3],right:[1,0],inward:[0,1],width:5,depth:7}}],cache=createRoomDetailsCache(scene,{capacity:6,stairs});
 for(let floor=1;floor<=4;floor++)for(const x of [3,13,23])cache.add({roomId:floor+'F-'+x,floor,center:new THREE.Vector3(x,(floor-1)*3.4,3),create:()=>new THREE.Group()});
 cache.update({x:2,y:1.5,z:0},'walk');assert.deepEqual(cache.state().prefetch,['2F-3','2F-13'],'Only two closest next-floor rooms warm before stairs');
@@ -17,4 +18,18 @@ const object=new THREE.Mesh(new THREE.BoxGeometry(),material);object.castShadow=
 await warm(root);assert.equal(calls.length,2);assert.equal(target,originalTarget,'Warm-up never leaves shadow target bound');
 assert.equal(object.parent,root);assert.equal(object.material,material);assert.equal(calls[1].root.children[0].material.depthPacking,THREE.RGBADepthPacking);assert.equal(calls[1].root.children[0].material.side,THREE.BackSide);assert.deepEqual(uploads,[texture]);
 const source=fs.readFileSync(new URL('../게임.mjs',import.meta.url),'utf8');assert(!source.includes('interiorLight.visible='),'Moving across stairs must not change shader light count');assert(source.includes('interiorLight.intensity='));
+const callsDuringFlight=[],flightCache=createRoomDetailsCache(new THREE.Scene(),{stairs});
+flightCache.add({roomId:'landing',floor:2,center:new THREE.Vector3(3,3.4,3),create(){callsDuringFlight.push('factory');return new THREE.Group();}});
+flightCache.update({x:2,y:6,z:1.7},'walk');await new Promise(r=>setTimeout(r,100));assert.equal(callsDuringFlight.length,0,'Never run a new room factory on a stair flight');
+flightCache.update({x:2,y:2.4,z:3.4},'walk');for(let i=0;i<80&&!flightCache.state().loaded;i++)await new Promise(r=>setTimeout(r,10));assert.equal(flightCache.state().loaded,1,'Landing room becomes ready after the descent');
+let uniformCount=0,readyPolls=0;
+const variants=[{isReady:()=>true,getUniforms:()=>uniformCount++,getAttributes(){}},{isReady:()=>++readyPolls>1,getUniforms:()=>uniformCount++,getAttributes(){}}];
+const properties={get:()=>({programs:new Map(variants.map((p,i)=>[i,p]))})};
+const multiWarm=createRenderPreparation({...renderer,properties,shadowMap:{enabled:false}},new THREE.PerspectiveCamera(),scene);
+await multiWarm(root,{textures:false});assert.equal(uniformCount,2,'Both regular and instanced/back-face programs finish first-use reflection');
+await multiWarm(root,{textures:false});assert.equal(uniformCount,2,'Already warm programs are reused');
 console.log({ok:true,adjacentFloorPrefetch:2,previousFloorKept:true,unchangedMaterialsAndTextures:true,regularAndShadowProgramsPrepared:true,renderTargetRestored:true,stableLightCount:true});
+const lighting=createPrincipalOfficeLights(),testScene=new THREE.Scene();testScene.add(lighting);
+const positions=lighting.children.map(l=>l.getWorldPosition(new THREE.Vector3()).toArray());
+assert.deepEqual(positions,[[31.6,6.17,3.4],[35.2,6.17,3.7]],'Original office lamp locations must not change');
+for(const active of [false,true,false,true]){lighting.children.forEach(l=>l.intensity=active?7:0);let count=0;testScene.traverseVisible(o=>{if(o.isPointLight)count++;});assert.equal(count,2,'Office hide/eviction must not change shader light count');}

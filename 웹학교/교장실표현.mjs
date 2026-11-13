@@ -27,7 +27,12 @@ function batchStatic(group){
   remove.forEach(o=>o.removeFromParent());
 }
 
-export function createPrincipalOffice(){
+export function createPrincipalOfficeLights(){
+  const group=new THREE.Group();group.name='교장실 고정 조명';group.position.set(OFFICE_ORIGIN.x,OFFICE_ORIGIN.z,-OFFICE_ORIGIN.y);
+  for(const [x,z] of [[1.6,3.4],[5.2,3.7]]){const light=new THREE.PointLight('#f1f2e8',7,8,2);light.position.set(x,2.77,z);group.add(light);}
+  return group;
+}
+export function createPrincipalOffice({lights=true}={}){
   const group=new THREE.Group();group.name='사진 참고 교장실';group.position.set(OFFICE_ORIGIN.x,OFFICE_ORIGIN.z,-OFFICE_ORIGIN.y);
   const white=paint('#e6e7e2',.48),wall=paint('#e3e2dd'),black=paint('#242b2b'),wood=paint('#b78c64'),glass=paint('#bdd0c9',.15,{metalness:.24,transparent:true,opacity:.64,depthWrite:false});
   const darkGlass=paint('#203537',.28),fabric=paint('#dedfda',.9),gold=paint('#c2a456',.26,{metalness:.83});
@@ -152,7 +157,7 @@ export function createPrincipalOffice(){
     }
   }
   // The side door now connects to the meeting room; its live leaf is rendered separately.
-  for(const [x,z] of [[1.6,3.4],[5.2,3.7]]){const l=new THREE.PointLight('#f1f2e8',7,8,2);l.position.set(x,2.77,z);group.add(l);}
+  if(lights){const lighting=createPrincipalOfficeLights();lighting.position.set(0,0,0);group.add(lighting);}
   batchStatic(group);return group;
 }
 

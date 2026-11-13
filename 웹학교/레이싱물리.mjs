@@ -10,7 +10,11 @@ const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 export const mod=(x,m)=>(x%m+m)%m;
 const angle=x=>Math.atan2(Math.sin(x),Math.cos(x));
 const maxSteering=profile=>.46+Math.min(profile.handling,11)*.018;
-export const RACE_ASSIST_CONFIG=Object.freeze({speedRatio:.50,maxStrength:.55,rampRate:3.3,minSteerInput:.08});
+export const RACE_ASSIST_CONFIG=Object.freeze({speedRatio:.50,maxStrength:.62,rampRate:3.6,minSteerInput:.08,cornerStrength:.16});
+export const CONE_BOUNDARY_HITBOX_SCALE=.70;
+// Cones mark a continuous course boundary. Reduce ONLY that collision envelope;
+// car-to-car contacts, classroom walls and the visible car/cones are unchanged.
+export const coneBoundaryFootprint=dimensions=>({halfW:(dimensions.width/2+.12)*CONE_BOUNDARY_HITBOX_SCALE,halfL:(dimensions.length/2-.18)*CONE_BOUNDARY_HITBOX_SCALE});
 const SIDE_OVERLAP=.40;
 
 export function roundRules(round){const r=clamp(Math.floor(round),1,5);return {round:r,laps:3,opponents:Math.min(5,r+2),pace:[.70,.78,.86,.91,.94][r-1],hazards:5+r*2};}
@@ -62,7 +66,7 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
   return p;
  }
  function penetration(c,x,z,yaw){
-  const halfW=c.dimensions.width/2+.12,halfL=c.dimensions.length/2-.18,fx=-Math.sin(yaw),fz=-Math.cos(yaw);
+  const {halfW,halfL}=boundaryFootprint(c),fx=-Math.sin(yaw),fz=-Math.cos(yaw);
   let overlap=-Infinity;
   for(let index=-1;index<=1;index++){
    const along=index===0?0:index*halfL;
@@ -71,8 +75,14 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
   }return overlap;
  }
  const inside=(c,x,z,yaw)=>penetration(c,x,z,yaw)<=0;
+ function boundaryFootprint(c){
+  // Solid school walls and elevated guardrails retain the full car envelope.
+  // Only the cone-lined open ground course gets the requested 70% contact area.
+  if(course.elevated||(trackPoint(c.s).width??TRACK.width)<=7)return {halfW:c.dimensions.width/2+.12,halfL:c.dimensions.length/2-.18};
+  return coneBoundaryFootprint(c.dimensions);
+ }
  function boundaryContact(c,x,z,yaw){
-  const halfW=c.dimensions.width/2+.12,halfL=c.dimensions.length/2-.18,fx=-Math.sin(yaw),fz=-Math.cos(yaw);let worst={overlap:-Infinity,nx:0,nz:0};
+  const {halfW,halfL}=boundaryFootprint(c),fx=-Math.sin(yaw),fz=-Math.cos(yaw);let worst={overlap:-Infinity,nx:0,nz:0};
   for(let index=-1;index<=1;index++){const along=index===0?0:index*halfL,sx=x+fx*along,sz=z+fz*along,p=nearestTrack(sx,sz,c.s),overlap=p.distance-p.width/2+halfW;if(overlap>worst.overlap)worst={overlap,nx:(sx-p.x)/Math.max(.001,p.distance),nz:(sz-p.z)/Math.max(.001,p.distance)};}
   return worst;
  }
@@ -126,7 +136,14 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
   // escape input; normal, brake and no-input states retain manual dynamics.
   const targetSteering=-assistedSteer*maxSteering(p);c.steering+=clamp(targetSteering-c.steering,-2.8*dt,2.8*dt);
   const average=c.assistActive?Math.min(c.assistSpeedLimit,Math.max((before+c.speed)*.5,c.assistSpeedLimit*c.assistStrength/RACE_ASSIST_CONFIG.maxStrength)):(before+c.speed)*.5,yawRate=average/c.dimensions.wheelbase*Math.tan(c.steering),gripRate=p.grip/Math.max(2,Math.abs(average));
-  c.yaw=angle(c.yaw+clamp(yawRate,-gripRate,gripRate)*dt);
+  let cornerHelp=0;
+  if(c.id===0&&!c.assistActive&&throttle>0&&!brake&&c.speed>2&&Math.abs(steer)>RACE_ASSIST_CONFIG.minSteerInput){
+   const ahead=trackPoint(c.s+clamp(c.speed*.4,3,9)),error=angle(ahead.yaw-c.yaw);
+   // Help a deliberate turn into a corner, never steer against the player,
+   // pull a reversing car around, or turn forward-only driving into autopilot.
+   if(Math.sign(error)===-Math.sign(steer)&&Math.abs(error)<1.2)cornerHelp=clamp(error*1.4,-.28,.28)*RACE_ASSIST_CONFIG.cornerStrength;
+  }
+  c.yaw=angle(c.yaw+(clamp(yawRate,-gripRate,gripRate)+cornerHelp)*dt);
   const travel=average*dt,dx=-Math.sin(c.yaw)*travel,dz=-Math.cos(c.yaw)*travel;let fraction=1,slide=null;
   const nextOverlap=penetration(c,oldX+dx,oldZ+dz,c.yaw);
   if(nextOverlap>0){

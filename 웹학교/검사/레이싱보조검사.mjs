@@ -6,7 +6,7 @@ import {PARKED_CARS} from '../주차장.mjs';
 // isolates collisions; no test driver aligns or teleports the car during escape.
 const source=PARKED_CARS[0],DT=1/60,results=[];
 assert.equal(RACE_ASSIST_CONFIG.speedRatio,.50,'Requested contact speed is half of the normal speed');
-assert.equal(RACE_ASSIST_CONFIG.maxStrength,.55,'Requested contact steering strength is 55%');
+assert.equal(RACE_ASSIST_CONFIG.maxStrength,.62,'Contact steering has a modest additional assist');
 const angle=x=>Math.atan2(Math.sin(x),Math.cos(x));
 function fixture(opponents=[]){
  let seed=83;const random=()=>((seed=Math.imul(seed,1664525)+1013904223>>>0)/4294967296);
@@ -25,10 +25,12 @@ function blockedCorner(race){
  return {x:c.x,z:c.z,yaw:c.yaw,s:c.s};
 }
 function bodyOutside(car){
- // Check the actual four body corners independently of the physics capsules.
+ // Independently sample the 70% contact body at cones, full body inside school
+ // walls. The artwork remains full size and may visually brush an open cone.
  const fx=-Math.sin(car.yaw),fz=-Math.cos(car.yaw),rx=Math.cos(car.yaw),rz=-Math.sin(car.yaw);
  let outside=0;
- for(const along of [-car.dimensions.length/2,0,car.dimensions.length/2])for(const side of [-car.dimensions.width/2,car.dimensions.width/2]){
+ const scale=trackPoint(car.s).width<=7?1:.7;
+ for(const along of [-car.dimensions.length/2*scale,0,car.dimensions.length/2*scale])for(const side of [-car.dimensions.width/2*scale,car.dimensions.width/2*scale]){
   const p=nearestTrack(car.x+fx*along+rx*side,car.z+fz*along+rz*side,car.s);
   outside=Math.max(outside,p.distance-p.width/2);
  }

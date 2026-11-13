@@ -2,6 +2,7 @@ import * as THREE from './외부도구/three.module.js';
 import {GLTFLoader} from './외부도구/GLTFLoader.js';
 import {normalizePrincipalModel} from './교장실캐릭터.mjs';
 import {createPrincipalWalkRigAsync} from './교장보행리그.mjs';
+import {fitStarterGrip,attachStarterFlag} from './깃발손보정.mjs';
 
 const smooth=x=>{const t=THREE.MathUtils.clamp(x,0,1);return t*t*(3-2*t);};
 export function starterPose(seconds){
@@ -19,9 +20,8 @@ export function createRaceStarter(scene,{loadModel}={}){
  for(let y=0;y<6;y++)for(let x=0;x<8;x++){ctx.fillStyle=(x+y)%2?'#12151a':'#fffdf4';ctx.fillRect(x*32,y*32,32,32);}
  const texture=new THREE.CanvasTexture(fabric);texture.colorSpace=THREE.SRGBColorSpace;
  const flag=new THREE.Group();flag.name='흑백 체크 출발 깃발';root.add(flag);
- const pole=new THREE.Mesh(new THREE.CylinderGeometry(.018,.022,1.4,10),new THREE.MeshStandardMaterial({color:0xb3bbc0,metalness:.5,roughness:.38}));pole.position.y=.65;flag.add(pole);
- const geometry=new THREE.PlaneGeometry(.95,.65,20,12);geometry.translate(.48,.92,0);const cloth=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({map:texture,side:THREE.DoubleSide,roughness:.8}));cloth.name='바람에 펄럭이는 체크 천';cloth.frustumCulled=false;flag.add(cloth);const rest=geometry.attributes.position.array.slice();
- const hand=new THREE.Vector3();
+ const pole=new THREE.Mesh(new THREE.CylinderGeometry(.016,.016,1.48,20),new THREE.MeshStandardMaterial({color:0xa8b1b7,metalness:.75,roughness:.3}));pole.position.y=.54;flag.add(pole);
+ const geometry=new THREE.PlaneGeometry(.86,.60,26,16);geometry.translate(.44,.93,0);const cloth=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({map:texture,side:THREE.DoubleSide,roughness:.8}));cloth.name='바람에 펄럭이는 체크 천';cloth.frustumCulled=false;flag.add(cloth);const rest=geometry.attributes.position.array.slice();
  function release(model){const resources=new Set();model?.traverse(o=>{if(o.geometry)resources.add(o.geometry);if(o.skeleton)resources.add(o.skeleton);for(const m of [].concat(o.material??[])){resources.add(m);for(const v of Object.values(m))if(v?.isTexture)resources.add(v);}});for(const r of resources)r.dispose?.();}
  async function prepare(){
   if(rig)return true;if(loading)return loading;status='loading';
@@ -31,7 +31,7 @@ export function createRaceStarter(scene,{loadModel}={}){
    const built=await createPrincipalWalkRigAsync(normalizePrincipalModel(source,1.83),{receiveShadow:false,continuousSleeves:true});
    // The rig owns cloned geometry and shares the approved material/texture data.
    source.traverse(o=>o.geometry?.dispose());
-   if(disposed){release(built.root);return false;}rig=built;body.add(rig.root);rig.root.traverse(o=>{if(o.isMesh)o.castShadow=false;});status='ready';return true;
+   if(disposed){release(built.root);return false;}rig=built;fitStarterGrip(rig);attachStarterFlag(rig,flag);body.add(rig.root);rig.root.traverse(o=>{if(o.isMesh)o.castShadow=false;});status='ready';return true;
   })().catch(error=>{status='error';console.warn('출발 심판 준비 실패',error.message);return false;}).finally(()=>{loading=null;});return loading;
  }
  function show(next){course=next;const p=course.trackPoint(-9,-course.width/2-2.2);root.position.set(p.x,p.height+.02,p.z);root.rotation.y=p.yaw+Math.PI;time=0;root.visible=true;update({phase:'countdown',countdown:3,time:0,paused:false});}
@@ -41,8 +41,8 @@ export function createRaceStarter(scene,{loadModel}={}){
   if(time>9){root.visible=false;return;}const pose=starterPose(time),b=rig.bones;
   b[7].rotation.set(pose.shoulderX,0,pose.shoulderZ);b[8].rotation.set(pose.elbowX,0,.08);b[5].rotation.x=-.1;b[6].rotation.x=-.12;
   b[0].rotation.y=pose.bodyYaw;b[0].rotation.z=pose.bodyLean;b[1].rotation.x=-pose.bodyLean*.4;b[3].rotation.x=pose.bodyLean*.4;
-  root.updateMatrixWorld(true);hand.set(0,-.255,.015);b[8].localToWorld(hand);root.worldToLocal(hand);flag.position.copy(hand);flag.rotation.set(.12,Math.sin(time*2)*.08,pose.poleAngle);
-  const pos=geometry.attributes.position;for(let i=0;i<pos.count;i++){const x=rest[i*3],u=Math.max(0,x/.95);pos.setXYZ(i,x,rest[i*3+1]+Math.sin(pose.clothPhase-5*u)*.025*u,Math.sin(pose.clothPhase-6*u)*.085*u+Math.sin(pose.clothPhase*1.4-u*9)*.018*u);}pos.needsUpdate=true;geometry.computeVertexNormals();
+  root.updateMatrixWorld(true);
+  const pos=geometry.attributes.position;for(let i=0;i<pos.count;i++){const x=rest[i*3],u=x/.86;pos.setZ(i,Math.sin(pose.clothPhase-u*6)*.065*u);}pos.needsUpdate=true;geometry.computeVertexNormals();
  }
  return {root,prepare,show,update,hide(){root.visible=false;},getState:()=>({status,visible:root.visible,source:'office-cute',time,pose:starterPose(time),flagVertices:geometry.attributes.position.count}),
   focus(cameraPosition,look){root.updateMatrixWorld(true);cameraPosition.copy(root.localToWorld(new THREE.Vector3(-1.8,2.3,5.4)));look.copy(root.localToWorld(new THREE.Vector3(.2,1.5,0)));},

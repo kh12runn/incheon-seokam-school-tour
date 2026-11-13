@@ -21,7 +21,7 @@ function label(p,value,pos,w,h){
   const map=new THREE.CanvasTexture(c);map.colorSpace=THREE.SRGBColorSpace;
   return put(p,new THREE.PlaneGeometry(w,h),new THREE.MeshStandardMaterial({map,roughness:.9}),pos);
 }
-export function createRunnerPrincipalNPC(){
+export function createRunnerPrincipalNPC({prepareRender=async()=>{}}={}){
   const root=new THREE.Group();root.name='중앙현관 마라토너 교장선생님';
   root.userData.greetingHeight=2.12;
   const skin=paint(PRINCIPAL_SKIN_COLOR),blue=paint('#176f89'),coral=paint('#f18a68'),navy=paint('#21394e'),white=paint('#f0eee5'),sole=paint('#d8dedb'),black=paint('#151e26',.25),silver=paint('#b2bac2',.4);
@@ -52,12 +52,12 @@ export function createRunnerPrincipalNPC(){
   const brim=new THREE.Shape();brim.moveTo(-.128,.018);brim.quadraticCurveTo(-.174,.095,-.125,.172);brim.quadraticCurveTo(0,.241,.125,.172);brim.quadraticCurveTo(.174,.095,.128,.018);brim.quadraticCurveTo(0,.095,-.128,.018);
   const brimMesh=put(head,new THREE.ExtrudeGeometry(brim,{depth:.007,bevelEnabled:true,bevelThickness:.002,bevelSize:.003,bevelSegments:2,steps:1,curveSegments:16}),white,[0,.233,0]);brimMesh.rotation.x=Math.PI/2;brimMesh.name='선캡 햇빛 가리개';
   line(head,coral,[[-.126,.234,.173],[0,.232,.207],[.126,.234,.173]],.003);
-  let modelStatus='loading',modelError=null;
-  void loader.loadAsync(officeHeadURL.href).then(gltf=>{
+  let modelStatus='loading',modelError=null,renderReady=false;
+  void loader.loadAsync(officeHeadURL.href).then(async gltf=>{
     const scale=RUNNER_PRINCIPAL_HEIGHT/(OFFICE_SOURCE_MAX_Y-OFFICE_SOURCE_MIN_Y);
     gltf.scene.scale.setScalar(scale);gltf.scene.position.y=-OFFICE_SOURCE_MIN_Y*scale;
     gltf.scene.traverse(object=>{if(object.isMesh){object.castShadow=true;object.receiveShadow=true;}});
-    root.add(gltf.scene);fallbackFace.visible=false;modelStatus='ready';
+    await prepareRender(gltf.scene);root.add(gltf.scene);fallbackFace.visible=false;modelStatus='ready';
   }).catch(reason=>{modelStatus='error';modelError=String(reason?.message??reason);console.warn('러닝복 교장선생님 얼굴 모델 로드 실패',reason);});
   ball(root,navy,[0,.965,0],[.176,.12,.11]);
   const legs=[];
@@ -116,5 +116,6 @@ export function createRunnerPrincipalNPC(){
     head.rotation.z=Math.sin(t*.75)*.012;
   }
   applyApprovedPrincipalAppearance(root,{runner:true});
-  return {root,update,getState:()=>({outfit:'running',accessories:['sunglasses','sun-visor','megaphone'],faceTexture:modelStatus,modelStatus,modelError,faceVersion:PRINCIPAL_FACE_VERSION,appearanceVersion:PRINCIPAL_APPEARANCE_VERSION,height:RUNNER_PRINCIPAL_HEIGHT,headScale:PRINCIPAL_HEAD_SCALE,sameFaceAsOffice:true,fallbackFaceTexture:getPrincipalFaceState()})};
+  root.visible=false;void prepareRender(root).then(()=>{renderReady=true;}).catch(error=>{console.warn('현관 교장선생님 재질 준비',error);renderReady=true;});
+  return {root,update,getState:()=>({outfit:'running',accessories:['sunglasses','sun-visor','megaphone'],faceTexture:modelStatus,modelStatus,modelError,renderReady,faceVersion:PRINCIPAL_FACE_VERSION,appearanceVersion:PRINCIPAL_APPEARANCE_VERSION,height:RUNNER_PRINCIPAL_HEIGHT,headScale:PRINCIPAL_HEAD_SCALE,sameFaceAsOffice:true,fallbackFaceTexture:getPrincipalFaceState()})};
 }
