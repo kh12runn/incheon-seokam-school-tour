@@ -42,6 +42,8 @@ try{
  }));
  assert.ok(results.every(r=>r.status===200));const before=(await call('records?round=2')).body.records;assert.equal(before.length,10);assert.ok(before.every((v,i)=>i===0||v.milliseconds>=before[i-1].milliseconds));
  api.close();api=createRaceRecords({filename,now:()=>clock,origin:'http://school.test'});assert.deepEqual((await call('records?round=2')).body.records,before,'Must persist after restart');
- const expired=await call('start',{round:1,carId:car.id,version:COURSE_VERSION});clock+=7300000;assert.equal((await call('finish',{token:expired.body.token,...fixtures[0]},expired.cookie)).status,400);
- console.log(JSON.stringify({ok:true,realPhysicsProofs:5,concurrentSubmissions:14,topTen:true,restartPersistence:true,duplicateAndInvalidBlocked:true,database:filename}));
+ const nextVersion=COURSE_VERSION+'-next-deployment';api.close();api=createRaceRecords({filename,now:()=>clock,origin:'http://school.test',courseVersion:nextVersion});
+ const afterUpgrade=(await call('records?round=2')).body;assert.equal(afterUpgrade.version,nextVersion);assert.deepEqual(afterUpgrade.records,before,'A newer course/application version must retain the same leaderboard');
+ const expired=await call('start',{round:1,carId:car.id,version:nextVersion});clock+=7300000;assert.equal((await call('finish',{token:expired.body.token,...fixtures[0]},expired.cookie)).status,400);
+ console.log(JSON.stringify({ok:true,realPhysicsProofs:5,concurrentSubmissions:14,topTen:true,restartPersistence:true,upgradePersistence:true,duplicateAndInvalidBlocked:true,database:filename}));
 }finally{await new Promise(r=>server.close(r));api.close();}

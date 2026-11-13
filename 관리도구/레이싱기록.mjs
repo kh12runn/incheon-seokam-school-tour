@@ -8,7 +8,11 @@ import {profileFor,carName} from '../웹학교/차량성능.mjs';
 
 const fail=(status,message)=>Object.assign(new Error(message),{status});
 const digest=s=>createHash('sha256').update(s).digest('hex');
-export function createRaceRecords({filename,now=Date.now,production=false,origin}={}){
+// Permanent storage namespace, deliberately equal to the first production
+// namespace. Never derive this from COURSE_VERSION or reset it on deployment.
+// Existing records must remain visible until the owner explicitly asks to reset.
+export const RECORDS_NAMESPACE='2026-11-worlds-1';
+export function createRaceRecords({filename,now=Date.now,production=false,origin,courseVersion=COURSE_VERSION}={}){
  if(!filename)return async(req,res)=>{if(!req.url.startsWith('/api/racing/'))return false;send(res,503,{error:'공용 기록 저장소를 준비 중입니다. 개인 기록은 기기에 저장돼요.'});return true;};
  if(filename!==':memory:')fs.mkdirSync(path.dirname(filename),{recursive:true});
  const db=new DatabaseSync(filename);db.exec(`PRAGMA journal_mode=WAL; PRAGMA busy_timeout=3000;
@@ -18,7 +22,7 @@ export function createRaceRecords({filename,now=Date.now,production=false,origin
  `);
  const rates=new Map();
  function limit(key,max,period){const time=now();let row=rates.get(key);if(!row||row.until<time){row={count:0,until:time+period};rates.set(key,row);}if(++row.count>max)throw fail(429,'잠시 후 다시 시도해주세요.');if(rates.size>4000)for(const [k,v] of rates){if(v.until<time)rates.delete(k);}if(rates.size>8000)rates.delete(rates.keys().next().value);}
- function top(round){return db.prepare('SELECT grade,class,nickname,car,milliseconds,created FROM records WHERE version=? AND round=? ORDER BY milliseconds,created LIMIT 10').all(COURSE_VERSION,round).map((row,i)=>({...row,rank:i+1,carName:carName(PARKED_CARS.find(c=>c.id===row.car)??PARKED_CARS[0])}));}
+ function top(round){return db.prepare('SELECT grade,class,nickname,car,milliseconds,created FROM records WHERE version=? AND round=? ORDER BY milliseconds,created LIMIT 10').all(RECORDS_NAMESPACE,round).map((row,i)=>({...row,rank:i+1,carName:carName(PARKED_CARS.find(c=>c.id===row.car)??PARKED_CARS[0])}));}
  function roundValue(value){const r=Number(value);if(!Number.isInteger(r)||r<1||r>5)throw fail(400,'올바른 라운드를 선택해주세요.');return r;}
  function identify(req,res){
   const name=production?'__Host-race_player':'race_player',match=(req.headers.cookie??'').split(';').map(s=>s.trim()).find(s=>s.startsWith(name+'=')),value=match?.slice(name.length+1);
@@ -46,15 +50,15 @@ export function createRaceRecords({filename,now=Date.now,production=false,origin
   const url=new URL(req.url,'http://localhost');if(!url.pathname.startsWith('/api/racing/'))return false;
   try{
    const ip=production?(req.headers['x-forwarded-for']??req.socket.remoteAddress??'').split(',').pop().trim():req.socket.remoteAddress??'local';limit('ip:'+ip,2400,60000);
-   if(req.method==='GET'&&url.pathname==='/api/racing/records'){const round=roundValue(url.searchParams.get('round'));send(res,200,{round,version:COURSE_VERSION,records:top(round)});return true;}
+   if(req.method==='GET'&&url.pathname==='/api/racing/records'){const round=roundValue(url.searchParams.get('round'));send(res,200,{round,version:courseVersion,records:top(round)});return true;}
    if(req.method!=='POST')throw fail(405,'지원하지 않는 요청입니다.');
    const expected=origin??`${production?'https':'http'}://${req.headers.host}`;
    if(req.headers.origin!==expected)throw fail(403,'학교 사이트에서 요청해주세요.');
    const participant=identify(req,res);limit('write:'+participant,90,60000);const data=await body(req);
    db.prepare('DELETE FROM runs WHERE expires<?').run(now());
    if(url.pathname==='/api/racing/start'){
-    limit('start:'+participant,40,3600000);const round=roundValue(data.round),car=PARKED_CARS.find(c=>c.id===data.carId);if(!car||data.version!==COURSE_VERSION)throw fail(409,'새로고침 후 다시 출발해주세요.');
-    const token=randomBytes(24).toString('hex');db.prepare('INSERT INTO runs(token,participant,round,car,started,expires) VALUES(?,?,?,?,?,?)').run(token,participant,round,car.id,now(),now()+7200000);send(res,200,{token,version:COURSE_VERSION});return true;
+    limit('start:'+participant,40,3600000);const round=roundValue(data.round),car=PARKED_CARS.find(c=>c.id===data.carId);if(!car||data.version!==courseVersion)throw fail(409,'새로고침 후 다시 출발해주세요.');
+    const token=randomBytes(24).toString('hex');db.prepare('INSERT INTO runs(token,participant,round,car,started,expires) VALUES(?,?,?,?,?,?)').run(token,participant,round,car.id,now(),now()+7200000);send(res,200,{token,version:courseVersion});return true;
    }
    const run=typeof data.token==='string'?db.prepare('SELECT * FROM runs WHERE token=? AND participant=?').get(data.token,participant):null;
    if(!run)throw fail(400,'출발 기록이 만료되었습니다. 다시 도전해주세요.');
@@ -70,11 +74,11 @@ export function createRaceRecords({filename,now=Date.now,production=false,origin
     if(!Number.isInteger(grade)||grade<1||grade>6||!Number.isInteger(classNumber)||classNumber<1||classNumber>20||!/^[-가-힣a-zA-Z0-9_ ]{2,12}$/.test(nickname))throw fail(400,'학년·반과 별명(한글·영문·숫자 2~12자)을 확인해주세요.');
     const recordParticipant=digest(participant+':'+grade+':'+classNumber+':'+nickname);
     db.exec('BEGIN IMMEDIATE');try{
-     db.prepare(`INSERT INTO records VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(version,round,participant) DO UPDATE SET grade=excluded.grade,class=excluded.class,nickname=excluded.nickname,car=excluded.car,milliseconds=excluded.milliseconds,created=excluded.created WHERE excluded.milliseconds<records.milliseconds`).run(COURSE_VERSION,run.round,recordParticipant,grade,classNumber,nickname,run.car,run.result,now());
-     db.prepare('DELETE FROM records WHERE version=? AND round=? AND participant NOT IN (SELECT participant FROM records WHERE version=? AND round=? ORDER BY milliseconds,created LIMIT 10)').run(COURSE_VERSION,run.round,COURSE_VERSION,run.round);
+     db.prepare(`INSERT INTO records VALUES(?,?,?,?,?,?,?,?,?) ON CONFLICT(version,round,participant) DO UPDATE SET grade=excluded.grade,class=excluded.class,nickname=excluded.nickname,car=excluded.car,milliseconds=excluded.milliseconds,created=excluded.created WHERE excluded.milliseconds<records.milliseconds`).run(RECORDS_NAMESPACE,run.round,recordParticipant,grade,classNumber,nickname,run.car,run.result,now());
+     db.prepare('DELETE FROM records WHERE version=? AND round=? AND participant NOT IN (SELECT participant FROM records WHERE version=? AND round=? ORDER BY milliseconds,created LIMIT 10)').run(RECORDS_NAMESPACE,run.round,RECORDS_NAMESPACE,run.round);
      db.prepare('UPDATE runs SET submitted=1 WHERE token=?').run(run.token);db.exec('COMMIT');
     }catch(error){db.exec('ROLLBACK');throw error;}
-    const rows=top(run.round),ordered=db.prepare('SELECT participant FROM records WHERE version=? AND round=? ORDER BY milliseconds,created LIMIT 10').all(COURSE_VERSION,run.round),index=ordered.findIndex(r=>r.participant===recordParticipant);
+    const rows=top(run.round),ordered=db.prepare('SELECT participant FROM records WHERE version=? AND round=? ORDER BY milliseconds,created LIMIT 10').all(RECORDS_NAMESPACE,run.round),index=ordered.findIndex(r=>r.participant===recordParticipant);
     send(res,200,{records:rows,rank:index<0?null:index+1});return true;
    }
    throw fail(404,'없는 기록 요청입니다.');
