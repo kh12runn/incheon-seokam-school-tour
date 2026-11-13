@@ -20,8 +20,8 @@ export function createRecordBoard({host,startRound=1,onChallenge,compact=false})
 }
 function renderRecords(host,records){
  host.replaceChildren();if(!records.length){const p=document.createElement('p');p.className='첫기록';p.textContent='아직 기록이 없어요. 첫 번째 이름을 남겨보세요!';host.append(p);return;}
- const table=document.createElement('table');table.innerHTML='<thead><tr><th>순위</th><th>도전자 / 차량</th><th>기록</th></tr></thead><tbody></tbody>';const body=table.lastChild;
- for(const record of records){const row=document.createElement('tr'),rank=document.createElement('td'),name=document.createElement('td'),time=document.createElement('td'),detail=document.createElement('small');rank.textContent=record.rank===1?'🏆':record.rank;name.textContent=`${record.grade}-${record.class} ${record.nickname}`;detail.textContent=record.carName;name.append(detail);time.textContent=raceTime(record.milliseconds/1000);row.append(rank,name,time);body.append(row);}host.append(table);
+ const table=document.createElement('table');table.innerHTML='<thead><tr><th scope="col">순위</th><th scope="col">도전자 / 사용 차량</th><th scope="col">기록</th></tr></thead><tbody></tbody>';const body=table.lastChild;
+ for(const record of records){const row=document.createElement('tr'),rank=document.createElement('td'),name=document.createElement('td'),time=document.createElement('td'),detail=document.createElement('small'),icon=document.createElement('span');rank.textContent=record.rank===1?'🏆':record.rank;name.textContent=`${record.grade}-${record.class} ${record.nickname}`;detail.className='기록사용차량';icon.textContent='🚘';icon.setAttribute('aria-hidden','true');detail.append(icon,document.createTextNode(' 사용 차량: '+(record.carName||'차량 정보 없음')));name.append(detail);time.textContent=raceTime(record.milliseconds/1000);row.append(rank,name,time);body.append(row);}host.append(table);
 }
 export function createRaceRecordRun(round,carId){
  const token=raceRequest('start',{round,carId,version:COURSE_VERSION}).then(r=>r.token).catch(()=>null),proof=[];

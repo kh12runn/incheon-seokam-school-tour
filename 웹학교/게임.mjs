@@ -203,12 +203,12 @@ function beginMission(){
 }
 async function requestMission(){
   if(!ready||missionLoading||characterPicker.isOpen()||mode!=='overview')return;
-  missionLoading=true;$('퀴즈시작').disabled=true;$('시작').disabled=true;$('퀴즈시작').textContent='미션 경로 준비 중…';
+  missionLoading=true;$('퀴즈시작').disabled=true;$('시작').disabled=true;$('퀴즈시작').querySelector('.시작문구').textContent='미션 경로 준비 중…';
   try{
     if(!missionMap)missionMap=await prepareMissionMap(world,[...CLASS_TEACHERS,...OFFICE_CHARACTERS.map(t=>({...t,id:'office-'+t.id,roomId:PRINCIPAL_ID}))],{yieldFrame:()=>new Promise(resolve=>requestAnimationFrame(resolve))});
     pendingMission=true;pendingParking=null;
   }catch(error){pendingMission=false;notice('미션을 준비하지 못했습니다. '+error.message);console.error(error);}
-  finally{missionLoading=false;$('퀴즈시작').disabled=false;$('시작').disabled=false;$('퀴즈시작').textContent='★ 퀴즈 미션 시작하기';}
+  finally{missionLoading=false;$('퀴즈시작').disabled=false;$('시작').disabled=false;$('퀴즈시작').querySelector('.시작문구').textContent='퀴즈미션으로 스탬프를 모아보세요';}
   if(pendingMission){if(characterChosenThisVisit)beginMission();else openCharacterPicker();}
 }
 $('퀴즈시작').addEventListener('click',requestMission);
@@ -418,7 +418,7 @@ function pausePanel(){
   panel.hidden=playing||missionUI?.isResult()||$('게임메뉴').open||$('탐험방법선택').open||$('주차장선택').open;document.body.dataset.mode=mode;document.body.dataset.playing=String(playing);
   $('조준점').hidden=true;
   const title=mode==='overview'?'탐험 시작하기':'탐험 계속하기';
-  $('걷기').textContent=title;$('시작').textContent=(mode==='overview'?'자유 탐험':title)+'  →';
+  $('걷기').textContent=title;$('시작').querySelector('.시작문구').textContent=mode==='overview'?'학교 자유롭게 둘러보기':title;
   $('안내표식').textContent=mode==='overview'?'달리고, 찾고, 맞히는 학교 모험':'탐험 일시정지';
   $('안내제목').innerHTML=mode==='overview'?'석암 Rock On!<br>스쿨런':'잠깐 쉬어갈까요?';
   updateCharacterLabel();
