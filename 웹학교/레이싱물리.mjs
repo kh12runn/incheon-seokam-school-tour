@@ -50,9 +50,9 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
  function damage(c,resistance,duration=.45){if(c.hit>0)return;c.speed*=resistance;c.hit=duration;c.hits++;}
  function project(c){
   const p=nearestTrack(c.x,c.z,c.s),delta=mod(p.s-mod(c.s,L)+L/2,L)-L/2;
-  c.s+=delta;c.lane=p.lane;c.height=groundHeight(c.x,c.z);
+  c.s+=delta;c.lane=p.lane;c.height=p.height;
   const fx=-Math.sin(c.yaw),fz=-Math.cos(c.yaw),axle=c.dimensions.wheelbase/2;
-  c.pitch=Math.atan2(groundHeight(c.x+fx*axle,c.z+fz*axle)-groundHeight(c.x-fx*axle,c.z-fz*axle),axle*2);
+  c.pitch=course.elevated?Math.atan((p.slope??0)*(fx*p.tx+fz*p.tz)):Math.atan2(groundHeight(c.x+fx*axle,c.z+fz*axle)-groundHeight(c.x-fx*axle,c.z-fz*axle),axle*2);
   const heading=-Math.sin(c.yaw)*p.tx-Math.cos(c.yaw)*p.tz;
   c.wrongWay=Math.abs(c.speed)>.3?c.speed*heading<-.3:heading<-.25;
   c.offTrack=Math.abs(p.lane)>(p.width??TRACK.width)/2-1.25;

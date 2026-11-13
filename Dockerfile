@@ -3,6 +3,8 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 RUN npm ci --ignore-scripts --no-audit --no-fund
 COPY ["관리도구/웹서버.mjs", "관리도구/웹서버.mjs"]
+COPY ["관리도구/레이싱기록.mjs", "관리도구/레이싱기록.mjs"]
+COPY ["관리도구/서버시작.mjs", "관리도구/서버시작.mjs"]
 COPY ["관리도구/배포최적화.mjs", "관리도구/배포최적화.mjs"]
 COPY ["관리도구/모델경량화.mjs", "관리도구/모델경량화.mjs"]
 COPY ["관리도구/배포모델복원.mjs", "관리도구/배포모델복원.mjs"]
@@ -23,6 +25,5 @@ RUN apk add --no-cache imagemagick imagemagick-heic imagemagick-jpeg imagemagick
 WORKDIR /app
 COPY --from=build /runtime/ ./
 ENV NODE_ENV=production PORT=8080
-USER node
 EXPOSE 8080
-CMD ["node", "관리도구/웹서버.mjs"]
+CMD ["node", "관리도구/서버시작.mjs"]

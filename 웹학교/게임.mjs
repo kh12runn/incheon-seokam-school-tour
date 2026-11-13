@@ -21,15 +21,16 @@ import {classroomSigns} from './교실팻말표현.mjs';
 import {getApprovedAssets} from './승인사진자료.mjs';
 import {exteriorRenderBox,exteriorSkins} from './외관사진디자인.mjs';
 import {campusEntranceDetails} from './정후문입체표현.mjs';
-import {PARKING,REAR_PARKING} from './주차장.mjs';
+import {PARKING,REAR_PARKING,PARKED_CARS} from './주차장.mjs';
 import {parkingDestination} from './주차장이동.mjs';
 import {parkedCarDetails,updateDrivenCars} from './자동차표현.mjs';
 import {createDriving} from './운전물리.mjs';
 import {drivingControls} from './운전화면.mjs';
 import {createSchoolProgress} from './스쿨런저장.mjs';
 import {createMiniRacing} from './레이싱.mjs';
+import {createRecordBoard} from './레이싱기록화면.mjs';
 import {createRacePassages} from './레이싱통로.mjs';
-import {canUseCar,stampsFor} from './차량성능.mjs';
+import {canUseCar,stampsFor,carName} from './차량성능.mjs';
 import {supportRoomDetails} from './지원실사진표현.mjs';
 import {recyclingShelterDetails} from './분리수거장사진표현.mjs';
 import {OUTDOOR_YAW} from './운동장환경.mjs';
@@ -99,7 +100,7 @@ let progressStorage;try{progressStorage=localStorage;}catch{}
 const schoolProgress=createSchoolProgress(progressStorage);
 let miniRacing=null,racePassages=null;
 const raceHiddenScenery=[];
-function updateStampLabel(){const p=schoolProgress.view();$('레이싱소개').textContent=`누적 스탬프 ${p.stamps}개 · 차량 18대 수집에 도전!\n스탬프 24개부터 스포츠카 해금`+(p.saved?'':' · 기록 저장 불가');}
+function updateStampLabel(){const p=schoolProgress.view();$('레이싱소개').textContent=`누적 스탬프 ${p.stamps}개 · 미션 완료마다 1개씩!\n스탬프 24개 → 슈퍼카 · 레이스 우승 → 다음 코스`+(p.saved?'':' · 기록 저장 불가');}
 updateStampLabel();
 let freeLookPoint=null;
 let lookRequestSerial=0,lookRequestPending=false;
@@ -176,6 +177,8 @@ monthQuizUI=createMonthQuizBubble({
   onHidden:resumeInteractionLook
 });
 missionUI=createMissionUI({onAnswer:index=>{if(isPlaying()&&missionUI.isVisible()){const state=mission.answer(index);clearInput();canvas.focus({preventScroll:true});return state;}},
+  getCollectionHint(){const p=schoolProgress.view(),next=[...PARKED_CARS].sort((a,b)=>stampsFor(a)-stampsFor(b)).find(c=>stampsFor(c)>p.stamps);return `누적 스탬프 ${p.stamps}개 · `+(next?`${carName(next)}까지 ${stampsFor(next)-p.stamps}개!`:'모든 자동차 해금! 기록에 도전하세요.');},
+  onGarage(){stopMission();$('게임메뉴').close();overview();$('레이싱시작').click();},
   onInteract:missionAction,
   onRetry:beginMission,onFree:()=>{stopMission();startWalk();},
   onQuestion(){freeLook=true;clearInput();if(document.pointerLockElement)document.exitPointerLock();},
@@ -211,7 +214,7 @@ async function requestMission(){
 $('퀴즈시작').addEventListener('click',requestMission);
 $('레이싱시작').addEventListener('click',()=>{
   if(!ready||mode!=='overview'||missionLoading)return;
-  if(!miniRacing)miniRacing=createMiniRacing({scene,camera,progress:schoolProgress,getDriver:()=>avatar,onShadow:()=>{renderer.shadowMap.needsUpdate=true;},onEnter(){
+  if(!miniRacing)miniRacing=createMiniRacing({scene,camera,progress:schoolProgress,getDriver:()=>avatar,onMission:requestMission,onShadow:()=>{renderer.shadowMap.needsUpdate=true;},onEnter(){
     stopMission();leaveVehicle();clearInput();monthQuiz.dismiss();monthQuizUI.hide();
     mode='race';dragMode=false;freeLook=false;drag=null;if(document.pointerLockElement)document.exitPointerLock();
     updateHUD();document.body.dataset.mode='race';document.body.dataset.playing='false';panel.hidden=true;
@@ -222,6 +225,8 @@ $('레이싱시작').addEventListener('click',()=>{
   },onExit(){racePassages?.close();avatar.setSeated(0);avatar.root.rotation.x=avatar.root.rotation.z=0;avatar.root.visible=false;camera.clearViewOffset();markerGroup.visible=true;footballVisual.group.visible=true;carVisual.visible=true;for(const object of raceHiddenScenery)object.visible=true;overview();updateHUD();updateStampLabel();renderer.shadowMap.needsUpdate=true;}});
   miniRacing.open();
 });
+const overviewRecordsHost=document.createElement('aside');overviewRecordsHost.id='항공뷰기록';document.body.append(overviewRecordsHost);
+createRecordBoard({host:overviewRecordsHost,compact:true,onChallenge(round){if(!ready)return;$('레이싱시작').click();miniRacing?.selectRound(round);}});
 function resize(){renderer.setSize(innerWidth,innerHeight,false);camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();}
 addEventListener('resize',resize);resize();
 function textTexture(text,background=false){

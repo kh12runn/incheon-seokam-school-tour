@@ -1,6 +1,8 @@
 // Race-only circuit: a large playground loop and rear-parking loop joined by
 // separate outbound/return lanes through the main central entrance. Coordinates
 // are Three.js world X/Z. This module never changes the school's source model.
+import {WORLD_COURSES,COURSE_VERSION} from './레이싱입체코스.mjs';
+export {COURSE_VERSION} from './레이싱입체코스.mjs';
 const TAU=Math.PI*2;
 const clamp=(value,min,max)=>Math.max(min,Math.min(max,value));
 const mod=(value,divisor)=>(value%divisor+divisor)%divisor;
@@ -181,17 +183,8 @@ for(const segment of segments)for(let i=0;i<=64;i++){
  const sections=Object.freeze(segments.map(s=>Object.freeze({start:s.start,length:s.size,zone:s.zone})));
  return Object.freeze({id,name,description,width:10,length,bounds:Object.freeze(bounds),height:-.30,trackPoint,nearestTrack,sections,direction:1,layout});
 }
-function reversedCourse(base,{id,name,description}){
- function reversePoint(p){p.yaw=Math.atan2(p.tx,p.tz);p.tx=-p.tx;p.tz=-p.tz;p.nx=-p.nx;p.nz=-p.nz;p.curve=-p.curve;return p;}
- function trackPoint(distance,lane=0){const p=base.trackPoint(-distance,-lane);p.s=mod(distance,base.length);p.lane=lane;return reversePoint(p);}
- function nearestTrack(x,z,hint){const p=base.nearestTrack(x,z,Number.isFinite(hint)?-hint:undefined);p.s=mod(-p.s,base.length);p.lane=-p.lane;return reversePoint(p);}
- const sections=Object.freeze([...base.sections].reverse().map(section=>Object.freeze({...section,start:mod(base.length-section.start-section.length,base.length)})).sort((a,b)=>a.start-b.start));
- return Object.freeze({...base,id,name,description,trackPoint,nearestTrack,sections,direction:-1});
-}
 const outer=makeCourse({id:'playground-outer',name:'운동장 외곽 순환',description:'넓은 운동장을 돌아 중앙현관과 후문 주차장까지 달려요.',layout:'outer'});
-const inner=makeCourse({id:'playground-inner',name:'운동장 안쪽 순환',description:'동쪽 코스가 안쪽으로 바뀌어요. 짧아진 직선 뒤 코너를 준비하세요.',layout:'inner'});
-const slalom=makeCourse({id:'playground-slalom',name:'운동장 S 코너',description:'운동장 남쪽과 동쪽의 S 코너에서 조향과 제동을 겨뤄요.',layout:'slalom'});
-export const RACE_COURSES=Object.freeze([outer,inner,slalom,reversedCourse(inner,{id:'playground-inner-reverse',name:'안쪽 순환 역방향',description:'익숙한 안쪽 코스를 반대로 달려요. 현관 진입 순서도 달라져요.'}),reversedCourse(slalom,{id:'playground-slalom-reverse',name:'S 코너 역방향 결승',description:'역방향 S 코너와 주차장 긴 직선을 모두 이겨 내는 결승 코스예요.'})]);
+export const RACE_COURSES=Object.freeze([Object.freeze({...outer,version:COURSE_VERSION,theme:'school',tag:'운동장 · 학교 · 후문',color:'#8ae8c0',highlights:[{at:.35,label:'학교 중앙현관을 통과하는 레이스'}]}),...WORLD_COURSES]);
 export function getRaceCourse(round=1){return RACE_COURSES[clamp(Math.floor(Number(round)||1),1,RACE_COURSES.length)-1];}
 // Compatibility exports retain round one for existing school diagnostics.
 export const TRACK=outer;

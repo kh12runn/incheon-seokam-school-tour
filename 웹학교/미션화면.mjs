@@ -1,9 +1,11 @@
 const clock=seconds=>{const s=Math.ceil(Math.max(0,seconds));return Math.floor(s/60)+':'+String(s%60).padStart(2,'0');};
-export function createMissionUI({onAnswer,onRetry,onFree,onQuestion,onQuestionEnd,onResult,onInteract}){
+export function createMissionUI({onAnswer,onRetry,onFree,onQuestion,onQuestionEnd,onResult,onInteract,getCollectionHint,onGarage}){
  const hud=document.createElement('aside');hud.id='미션안내';hud.hidden=true;hud.innerHTML='<div class="미션윗줄"><span id="미션단계"></span><strong id="미션시간"></strong></div><progress id="미션시계" max="1" value="1" aria-label="이번 미션의 남은 시간"></progress><h2 id="미션목표"></h2><p id="미션장소"></p><div id="미션도장" aria-label="획득한 스탬프"></div><p id="미션상태" role="status"></p>';
  const bubble=document.createElement('section');bubble.id='탐험퀴즈말풍선';bubble.hidden=true;bubble.setAttribute('aria-labelledby','탐험퀴즈문제');bubble.innerHTML='<small id="탐험퀴즈선생님"></small><h2 id="탐험퀴즈문제"></h2><div id="탐험퀴즈보기" role="group" aria-label="정답 선택지"></div><p id="탐험퀴즈반응" role="status" aria-live="polite"></p><small>숫자 1~4 · 선택지 클릭 또는 터치</small>';
  const result=document.createElement('section');result.id='미션결과';result.hidden=true;result.setAttribute('aria-labelledby','미션결과제목');result.innerHTML='<span class="작은제목">나만의 학교 모험</span><h2 id="미션결과제목"></h2><p id="미션결과내용"></p><p id="미션최고기록"></p><button id="미션다시" class="primary">다시 도전하기</button><button id="미션자유">자유 탐험으로 돌아가기</button>';
  const guide=document.createElement('p');guide.id='미션방향';hud.append(guide);
+ const collection=document.createElement('p');collection.id='미션차량보상';hud.append(collection);
+ if(onGarage){const button=document.createElement('button');button.id='미션보상차고';button.textContent='모은 스탬프로 차고 구경하기 →';button.onclick=onGarage;result.append(button);}
  const action=document.createElement('button');action.id='미션동작';action.type='button';action.hidden=true;action.onclick=onInteract;hud.append(action);
  document.body.append(hud,bubble,result);document.getElementById('미션다시').onclick=onRetry;document.getElementById('미션자유').onclick=onFree;
  const $=id=>document.getElementById(id);let questionKey='',lastPhase='',lastSignature='',state=null;
@@ -40,6 +42,7 @@ export function createMissionUI({onAnswer,onRetry,onFree,onQuestion,onQuestionEn
    setText(action,'R · '+s.action);
    const signature=[s.phase,s.round,s.stamps,Math.ceil(s.remaining),playing,s.waiting,s.feedback,s.checkpoint,s.cargo].join('|');
    if(signature!==lastSignature){
+    setText(collection,getCollectionHint?.()??'미션 하나 완료 → 스탬프 1개 → 새 자동차 해금!');
     $('미션단계').textContent=`${s.round} / ${s.total} · ${s.title} · ${s.chapter}/3장`;$('미션시간').textContent=clock(s.remaining);$('미션시계').value=s.remaining/Math.max(1,s.limit);
     $('미션목표').textContent=s.clue;$('미션장소').textContent=s.place;
     $('미션도장').textContent=Array.from({length:s.total},(_,i)=>i<s.stamps?'★':'☆').join('');$('미션도장').setAttribute('aria-label',`스탬프 ${s.stamps}개 / ${s.total}개`);
