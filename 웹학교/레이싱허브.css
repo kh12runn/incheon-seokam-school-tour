@@ -18,7 +18,7 @@
 #레이스차고 .라운드선택,#레이스차고 #레이스코스안내{display:none}.기록목표HUD{max-width:280px;background:#163a48c9;padding:8px 11px;border-radius:9px;color:#ffe3a1!important;font-size:12px!important}
 @media(max-width:1000px){#항공뷰기록{width:280px;right:16px;top:88px;padding:15px}.코스탭 b{font-size:12px}.코스카드{width:52vw;padding:16px}.코스카드 h2{font-size:22px}}
 @media(max-width:700px){
- #레이스복귀{top:231px}
+ #레이스복귀{top:272px}
  body[data-mode=overview] #시작안내{max-height:calc(100dvh - 235px)}
  #항공뷰기록{left:12px;right:12px;top:74px;width:auto;padding:10px 14px;max-height:60dvh;overflow:auto}.기록표제목 h2{font-size:15px;margin:4px 0}.기록접기{font-size:11px!important}.기록표제목 small{font-size:8px}.기록내용{margin-top:10px}
  #레이스코스선택{inset:70px 10px 10px}.코스탭{gap:4px;grid-template-columns:repeat(5,minmax(0,1fr))}#레이싱 .코스탭 button{min-height:82px;padding:7px 4px;gap:5px;border-radius:8px}.코스탭 small{font-size:8px;letter-spacing:0}.코스탭 b{font-size:10px;line-height:1.3;word-break:keep-all}.코스탭 span{font-size:8px}

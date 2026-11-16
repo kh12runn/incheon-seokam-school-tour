@@ -1,6 +1,7 @@
 // Game balance, not the specifications of real road cars. Shared by the garage,
 // school parking and race simulation; sports is better in every measured axis.
 export const SPORTS_STAMPS=24;
+export const PICKUP_BOOST=Object.freeze({duration:3,multiplier:1.5});
 export const VEHICLE_PROFILES=Object.freeze({
  sedan:{name:'클래식 세단',specialty:'균형 잡힌 주행',speed:20,accel:8,launch:10,handling:5.6,grip:16,brake:24,resilience:.52,boost:1.15},
  compact:{name:'시티 경차',specialty:'가벼운 몸놀림 · 빠른 출발',speed:19,accel:10,launch:15,handling:7,grip:17,brake:25,resilience:.46,boost:1.15},

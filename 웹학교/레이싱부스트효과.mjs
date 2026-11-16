@@ -26,7 +26,7 @@ export function createBoostFlames(parent,{capacity=6}={}){
   if(paused||phase!=='racing'||!fleet){clear();return;}
   ribbons.count=sparks.count=0;activeCars=0;
   for(let i=0;i<Math.min(cars.length,capacity);i++){
-   const car=cars[i],target=car.boosting&&car.finish===null?1:0;
+   const car=cars[i],burst=car.pickupBurst??0,target=(car.boosting||burst>0)&&car.finish===null?1:0;
    const intensity=target?Math.min(1,(intensities.get(car.id)??0)+dt*14):Math.max(0,(intensities.get(car.id)??0)-dt*8);
    intensities.set(car.id,intensity);if(intensity<.01)continue;
    const vehicle=fleet.getObjectByName('race-'+car.id);if(!vehicle?.visible)continue;
@@ -35,15 +35,15 @@ export function createBoostFlames(parent,{capacity=6}={}){
    for(const side of [-1,1]){
     const x=side*car.dimensions.width*.29;
     const flicker=.88+.12*Math.sin(time*37+car.id*2+side)+.07*Math.sin(time*61+side);
-    const length=(1.05+Math.min(1,Math.abs(car.speed)/24)*.65)*intensity*flicker;
+    const length=(1.05+Math.min(1,Math.abs(car.speed)/24)*.65)*intensity*flicker*(1+burst*.6);
     for(let k=0;k<3;k++){
      local.position.set(x,height,rear);local.rotation.set(0,0,k*Math.PI/3+Math.sin(time*18+side)*.08);local.scale.set(.60*intensity*flicker,1,length*(1-k*.08));local.updateMatrix();
      matrix.multiplyMatrices(vehicle.matrix,local.matrix);ribbons.setMatrixAt(ribbons.count++,matrix);
     }
     for(let k=0;k<8;k++){
-     const age=(time*2.6+k*.137+car.id*.17)%1,spread=(k%3-1)*.21*age;
-     local.position.set(x+spread,height+Math.sin(age*Math.PI)*.18+((k%2)-.5)*.10,rear+age*2.8);
-     local.rotation.set(age*3,k*.8,0);const size=.032*(1-age)*intensity;local.scale.set(size,size,size*(2.5+age*2));local.updateMatrix();
+     const age=(time*2.6+k*.137+car.id*.17)%1,spread=(k%3-1)*.21*age*(1+burst*2);
+     local.position.set(x+spread,height+Math.sin(age*Math.PI)*(.18+burst*.25)+((k%2)-.5)*.10,rear+age*(2.8+burst*1.2));
+     local.rotation.set(age*3,k*.8,0);const size=.032*(1-age)*intensity*(1+burst*3);local.scale.set(size,size,size*(2.5+age*2));local.updateMatrix();
      matrix.multiplyMatrices(vehicle.matrix,local.matrix);sparks.setMatrixAt(sparks.count++,matrix);
     }
    }

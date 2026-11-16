@@ -4,7 +4,7 @@ import path from 'node:path';
 import {randomBytes,createHash} from 'node:crypto';
 import {getRaceCourse,COURSE_VERSION} from '../웹학교/레이싱코스.mjs';
 import {PARKED_CARS} from '../웹학교/주차장.mjs';
-import {profileFor,carName} from '../웹학교/차량성능.mjs';
+import {profileFor,carName,PICKUP_BOOST} from '../웹학교/차량성능.mjs';
 
 const fail=(status,message)=>Object.assign(new Error(message),{status});
 const digest=s=>createHash('sha256').update(s).digest('hex');
@@ -31,16 +31,16 @@ export function createRaceRecords({filename,now=Date.now,production=false,origin
  }
  async function body(req){if(req.headers['content-type']?.split(';')[0]!=='application/json')throw fail(415,'JSON 요청만 가능합니다.');let bytes=0,chunks=[];for await(const chunk of req){bytes+=chunk.length;if(bytes>230000)throw fail(413,'기록 데이터가 너무 큽니다.');chunks.push(chunk);}try{return JSON.parse(Buffer.concat(chunks).toString());}catch{throw fail(400,'잘못된 기록 요청입니다.');}}
  function validate(run,data){
-  const course=getRaceCourse(run.round),car=PARKED_CARS.find(c=>c.id===run.car),p=profileFor(car),time=data.time,proof=data.proof;
-  if(!Number.isFinite(time)||time<course.length*3/(p.speed*p.boost)*.92||time>3600||time*1000>now()-run.started+2500)throw fail(400,'완주 시간을 확인할 수 없습니다.');
+  const course=getRaceCourse(run.round),car=PARKED_CARS.find(c=>c.id===run.car),p=profileFor(car),time=data.time,proof=data.proof,maxSpeed=p.speed*Math.max(p.boost,PICKUP_BOOST.multiplier);
+  if(!Number.isFinite(time)||time<course.length*3/maxSpeed*.92||time>3600||time*1000>now()-run.started+2500)throw fail(400,'완주 시간을 확인할 수 없습니다.');
   if(!Array.isArray(proof)||proof.length<12||proof.length>1900)throw fail(400,'완주 구간 기록이 부족합니다.');
   let last=null;
   for(const point of proof){
    if(!Array.isArray(point)||point.length!==4||point.some(n=>!Number.isFinite(n)))throw fail(400,'올바르지 않은 구간 기록입니다.');
    const [t,s,x,z]=point;if(t<0||t>time+.1)throw fail(400,'구간 시간이 올바르지 않습니다.');
    const at=course.nearestTrack(x,z,s);if(at.distance>at.width/2+3)throw fail(400,'코스를 벗어난 기록입니다.');
-   if(last){const dt=t-last[0],advance=s-last[1];if(dt<=0||dt>6||advance>p.speed*p.boost*dt+5||advance< -p.speed*dt-8)throw fail(400,'구간 이동을 확인할 수 없습니다.');}
-   else if(t>3||s>p.speed*3)throw fail(400,'출발 기록이 없습니다.');
+   if(last){const dt=t-last[0],advance=s-last[1];if(dt<=0||dt>6||advance>maxSpeed*dt+5||advance< -p.speed*dt-8)throw fail(400,'구간 이동을 확인할 수 없습니다.');}
+   else if(t>3||s>maxSpeed*3)throw fail(400,'출발 기록이 없습니다.');
    last=point;
   }
   if(time-last[0]>3||Math.abs(last[1]-course.length*3)>4)throw fail(400,'3바퀴 완주 기록이 없습니다.');

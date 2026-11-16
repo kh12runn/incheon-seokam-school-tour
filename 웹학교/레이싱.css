@@ -23,6 +23,20 @@ body[data-mode=race] #시작안내,body[data-mode=race] .게임헤더,body[data-
 @media(max-width:700px){#레이스덮개{padding:10px}#레이스덮개>section{padding:20px 14px;max-height:94dvh}#레이스결과표 table{font-size:11px}#레이스결과표 th,#레이스결과표 td{padding:10px 4px}.레이스선수표식{width:24px;height:24px;font-size:9px;margin-right:5px}.레이스선수>span:last-child{width:calc(100% - 29px)}#레이스덮개 h2{font-size:23px}}
 
 /* Boost remains readable against both bright dirt and the darker school passage. */
+.레이스보상안내{display:grid;gap:5px;padding:12px 14px;margin:10px 0 15px;background:#224b4d;border:1px solid #91e5ca80;border-radius:10px;color:#d8fff3;font-size:12px;line-height:1.5}
+.레이스보상안내 b{color:#ffe39b;font-size:15px}
+#레이스완주보상{color:#ffe39b;background:#173844df;padding:7px 10px;border-radius:8px;font-weight:700;max-width:max-content}
+#레이스덮개 #레이스결과설명{white-space:pre-line;line-height:1.8}
+#아이템부스트{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:9px;border:1px solid #75f4e7;background:#16484f;padding:9px 7px;border-radius:8px;color:#a4fff1;font-size:12px}
+#아이템부스트시간{font-variant-numeric:tabular-nums;font-weight:900;color:#fff5b6;white-space:nowrap}
+.레이스속도효과{position:absolute;inset:0;pointer-events:none;opacity:0;transition:opacity .18s ease;overflow:hidden}
+.레이스속도효과::before{content:'';position:absolute;inset:-15%;background:repeating-conic-gradient(from 7deg at 50% 48%,transparent 0deg 17deg,#defbff65 17.2deg 17.45deg,transparent 17.7deg 36deg);mask-image:radial-gradient(ellipse at center,transparent 35%,#000 90%);animation:레이스속도선 .48s linear infinite;animation-play-state:paused}
+#레이싱[data-speed-boost=true] .레이스속도효과{opacity:.65}
+#레이싱[data-speed-boost=true] .레이스속도효과::before{animation-play-state:running}
+@keyframes 레이스속도선{from{transform:scale(.92);opacity:.4}to{transform:scale(1.14);opacity:.8}}
+@media(prefers-reduced-motion:reduce){.레이스속도효과{display:none}}
+@media(max-width:700px){.레이스보상안내{padding:9px 10px;font-size:11px}.레이스보상안내 b{font-size:13px}#아이템부스트{padding:7px 5px;font-size:10px}#레이스완주보상{font-size:10px}#레이스복귀{top:272px}}
+@media(pointer:coarse) and (orientation:landscape){#레이스복귀{top:62px}}
 .레이스계기{width:226px;box-sizing:border-box;padding:14px 18px;background:#0c2333ed;border-color:#7495a8}
 .레이스속도줄{white-space:nowrap;margin-bottom:12px}
 .부스트계기{border-top:1px solid #7697aa66;padding-top:11px;text-align:left}
@@ -58,5 +72,7 @@ body[data-mode=race] #시작안내,body[data-mode=race] .게임헤더,body[data-
 @media(pointer:coarse) and (orientation:landscape){
  .레이스계기{bottom:150px;width:166px;padding:7px 11px}.레이스속도줄{display:flex;align-items:baseline;justify-content:flex-end;margin-bottom:4px}.레이스계기 strong{font-size:26px}
  .부스트계기{padding-top:5px}#레이스부스트{height:16px;margin:5px 0}.부스트키 kbd{font-size:12px;padding:3px 7px}#레이스부스트상태{display:none}
- .레이스터치{bottom:max(45px,calc(env(safe-area-inset-bottom) + 36px))}#레이스트랙지도{bottom:148px;width:112px;height:67px}
+ .레이스터치{bottom:max(45px,calc(env(safe-area-inset-bottom) + 36px))}#레이스트랙지도{top:65px;bottom:auto;left:240px;width:100px;height:60px}
+ #아이템부스트{margin-top:5px;padding:4px;font-size:10px}
+ #레이싱 #레이스복귀{top:49px;padding:5px 10px;font-size:11px;line-height:16px}
 }

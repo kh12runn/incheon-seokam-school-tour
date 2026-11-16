@@ -105,6 +105,8 @@ export function createRaceVisual(scene,{getDriver}={}){
   const mesh=new THREE.InstancedMesh(unit,material,16*12);mesh.name='장애물 반복 부품';mesh.castShadow=true;mesh.receiveShadow=true;mesh.count=0;obstacles.add(mesh);
   obstacleBatches.set(material,mesh);
  }
+ const pickupHalos=new THREE.InstancedMesh(new THREE.RingGeometry(.62,.78,28).rotateX(-Math.PI/2),new THREE.MeshBasicMaterial({color:0x73ffe0,transparent:true,opacity:.8,depthWrite:false,side:THREE.DoubleSide}),16);
+ pickupHalos.name='책·의자 부스트 아이템 표시';pickupHalos.count=0;obstacles.add(pickupHalos);
  for(const entry of obstaclePool){
   entry.item.updateMatrixWorld(true);itemInverse.copy(entry.item.matrixWorld).invert();entry.parts=[];
   for(const [kind,group] of [['chair',entry.chair],['books',entry.books]]){
@@ -112,14 +114,17 @@ export function createRaceVisual(scene,{getDriver}={}){
   }
  }
  function updateObstacleBatches(){
+  pickupHalos.count=0;
   for(const mesh of obstacleBatches.values())mesh.count=0;
   for(const entry of obstaclePool){if(!entry.item.visible)continue;entry.item.updateMatrix();
+   obstacleMatrix.copy(entry.item.matrix);obstacleMatrix.elements[13]+=.025;pickupHalos.setMatrixAt(pickupHalos.count++,obstacleMatrix);
    for(const part of entry.parts){if((part.kind==='chair')!==entry.chair.visible)continue;const mesh=obstacleBatches.get(part.material);obstacleMatrix.multiplyMatrices(entry.item.matrix,part.matrix);mesh.setMatrixAt(mesh.count++,obstacleMatrix);}
   }
   for(const mesh of obstacleBatches.values()){mesh.visible=mesh.count>0;mesh.instanceMatrix.needsUpdate=true;mesh.computeBoundingSphere();}
+  pickupHalos.visible=pickupHalos.count>0;pickupHalos.instanceMatrix.needsUpdate=true;pickupHalos.computeBoundingSphere();
  }
- let fleet=null,preview=null,previewSource=null,lastGeneration=0,lastReset=0;const target=new THREE.Vector3(),look=new THREE.Vector3(),smoothLook=new THREE.Vector3();let cameraReady=false,cameraYaw=0;
- function clearCars({keepTeacherCache=false}={}){starter.hide();boostFlames.clear();driver.release();teachers.clear({keepCache:keepTeacherCache});if(fleet){disposeRaceTree(fleet,scene.environment);fleet=null;}if(preview){disposeRaceTree(preview,scene.environment);preview=null;}}
+ let fleet=null,preview=null,previewSource=null,lastGeneration=0,lastReset=0,lastPickupRevision=-1,boostCameraMix=0;const reducedMotion=typeof matchMedia!=='undefined'&&matchMedia('(prefers-reduced-motion: reduce)').matches;const target=new THREE.Vector3(),look=new THREE.Vector3(),smoothLook=new THREE.Vector3();let cameraReady=false,cameraYaw=0;
+ function clearCars({keepTeacherCache=false}={}){boostCameraMix=0;starter.hide();boostFlames.clear();driver.release();teachers.clear({keepCache:keepTeacherCache});if(fleet){disposeRaceTree(fleet,scene.environment);fleet=null;}if(preview){disposeRaceTree(preview,scene.environment);preview=null;}}
  // Display on the school's dirt surface (world Y=-.30), independently of
  // elevated roads. Courses 3/4 cross this spot and used to cut through tyres.
  function garage(car,nextCourse){mapPreview=false;setCourse(nextCourse);trackLayer.visible=false;if(!preview||previewSource!==car){clearCars();previewSource=car;preview=parkedCarDetails({cars:[{...car,x:43,y:-50,z:-.30-root.position.y+.004,yaw:0}],instanced:false,environment:scene.environment});root.add(preview);cameraReady=false;}preview.visible=true;root.visible=true;obstacles.visible=false;}
@@ -149,7 +154,7 @@ export function createRaceVisual(scene,{getDriver}={}){
   const trackPoint=race.course.trackPoint;
   const state=currentState??race.view();
   starter.update(state);
-  if(lastGeneration!==state.generation){lastGeneration=state.generation;obstaclePool.forEach(({item,chair,books},i)=>{const o=race.obstacles[i];item.visible=!!o;if(!o)return;const p=trackPoint(o.s,o.lane);item.position.set(p.x,ground(p)+.06,p.z);item.rotation.y=p.yaw+o.angle;chair.visible=o.kind==='chair';books.visible=!chair.visible;});updateObstacleBatches();}
+  if(lastGeneration!==state.generation||lastPickupRevision!==state.pickupRevision){lastGeneration=state.generation;lastPickupRevision=state.pickupRevision;obstaclePool.forEach(({item,chair,books},i)=>{const o=race.obstacles[i];item.visible=!!o&&o.collectedBy==null;if(!o)return;const p=trackPoint(o.s,o.lane);item.position.set(p.x,ground(p)+.06,p.z);item.rotation.y=p.yaw+o.angle;chair.visible=o.kind==='chair';books.visible=!chair.visible;});updateObstacleBatches();}
   for(const c of race.cars){const obj=fleet.getObjectByName('race-'+c.id),height=c.height??trackPoint(c.s).height??-.30,speed=Math.abs(c.speed),finished=c.id&&c.finish!=null;obj.visible=!finished;obj.scale.setScalar(finished?0:1);obj.position.set(c.x,height-root.position.y+.02+Math.sin(c.spin*2)*Math.min(.012,speed*.0005),c.z);obj.rotation.order='YXZ';obj.rotation.set(c.pitch??0,c.yaw,THREE.MathUtils.clamp(c.steering*c.speed*.006,-.055,.055));for(const wheel of obj.userData.wheels){wheel.rotation.x=-c.spin;wheel.rotation.y=wheel.userData.front?c.steering:0;}}
   for(const obj of fleet.children)if(obj.visible)updateCarEffects(obj,elapsed);
   fleet.userData.instances.update();
@@ -162,6 +167,8 @@ export function createRaceVisual(scene,{getDriver}={}){
   for(const b of race.course.elevated?[]:RACE_PASSAGES){const dx=Math.max(b.minX-c.x,0,c.x-b.maxX),dz=Math.max(b.minZ-c.z,0,c.z-b.maxZ);passageBlend=Math.max(passageBlend,Math.max(0,1-Math.hypot(dx,dz)/7));}
   let distance=THREE.MathUtils.lerp(7.7+speed*.055,4.6,passageBlend);
   if(insideTunnel)distance=4.7;
+  const boostTarget=!reducedMotion&&c.boosting&&speed>3&&!state.paused&&state.phase==='racing'?1:0;boostCameraMix+=(boostTarget-boostCameraMix)*(1-Math.exp(-dt*(boostTarget?7:5)));
+  if(!insideTunnel)distance+=boostCameraMix*.65*(1-passageBlend);
   if(lastReset!==c.resetSerial){lastReset=c.resetSerial;cameraReady=false;}
   // Follow the driver's real heading. Never look ahead along the route: even
   // against a boundary, steering and camera remain under the driver's control.
@@ -178,7 +185,7 @@ export function createRaceVisual(scene,{getDriver}={}){
   if(!cameraReady){camera.position.copy(target);smoothLook.copy(look);cameraReady=true;}else{camera.position.lerp(target,1-Math.exp(-dt*9));smoothLook.lerp(look,1-Math.exp(-dt*11));}
   if(insideTunnel){const behind=course.nearestTrack(camera.position.x,camera.position.z,c.s-distance);camera.position.y=THREE.MathUtils.clamp(camera.position.y,behind.height+1.7,behind.height+3);}
   for(const b of race.course.elevated?[]:RACE_PASSAGES)if(camera.position.x>b.minX&&camera.position.x<b.maxX&&camera.position.z>b.minZ&&camera.position.z<b.maxZ)camera.position.y=Math.min(camera.position.y,b.ceiling-.25);
-  camera.lookAt(smoothLook);const fov=62+speed*.22+(c.boosting?4:0);if(Math.abs(camera.fov-fov)>.02){camera.fov=fov;camera.updateProjectionMatrix();}
+  camera.lookAt(smoothLook);const fov=62+speed*.22+boostCameraMix*8;if(Math.abs(camera.fov-fov)>.02){camera.fov=fov;camera.updateProjectionMatrix();}
  }
- return {root,garage,start,update,setCourse,previewCourse,prepareStarter:starter.prepare,starterState:starter.getState,orbit(dx,dy,zoom=1){previewTurn-=dx*.006;previewTilt=THREE.MathUtils.clamp(previewTilt+dy*.003,.25,1.3);previewZoom=THREE.MathUtils.clamp(previewZoom*zoom,.4,2);manualUntil=performance.now()+12000;},teacherState:teachers.getState,boostState:boostFlames.getState,hide(){root.visible=false;clearCars();if(originalFog&&scene.fog)Object.assign(scene.fog,originalFog);if(viewCamera){viewCamera.far=originalFar;viewCamera.near=originalNear;viewCamera.updateProjectionMatrix();}},dispose(){clearCars();starter.dispose();boostFlames.dispose();teachers.dispose();disposeRaceTree(root,scene.environment);if(!trackLayer){courseMaterials.forEach(m=>m.dispose());chalkMap.dispose();}}};
+ return {root,garage,start,update,setCourse,previewCourse,prepareStarter:starter.prepare,starterState:starter.getState,orbit(dx,dy,zoom=1){previewTurn-=dx*.006;previewTilt=THREE.MathUtils.clamp(previewTilt+dy*.003,.25,1.3);previewZoom=THREE.MathUtils.clamp(previewZoom*zoom,.4,2);manualUntil=performance.now()+12000;},teacherState:teachers.getState,boostState:()=>({...boostFlames.getState(),cameraBoost:boostCameraMix}),hide(){root.visible=false;clearCars();if(originalFog&&scene.fog)Object.assign(scene.fog,originalFog);if(viewCamera){viewCamera.far=originalFar;viewCamera.near=originalNear;viewCamera.updateProjectionMatrix();}},dispose(){clearCars();starter.dispose();boostFlames.dispose();teachers.dispose();disposeRaceTree(root,scene.environment);if(!trackLayer){courseMaterials.forEach(m=>m.dispose());chalkMap.dispose();}}};
 }

@@ -32,7 +32,7 @@ function decisionFixture(round=3,course=getRaceCourse(1)){
 
 {
  const f=decisionFixture(),o=trackPoint(24);f.obstacles.push({id:1,s:24,lane:0,x:o.x,z:o.z});
- f.ai(f.c);assert.ok(Math.abs(f.c.aiLane)>1.5,'Plan an open lane before reaching books/chairs');
+ f.ai(f.c);assert.ok(Math.abs(f.c.aiLane)<.6,'Collect books/chairs instead of avoiding them');
 }
 {
  const f=decisionFixture();place(f.other,21,0,6);f.ai(f.c);
@@ -76,7 +76,8 @@ for(let round=1;round<=5;round++){
  const signs=new Set();
  for(let s=0;s<course.length;s+=1){
   const at=course.trackPoint(s),ahead=course.trackPoint(s+6);
-  if(Math.abs(at.curve)<.04||at.curve*ahead.curve<=0)continue;
+  // Round 5's left bends peak at 0.0355; sample gentle as well as tight bends.
+  if(Math.abs(at.curve)<.01||at.curve*ahead.curve<=0)continue;
   const sign=Math.sign(at.curve);if(signs.has(sign))continue;
   place(fixture.c,s,0,5,course);fixture.other.finish=0;fixture.advance(1);
   const input=fixture.ai(fixture.c);
@@ -87,7 +88,8 @@ for(let round=1;round<=5;round++){
 }
 {
  const random=rng(42),suv=PARKED_CARS.find(c=>c.type==='suv');assert.ok(suv);
- const race=createRace({car:PARKED_CARS[0],opponents:[suv],round:3,random});
+ // The school-lobby 5m passage belongs to round 1 after the five-course update.
+ const race=createRace({car:PARKED_CARS[0],opponents:[suv],round:1,random});
  for(let i=0;i<190;i++)race.update(1/60,{brake:true});race.obstacles.splice(0);
  const course=race.course;let entrance;
  for(let s=20;s<course.length-30;s++)if([0,6,12,18].every(d=>{const p=course.trackPoint(s+d);return p.width===5&&Math.abs(p.curve)<.001;})){entrance=s;break;}

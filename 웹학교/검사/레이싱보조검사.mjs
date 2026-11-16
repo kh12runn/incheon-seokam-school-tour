@@ -79,11 +79,12 @@ for(const wallSide of [-1,1])for(const steer of [-1,0,1])check(`90도 벽 접촉
  assert.equal(c.resetSerial,0);return {...stats,moved:moved(c,start)};
 });
 
-for(const steer of [0,1])check('책 장애물 접촉에서 전진 조향 '+steer,()=>{
+for(const steer of [0,1])check('책 아이템 획득 후 전진 조향 '+steer,()=>{
  const race=fixture(),c=race.player,start=pose(c,8),p=trackPoint(10.4);
  race.obstacles.push({id:999,s:10.4,lane:0,x:p.x,z:p.z,kind:'books',angle:0});
  const stats=run(race,{throttle:1,steer},3.5);
- assert.ok(stats.active>0,'An obstacle contact can enable low-speed assistance');
+ assert.equal(c.pickups,1,'Books are collected once, without an obstacle impact');
+ assert.equal(c.obstacleContact,0,'Pickup does not invoke obstruction assistance');
  assert.ok(moved(c,start)>3);assert.equal(c.resetSerial,0);return stats;
 });
 

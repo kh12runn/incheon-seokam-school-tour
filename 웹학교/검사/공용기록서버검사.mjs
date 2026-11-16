@@ -7,6 +7,7 @@ import {COURSE_VERSION} from '../레이싱코스.mjs';
 import {createRace} from '../레이싱물리.mjs';
 import {PARKED_CARS} from '../주차장.mjs';
 import {driverInput} from './레이싱테스트조작.mjs';
+import {PICKUP_BOOST,profileFor} from '../차량성능.mjs';
 const dir=fs.mkdtempSync(path.resolve('output','record-test-')),filename=path.join(dir,'records.sqlite');let clock=1000000;
 let api=createRaceRecords({filename,now:()=>clock,origin:'http://school.test'});
 const server=http.createServer(async(req,res)=>{if(!await api(req,res)){res.writeHead(404);res.end();}});await new Promise(r=>server.listen(0,'127.0.0.1',r));
@@ -34,6 +35,22 @@ try{
   assert.equal((await call('submit',{token:start.body.token,grade:6,classNumber:1,nickname:'<script>'},start.cookie)).status,400);
   const submit=await call('submit',{token:start.body.token,grade:6,classNumber:1,nickname:'검사선수'},start.cookie);assert.equal(submit.body.rank,1);
   assert.equal((await call('submit',{token:start.body.token,grade:6,classNumber:1,nickname:'검사선수'},start.cookie)).body.alreadySubmitted,true);
+ }
+ // Cover a legitimate item-boost segment above the former Shift-only ceiling.
+ // The isolated fixture follows the real road and all three laps; production
+ // records are never used for these validation checks.
+ {
+  const baseCar=PARKED_CARS[0],race=createRace({car:baseCar}),course=race.course,p=profileFor(baseCar),proof=[];
+  let seconds=0,distance=0,maxAdvanceSpeed=0;
+  while(distance<course.length*3){
+   const s=distance%course.length;
+   const boosted=s>20&&s<100,velocity=p.speed*(boosted?PICKUP_BOOST.multiplier:1);
+   const dt=Math.min(1.5,(course.length*3-distance)/velocity);seconds+=dt;distance+=velocity*dt;
+   const at=course.trackPoint(distance);proof.push([seconds,distance,at.x,at.z]);maxAdvanceSpeed=Math.max(maxAdvanceSpeed,velocity);
+  }
+  assert(maxAdvanceSpeed>p.speed*p.boost);
+  const start=await call('start',{round:1,carId:baseCar.id,version:COURSE_VERSION});clock+=seconds*1000+5000;
+  const finished=await call('finish',{token:start.body.token,time:seconds,proof},start.cookie);assert.equal(finished.status,200,JSON.stringify(finished.body));
  }
  const results=await Promise.all(Array.from({length:14},async(_,i)=>{
   const start=await call('start',{round:2,carId:car.id,version:COURSE_VERSION});const scale=1+(14-i)/80,fixture=fixtures[1],time=fixture.time*scale,proof=fixture.proof.map(p=>[p[0]*scale,...p.slice(1)]);clock+=time*1000+5000;

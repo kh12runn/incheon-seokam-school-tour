@@ -5,7 +5,7 @@ const note=midi=>440*2**((midi-69)/12);
 export function createRaceAudio({contextFactory=()=>new (globalThis.AudioContext||globalThis.webkitAudioContext)()}={}){
  let ctx=null,master,compressor,analyser,engine,body,engineGain,bodyGain,filter,gravel,gravelGain,noise;
  let enabled=true,available=true,active=false,lastPhase='',lastCount=-1,lastLap=1,lastHits=0,lastBoost=false,lastGear=0;
- let nextBeat=0,beat=0,nextUpdate=0,lastEffect=-10,frequency=0,peakVoices=0;
+ let nextBeat=0,beat=0,nextUpdate=0,lastEffect=-10,frequency=0,peakVoices=0,lastPickups=0;
  const voices=new Set(),events={countdown:0,start:0,lap:0,collision:0,boost:0,finish:0};
  function build(){
   if(ctx)return;
@@ -67,7 +67,7 @@ export function createRaceAudio({contextFactory=()=>new (globalThis.AudioContext
   engineGain.gain.setValueAtTime(0,ctx.currentTime);bodyGain.gain.setValueAtTime(0,ctx.currentTime);gravelGain.gain.setValueAtTime(0,ctx.currentTime);
   if(suspend&&ctx.state==='running')void ctx.suspend().catch(()=>{});
  }
- function start(){stop({suspend:false});lastLap=1;lastHits=0;lastBoost=false;lastGear=0;beat=0;unlock();}
+ function start(){stop({suspend:false});lastLap=1;lastHits=0;lastBoost=false;lastPickups=0;lastGear=0;beat=0;unlock();}
  function update(state,car,controls){
   if(!ctx||!enabled||!available)return;
   if(state.paused){if(active)stop();return;}
@@ -79,11 +79,11 @@ export function createRaceAudio({contextFactory=()=>new (globalThis.AudioContext
    if(lastPhase==='countdown')cue('start');
    if(state.lap>lastLap)cue('lap');
    if(state.hits>lastHits&&now-lastEffect>.20){cue('collision');lastEffect=now;}
-   if(car.boosting&&!lastBoost)cue('boost');
+   if((car.pickups??0)>lastPickups||(car.boosting&&!lastBoost))cue('boost');
    music(now,state.lap===state.laps);
   }
   if(phase==='finished'&&lastPhase!=='finished'){clearVoices();cue('finish',state.won);}
-  lastPhase=phase;lastLap=state.lap;lastHits=state.hits;lastBoost=!!car.boosting;
+  lastPhase=phase;lastLap=state.lap;lastHits=state.hits;lastBoost=!!car.boosting;lastPickups=car.pickups??0;
   if(now<nextUpdate)return;nextUpdate=now+1/30;
   const running=phase==='racing'||phase==='countdown',speed=Math.abs(car.speed),throttle=Math.max(0,controls.throttle??0),gear=Math.min(5,Math.floor(speed/6));
   frequency=43+(speed%6)*9+gear*4+throttle*13;

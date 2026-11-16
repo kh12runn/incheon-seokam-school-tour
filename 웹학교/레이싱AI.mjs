@@ -1,4 +1,5 @@
 import {TRACK,trackPoint as originalTrackPoint} from './레이싱코스.mjs';
+import {PICKUP_BOOST} from './차량성능.mjs';
 
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const angle=v=>Math.atan2(Math.sin(v),Math.cos(v));
@@ -15,7 +16,7 @@ export function createRaceAI({cars,obstacles,rules,course,random=Math.random,tim
  const memories=new WeakMap();
  const memoryFor=c=>{
   let memory=memories.get(c);
-  if(!memory){memory={next:0,lane:c.lane??0,lockUntil:0,targetId:null,decisions:0,paceOffset:(random()-.5)*.018,look:[],obstacleGap:Infinity};memories.set(c,memory);}
+  if(!memory){memory={next:0,lane:c.lane??0,lockUntil:0,targetId:null,decisions:0,paceOffset:(random()-.5)*.018,look:[],};memories.set(c,memory);}
   return memory;
  };
  function perceive(c,m,now){
@@ -24,7 +25,7 @@ export function createRaceAI({cars,obstacles,rules,course,random=Math.random,tim
   const look=[];for(let d=0;d<=horizon;d+=2.5){const point=trackPoint(c.s+d);look.push({d,width:point.width,curve:point.curve});}
   m.look=look;
   const nearby=cars.filter(other=>other!==c&&other.finish===null).map(other=>({car:other,gap:signedGap(other.s,c.s)})).filter(o=>o.gap>-12&&o.gap<horizon+8);
-  const threats=obstacles().map(o=>({...o,gap:mod(o.s-c.s,L)})).filter(o=>o.gap<horizon+5);
+  const pickups=obstacles().filter(o=>o.collectedBy==null).map(o=>({...o,gap:mod(o.s-c.s,L)})).filter(o=>o.gap<horizon);
   const ahead=trackPoint(c.s+clamp(4+speed*.25,5,10)),halfW=c.dimensions.width/2;
   const narrow=Math.min(at.width,ahead.width)<=7;
   let target=m.targetId===null?null:nearby.find(o=>o.car.id===m.targetId);
@@ -36,16 +37,13 @@ export function createRaceAI({cars,obstacles,rules,course,random=Math.random,tim
    if(target){m.targetId=target.car.id;m.lockUntil=now+1.35;}
   }
   const legalLimit=Math.max(0,Math.min(at.width,ahead.width)/2-halfW-(target&&narrow?.14:.25)),wideLimit=Math.min(2.6,legalLimit);
-  const urgent=threats.some(o=>o.gap<15&&Math.abs(o.lane-c.lane)<halfW+.65);
-  const limit=narrow&&!target&&!urgent?0:wideLimit;
+  const limit=narrow&&!target?0:wideLimit;
   const candidates=[-limit,-limit*.52,0,limit*.52,limit];
   const costs=candidates.map(lane=>{
    let cost=Math.abs(lane-m.lane)*.65+Math.abs(lane)*.10;
    if(now<m.lockUntil)cost+=Math.abs(lane-m.lane)*2.4;
-   for(const o of threats){
-    const clearance=Math.abs(lane-o.lane),safe=halfW+.65;
-    if(clearance<safe)cost+=(safe-clearance)*Math.max(0,44-o.gap)*2.5;
-   }
+   // Gently prefer a nearby pickup; safe overtakes/corners retain priority.
+   if(!target)for(const o of pickups)cost-=Math.max(0,1-Math.abs(lane-o.lane)/1.4)*Math.max(0,18-o.gap)*.10;
    for(const o of nearby){
     const relative=Math.max(.3,speed-o.car.speed),catchTime=clamp(o.gap/relative,0,2);
     const predicted=o.gap+(o.car.speed-speed)*catchTime;
@@ -74,10 +72,9 @@ export function createRaceAI({cars,obstacles,rules,course,random=Math.random,tim
    // If all passing lanes are occupied, follow first; don't zigzag into traffic.
    m.targetId=null;target=null;
   }
-  m.obstacleGap=Infinity;
-  for(const o of threats)if(Math.abs(o.lane-c.lane)<halfW+.6)m.obstacleGap=Math.min(m.obstacleGap,o.gap);
+
   c.aiLane=m.lane;c.passingId=m.targetId;c.passingLane=m.lane;
-  c.aiPlan={intent:target?'pass':urgent?'avoid':narrow?'merge':'cruise',targetId:m.targetId,lane:m.lane,decisions:m.decisions};
+  c.aiPlan={intent:target?'pass':narrow?'merge':pickups.some(o=>o.gap<18&&Math.abs(o.lane-m.lane)<1.4)?'collect':'cruise',targetId:m.targetId,lane:m.lane,decisions:m.decisions};
  }
  return function input(c,dt=1/120){
   const m=memoryFor(c),now=time(),p=c.profile,at=trackPoint(c.s);
@@ -89,8 +86,8 @@ export function createRaceAI({cars,obstacles,rules,course,random=Math.random,tim
   // instead of evaluating the same analytic segment a second time per step.
   const dx=ahead.x+ahead.nx*lane-c.x,dz=ahead.z+ahead.nz*lane-c.z,distance=Math.max(2,Math.hypot(dx,dz)),error=angle(Math.atan2(-dx,-dz)-c.yaw);
   let steer=clamp(-Math.atan(2*c.dimensions.wheelbase*Math.sin(error)/distance)/rackLimit(p),-1,1);
-  const pace=Math.min(1,rules.pace+.025+m.paceOffset),base=p.speed*pace;
-  const advanced=signedGap(c.s,m.originS),obstacleGap=m.obstacleGap-advanced;
+  const itemMultiplier=c.itemBoostTime>0?PICKUP_BOOST.multiplier:1,pace=Math.min(1,rules.pace+.025+m.paceOffset),base=p.speed*pace*itemMultiplier;
+  const advanced=signedGap(c.s,m.originS);
   let desired=base;
   const currentCurve=Math.abs(at.curve/(1+at.curve*lane));
   if(currentCurve>.002)desired=Math.min(desired,Math.sqrt(p.grip*cornerUse/currentCurve)*pace);
@@ -104,7 +101,7 @@ export function createRaceAI({cars,obstacles,rules,course,random=Math.random,tim
    desired=Math.min(desired,Math.sqrt(corner*corner+2*p.brake*(.48+level*.10)*Math.max(0,remaining-3.8)));
   }
   desired*=clamp(1-Math.abs(error)*(.36-level*.08),.36,1);
-  if(obstacleGap<11&&Math.abs(lane-c.lane)>.5)desired=Math.min(desired,Math.max(3.5,(obstacleGap-2)*1.5));
+
   const passing=m.targetId===null?null:cars.find(other=>other.id===m.targetId&&other.finish===null);
   if(passing&&at.width<=7)desired=Math.min(desired,p.speed*.37);
   for(const other of cars){
@@ -124,6 +121,6 @@ export function createRaceAI({cars,obstacles,rules,course,random=Math.random,tim
   if(passing&&c.contact>0&&Math.abs(c.speed)<2&&Math.abs(lane-c.lane)>.15)steer=Math.sign(lane-c.lane)*Math.max(.45,Math.abs(steer));
   const straight=m.look.every(q=>q.d-advanced>Math.max(16,c.speed*.9)||q.d-advanced<-3||Math.abs(q.curve)<.005),clear=cars.every(o=>o===c||o.finish!==null||signedGap(o.s,c.s)<0||signedGap(o.s,c.s)>12||Math.abs(o.lane-c.lane)>2.3);
   c.aiPlan.desiredSpeed=desired;
-  return {throttle:clamp(desired/p.speed,0,1),steer,brake:c.speed>desired+.9,boost:rules.round>=3&&straight&&clear&&c.boost>.45&&Math.abs(error)<.10&&obstacleGap>20};
+  return {throttle:clamp(desired/(p.speed*itemMultiplier),0,1),steer,brake:c.speed>desired+.9,boost:c.itemBoostTime<=0&&rules.round>=3&&straight&&clear&&c.boost>.45&&Math.abs(error)<.10};
  };
 }

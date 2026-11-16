@@ -1,4 +1,4 @@
-import {profileFor,carName} from './차량성능.mjs';
+import {profileFor,carName,PICKUP_BOOST} from './차량성능.mjs';
 import {pickRaceDrivers} from './레이싱선수.mjs';
 import {createRaceAI} from './레이싱AI.mjs';
 import {PARKED_CARS,CAR_DIMENSIONS} from './주차장.mjs';
@@ -32,7 +32,7 @@ export function makeObstacles(round,random=Math.random,cars=[],course=getRaceCou
   if(cars.some(c=>Math.abs(mod(s-c.s+L/2,L)-L/2)<15))continue;
   const at=trackPoint(s);if((at.width??TRACK.width)<=7)continue;
   const limit=Math.min(laneLimit,(at.width??TRACK.width)/2-1.7),lane=[-limit,0,limit][Math.floor(random()*3)],p=trackPoint(s,lane);
-  items.push({id:i,s,lane,x:p.x,z:p.z,height:p.height,kind:random()<.5?'books':'chair',angle:(random()-.5)*.6});
+  items.push({id:i,s,lane,x:p.x,z:p.z,height:p.height,kind:random()<.5?'books':'chair',angle:(random()-.5)*.6,collectedBy:null});
  }return items;
 }
 
@@ -49,7 +49,8 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
   const driver=i?drivers[i-1]:{id:'player',name:'나'};
   return {source,id:i,name:driver.name,driverId:driver.id,driverName:driver.name,profile:profileFor(source),dimensions:CAR_DIMENSIONS[source.type],x:p.x,z:p.z,height:p.height??-.3,yaw:p.yaw,steering:0,s,lane,speed:0,sideSpeed:0,lap:0,spin:0,hit:0,hits:0,boost:1,boosting:false,finish:null,wall:0,aiLane:lane,decision:0,started:false,checkpoint:0,nextCheckpoint:0,progress:s,offTrack:false,wrongWay:false,resetSerial:0,reverseTime:0,recoveryCooldown:0,stuckTime:0,lastAdvance:s,recoveries:0,contact:0,obstacleContact:0,assistActive:false,assistReason:null,assistStrength:0,assistSpeedLimit:profileFor(source).speed*RACE_ASSIST_CONFIG.speedRatio,passingId:null,passingLane:0};
  });
- let phase='countdown',countdown=3,time=0,paused=false,obstacles=makeObstacles(round,random,cars,course),generation=1,accumulator=0;
+ for(const c of cars)Object.assign(c,{itemBoostTime:0,pickupBurst:0,pickups:0});
+ let phase='countdown',countdown=3,time=0,paused=false,obstacles=makeObstacles(round,random,cars,course),generation=1,accumulator=0,pickupRevision=0;
  const player=cars[0];
  function damage(c,resistance,duration=.45){if(c.hit>0)return;c.speed*=resistance;c.hit=duration;c.hits++;}
  function project(c){
@@ -99,13 +100,15 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
  const aiInput=createRaceAI({course,cars,obstacles:()=>obstacles,rules,random,time:()=>time});
  function moveCar(c,dt,input){
   const p=c.profile,throttle=clamp(Number(input.throttle)||0,-1,1),brake=!!input.brake,steer=clamp(Number(input.steer)||0,-1,1),oldX=c.x,oldZ=c.z,oldYaw=c.yaw;
-  c.assistReason=c.wall>0?'boundary':c.obstacleContact>0?'obstacle':c.contact>0?'traffic':null;
+  c.assistReason=c.wall>0?'boundary':c.contact>0?'traffic':null;
   c.assistActive=!!c.assistReason&&throttle>0&&!brake;
   c.assistSpeedLimit=p.speed*RACE_ASSIST_CONFIG.speedRatio;
   c.assistStrength=c.assistActive?Math.min(RACE_ASSIST_CONFIG.maxStrength,c.assistStrength+dt*RACE_ASSIST_CONFIG.rampRate):0;
   if(!c.assistActive)c.assistReason=null;
-  c.boosting=!c.assistActive&&!!input.boost&&c.boost>.01&&throttle>0&&!brake&&c.speed>3;c.boost=clamp(c.boost+dt*(c.boosting?-.32:.085),0,1);
-  const desired=brake?0:c.assistActive?c.assistSpeedLimit:throttle*(throttle<0?p.speed*.38:p.speed*(c.boosting?p.boost:1)),before=c.speed,opposed=c.speed*desired<0;
+  const itemActive=c.itemBoostTime>0,manualBoost=!itemActive&&!!input.boost&&c.boost>.01;
+  c.boosting=!c.assistActive&&(itemActive||manualBoost)&&throttle>0&&!brake&&c.speed>3;c.boost=clamp(c.boost+dt*(c.boosting&&manualBoost?-.32:.085),0,1);
+  const multiplier=c.boosting?(itemActive?PICKUP_BOOST.multiplier:p.boost):1;
+  const desired=brake?0:c.assistActive?c.assistSpeedLimit:throttle*(throttle<0?p.speed*.38:p.speed*multiplier),before=c.speed,opposed=c.speed*desired<0;
   const accel=brake||opposed?p.brake:Math.abs(desired)<Math.abs(c.speed)?(throttle===0?3.2:8):Math.abs(c.speed)<6?p.launch:p.accel;
   c.speed+=clamp(desired-c.speed,-accel*dt,accel*dt);
   if(c.assistActive)c.speed=clamp(c.speed,0,c.assistSpeedLimit);
@@ -160,7 +163,18 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
    }
   }
   c.x=slide?.x??oldX+dx*fraction;c.z=slide?.z??oldZ+dz*fraction;c.spin+=Math.hypot(c.x-oldX,c.z-oldZ)*Math.sign(travel)/.325;
-  for(const o of obstacles){if(Math.abs((o.height??c.height)-c.height)>2.3)continue;const ox=o.x-c.x,oz=o.z-c.z,forward=ox*(-Math.sin(c.yaw))+oz*(-Math.cos(c.yaw)),side=ox*Math.cos(c.yaw)-oz*Math.sin(c.yaw);if(Math.abs(forward)<c.dimensions.length/2+.4&&Math.abs(side)<c.dimensions.width/2+.4){const blocking=forward>-.5&&Math.abs(side)<c.dimensions.width*.45;damage(c,blocking?p.resilience:.97);if(blocking)c.obstacleContact=.4;}}
+  // Books/chairs are shared pickups, never collision obstacles. Testing the
+  // swept centre segment also catches an item crossed at boosted speed.
+  for(const o of obstacles){
+   if(o.collectedBy!=null||Math.abs((o.height??c.height)-c.height)>1)continue;
+   const vx=c.x-oldX,vz=c.z-oldZ,length=vx*vx+vz*vz,t=length?clamp(((o.x-oldX)*vx+(o.z-oldZ)*vz)/length,0,1):0;
+   const ox=o.x-(oldX+vx*t),oz=o.z-(oldZ+vz*t),forward=ox*(-Math.sin(c.yaw))+oz*(-Math.cos(c.yaw)),side=ox*Math.cos(c.yaw)-oz*Math.sin(c.yaw);
+   if(Math.abs(forward)>c.dimensions.length/2+.4||Math.abs(side)>c.dimensions.width/2+.4)continue;
+   o.collectedBy=c.id;pickupRevision++;c.pickups++;
+   if(c.itemBoostTime<=0&&throttle>0&&!brake&&!c.assistActive)c.speed=Math.min(p.speed*PICKUP_BOOST.multiplier,Math.max(0,c.speed)*PICKUP_BOOST.multiplier);
+   c.itemBoostTime=PICKUP_BOOST.duration;c.pickupBurst=1;
+   c.boosting=throttle>0&&!brake&&!c.assistActive&&c.speed>3;
+  }
   project(c);gateCrossing(c,oldX,oldZ,dt);
  }
  function carContact(a,b){
@@ -197,7 +211,10 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
  function step(dt,input){
   if(phase==='countdown'){countdown-=dt;if(countdown<=0){countdown=0;phase='racing';}return;}
   if(phase!=='racing')return;time+=dt;
-  for(const c of cars){if(c.finish!==null)continue;c.hit=Math.max(0,c.hit-dt);c.wall=Math.max(0,c.wall-dt);c.contact=Math.max(0,c.contact-dt);c.obstacleContact=Math.max(0,c.obstacleContact-dt);moveCar(c,dt,c.id?aiInput(c):input);}
+  for(const c of cars){if(c.finish!==null)continue;c.hit=Math.max(0,c.hit-dt);c.wall=Math.max(0,c.wall-dt);c.contact=Math.max(0,c.contact-dt);c.obstacleContact=Math.max(0,c.obstacleContact-dt);
+   const wasBoosted=c.itemBoostTime>0;c.itemBoostTime=Math.max(0,c.itemBoostTime-dt);c.pickupBurst=Math.max(0,c.pickupBurst-dt/.55);
+   if(wasBoosted&&c.itemBoostTime===0)c.speed=Math.min(c.speed,c.profile.speed);
+   moveCar(c,dt,c.id?aiInput(c):input);}
   for(let i=0;i<cars.length;i++)for(let j=i+1;j<cars.length;j++){
    const a=cars[i],b=cars[j];if(a.finish!==null||b.finish!==null)continue;
    const contact=carContact(a,b);
@@ -220,14 +237,14 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
   if(player.finish!==null)phase='finished';
  }
  function standings(){return [...cars].sort((a,b)=>a.finish!==null&&b.finish!==null?a.finish-b.finish:a.finish!==null?-1:b.finish!==null?1:b.progress-a.progress);}
- function view(){const order=standings();return {course:{id:course.id,name:course.name,length:course.length,direction:course.direction},phase,paused,countdown,round:rules.round,laps:rules.laps,lap:Math.min(rules.laps,player.lap+1),rank:order.indexOf(player)+1,total:cars.length,time,won:phase==='finished'&&order[0]===player,cleared:phase==='finished'&&order.indexOf(player)<3,speed:player.speed,boost:player.boost,assistActive:player.assistActive,assistReason:player.assistReason,assistStrength:player.assistStrength,assistSpeedLimit:player.assistSpeedLimit,hits:player.hits,generation,offTrack:player.offTrack,wrongWay:player.wrongWay,checkpoint:player.checkpoint,nextCheckpoint:player.nextCheckpoint,checkpointsPerLap:gateCount,standings:order.map(c=>({id:c.id,name:c.name,driverId:c.driverId,driverName:c.driverName,carName:carName(c.source),carId:c.source.id,finished:c.finish!==null,time:c.finish,progress:c.progress})),cars:cars.map(c=>({id:c.id,x:c.x,z:c.z,height:c.height,yaw:c.yaw,steering:c.steering,s:c.s,lane:c.lane,speed:c.speed,lap:c.lap,finish:c.finish,progress:c.progress,checkpoint:c.checkpoint,nextCheckpoint:c.nextCheckpoint}))};}
+ function view(){const order=standings();return {course:{id:course.id,name:course.name,length:course.length,direction:course.direction},phase,paused,countdown,round:rules.round,laps:rules.laps,lap:Math.min(rules.laps,player.lap+1),rank:order.indexOf(player)+1,total:cars.length,time,won:phase==='finished'&&order[0]===player,cleared:phase==='finished'&&order.indexOf(player)<3,speed:player.speed,boost:player.boost,completedLaps:Math.min(rules.laps,player.lap),itemBoostTime:player.itemBoostTime,pickups:player.pickups,pickupRevision,assistActive:player.assistActive,assistReason:player.assistReason,assistStrength:player.assistStrength,assistSpeedLimit:player.assistSpeedLimit,hits:player.hits,generation,offTrack:player.offTrack,wrongWay:player.wrongWay,checkpoint:player.checkpoint,nextCheckpoint:player.nextCheckpoint,checkpointsPerLap:gateCount,standings:order.map(c=>({id:c.id,name:c.name,driverId:c.driverId,driverName:c.driverName,carName:carName(c.source),carId:c.source.id,finished:c.finish!==null,time:c.finish,progress:c.progress})),cars:cars.map(c=>({id:c.id,x:c.x,z:c.z,height:c.height,yaw:c.yaw,steering:c.steering,s:c.s,lane:c.lane,speed:c.speed,lap:c.lap,finish:c.finish,progress:c.progress,checkpoint:c.checkpoint,nextCheckpoint:c.nextCheckpoint}))};}
  function resetCar(){
   if(paused||phase!=='racing'||player.finish!==null)return false;
   const s=player.started?(player.checkpoint*gateLength+1):-8;
   // Recovery is an explicit driver action; it cannot advance the next gate.
   const candidates=lanes.map(l=>({lane:l,p:trackPoint(s,l)})).filter(({p})=>inside(player,p.x,p.z,p.yaw)&&cars.slice(1).every(c=>Math.abs(c.height-p.height)>2.3||Math.hypot(c.x-p.x,c.z-p.z)>5));
   const choice=candidates.sort((a,b)=>Math.abs(a.lane)-Math.abs(b.lane))[0];if(!choice)return false;
-  Object.assign(player,{x:choice.p.x,z:choice.p.z,height:choice.p.height??-.3,yaw:choice.p.yaw,s,lane:choice.lane,speed:0,steering:0,sideSpeed:0,wall:0,hit:.8,boosting:false,offTrack:false,wrongWay:false,contact:0,obstacleContact:0,assistActive:false,assistReason:null,assistStrength:0,resetSerial:player.resetSerial+1});project(player);return true;
+  Object.assign(player,{x:choice.p.x,z:choice.p.z,height:choice.p.height??-.3,yaw:choice.p.yaw,s,lane:choice.lane,speed:0,steering:0,sideSpeed:0,wall:0,hit:.8,boosting:false,itemBoostTime:0,pickupBurst:0,offTrack:false,wrongWay:false,contact:0,obstacleContact:0,assistActive:false,assistReason:null,assistStrength:0,resetSerial:player.resetSerial+1});project(player);return true;
  }
  return {course,cars,player,rules,get obstacles(){return obstacles;},view,resetCar,
   pause(value=true){paused=value;accumulator=0;},

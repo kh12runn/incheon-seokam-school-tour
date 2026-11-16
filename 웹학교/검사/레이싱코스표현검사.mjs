@@ -60,6 +60,17 @@ for(let round=1;round<=5;round++){
  }
  assert(visual.root.getObjectByName('race-0'),'real player vehicle exists after round change');
 }
+{
+ const race=createRace({car,round:1});for(let i=0;i<13;i++)race.update(.25);visual.start(race);
+ race.player.speed=15;visual.update(race,1/60,camera,1);const normal=camera.fov;
+ race.player.boosting=true;for(let i=0;i<40;i++)visual.update(race,1/60,camera,1+i/60);
+ assert(camera.fov>normal+7,'Boost widens the lens without changing driving controls');assert(visual.boostState().cameraBoost>.98);
+ race.player.boosting=false;for(let i=0;i<90;i++)visual.update(race,1/60,camera,2+i/60);
+ assert(Math.abs(camera.fov-normal)<.04,'The lens smoothly returns after boost');
+ globalThis.matchMedia=()=>({matches:true});const reduced=createRaceVisual(new THREE.Scene());reduced.start(race);race.player.boosting=true;
+ for(let i=0;i<40;i++)reduced.update(race,1/60,camera,4+i/60);
+ assert.equal(reduced.boostState().cameraBoost,0,'Respect reduced-motion preference');reduced.dispose();delete globalThis.matchMedia;
+}
 visual.hide();assert.equal(visual.root.visible,false);assert.equal(visual.teacherState().length,0);
 visual.dispose();assert.equal(visual.root.parent,null);assert.equal(sharedMaterialDisposals,1,'shared powder disposed once at final teardown');
 console.log(JSON.stringify({ok:true,courseGeometries:signatures.size,previewPreserved:true,obstaclePoolPreserved:true,roundObstaclePositions:true,disposedGeometry,disposedBanners,sharedMaterialDisposals,webGLPixelCheck:false}));
