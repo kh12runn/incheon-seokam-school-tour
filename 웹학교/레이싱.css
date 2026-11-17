@@ -23,6 +23,12 @@ body[data-mode=race] #시작안내,body[data-mode=race] .게임헤더,body[data-
 @media(max-width:700px){#레이스덮개{padding:10px}#레이스덮개>section{padding:20px 14px;max-height:94dvh}#레이스결과표 table{font-size:11px}#레이스결과표 th,#레이스결과표 td{padding:10px 4px}.레이스선수표식{width:24px;height:24px;font-size:9px;margin-right:5px}.레이스선수>span:last-child{width:calc(100% - 29px)}#레이스덮개 h2{font-size:23px}}
 
 /* Boost remains readable against both bright dirt and the darker school passage. */
+#레이스출발안내{pointer-events:auto;box-sizing:border-box;width:min(460px,calc(100vw - 24px));max-height:calc(100dvh - 24px);overflow:auto;margin:auto;padding:24px;border:1px solid #d9bd75;border-radius:18px;background:#102837;color:#edf6fa;box-shadow:0 20px 80px #0008}
+#레이스출발안내::backdrop{background:#071322bc}
+#레이스출발안내>small{color:#e9ca85;font-size:12px}#레이스출발안내 h2{font-size:22px;margin:10px 0 12px;line-height:1.35}#레이스출발안내 p{font-size:14px;line-height:1.6;color:#c2dbe3}
+.완주보상표{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0}.완주보상표>div{display:flex;align-items:center;justify-content:space-between;gap:6px;padding:12px;border:1px solid #6b8e9655;border-radius:10px;background:#234450}.완주보상표 dt{font-size:14px}.완주보상표 dd{margin:0;color:#ffe295;font-size:19px;font-weight:800;white-space:nowrap}.완주보상표>div:first-child{border-color:#e8c56e;background:#3b5146}
+#레이스출발안내 .완주보상주의{font-size:12px}#레이스보상취소{display:block;margin:10px auto 0}
+@media(max-width:480px),(max-height:480px){#레이스출발안내{padding:16px}#레이스출발안내 h2{font-size:19px}.완주보상표{margin:10px 0}.완주보상표>div{padding:9px}}
 .레이스보상안내{display:grid;gap:5px;padding:12px 14px;margin:10px 0 15px;background:#224b4d;border:1px solid #91e5ca80;border-radius:10px;color:#d8fff3;font-size:12px;line-height:1.5}
 .레이스보상안내 b{color:#ffe39b;font-size:15px}
 #레이스완주보상{color:#ffe39b;background:#173844df;padding:7px 10px;border-radius:8px;font-weight:700;max-width:max-content}

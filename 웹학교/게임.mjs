@@ -105,7 +105,7 @@ let progressStorage;try{progressStorage=localStorage;}catch{}
 const schoolProgress=createSchoolProgress(progressStorage);
 let miniRacing=null,racePassages=null;
 const raceHiddenScenery=[];
-function updateStampLabel(){const p=schoolProgress.view();$('레이싱소개').textContent=`누적 스탬프 ${p.stamps}개 · 미션 완료 +1 · 레이스 3바퀴 완주 +2\n스탬프 24개 → 슈퍼카 · 레이스 3위 이내 → 다음 코스`+(p.saved?'':' · 기록 저장 불가');}
+function updateStampLabel(){const p=schoolProgress.view();$('레이싱소개').textContent=`누적 스탬프 ${p.stamps}개 · 미션 완료 +1 · 레이스 완주 +2~5\n스탬프 24개 → 슈퍼카 · 레이스 3위 이내 → 다음 코스`+(p.saved?'':' · 기록 저장 불가');}
 updateStampLabel();
 let freeLookPoint=null;
 let lookRequestSerial=0,lookRequestPending=false;

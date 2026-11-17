@@ -40,7 +40,7 @@ function run(race,input,seconds,{before,after}={}){
  let active=0,maxAssistSpeed=0,maxStep=0,maxOutside=0;
  for(let i=0;i<Math.round(seconds/DT);i++){
   before?.(i);const c=race.player,previous={x:c.x,z:c.z};race.update(DT,input);
-  if(c.assistActive){active++;maxAssistSpeed=Math.max(maxAssistSpeed,Math.abs(c.speed));assert.ok(c.assistStrength<=RACE_ASSIST_CONFIG.maxStrength+.000001);assert.ok(c.speed<=c.profile.speed*RACE_ASSIST_CONFIG.speedRatio+.05,'Assistance must respect the configured contact speed limit');}
+  if(c.assistActive){active++;maxAssistSpeed=Math.max(maxAssistSpeed,Math.abs(c.speed));assert.ok(c.assistStrength<=RACE_ASSIST_CONFIG.maxStrength+.000001);assert.ok(c.speed<=c.assistSpeedLimit+.05&&c.assistSpeedLimit<=c.profile.speed*.75+.05,'Contact assistance preserves at most half of the 1.5x boosted speed');}
   maxStep=Math.max(maxStep,Math.hypot(c.x-previous.x,c.z-previous.z));maxOutside=Math.max(maxOutside,bodyOutside(c));after?.(i);
  }
  return {active,maxAssistSpeed,maxStep,maxOutside};

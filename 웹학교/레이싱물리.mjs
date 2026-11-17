@@ -12,6 +12,7 @@ const angle=x=>Math.atan2(Math.sin(x),Math.cos(x));
 const maxSteering=profile=>.46+Math.min(profile.handling,11)*.018;
 export const RACE_ASSIST_CONFIG=Object.freeze({speedRatio:.50,maxStrength:.62,rampRate:3.6,minSteerInput:.08,cornerStrength:.16});
 export const CONE_BOUNDARY_HITBOX_SCALE=.70;
+export const BOUNDARY_IMPACT_SPEED_RATIO=.50;
 // Cones mark a continuous course boundary. Reduce ONLY that collision envelope;
 // car-to-car contacts, classroom walls and the visible car/cones are unchanged.
 export const coneBoundaryFootprint=dimensions=>({halfW:(dimensions.width/2+.12)*CONE_BOUNDARY_HITBOX_SCALE,halfL:(dimensions.length/2-.18)*CONE_BOUNDARY_HITBOX_SCALE});
@@ -102,7 +103,7 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
   const p=c.profile,throttle=clamp(Number(input.throttle)||0,-1,1),brake=!!input.brake,steer=clamp(Number(input.steer)||0,-1,1),oldX=c.x,oldZ=c.z,oldYaw=c.yaw;
   c.assistReason=c.wall>0?'boundary':c.contact>0?'traffic':null;
   c.assistActive=!!c.assistReason&&throttle>0&&!brake;
-  c.assistSpeedLimit=p.speed*RACE_ASSIST_CONFIG.speedRatio;
+  c.assistSpeedLimit=Math.max(p.speed*RACE_ASSIST_CONFIG.speedRatio,c.assistReason==='boundary'?c.speed:0);
   c.assistStrength=c.assistActive?Math.min(RACE_ASSIST_CONFIG.maxStrength,c.assistStrength+dt*RACE_ASSIST_CONFIG.rampRate):0;
   if(!c.assistActive)c.assistReason=null;
   const itemActive=c.itemBoostTime>0,manualBoost=!itemActive&&!!input.boost&&c.boost>.01;
@@ -152,14 +153,22 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
   if(nextOverlap>0){
    const oldOverlap=penetration(c,oldX,oldZ,oldYaw),allowed=Math.max(0,oldOverlap-.00001),valid=(x,z,yaw)=>penetration(c,x,z,yaw)<=allowed;
    if(nextOverlap>allowed){
-    if(c.assistActive){
-     let x=oldX+dx,z=oldZ+dz;
+    const firstContact=c.wall<=0,retainedSpeed=Math.max(0,c.speed)*(firstContact?BOUNDARY_IMPACT_SPEED_RATIO:1);
+    if(c.assistActive||(c.speed>0&&!brake)){
+     // Resolve the first touch as a wall slide too. Repeated contact keeps the
+     // retained speed instead of halving it each physics tick or setting it to 0.
+     const hit=boundaryContact(c,oldX+dx,oldZ+dz,c.yaw),at=trackPoint(c.s);
+     let tx=-hit.nz,tz=hit.nx;
+     const along=dx*tx+dz*tz,forward=at.tx*tx+at.tz*tz;
+     if(Math.abs(along)>.0001?along<0:forward<0){tx=-tx;tz=-tz;}
+     const slipSpeed=firstContact?retainedSpeed:Math.max(retainedSpeed,Math.abs(average)*.5);
+     let x=oldX+tx*slipSpeed*dt,z=oldZ+tz*slipSpeed*dt;
      for(let i=0;i<4;i++){const hit=boundaryContact(c,x,z,c.yaw);if(hit.overlap<=0)break;x-=hit.nx*(hit.overlap+.0001);z-=hit.nz*(hit.overlap+.0001);}
-     const distance=Math.hypot(x-oldX,z-oldZ),limit=c.assistSpeedLimit*dt;if(distance>limit){x=oldX+(x-oldX)*limit/distance;z=oldZ+(z-oldZ)*limit/distance;}
+     const distance=Math.hypot(x-oldX,z-oldZ),limit=(firstContact?retainedSpeed:c.assistSpeedLimit)*dt;if(distance>limit){x=oldX+(x-oldX)*limit/distance;z=oldZ+(z-oldZ)*limit/distance;}
      if(penetration(c,x,z,c.yaw)<=Math.max(.025,oldOverlap+.0001))slide={x,z};
     }
     if(!slide){let lo=0,hi=1;for(let i=0;i<7;i++){const mid=(lo+hi)/2;if(valid(oldX+dx*mid,oldZ+dz*mid,c.yaw))lo=mid;else hi=mid;}fraction=lo;if(fraction===0&&!valid(oldX,oldZ,c.yaw))c.yaw=oldYaw;}
-    if(c.wall<=0)damage(c,.10,.28);c.wall=.6;c.speed=slide?Math.min(c.assistSpeedLimit,Math.hypot(slide.x-oldX,slide.z-oldZ)/dt):0;
+    if(firstContact)damage(c,BOUNDARY_IMPACT_SPEED_RATIO,.28);c.wall=.6;c.speed=slide?Math.min(firstContact?retainedSpeed:c.assistSpeedLimit,Math.hypot(slide.x-oldX,slide.z-oldZ)/dt):Math.max(0,c.speed)*fraction;
    }
   }
   c.x=slide?.x??oldX+dx*fraction;c.z=slide?.z??oldZ+dz*fraction;c.spin+=Math.hypot(c.x-oldX,c.z-oldZ)*Math.sign(travel)/.325;

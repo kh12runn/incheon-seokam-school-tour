@@ -26,7 +26,13 @@ for(const kind of ['books','chair']){
 }
 {
  const data=new Map(),storage={getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v)},p=createSchoolProgress(storage);
- p.stamp('mission-1');assert(p.raceFinish('run-1'));assert.equal(p.view().stamps,3);assert.equal(p.raceFinish('run-1'),false);
- const restored=createSchoolProgress(storage);assert.equal(restored.view().stamps,3);assert.equal(restored.raceFinish('run-1'),false);assert(restored.raceFinish('run-2'));assert.equal(restored.view().stamps,5);
+ p.stamp('mission-1');assert(p.raceFinish('run-1',4));assert.equal(p.view().stamps,3);assert.equal(p.raceFinish('run-1',1),false);
+ const restored=createSchoolProgress(storage);assert.equal(restored.view().stamps,3);assert.equal(restored.raceFinish('run-1',4),false);assert(restored.raceFinish('run-2',1));assert.equal(restored.view().stamps,8);
+ let expected=8;
+ for(let round=1;round<=5;round++)for(const [rank,reward] of [[1,5],[2,4],[3,3],[4,2],[5,2],[6,2]]){
+  const id=`round-${round}-rank-${rank}`;assert(restored.raceFinish(id,rank));expected+=reward;assert.equal(restored.view().stamps,expected);assert.equal(restored.raceFinish(id,rank),false);
+ }
+ for(const rank of [undefined,0,-1,1.5,'1',NaN,Infinity])assert.equal(restored.raceFinish('invalid',rank),false);
+ assert.equal(createSchoolProgress(storage).view().stamps,expected,'rank rewards persist after reload');
 }
-console.log('Pickups: both items, 1.5x instant speed, 3 seconds, refresh/no stacking, braking, pause, height, reset, saved +2 finish reward passed');
+console.log('Pickups and saved rank rewards (5/4/3/2), all rounds, deduplication and invalid rank checks passed');
