@@ -18,9 +18,10 @@ export function createMonthQuizBubble({onAnswer,onAnswered,onHidden}){
     answer,isVisible:()=>!bubble.hidden,
     hide,
     show(state){
-      get('월퀴즈문제').textContent=state.question.prompt;
+      get('월퀴즈문제').textContent=state.introduction??state.question.prompt;
+      bubble.querySelector('small').hidden=!!state.introduction;
       get('월퀴즈결과').textContent='';delete get('월퀴즈결과').dataset.result;
-      buttons=state.question.choices.map((word,index)=>{
+      buttons=(state.introduction?[]:state.question.choices).map((word,index)=>{
         const button=document.createElement('button');button.type='button';button.dataset.index=String(index);
         const number=document.createElement('span');number.textContent=String(index+1);
         const label=document.createElement('span');label.textContent=word;label.lang='en';button.append(number,label);

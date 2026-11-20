@@ -5,7 +5,7 @@ import {canUseCar,stampsFor,VEHICLE_PROFILES} from '../차량성능.mjs';
 import {createSchoolProgress,PROGRESS_KEY} from '../스쿨런저장.mjs';
 import {driverInput} from './레이싱테스트조작.mjs';
 const memory=new Map(),storage={getItem:k=>memory.get(k),setItem:(k,v)=>memory.set(k,v)};
-let p=createSchoolProgress(storage);for(let i=0;i<48;i++)assert.equal(p.stamp('task-'+i),true);assert.equal(p.stamp('task-47'),false);p=createSchoolProgress(storage);assert.equal(p.view().stamps,48);assert.ok(PARKED_CARS.every(c=>canUseCar(c,48)));assert.ok(!canUseCar(PARKED_CARS.find(c=>c.type==='sports'),23));p.win(3);assert.equal(createSchoolProgress(storage).view().bestRound,3);
+let p=createSchoolProgress(storage);for(let i=0;i<60;i++)assert.equal(p.stamp('task-'+i),true);assert.equal(p.stamp('task-47'),false);p=createSchoolProgress(storage);assert.equal(p.view().stamps,60);assert.ok(PARKED_CARS.every(c=>canUseCar(c,60)));assert.ok(!canUseCar(PARKED_CARS.find(c=>c.type==='sports'),23));p.win(3);assert.equal(createSchoolProgress(storage).view().bestRound,3);
 memory.set(PROGRESS_KEY,'broken');assert.equal(createSchoolProgress(storage).view().stamps,0);assert.equal(createSchoolProgress({getItem(){throw Error();},setItem(){throw Error();}}).view().saved,false);
 for(const normal of Object.values(VEHICLE_PROFILES).slice(0,7))for(const metric of ['speed','accel','launch','handling','grip','brake','resilience','boost'])assert.ok(VEHICLE_PROFILES.sports[metric]>normal[metric],metric);
  assert.ok(TRACK.length>280,'Course must extend through the playground and rear lot');

@@ -14,8 +14,9 @@ export const PARKED_CARS=[
   {id:'field-touring',x:-11.4,y:-53.5,z:-.58,yaw:-Math.PI/2,type:'sports',variant:'touring',color:'#aa253c',lot:'field',label:'스포츠 투어러'},
   {id:'field-hyper',x:-11.4,y:-48.5,z:-.58,yaw:-Math.PI/2,type:'sports',variant:'hyper',color:'#17a8aa',lot:'field',label:'오로라 하이퍼카'},
   {id:'field-champion',x:-11.4,y:-43.5,z:-.58,yaw:-Math.PI/2,type:'sports',variant:'champion',color:'#3d106f',lot:'field',label:'석암 챔피언 에디션'},
+  {id:'field-drone',x:-4.5,y:-55,z:-.3,yaw:-Math.PI/2,type:'drone',color:'#47d6e0',lot:'field',label:'석암 스카이 드론'},
 ];
-export const CAR_DIMENSIONS={sports:{width:1.93,length:4.52,height:1.18,wheelbase:2.62},sedan:{width:1.83,length:4.72,height:1.46,wheelbase:2.76},suv:{width:1.9,length:4.72,height:1.72,wheelbase:2.76},compact:{width:1.62,length:3.6,height:1.5,wheelbase:2.38}};
+export const CAR_DIMENSIONS={drone:{width:2.95,length:3.59,height:.95,wheelbase:2.6},sports:{width:1.93,length:4.52,height:1.18,wheelbase:2.62},sedan:{width:1.83,length:4.72,height:1.46,wheelbase:2.76},suv:{width:1.9,length:4.72,height:1.72,wheelbase:2.76},compact:{width:1.62,length:3.6,height:1.5,wheelbase:2.38}};
 export function addParking(addBox){
   const add=(name,bounds,color,solid=false)=>addBox(name,bounds,color,solid?'wall':'finish',0);
   add('주차장 흙 바닥',PARKING.bounds,[.61,.52,.41]).material='soil';

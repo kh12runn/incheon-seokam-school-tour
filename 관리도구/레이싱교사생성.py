@@ -26,6 +26,9 @@ MODELS = [
     ('teacher-6-7', '6-7-담임선생님.glb', 1.76),
     ('teacher-science', '과학선생님.glb', 1.68),
     ('office-cute', '교장선생님-귀여운.glb', 1.83),
+    ('vice-hwang', 'hwang-chaho.glb', 1.80),
+    ('vice-yun', 'yun-hyojin.glb', 1.68),
+    ('staff-lee', 'lee-changseong.glb', 1.75),
 ]
 
 def smooth(a, b, v):
@@ -111,6 +114,10 @@ def create(identifier, filename, height):
             bpy.ops.object.modifier_apply(modifier=modifier.name)
         obj.name=identifier+'-운전자'
     enforce_total_budget()
+    # Repair degenerate remnants at the waist cut before exporting new scans.
+    for obj in bpy.context.scene.objects:
+        if obj.type=='MESH':
+            obj.data.validate(verbose=False);obj.data.update()
     # Cabin views only need a compact atlas; original NPC textures remain intact.
     for image in bpy.data.images:
         if image.type!='IMAGE' or not image.size[0] or not image.size[1]: continue

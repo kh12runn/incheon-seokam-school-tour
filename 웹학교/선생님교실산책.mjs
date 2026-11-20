@@ -45,11 +45,12 @@ function* prepareTeacherWalk(world,config,{planningBudgetMs=0,clock=()=>performa
   const connected=new Set([initial.id]),queue=[initial.id];
   for(let i=0;i<queue.length;i++)for(const id of nodes[queue[i]].neighbors)if(!connected.has(id)){connected.add(id);queue.push(id);}
   const reachable=queue.map(id=>nodes[id]);
-  let position={x:initial.x,y:initial.y,z},heading=Math.PI/2,speed=0,phase=0,total=0,wait=1.1,serial=0,path=[],moving=false,yielding=false,replanIn=0,replans=0,planner=null;
+  const variation=Number.isFinite(config.heading)?[...config.id].reduce((sum,c)=>sum+c.charCodeAt(0),0)%11:0;
+  let position={x:initial.x,y:initial.y,z},heading=config.heading??Math.PI/2,speed=0,phase=0,total=0,wait=1.1+variation*.12,serial=variation,path=[],moving=false,yielding=false,replanIn=0,replans=0,planner=null;
   const planningStats={slices:0,maxSliceMs:0};
-  function* choosePath(player=null){
+  function* choosePath(obstacles=[]){
     path=[];replans++;
-    const passable=(a,c)=>avoidsPlayer(a,c,player);
+    const passable=(a,c)=>obstacles.every(p=>avoidsPlayer(a,c,p));
     let start;
     for(const node of [...reachable].sort((a,c)=>distance(a,position)-distance(c,position))){if((yield* clearSteps(position,node))&&passable(position,node)){start=node;break;}yield;}
     if(!start)return;
@@ -74,29 +75,30 @@ function* prepareTeacherWalk(world,config,{planningBudgetMs=0,clock=()=>performa
     }
     path=planned;
   }
-  function plan(player){planner=choosePath(player);advancePlan();}
+  function plan(obstacles){planner=choosePath(obstacles);advancePlan();}
   function advancePlan(){
     const started=clock();let result;
     do{result=planner.next();if(result.done){planner=null;break;}}while(planningBudgetMs<=0||clock()-started<planningBudgetMs);
     planningStats.slices++;planningStats.maxSliceMs=Math.max(planningStats.maxSliceMs,clock()-started);
   }
   const state=()=>({position:{...position},heading,speed,phase,distance:total,moving,yielding,waiting:wait>0,planning:!!planner,planningSlices:planningStats.slices,maxPlanningSliceMs:planningStats.maxSliceMs,roomId:config.roomId,navigationNodes:reachable.length,replans});
-  return {getState:state,update(dt,player,{paused=false}={}){
+  return {getState:state,update(dt,player,{paused=false,others=[]}={}){
     if(paused||!Number.isFinite(dt)||dt<=0){speed=0;moving=false;return state();}
     dt=Math.min(dt,.05);moving=false;replanIn=Math.max(0,replanIn-dt);
-    const obstacle=player&&Math.abs(player.z-z)<1.15?player:null;
+    const obstacles=[player,...others].filter(p=>p&&Math.abs(p.z-z)<1.15);
+    const passable=(a,c)=>obstacles.every(p=>avoidsPlayer(a,c,p));
     // Physical contact still stops the teacher; merely watching from 0.8–1 m
     // away no longer freezes them indefinitely.
-    yielding=!!obstacle&&distance(obstacle,position)<.68;
+    yielding=obstacles.some(p=>distance(p,position)<.68);
     if(yielding){speed=0;return state();}
     if(planner){speed=0;advancePlan();if(planner)return state();}
     if(wait>0){wait-=dt;speed=0;return state();}
-    if(path.length&&!avoidsPlayer(position,path[0],obstacle)){
+    if(path.length&&!passable(position,path[0])){
       speed=0;yielding=true;
-      if(replanIn<=0){plan(obstacle);replanIn=.8;wait=.35;}
+      if(replanIn<=0){plan(obstacles);replanIn=.8;wait=.35;}
       return state();
     }
-    if(!path.length){if(replanIn>0)return state();plan(obstacle);replanIn=.8;if(planner||!path.length)return state();}
+    if(!path.length){if(replanIn>0)return state();plan(obstacles);replanIn=.8;if(planner||!path.length)return state();}
     const target=path[0],len=distance(position,target);
     if(len<.001){path.shift();if(!path.length)wait=1.2+(serial%4)*.45;speed=0;return state();}
     const dx=(target.x-position.x)/len,dy=(target.y-position.y)/len,angle=turn(heading,Math.atan2(dx,-dy));
@@ -104,7 +106,7 @@ function* prepareTeacherWalk(world,config,{planningBudgetMs=0,clock=()=>performa
     const desired=Math.abs(angle)>.55?0:Math.min(.48,Math.sqrt(len*.8));
     speed+=Math.max(-1.5*dt,Math.min(.65*dt,desired-speed));
     const step=Math.min(speed*dt,len),next={x:position.x+dx*step,y:position.y+dy*step,z};
-    if(!safe(next,.04)||!avoidsPlayer(position,next,obstacle)){speed=0;path=[];wait=.4;return state();}
+    if(!safe(next,.04)||!passable(position,next)){speed=0;path=[];wait=.4;return state();}
     position=next;total+=step;phase+=step*Math.PI*2/.68;moving=step>.00001;return state();
   }};
 }

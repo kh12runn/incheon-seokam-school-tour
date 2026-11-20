@@ -13,9 +13,10 @@ export const VEHICLE_PROFILES=Object.freeze({
  sports:{name:'Rock On 슈퍼카',specialty:'최고 속도 · 가속 · 코너링 · 회복력',speed:27.5,accel:18,launch:24,handling:9,grip:24,brake:36,resilience:.88,boost:1.25},
  touring:{name:'스포츠 투어러',specialty:'긴 직선과 연속 코너를 위한 GT',speed:28.5,accel:19,launch:25,handling:9.3,grip:25,brake:38,resilience:.90,boost:1.26},
  hyper:{name:'오로라 하이퍼카',specialty:'강력한 가속 · 뛰어난 접지력',speed:30,accel:21,launch:28,handling:10,grip:27,brake:40,resilience:.92,boost:1.28},
- champion:{name:'석암 챔피언 에디션',specialty:'모든 성능의 정점 · 최종 수집 보상',speed:33,accel:24,launch:32,handling:11,grip:30,brake:44,resilience:.95,boost:1.30},
+ champion:{name:'석암 챔피언 에디션',specialty:'미러 바이올렛 · 최상급 스포츠카',speed:33,accel:24,launch:32,handling:11,grip:30,brake:44,resilience:.95,boost:1.30},
+ drone:{name:'석암 스카이 드론',specialty:'챔피언 대비 주행 성능 115% · 단점: 충돌 시 더 크게 감속 · 자유탐험 비행',speed:33*1.15,accel:24*1.15,launch:32*1.15,handling:11*1.15,grip:30*1.15,brake:44*1.15,resilience:.65,boost:1.30*1.15},
 });
-export const UNLOCK_STAMPS=Object.freeze({sedan:0,compact:0,suv:3,morning:6,tucson:10,electric:14,rally:18,sports:24,touring:30,hyper:36,champion:48});
+export const UNLOCK_STAMPS=Object.freeze({sedan:0,compact:0,suv:3,morning:6,tucson:10,electric:14,rally:18,sports:24,touring:30,hyper:36,champion:48,drone:60});
 export const stampsFor=car=>UNLOCK_STAMPS[car.variant??car.type]??0;
 export const canUseCar=(car,stamps)=>stamps>=stampsFor(car);
 export const profileFor=car=>VEHICLE_PROFILES[car.variant??car.type]??VEHICLE_PROFILES.sedan;

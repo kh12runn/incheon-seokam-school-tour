@@ -2,6 +2,8 @@ import {Body,Box,Vec3,RaycastVehicle,Material,ContactMaterial} from './외부도
 import {PARKED_CARS,CAR_DIMENSIONS} from './주차장.mjs';
 import {RUN_SPEED} from './달리기모션.mjs';
 import {profileFor} from './차량성능.mjs';
+import {createDroneFlight,FLIGHT} from './드론비행.mjs';
+import {DRONE_DECK_HEIGHT} from './드론표현.mjs';
 const CENTER_HEIGHT=.52;
 const TRANSITION_SECONDS=1.35;
 const smooth=t=>{t=Math.max(0,Math.min(1,t));return t*t*(3-2*t);};
@@ -33,13 +35,13 @@ export function createDriving(school,physics,{canEnter=()=>true,lockedMessage=()
     });
     const proxy=school.colliders.find(b=>b.vehicleId===source.id);
     if(proxy)proxy.containsXY=(x,y,r)=>{const p=body.pointToLocalFrame(new Vec3(x,y,body.position.z));return Math.hypot(Math.max(0,Math.abs(p.x)-d.width/2),Math.max(0,Math.abs(p.y)-d.length/2))<r;};
-    const p=profileFor(source),tuning={...DRIVING_TUNING,forwardSpeed:DRIVING_TUNING.forwardSpeed*p.speed/20,accel:p.accel,launch:p.launch,handling:p.handling/5.6};
-    return {id:source.id,source,d,body,vehicle,proxy,tuning,door:0,steering:0,wheelSpin:0};
+    const p=profileFor(source),tuning={...DRIVING_TUNING,forwardSpeed:source.type==='drone'?FLIGHT.speed:DRIVING_TUNING.forwardSpeed*p.speed/20,accel:p.accel,launch:p.launch,handling:p.handling/5.6};
+    return {id:source.id,source,d,body,vehicle,proxy,tuning,door:0,steering:0,wheelSpin:0,flight:source.type==='drone'?createDroneFlight(school,source.id):null,flightState:null,home:{x:source.x,y:source.y,z:base}};
   });
-  let phase='walking',active=null,route=[],timer=0,transitionFrom=null,transitionTo=null,error='';
+  let phase='walking',active=null,route=[],timer=0,transitionFrom=null,transitionTo=null,error='',pendingDismount=false;
   const point=(car,x,y,z=0)=>{const p=car.body.pointToWorldFrame(new Vec3(x,y,z-CENTER_HEIGHT));return {x:p.x,y:p.y,z:p.z};};
   const carYaw=car=>{const d=car.body.vectorToWorldFrame(new Vec3(0,1,0));return Math.atan2(-d.x,d.y);};
-  const speed=car=>car.body.velocity.dot(car.body.vectorToWorldFrame(new Vec3(0,1,0)));
+  const speed=car=>car.flight?(car.flightState?.speed??0):car.body.velocity.dot(car.body.vectorToWorldFrame(new Vec3(0,1,0)));
   function safePoint(car,x,y){const p=point(car,x,y);return school.candidate(p.x,p.y,p.z);}
   function pathClear(start,points){let p=start;for(const q of points){if(!q)return false;const end=school.move(p,q.x-p.x,q.y-p.y);if(Math.hypot(end.x-q.x,end.y-q.y)>.12)return false;p=end;}return true;}
   function entryPath(car,p){
@@ -59,7 +61,7 @@ export function createDriving(school,physics,{canEnter=()=>true,lockedMessage=()
     active=car;route=path;phase='approaching';timer=0;error='';return true;
   }
   // The seated rig fits the cushion/footwell; keep its root at tyre height.
-  const seat=()=>point(active,-.36,-.15,0);
+  const seat=()=>active.flight?point(active,0,0,DRONE_DECK_HEIGHT):point(active,-.36,-.15,0);
   function resetControls(car){
     car.parkingBrake=false;car.steering=0;car.body.force.setZero();car.body.torque.setZero();
     for(let i=0;i<4;i++){car.vehicle.applyEngineForce(0,i);car.vehicle.setBrake(0,i);car.vehicle.setSteeringValue(0,i);}
@@ -75,12 +77,14 @@ export function createDriving(school,physics,{canEnter=()=>true,lockedMessage=()
   }
   function exit(){
     if(phase!=='driving')return false;
+    if(active.flight&&!active.flightState?.landed){active.flight.land();pendingDismount=true;error='';return true;}
     if(active.body.velocity.length()>1){error='차를 멈춘 뒤 내릴 수 있습니다.';return false;}
     const p=exitPoint();if(!p){error='내릴 공간이 없습니다. 열린 곳에 주차해 주세요.';return false;}
-    park();transitionFrom=seat();transitionTo=p;phase='exiting';timer=0;error='';return true;
+    park();transitionFrom=seat();transitionTo=p;phase='exiting';timer=0;error='';pendingDismount=false;return true;
   }
   function cancel(){
-    const p=active?exitPoint():null;park();if(active)active.door=0;phase='walking';active=null;route=[];return p??{...school.spawn};
+    if(active?.flight){const c=active;c.flight.reset();c.flightState=null;c.body.position.set(c.home.x,c.home.y,c.home.z+CENTER_HEIGHT);c.body.quaternion.setFromAxisAngle(new Vec3(0,0,1),c.source.yaw);c.body.aabbNeedsUpdate=true;sync();}
+    const p=active?exitPoint():null;park();if(active)active.door=0;phase='walking';active=null;route=[];pendingDismount=false;return p??{...school.spawn};
   }
   function update(dt,player,input={},{playing=true}={}){
     if(!playing)return {...player};let p={...player};
@@ -95,10 +99,21 @@ export function createDriving(school,physics,{canEnter=()=>true,lockedMessage=()
       if(t>=1){
         if(phase==='entering'){
           resetControls(active);
-          phase='driving';physics.world.removeBody(active.body);active.body.mass=1100;active.body.type=Body.DYNAMIC;active.body.updateMassProperties();active.body.wakeUp();active.vehicle.addToWorld(physics.world);
+          phase='driving';
+          if(active.flight){active.flight.reset();active.flightState=active.flight.step(0,point(active,0,0));}
+          else{physics.world.removeBody(active.body);active.body.mass=1100;active.body.type=Body.DYNAMIC;active.body.updateMassProperties();active.body.wakeUp();active.vehicle.addToWorld(physics.world);}
         }else{phase='walking';active.door=0;active=null;}
       }
     }else if(phase==='driving'){
+      if(active.flight){
+        const c=active;c.flightState=c.flight.step(dt,point(c,0,0),{...input,yaw:input.yaw??carYaw(c)});const q=c.flightState.position;
+        c.body.position.set(q.x,q.y,q.z+CENTER_HEIGHT);c.body.velocity.setZero();c.body.angularVelocity.setZero();
+        const heading=carYaw(c),target=input.yaw??heading,turn=Math.atan2(Math.sin(target-heading),Math.cos(target-heading));
+        c.body.quaternion.setFromAxisAngle(new Vec3(0,0,1),heading+turn*(1-Math.exp(-dt*6)));c.body.aabbNeedsUpdate=true;physics.world.broadphase.dirty=true;
+        if(pendingDismount&&!c.flightState.landing&&!c.flightState.landed)pendingDismount=false;
+        if(pendingDismount&&c.flightState.landed){pendingDismount=false;exit();}
+        return seat();
+      }
       const car=active,tuning=car.tuning,forward=Math.max(-1,Math.min(1,input.forward||0)),right=Math.max(-1,Math.min(1,input.right||0));
       // Short, model-specific launch ramp. Releasing controls still stops the
       // car immediately, keeping school parking and delivery manoeuvres easy.
@@ -123,7 +138,7 @@ export function createDriving(school,physics,{canEnter=()=>true,lockedMessage=()
   function sync(dt=0){
     for(const c of cars){
       // Do not restore target velocity after physics: walls must still stop us.
-      if(c===active&&phase==='driving'){
+      if(c===active&&phase==='driving'&&!c.flight){
         const heading=carYaw(c),x=-Math.sin(heading),y=Math.cos(heading),v=c.body.velocity.x*x+c.body.velocity.y*y;
         const excess=v-Math.max(-c.tuning.reverseSpeed,Math.min(c.tuning.forwardSpeed,v));
         if(excess){c.body.velocity.x-=x*excess;c.body.velocity.y-=y*excess;}
@@ -147,5 +162,5 @@ export function createDriving(school,physics,{canEnter=()=>true,lockedMessage=()
     car.body.previousQuaternion.copy(car.body.quaternion);car.body.interpolatedQuaternion.copy(car.body.quaternion);sync();
   }
   return {cars,nearby,enter,exit,cancel,update,sync,point,prepareMissionCar,canEnter:car=>canEnter(car.source),lockedMessage:car=>lockedMessage(car.source),get phase(){return phase;},get active(){return active;},get error(){return error;},get seated(){return seatBlend()>.5;},get seatBlend(){return seatBlend();},seat:()=>active?seat():null,
-    getState:()=>({phase,seatBlend:seatBlend(),carId:active?.id??null,speed:active?speed(active):0,yaw:active?carYaw(active):0,door:active?.door??0,error,cars:cars.map(c=>({id:c.id,position:point(c,0,0),yaw:carYaw(c)}))})};
+    getState:()=>({phase,seatBlend:seatBlend(),carId:active?.id??null,speed:active?speed(active):0,yaw:active?carYaw(active):0,door:active?.door??0,flight:active?.flight?{...active.flightState,landing:pendingDismount||active.flight.landing}:null,error,cars:cars.map(c=>({id:c.id,position:point(c,0,0),yaw:carYaw(c)}))})};
 }

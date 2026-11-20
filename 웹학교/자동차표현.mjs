@@ -4,6 +4,7 @@ import {mergeGeometries} from './외부도구/BufferGeometryUtils.js';
 import {PARKED_CARS,CAR_DIMENSIONS} from './주차장.mjs';
 import {createExhaustSparks,updateCarEffects} from './차량배기스파크.mjs';
 import {applyChampionReflection} from './챔피언반사.mjs';
+import {addDroneDetails,updateDroneDetails} from './드론표현.mjs';
 
 // Photo-guided generic road cars, not scans or exact branded models.
 export function parkedCarDetails({cars=PARKED_CARS,instanced=true,environment=null}={}){
@@ -49,6 +50,7 @@ export function parkedCarDetails({cars=PARKED_CARS,instanced=true,environment=nu
   for(const car of cars){
     const d=CAR_DIMENSIONS[car.type],suv=car.type==='suv',compact=car.type==='compact',sports=car.type==='sports',root=new THREE.Group();root.name=car.id;root.userData={...car};group.add(root);
     root.position.set(car.x,car.z,-car.y);root.rotation.y=car.yaw;
+    if(car.type==='drone'){addDroneDetails(root,env);continue;}
     const L=d.length/2,W=d.width/2,H=d.height,axle=d.wheelbase/2,R=suv?.365:compact?.29:.325,shoulder=sports?.72:suv?1.06:compact?.98:.86;
     const champion=car.variant==='champion';
     const paint=new THREE.MeshPhysicalMaterial({color:champion?'#3d106f':car.color,metalness:champion?.8:sports?.55:.28,roughness:champion?.055:sports?.23:.32,clearcoat:1,clearcoatRoughness:champion?.018:.12,envMap:env,envMapIntensity:champion?1.35:sports?.95:.65});
@@ -241,6 +243,7 @@ export function parkedCarDetails({cars=PARKED_CARS,instanced=true,environment=nu
   }
   group.updateMatrixWorld(true);
   for(const car of group.children){
+    if(car.userData.type==='drone')continue;
     const moving=[car.userData.door,...car.userData.wheels];
     for(const part of moving){batch(part);car.remove(part);}batch(car);for(const part of moving)car.add(part);
   }
@@ -252,7 +255,7 @@ export function parkedCarDetails({cars=PARKED_CARS,instanced=true,environment=nu
   const shadowMaterial=new THREE.MeshBasicMaterial({map:new THREE.CanvasTexture(shadowCanvas),transparent:true,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-1});
   for(const car of group.children){
     const d=CAR_DIMENSIONS[car.userData.type],plane=new THREE.Mesh(new THREE.PlaneGeometry(d.width*1.35,d.length*1.12),shadowMaterial);
-    plane.rotation.x=-Math.PI/2;plane.position.y=.012;car.add(plane);
+    plane.rotation.x=-Math.PI/2;plane.position.y=.012;if(car.userData.type!=='drone')car.add(plane);else plane.geometry.dispose();
     if(car.userData.variant==='champion'){const sparks=createExhaustSparks(d.length);car.add(sparks);car.userData.exhaustSparks=sparks;}
   }
   group.userData.instances=instanced?instanceRepeatedParts(group):{update(){}};
@@ -266,6 +269,7 @@ export function updateDrivenCars(group,driving,time=performance.now()/1000){
   for(const c of driving.cars){
     const root=group.children.find(o=>o.name===c.id),p=driving.point(c,0,0);if(!root)continue;
     updateCarEffects(root,time);
+    if(c.source.type==='drone')updateDroneDetails(root,time,driving.active===c&&driving.phase==='driving');
     const pose=[p.x,p.y,p.z,c.body.quaternion.x,c.body.quaternion.y,c.body.quaternion.z,c.body.quaternion.w,c.door,c.steering,c.wheelSpin];
     if(root.userData.lastPose?.every((v,i)=>v===pose[i]))continue;
     root.userData.lastPose=pose;dirty=true;

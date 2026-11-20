@@ -40,7 +40,7 @@ export function createMiniRacing({scene,camera,progress,onEnter,onExit,onShadow,
   for(const [id,b] of cards){const c=PARKED_CARS.find(c=>c.id===id),open=canUseCar(c,record.stamps);b.setAttribute('aria-pressed',String(id===selected.id));b.classList.toggle('잠금',!open);b.lastChild.textContent=open?'보유 중':'스탬프 '+stampsFor(c)+'개';}
   el('레이스스탬프').textContent=`누적 스탬프 ${record.stamps}개 · ${PARKED_CARS.filter(c=>canUseCar(c,record.stamps)).length}/${PARKED_CARS.length}대 보유`+(record.saved?' · 이 브라우저에 저장됨':' · 저장 불가: 현재 방문에서만 유지');
   el('레이스차량명').textContent=carName(selected);el('레이스특성').textContent=p.specialty;
-  const metrics=[['최고 속도',p.speed,33],['가속',p.accel,24],['출발',p.launch,32],['코너링',p.handling,11],['접지력',p.grip,30],['회복력',p.resilience,1]];
+  const metrics=[['최고 속도',p.speed,33*1.15],['가속',p.accel,24*1.15],['출발',p.launch,32*1.15],['코너링',p.handling,11*1.15],['접지력',p.grip,30*1.15],['충돌 저항',p.resilience,1]];
   el('레이스성능').replaceChildren(...metrics.map(([name,value,max])=>{const label=document.createElement('label');label.textContent=name;const bar=document.createElement('meter');bar.min=0;bar.max=max;bar.value=value;label.append(bar);return label;}));
   el('레이스출발').disabled=!unlocked;el('레이스출발').textContent=unlocked?'다음 · 코스 선택하기 →':`스탬프 ${Math.max(0,required-record.stamps)}개 더 모으면 해금`;
   const next=[...PARKED_CARS].sort((a,b)=>stampsFor(a)-stampsFor(b)).find(c=>stampsFor(c)>record.stamps);
@@ -82,7 +82,7 @@ export function createMiniRacing({scene,camera,progress,onEnter,onExit,onShadow,
   }));el('레이스다음').hidden=!s.cleared||finalRound;el('레이스다음').textContent='해금한 다음 코스 둘러보기 →';el('레이스다음코스').hidden=!s.cleared||finalRound;if(s.cleared&&!finalRound){const next=getRaceCourse(round+1);el('레이스다음코스').textContent=`다음 코스: ${next.name} · ${Math.round(next.length)}m\n${next.description}`;}el('레이스재도전').hidden=false;el('레이스차고이동').hidden=false;el('레이스재도전').focus({preventScroll:true});
  }
  function pause(value){if(!race||race.view().phase==='finished')return;recordEntry.hide();race.pause(value);resetInput();if(value)silence();else audio.unlock();cover.hidden=!value;if(value){el('레이스결과분류').textContent='PIT STOP';el('레이스결과제목').textContent='잠깐 쉬어가기';el('레이스결과설명').textContent='멈춰 있는 동안 시간과 상대 차량도 함께 멈춰요.';el('레이스결과표').hidden=true;el('레이스결과순위').replaceChildren();el('레이스다음코스').hidden=true;el('레이스다음').hidden=false;el('레이스다음').textContent='레이스 계속하기';el('레이스재도전').hidden=false;el('레이스차고이동').hidden=false;el('레이스다음').focus();}}
- function exit(){rewardDialog.close();startGeneration++;hub.show(false);recordEntry.hide();resetInput();silence();active=false;race=null;root.hidden=true;visual?.hide();onExit();}
+ function exit(){rewardDialog.close();startGeneration++;hub.show(false);recordEntry.hide();resetInput();silence();active=false;race=null;root.hidden=true;visual?.hide();visual?.dispose();visual=null;onExit();}
  el('레이스출발').onclick=()=>showHub(round);el('레이스종료').onclick=exit;el('레이스차고이동').onclick=garage;el('레이스재도전').onclick=requestStart;
  el('레이스복귀').onclick=returnToCourse;
  el('레이스라운드').onchange=showCourse;

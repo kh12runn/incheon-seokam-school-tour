@@ -45,7 +45,7 @@ releaseRig();await until(()=>slowRig.getStates()[3].modelStatus==='ready');for(c
 const officeStaff=ADDITIONAL_STAFF.filter(c=>c.roomId==='2F_STAFF');
 for(const config of officeStaff){
  manager.update(.016,officeStaff[0].position,'walk');
- await until(()=>manager.getStates().filter(s=>s.roomId==='2F_STAFF'&&s.hasModel).length>=officeStaff.indexOf(config)+1);
+ await until(()=>manager.getStates().filter(s=>s.roomId==='2F_STAFF'&&s.modelStatus==='ready').length>=officeStaff.indexOf(config)+1);
 }
 assert.equal(manager.getStates().filter(s=>s.roomId==='2F_STAFF'&&s.modelStatus==='ready'&&s.visible).length,3);
 manager.update(21,CLASS_TEACHERS[0].position,'overview');

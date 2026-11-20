@@ -23,6 +23,16 @@ export function createSeatedPose(root,asset,holder){
  function apply(weight,type='sedan'){
   if(!hips||weight<=0)return;
   for(const [bone,q] of saved)q.copy(bone.quaternion);applied=true;
+  if(type==='drone'){
+    // Stand on the deck, with both hands around the small flight controller.
+    root.updateWorldMatrix(true,true);
+    for(const limb of limbs.filter(l=>l.kind==='arm')){
+      limb.upper.getWorldPosition(a);const side=root.worldToLocal(local.copy(a)).x<0?-1:1;
+      joint.set(side*.24,.91,.12);root.localToWorld(joint);aim(limb.upper,limb.lower,joint,weight);
+      target.set(side*.12,.86,.33);root.localToWorld(target);aim(limb.lower,limb.end,target,weight);
+    }
+    return;
+  }
   const sports=type==='sports',size=sports?.78:1,hipHeight=sports?.54:.63;
   holder.scale.copy(restScale).multiplyScalar(1+(size-1)*weight);
   root.updateWorldMatrix(true,true);hips.getWorldPosition(local);root.worldToLocal(local);

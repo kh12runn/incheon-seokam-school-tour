@@ -15,6 +15,8 @@ assert.equal(quiz.update(near,npcs,{active:false}),null);
 assert.equal(quiz.update(near,npcs,{colliders:[{bounds:[.5,-1,0,1,1,3]}]}),null);
 assert.equal(quiz.update({...near,z:7},npcs),null);assert.equal(quiz.update(far,npcs),null);
 const first=quiz.update(near,npcs);assert.equal(first.question.npcId,'lobby');assert.equal(first.open,true);
+assert.equal(first.introduction,'석수다방에 오세요~');assert.equal(quiz.answer(0).attempts,0);
+for(let i=0;i<27;i++)quiz.update(near,npcs,{dt:.1});assert.equal(quiz.getState().introduction,null);
 assert.equal(quiz.update(near,npcs),null);
 const wrong=first.question.choices.findIndex(word=>word!==MONTHS[first.question.month-1]);
 let answer=quiz.answer(wrong);assert.equal(answer.message,'다시한번 생각해보세요');assert.equal(answer.solved,false);assert.deepEqual(answer.question,first.question);

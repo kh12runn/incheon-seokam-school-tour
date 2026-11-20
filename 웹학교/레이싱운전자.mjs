@@ -1,4 +1,5 @@
 import * as THREE from './외부도구/three.module.js';
+import {DRONE_DECK_HEIGHT} from './드론표현.mjs';
 
 // Borrow the selected student's scene root. Never reparent or dispose it:
 // free exploration owns the avatar and its already-loaded model resources.
@@ -23,7 +24,7 @@ export function createRaceDriver(getDriver=()=>null){
   carObject.updateWorldMatrix(true,false);
   // Same offsets as free-driving seat(), converted from its +Y forward
   // physics coordinates to the renderer's -Z forward coordinates.
-  seat.set(-.36,0,.15);carObject.localToWorld(seat);
+  if(source.type==='drone')seat.set(0,DRONE_DECK_HEIGHT,0);else seat.set(-.36,0,.15);carObject.localToWorld(seat);
   carObject.getWorldQuaternion(rotation);rotation.multiply(faceForward);
   avatar.root.position.copy(seat);avatar.root.quaternion.copy(rotation);
   avatar.snapHeading(carObject.rotation.y+Math.PI);avatar.update(Math.max(0,dt));

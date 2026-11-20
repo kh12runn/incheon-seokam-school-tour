@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import {RACE_DRIVERS,pickRaceDrivers,resultDriverBadge} from '../레이싱선수.mjs';
 import {CLASS_TEACHERS} from '../담임선생님.mjs';
+import {OFFICE_STAFF} from '../교무실선생님목록.mjs';
+import {RACE_TEACHER_MODELS} from '../레이싱교사.mjs';
 import {OFFICE_CHARACTERS} from '../교장실캐릭터.mjs';
 import {createRace,raceOpponents} from '../레이싱물리.mjs';
 import {PARKED_CARS} from '../주차장.mjs';
@@ -10,7 +12,10 @@ import {carName} from '../차량성능.mjs';
 assert.deepEqual(RACE_DRIVERS,[
  ...CLASS_TEACHERS.map(t=>({id:t.id,name:t.label})),
  ...OFFICE_CHARACTERS.map(t=>({id:'office-'+t.id,name:t.label})),
+ ...OFFICE_STAFF.map(t=>({id:t.id,name:t.label})),
 ]);
+for(const driver of RACE_DRIVERS)assert(RACE_TEACHER_MODELS[driver.id],'Every named racer has a visible driver: '+driver.id);
+for(const staff of OFFICE_STAFF)assert.equal(resultDriverBadge(staff.id),staff.badge);
 let seed=19;
 const random=()=>((seed=Math.imul(seed,1664525)+1013904223>>>0)/4294967296);
 const seen=new Set();
@@ -41,4 +46,4 @@ for(const row of race.view().standings){
  if(row.id)assert.ok(RACE_DRIVERS.some(d=>d.id===row.driverId&&d.name===row.driverName));
  else assert.equal(row.driverId,'player');
 }
-console.log('레이싱 선수 검사 통과: 기존 9명 일치, 중복 없는 무작위 배정, 순위·선수·차량 연결');
+console.log('레이싱 선수 검사 통과: 교무실 포함 12명, 중복 없는 무작위 배정, 순위·선수·차량 연결');

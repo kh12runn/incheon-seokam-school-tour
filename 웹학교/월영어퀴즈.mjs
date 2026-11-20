@@ -2,6 +2,7 @@ import {principalCanGreet} from './교장선생님인사.mjs';
 
 export const MONTHS=Object.freeze(['january','february','march','april','may','june','july','august','september','october','november','december']);
 export const QUIZ_RELEASE_DISTANCE=3.05;
+export const LOBBY_INVITATION='석수다방에 오세요~';
 const shuffle=(values,random)=>{
   const list=[...values];
   for(let i=list.length-1;i>0;i--){const j=Math.floor(random()*(i+1));[list[i],list[j]]=[list[j],list[i]];}
@@ -16,17 +17,18 @@ export function createMonthQuestion(random=Math.random,previousMonth=0){
 // Small hysteresis beyond the 2.8m trigger prevents boundary jitter, while
 // leaving the encounter resets even an unanswered or correctly answered quiz.
 export function createMonthQuiz(random=Math.random){
-  const visited=new Set();let question=null,open=false,solved=false,attempts=0,message='',previousMonth=0,visit=0;
-  const state=()=>({open,solved,attempts,message,visit,question:question?{...question,choices:[...question.choices]}:null});
+  const visited=new Set();let question=null,open=false,solved=false,attempts=0,message='',previousMonth=0,visit=0,introRemaining=0;
+  const state=()=>({open,solved,attempts,message,visit,introduction:introRemaining>0?LOBBY_INVITATION:null,question:question?{...question,choices:[...question.choices]}:null});
   return {
     getState:state,
-    update(player,npcs,{active=true,colliders=[]}={}){
+    update(player,npcs,{active=true,colliders=[],dt=0}={}){
       if(!player)return null;
       const nearby=npcs.filter(n=>Math.abs(player.z-n.position.z)<=1.15&&Math.hypot(player.x-n.position.x,player.y-n.position.y)<=QUIZ_RELEASE_DISTANCE);
       for(const id of visited)if(!nearby.some(n=>n.id===id))visited.delete(id);
       if(open&&!nearby.some(n=>n.id===question.npcId)){
-        open=false;question=null;solved=false;attempts=0;message='';
+        open=false;question=null;solved=false;attempts=0;message='';introRemaining=0;
       }
+      if(open&&active&&introRemaining>0){const npc=npcs.find(n=>n.id===question.npcId);if(npc&&principalCanGreet(player,npc.position,{colliders})){introRemaining=Math.max(0,introRemaining-Math.max(0,Math.min(dt,.1)));if(introRemaining===0)return state();}}
       if(open||!active)return null;
       const candidates=npcs.filter(n=>n.available!==false&&!visited.has(n.id)&&principalCanGreet(player,n.position,{colliders}));
       candidates.sort((a,b)=>Math.hypot(player.x-a.position.x,player.y-a.position.y)-Math.hypot(player.x-b.position.x,player.y-b.position.y));
@@ -35,13 +37,14 @@ export function createMonthQuiz(random=Math.random){
       for(const n of nearby)visited.add(n.id);
       question={...createMonthQuestion(random,previousMonth),npcId:npc.id,npcName:npc.name};previousMonth=question.month;
       open=true;solved=false;attempts=0;message='보기 4개 중 하나를 골라주세요.';visit++;
+      introRemaining=npc.id==='lobby'?2.6:0;
       return state();
     },
     answer(index){
-      if(!open||solved||!Number.isInteger(index)||index<0||index>3)return state();
+      if(!open||introRemaining>0||solved||!Number.isInteger(index)||index<0||index>3)return state();
       attempts++;solved=question.choices[index]===MONTHS[question.month-1];
       message=solved?'참 잘했어요~':'다시한번 생각해보세요';return state();
     },
-    dismiss(){open=false;}
+    dismiss(){open=false;introRemaining=0;}
   };
 }

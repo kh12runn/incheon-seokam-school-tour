@@ -9,7 +9,7 @@ export const ROUND_COUNT=5;
 const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
 export const mod=(x,m)=>(x%m+m)%m;
 const angle=x=>Math.atan2(Math.sin(x),Math.cos(x));
-const maxSteering=profile=>.46+Math.min(profile.handling,11)*.018;
+const maxSteering=profile=>.46+Math.min(profile.handling,13)*.018;
 export const RACE_ASSIST_CONFIG=Object.freeze({speedRatio:.50,maxStrength:.62,rampRate:3.6,minSteerInput:.08,cornerStrength:.16});
 export const CONE_BOUNDARY_HITBOX_SCALE=.70;
 export const BOUNDARY_IMPACT_SPEED_RATIO=.50;
@@ -53,7 +53,8 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
  for(const c of cars)Object.assign(c,{itemBoostTime:0,pickupBurst:0,pickups:0});
  let phase='countdown',countdown=3,time=0,paused=false,obstacles=makeObstacles(round,random,cars,course),generation=1,accumulator=0,pickupRevision=0;
  const player=cars[0];
- function damage(c,resistance,duration=.45){if(c.hit>0)return;c.speed*=resistance;c.hit=duration;c.hits++;}
+ function impactRatio(c,ratio){return c.source.type==='drone'?ratio*(c.profile.resilience/.95):ratio;}
+ function damage(c,resistance,duration=.45){if(c.hit>0)return;c.speed*=impactRatio(c,resistance);c.hit=duration;c.hits++;}
  function project(c){
   const p=nearestTrack(c.x,c.z,c.s),delta=mod(p.s-mod(c.s,L)+L/2,L)-L/2;
   c.s+=delta;c.lane=p.lane;c.height=p.height;
@@ -153,7 +154,7 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
   if(nextOverlap>0){
    const oldOverlap=penetration(c,oldX,oldZ,oldYaw),allowed=Math.max(0,oldOverlap-.00001),valid=(x,z,yaw)=>penetration(c,x,z,yaw)<=allowed;
    if(nextOverlap>allowed){
-    const firstContact=c.wall<=0,retainedSpeed=Math.max(0,c.speed)*(firstContact?BOUNDARY_IMPACT_SPEED_RATIO:1);
+    const firstContact=c.wall<=0,retainedSpeed=Math.max(0,c.speed)*(firstContact?impactRatio(c,BOUNDARY_IMPACT_SPEED_RATIO):1);
     if(c.assistActive||(c.speed>0&&!brake)){
      // Resolve the first touch as a wall slide too. Repeated contact keeps the
      // retained speed instead of halving it each physics tick or setting it to 0.
@@ -228,7 +229,7 @@ export function createRace({car,opponents=[],round=1,random=Math.random}){
    const a=cars[i],b=cars[j];if(a.finish!==null||b.finish!==null)continue;
    const contact=carContact(a,b);
    if(contact){
-    if(contact.soft){a.speed*=Math.exp(-dt*.7);b.speed*=Math.exp(-dt*.7);continue;}
+    if(contact.soft){a.speed*=Math.exp(-dt*(a.source.type==='drone'?1.05:.7));b.speed*=Math.exp(-dt*(b.source.type==='drone'?1.05:.7));continue;}
     a.contact=b.contact=.35;
     damage(a,.72,.6);damage(b,.72,.6);
     const canA=inside(a,a.x-contact.nx*contact.push,a.z-contact.nz*contact.push,a.yaw),canB=inside(b,b.x+contact.nx*contact.push,b.z+contact.nz*contact.push,b.yaw);

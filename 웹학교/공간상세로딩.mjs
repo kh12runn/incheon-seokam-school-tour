@@ -4,15 +4,32 @@ function resources(root){const set=new Set();root.traverse(o=>{if(o.geometry)set
 // Each factory is the original, room-specific artwork. Only its creation time
 // changes. Keep near rooms warm and release distant GPU resources on phones.
 const yieldWork=()=>new Promise(resolve=>setTimeout(resolve,0));
-export function createRoomDetailsCache(scene,{compile=async()=>{},initTexture=()=>{},capacity=12,stairs=[],onBuilt=()=>{}}={}){
- const entries=[],clock=()=>performance.now();let busy=false,queued=false,point=null,walking=false,prefetch=new Set(),onFlight=false,lastVerticalAt=-Infinity;
+export function createRoomDetailsCache(scene,{compile=async()=>{},initTexture=()=>{},capacity=12,memoryBudget=384*1024*1024,stairs=[],onBuilt=()=>{}}={}){
+ const entries=[],clock=()=>performance.now();let busy=false,queued=false,point=null,walking=false,prefetch=new Set(),targets=new Set(),onFlight=false,lastVerticalAt=-Infinity;
+ const cancelled=Symbol('obsolete room');
+ const bytes=root=>{let n=0;const arrays=new Set();for(const r of resources(root)){
+  if(r.isTexture)n+=(r.image?.width??0)*(r.image?.height??0)*4*(r.generateMipmaps?4/3:1);
+  if(r.isBufferGeometry)for(const a of [r.index,...Object.values(r.attributes)])if(a?.array&&!arrays.has(a.array)){arrays.add(a.array);n+=a.array.byteLength;}
+ }return n;};
  const timings={built:0,evicted:0,maxCreateMs:0,maxBatchMs:0};
  const gap=e=>Math.hypot(point.x-e.center.x,point.y+e.center.z);
  const nearby=e=>walking&&Math.abs(point.z-(e.floor-1)*3.4)<2&&gap(e)<42;
- const wanted=e=>nearby(e)||prefetch.has(e);
+ const priority=e=>(nearby(e)?0:18)+gap(e);
+ function refreshTargets(){
+  targets=new Set();let cost=0;
+  for(const e of entries.filter(e=>nearby(e)||prefetch.has(e)).sort((a,b)=>priority(a)-priority(b))){
+   const estimate=e.bytes??16*1024*1024;
+   // Preserve the nearest room at original fidelity; bound speculative rooms.
+   if(targets.size&&(targets.size>=capacity||cost+estimate>memoryBudget))continue;
+   targets.add(e);cost+=estimate;
+  }
+ }
+ const wanted=e=>targets.has(e);
  async function yieldAtLanding(){await yieldWork();while(onFlight)await new Promise(resolve=>setTimeout(resolve,60));}
  function release(entry){const root=entry.mesh;if(!root)return;scene.remove(root);const keep=resources(scene),owned=resources(root);for(const item of owned)if(!keep.has(item))item.dispose?.();entry.mesh=null;entry.state='idle';entry.onEvict?.();timings.evicted++;}
- function victim(){const loaded=entries.filter(e=>e.state==='ready');return loaded.length>capacity?loaded.filter(e=>!wanted(e)).sort((a,b)=>a.used-b.used)[0]:null;}
+ function victim(){const loaded=entries.filter(e=>e.state==='ready'),resident=entries.filter(e=>e.mesh),cost=resident.reduce((n,e)=>n+(e.bytes??0),0);
+  return !walking||resident.length>capacity||cost>memoryBudget?loaded.filter(e=>!wanted(e)).sort((a,b)=>a.used-b.used)[0]:null;
+ }
  function choose(){
   // A stair flight only exposes its landing, not every classroom on both floors.
   // Keep the already prepared rooms visible; defer new synchronous factories
@@ -28,14 +45,18 @@ export function createRoomDetailsCache(scene,{compile=async()=>{},initTexture=()
   const next=choose();if(!next)return;
   busy=true;next.state='loading';
   try{
-   let started=clock();const root=next.create();next.mesh=root;timings.maxCreateMs=Math.max(timings.maxCreateMs,clock()-started);
-   await yieldAtLanding();started=clock();const removed=await batchStaticDetailsAsync(root,yieldAtLanding);timings.maxBatchMs=Math.max(timings.maxBatchMs,clock()-started);freezeStaticTree(root);
-   await yieldAtLanding();await compile(root);
+   const checkpoint=async()=>{await yieldAtLanding();if(!wanted(next))throw cancelled;};
+   let started=clock();const root=next.create();next.mesh=root;next.bytes=bytes(root);refreshTargets();timings.maxCreateMs=Math.max(timings.maxCreateMs,clock()-started);
+   await checkpoint();
+   // Evict before uploading so old and new room textures don't peak together.
+   for(let old;(old=victim());){release(old);await checkpoint();}
+   started=clock();const removed=await batchStaticDetailsAsync(root,checkpoint);timings.maxBatchMs=Math.max(timings.maxBatchMs,clock()-started);freezeStaticTree(root);
+   await checkpoint();await compile(root);
    // Upload each original-resolution canvas separately before first visibility.
-   for(const texture of resources(root))if(texture.isTexture){await yieldAtLanding();initTexture(texture);}
-   await yieldAtLanding();scene.add(root);next.state='ready';next.used=clock();onBuilt(removed);timings.built++;
+   for(const texture of resources(root))if(texture.isTexture){await checkpoint();initTexture(texture);}
+   await checkpoint();scene.add(root);next.state='ready';next.used=clock();onBuilt(removed);timings.built++;
    root.visible=nearby(next)&&gap(next)<34;
-  }catch(error){next.state='error';next.error=String(error?.message??error);console.error('공간 상세 로딩',next.roomId,error);}
+  }catch(error){release(next);if(error!==cancelled){next.state='error';next.error=String(error?.message??error);console.error('공간 상세 로딩',next.roomId,error);}}
   finally{busy=false;schedule();}
  }
  function schedule(){if(!queued&&!busy&&!onFlight&&(victim()||choose())){queued=true;setTimeout(run,32);}}
@@ -51,9 +72,9 @@ export function createRoomDetailsCache(scene,{compile=async()=>{},initTexture=()
      for(const target of [floor-1,floor+1])for(const e of entries.filter(e=>e.floor===target&&gap(e)<24).sort((a,b)=>gap(a)-gap(b)).slice(0,2))prefetch.add(e);
     }
    }
-   for(const e of entries)if(e.mesh){e.mesh.visible=e.state==='ready'&&nearby(e)&&gap(e)<34;if(wanted(e))e.used=clock();}
+   refreshTargets();for(const e of entries)if(e.mesh){e.mesh.visible=e.state==='ready'&&nearby(e)&&gap(e)<34;if(wanted(e))e.used=clock();}
    schedule();
   },
-  state:()=>({total:entries.length,loaded:entries.filter(e=>e.state==='ready').length,loading:entries.filter(e=>e.state==='loading').map(e=>e.roomId),errors:entries.filter(e=>e.state==='error').map(e=>({roomId:e.roomId,error:e.error})),rooms:entries.filter(e=>e.state==='ready').map(e=>e.roomId),prefetch:[...prefetch].map(e=>e.roomId),onFlight,timings:{...timings}})
+  state:()=>({total:entries.length,capacity,memoryBudget,estimatedBytes:entries.filter(e=>e.mesh).reduce((n,e)=>n+(e.bytes??0),0),loaded:entries.filter(e=>e.state==='ready').length,loading:entries.filter(e=>e.state==='loading').map(e=>e.roomId),errors:entries.filter(e=>e.state==='error').map(e=>({roomId:e.roomId,error:e.error})),rooms:entries.filter(e=>e.state==='ready').map(e=>e.roomId),prefetch:[...prefetch].map(e=>e.roomId),onFlight,timings:{...timings}})
  };
 }

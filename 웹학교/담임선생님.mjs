@@ -4,6 +4,7 @@ import {normalizePrincipalModel} from './교장실캐릭터.mjs';
 import {createPrincipalWalkRigAsync} from './교장보행리그.mjs';
 import {createTeacherWalkAsync} from './선생님교실산책.mjs';
 import {prepareApprovedTeacherMaterials,TEACHER_MODEL_RELEASE} from './승인교사모델.mjs';
+import {OFFICE_STAFF} from './교무실선생님목록.mjs';
 
 // Recover only the collaborator's models, not their older copy of the school.
 export const CLASS_TEACHERS=Object.freeze([
@@ -17,14 +18,13 @@ export const CLASS_TEACHERS=Object.freeze([
   {id:'teacher-science',roomId:'2F_SCIENCE',label:'과학선생님',position:{x:82.6,y:-4.55,z:3.4},height:1.68,url:new URL('./캐릭터모델/과학선생님.glb',import.meta.url)}
 ]);
 
-// Keep the established stamp-mission roster independent of additional school staff.
+// Preserve the collaborator's additional classroom placements.
 export const ADDITIONAL_STAFF=Object.freeze([
   {id:'teacher-5-1',roomId:'3F_5-1',label:'조미진 선생님',position:{x:62.6,y:-4.55,z:6.8},height:1.70,url:new URL('./캐릭터모델/jo-mijin.glb',import.meta.url)},
   {id:'teacher-5-6',roomId:'3F_5-6',label:'김종섭 선생님',position:{x:12.6,y:-4.55,z:6.8},height:1.81,url:new URL('./캐릭터모델/kim-jongseop.glb',import.meta.url)},
-  {id:'vice-hwang',roomId:'2F_STAFF',label:'황차호 교감선생님',position:{x:45.3,y:-1.55,z:3.4},heading:2.25,height:1.80,url:new URL('./캐릭터모델/hwang-chaho.glb',import.meta.url)},
-  {id:'vice-yun',roomId:'2F_STAFF',label:'윤효진 교감선생님',position:{x:48.2,y:-3.35,z:3.4},heading:-2.95,height:1.68,url:new URL('./캐릭터모델/yun-hyojin.glb',import.meta.url)},
-  {id:'staff-lee',roomId:'2F_STAFF',label:'이창성 교무부장선생님',position:{x:45.4,y:-5.45,z:3.4},heading:2.75,height:1.75,url:new URL('./캐릭터모델/lee-changseong.glb',import.meta.url)}
+  ...OFFICE_STAFF
 ]);
+export const MISSION_TEACHERS=Object.freeze([...CLASS_TEACHERS,...OFFICE_STAFF]);
 
 function resources(root,set=new Set()){
   root.traverse(o=>{if(o.isMesh){set.add(o.geometry);if(o.skeleton)set.add(o.skeleton);for(const m of [].concat(o.material)){set.add(m);for(const value of Object.values(m))if(value?.isTexture)set.add(value);}}});return set;
@@ -54,10 +54,9 @@ export function createClassTeachers(world,services={}){
   const makeRig=services.makeRig??createPrincipalWalkRigAsync;
   const prepareRender=services.prepareRender??(async()=>{});
   const teachers=[...CLASS_TEACHERS,...ADDITIONAL_STAFF].map(config=>{
-    const stationed=Number.isFinite(config.heading);
     const root=new THREE.Group();root.name=config.label;root.visible=false;
     root.position.set(config.position.x,config.position.z,-config.position.y);
-    if(stationed)root.rotation.y=config.heading;
+    if(Number.isFinite(config.heading))root.rotation.y=config.heading;
     const badge=ADDITIONAL_STAFF.includes(config)?nameLabel(config.label):null;
     if(badge){badge.visible=false;root.add(badge);}
     const label=nameLabel(config.label+' · 불러오는 중');if(label)root.add(label);
@@ -80,8 +79,8 @@ export function createClassTeachers(world,services={}){
       }finally{if(finishAbort===controller)finishAbort=null;}
     }
     return {root,config,near(player,mode){const b=room.bounds;return !!player&&mode==='walk'&&Math.abs(player.z-b[4])<1&&player.x>=b[0]-1.25&&player.x<=b[1]+1.25&&player.y>=b[2]-1.5&&player.y<=b[3]+4;},
-      getState:()=>({...walk?.getState(),position:walk?.getState().position??{...config.position},id:config.id,roomId:config.roomId,label:config.label,height:config.height,modelRelease:ADDITIONAL_STAFF.includes(config)?'staff-20261120':TEACHER_MODEL_RELEASE,modelStatus:status,visible:root.visible,hasModel:!!(preview||rig),error,lastUsed,preparation,animation:stationed?'standing':'procedural-skinned-walk'}),
-      update(dt,player,paused){lastUsed=tick;const state=walk?.update(dt,player,{paused:paused||status!=='ready'});if(!state)return;root.position.set(state.position.x,state.position.z,-state.position.y);root.rotation.y=state.heading;rig?.update(paused?0:dt,state);},
+      getState:()=>({...walk?.getState(),position:walk?.getState().position??{...config.position},id:config.id,roomId:config.roomId,label:config.label,height:config.height,modelRelease:ADDITIONAL_STAFF.includes(config)?'staff-20261120':TEACHER_MODEL_RELEASE,modelStatus:status,visible:root.visible,hasModel:!!(preview||rig),error,lastUsed,preparation,animation:'procedural-skinned-walk'}),
+      update(dt,player,paused,others){lastUsed=tick;const state=walk?.update(dt,player,{paused:paused||status!=='ready',others});if(!state)return;root.position.set(state.position.x,state.position.z,-state.position.y);root.rotation.y=state.heading;rig?.update(paused?0:dt,state);},
       evict(){generation++;finishAbort?.abort();if(rig)root.remove(rig.root);if(preview)root.remove(preview);release(owned);owned.clear();rig=null;preview=null;source=null;status='not-requested';preparation=null;if(label)label.visible=true;if(badge)badge.visible=false;},
       canLoad:()=>status==='not-requested'||status==='error'&&tick>retryAt,
       async load(){
@@ -91,13 +90,6 @@ export function createClassTeachers(world,services={}){
           const asset=await fetchModel(config);
           if(version!==generation){release(resources(asset));return;}
           owned=resources(asset);source=normalizePrincipalModel(asset,config.height);
-          if(stationed){
-            await prepareRender(source);
-            if(version!==generation){release(resources(asset));return;}
-            preview=source;root.add(preview);source=null;
-            if(label)label.visible=false;if(badge)badge.visible=true;
-            status='ready';preparation={processing:'original-materials'};return;
-          }
           // Show the approved model immediately while the walk rig is assembled.
           // Keep the release's vertex tints and maps; this is not the old scan.
           const rigSource=source.clone(true);
@@ -128,9 +120,13 @@ export function createClassTeachers(world,services={}){
       }
     };
   });
-  return {teachers,getStates:()=>teachers.map(t=>t.getState()),update(dt,player,mode,{paused=false,focusedTeacher=null}={}){
+  return {teachers,clear(){for(const t of teachers){t.root.visible=false;if(t.getState().modelStatus!=='not-requested')t.evict();}},getStates:()=>teachers.map(t=>t.getState()),update(dt,player,mode,{paused=false,focusedTeacher=null}={}){
     tick+=Math.max(0,dt);
-    for(const teacher of teachers){teacher.root.visible=teacher.near(player,mode);if(teacher.root.visible)teacher.update(dt,player,paused||teacher.config.id===focusedTeacher);}
+    for(const teacher of teachers)teacher.root.visible=teacher.near(player,mode);
+    for(const teacher of teachers)if(teacher.root.visible){
+      const others=teachers.filter(other=>other!==teacher&&other.root.visible&&other.config.roomId===teacher.config.roomId).map(other=>other.getState().position);
+      teacher.update(dt,player,paused||teacher.config.id===focusedTeacher,others);
+    }
     for(const teacher of teachers){const state=teacher.getState();if(!teacher.root.visible&&state.modelStatus==='ready'&&tick-state.lastUsed>20)teacher.evict();}
     // Decode models sequentially. Staff sharing a room must fit in the cache together.
     if(!busy){const next=teachers.filter(t=>t.root.visible&&t.canLoad()).sort((a,b)=>Math.abs(player.x-a.config.position.x)-Math.abs(player.x-b.config.position.x))[0];if(next){

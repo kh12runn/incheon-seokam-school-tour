@@ -56,9 +56,11 @@ export function class21Details(config){
 
 export function computerEntranceDetails(){
   const group=new THREE.Group();group.name='4층 컴퓨터실 입구 사진 안내';
-  function sign(name,w,h,x,y,z,angle,draw){
-    const c=document.createElement('canvas');c.width=1024;c.height=Math.round(1024*h/w);const ctx=c.getContext('2d');draw(ctx,c.width,c.height);
-    const map=new THREE.CanvasTexture(c);map.colorSpace=THREE.SRGBColorSpace;
+  const maps=new Map();
+  function sign(name,w,h,x,y,z,angle,draw,key=name){
+    let map=maps.get(key);
+    if(!map){const c=document.createElement('canvas');c.width=1024;c.height=Math.round(1024*h/w);const ctx=c.getContext('2d');draw(ctx,c.width,c.height);
+    map=new THREE.CanvasTexture(c);map.colorSpace=THREE.SRGBColorSpace;maps.set(key,map);}
     const mesh=new THREE.Mesh(new THREE.PlaneGeometry(w,h),new THREE.MeshStandardMaterial({map,roughness:.85}));mesh.position.set(x,z,-y);mesh.rotation.y=angle;mesh.name=name;group.add(mesh);
   }
   sign('신나는 컴퓨터실 끝벽',2.42,.68,101.5,-72.70,12.63,Math.PI,(c,w,h)=>{
@@ -86,7 +88,7 @@ export function computerEntranceDetails(){
   }
   // Posters on both faces of the open glass doors remain readable, not mirrored.
   for(const [x,theme] of [[gate.left+.07,'#e4b96a'],[gate.right-.07,'#aa93c7']])for(const side of [-1,1]){
-    sign('유리문 컴퓨터부 모집 '+x+' '+side,.65,1.04,x+side*.016,gate.y+.49,gate.base+1.54,side*Math.PI/2,(c,w,h)=>pamphlet(c,w,h,theme));
+    sign('유리문 컴퓨터부 모집 '+x+' '+side,.65,1.04,x+side*.016,gate.y+.49,gate.base+1.54,side*Math.PI/2,(c,w,h)=>pamphlet(c,w,h,theme),theme);
   }
   sign('컴퓨터부 활동 안내 끝벽',1.24,1.48,101.44,-72.70,11.6,Math.PI,(c,w,h)=>pamphlet(c,w,h,'#7eafba'));
   const bunting=new THREE.Group();bunting.name='유리문 알록달록 가랜드';

@@ -6,6 +6,16 @@
 #차량속도{min-width:84px;font-variant-numeric:tabular-nums;text-align:center;font-size:18px;color:#fff;background:#152c2ee8;padding:13px 9px;border-radius:8px}
 #차량조작 #차량브레이크{background:#493432;border-color:#b98c7f}
 #차량브레이크.누르는중{background:#8d4136}
+#차량조작[data-flight=true]{flex-wrap:wrap;justify-content:center;width:min(650px,calc(100vw - 24px));bottom:30px;background:#142b33ed;border:1px solid #72d9db;border-radius:14px;padding:10px}
+#드론조작{flex-basis:100%;text-align:center;color:#efffff;font-size:13px}
+#드론조작>div{display:flex;justify-content:center;align-items:center;gap:8px}
+#드론조작 small{display:block;margin-top:7px;color:#c5e6ec;font-size:12px}
+#드론조작 kbd{border:1px solid #829da1;border-radius:4px;padding:2px 5px;font-size:11px}
+#드론조작 button{touch-action:none;user-select:none}
+#드론조작 button.누르는중{background:#287781}
+body[data-touch=true] #차량조작[data-flight=true]{bottom:calc(185px + env(safe-area-inset-bottom));padding:7px}
+body[data-touch=true] #드론조작 kbd{display:none}
+@media(max-height:520px){body[data-touch=true] #차량조작[data-flight=true]{bottom:auto;top:66px;left:auto;right:12px;transform:none;width:310px}#드론조작 small{font-size:10px}#차량조작[data-flight=true] button{height:36px}}
 body[data-driving=true] .터치동작,body[data-driving=true] #조작힌트{visibility:hidden}
 body[data-touch=true] #차량조작{bottom:calc(175px + env(safe-area-inset-bottom))}
 @media(max-width:450px){#차량조작{gap:5px}#차량조작 button{font-size:12px;padding:0 10px}#차량속도{font-size:15px;min-width:70px;padding:15px 6px}}

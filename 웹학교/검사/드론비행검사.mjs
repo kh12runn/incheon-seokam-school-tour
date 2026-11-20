@@ -1,0 +1,32 @@
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import {buildWorld} from '../이동물리.mjs';
+import {createDroneFlight,FLIGHT} from '../드론비행.mjs';
+import {createDriving} from '../운전물리.mjs';
+import {createFootballPhysics} from '../축구공물리.mjs';
+import {PARKED_CARS} from '../주차장.mjs';
+import {VEHICLE_PROFILES,canUseCar,stampsFor} from '../차량성능.mjs';
+import {RUN_SPEED} from '../달리기모션.mjs';
+const source=PARKED_CARS.find(c=>c.type==='drone'),p=VEHICLE_PROFILES.drone,champion=VEHICLE_PROFILES.champion;
+for(const key of ['speed','accel','launch','handling','grip','brake','boost'])assert.equal(p[key],champion[key]*1.15,key);
+assert(p.resilience<champion.resilience);assert.equal(stampsFor(source),60);assert(!canUseCar(source,59));assert(canUseCar(source,60));assert.equal(FLIGHT.speed,RUN_SPEED*2);
+const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),world=buildWorld(data),flight=createDroneFlight(world,source.id);
+let at={x:30,y:-40,z:-.26},last;
+const tick=(input,n=60)=>{for(let i=0;i<n;i++){last=flight.step(1/60,at,input);at=last.position;assert(!flight.blocked(at),'Never penetrate world');assert(Number.isFinite(at.z));}return last;};
+tick({up:1},300);assert(at.z>19&&at.z<21);const hover={...at};tick({},120);assert.deepEqual(at,hover,'Hold altitude without drifting');
+const start={...at};tick({forward:1,right:1,yaw:0},300);assert(Math.hypot(at.x-start.x,at.y-start.y)>46);assert(Math.hypot(at.x-start.x,at.y-start.y)<48.1,'Diagonal does not exceed 2x speed');assert(Math.abs(last.speed-FLIGHT.speed)<.001);
+at={x:30,y:-40,z:37};flight.reset();tick({up:1},300);assert(at.z<=38&&at.z>37.9,'Ceiling bounds');
+at={x:25,y:-40,z:-.26};flight.reset();tick({forward:1,yaw:0},500);assert(at.y< -8,'Building facade blocks ground-level flight');
+const wall=at.y;tick({up:1},360);assert(at.z>23,'Rise above building');tick({forward:1,yaw:0},210);assert(at.y>wall+25,'Can cross above the school');
+// Land from open sky on the playground, then stay on its actual raised ground.
+at={x:30,y:-40,z:15};flight.reset();flight.land();tick({},600);assert(last.landed&&!last.landing);assert(at.z>=-.3&&at.z<=-.19);
+// A roof blocks descent and the narrow rider envelope blocks climbing through it.
+const fixture={colliders:[{bounds:[-5,-5,8,5,5,8.3]}],floorBelow:(x,y,z)=>z>=8.3?8.3:0};
+const roof=createDroneFlight(fixture,'test');let roofAt={x:0,y:0,z:12};for(let i=0;i<300;i++)roofAt=roof.step(1/60,roofAt,{up:-1}).position;assert(roofAt.z>=8.3&&roofAt.z<8.4);
+let under={x:0,y:0,z:4};for(let i=0;i<120;i++)under=roof.step(1/60,under,{up:1}).position;assert(under.z+FLIGHT.height<=8.001);
+const physics=createFootballPhysics(world,{count:0});let stamps=59;const driving=createDriving(world,physics,{canEnter:c=>canUseCar(c,stamps)}),car=driving.cars.find(c=>c.id===source.id),door=driving.point(car,-car.d.width/2-.62,.35);let player=world.candidate(door.x,door.y,door.z);
+assert(player);assert(!driving.enter(player),'59 stamps locked');stamps=60;assert(driving.enter(player));
+const step=(input,n=1)=>{for(let i=0;i<n;i++){const before=player;player=driving.update(1/60,player,input);physics.update(1/60,player,before,{canKick:false});driving.sync(1/60);if(driving.phase==='driving')player=driving.seat();}};
+step({},200);assert.equal(driving.phase,'driving');step({up:1},180);assert(driving.getState().flight.altitude>11);assert(driving.exit(),'Airborne exit requests landing');step({},400);assert.equal(driving.phase,'walking','Automatic landing completes dismount');assert(world.candidate(player.x,player.y,player.z));
+assert(driving.enter(player));step({},200);step({up:1},90);const paused={...car.body.position};driving.update(.1,player,{up:1},{playing:false});assert.deepEqual({...car.body.position},paused);const safe=driving.cancel();assert(world.candidate(safe.x,safe.y,safe.z));assert.equal(car.body.position.z,car.home.z+.52,'Cancel parks on ground');
+console.log({ok:true,unlock:60,speedMultiplier:1.15,flightSpeed:FLIGHT.speed,collisionWeakness:p.resilience,hover:true,walls:true,roofs:true,bounds:true,autoLanding:true,safeCancel:true});

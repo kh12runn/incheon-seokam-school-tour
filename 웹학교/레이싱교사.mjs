@@ -13,7 +13,10 @@ export const RACE_TEACHER_MODELS=Object.freeze({
  'teacher-6-6':{height:1.82,url:new URL('./캐릭터모델/레이싱/teacher-6-6.glb',import.meta.url)},
  'teacher-6-7':{height:1.76,url:new URL('./캐릭터모델/레이싱/teacher-6-7.glb',import.meta.url)},
  'teacher-science':{height:1.68,url:new URL('./캐릭터모델/레이싱/teacher-science.glb',import.meta.url)},
- 'office-cute':{height:1.83,url:new URL('./캐릭터모델/레이싱/office-cute.glb',import.meta.url)}
+ 'office-cute':{height:1.83,url:new URL('./캐릭터모델/레이싱/office-cute.glb',import.meta.url)},
+ 'vice-hwang':{height:1.80,url:new URL('./캐릭터모델/레이싱/vice-hwang.glb',import.meta.url)},
+ 'vice-yun':{height:1.68,url:new URL('./캐릭터모델/레이싱/vice-yun.glb',import.meta.url)},
+ 'staff-lee':{height:1.75,url:new URL('./캐릭터모델/레이싱/staff-lee.glb',import.meta.url)}
 });
 
 function disposeModel(root){

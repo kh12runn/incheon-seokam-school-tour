@@ -5,13 +5,13 @@ import {prepareMissionMap} from '../미션경로.mjs';
 import {createStampMission,missionTime} from '../스탬프미션.mjs';
 import {MISSION_QUESTIONS,pickQuestion} from '../탐험문제.mjs';
 import {createMissionDraws} from '../미션추첨.mjs';
-import {CLASS_TEACHERS} from '../담임선생님.mjs';
+import {MISSION_TEACHERS} from '../담임선생님.mjs';
 import {OFFICE_CHARACTERS} from '../교장실캐릭터.mjs';
 import {RUN_SPEED} from '../달리기모션.mjs';
 const world=buildWorld(JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),{interactiveDoors:true});
-const teachers=[...CLASS_TEACHERS,...OFFICE_CHARACTERS.map(t=>({...t,id:'office-'+t.id,roomId:'2F_PRINCIPAL'}))];
+const teachers=[...MISSION_TEACHERS,...OFFICE_CHARACTERS.map(t=>({...t,id:'office-'+t.id,roomId:'2F_PRINCIPAL'}))];
 const map=await prepareMissionMap(world,teachers);
-assert.equal(map.rooms.size,43);assert.equal(map.grades.get(2).length,6);
+assert.equal(map.rooms.size,44);assert.equal(map.grades.get(2).length,6);
 assert.deepEqual([...new Set(map.grades.get(2).map(r=>r.room.floor))].sort(),['2F','3F','4F']);
 assert.equal(MISSION_QUESTIONS.length,60);assert.equal(new Set(MISSION_QUESTIONS.map(q=>q.id)).size,60);
 for(const q of MISSION_QUESTIONS){assert.equal(new Set(q.answers).size,4);assert(q.explanation);}

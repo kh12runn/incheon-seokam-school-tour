@@ -4,7 +4,7 @@ const VARIANTS=['boy-cute','girl-cute'];
 export function createCharacterPicker({onChoose,onClose,onStarted,initial='boy'}){
   const dialog=document.createElement('dialog');dialog.id='캐릭터창';dialog.setAttribute('aria-labelledby','캐릭터제목');
   dialog.innerHTML=`<h2 id="캐릭터제목">함께 탐험할 친구를 골라요</h2><p>함께 학교를 탐험할 마음에 드는 친구를 골라 보세요.</p><canvas aria-label="선택한 친구의 3D 달리기 미리보기"></canvas><p id="캐릭터미리보기상태" role="status" aria-live="polite"></p><button id="캐릭터다시시도" hidden>다시 불러오기</button><div class="캐릭터선택줄"><button data-character="boy-cute" aria-pressed="false">남학생</button><button data-character="girl-cute" aria-pressed="false">여학생</button></div><button class="primary" id="캐릭터확인" disabled>이 친구로 출발!</button><button id="캐릭터닫기">취소</button>`;
-  document.body.append(dialog);const canvas=dialog.querySelector('canvas'),status=dialog.querySelector('#캐릭터미리보기상태'),confirm=dialog.querySelector('#캐릭터확인'),retry=dialog.querySelector('#캐릭터다시시도');
+  document.body.append(dialog);let canvas=dialog.querySelector('canvas');const status=dialog.querySelector('#캐릭터미리보기상태'),confirm=dialog.querySelector('#캐릭터확인'),retry=dialog.querySelector('#캐릭터다시시도');
   let renderer,scene,camera,student=null,selected=VARIANTS.includes(normalizeStudentVariant(initial))?normalizeStudentVariant(initial):'boy-cute',frameId=0,last=0,time=0,confirmed=false,requestId=0,ready=false;
   const refresh=()=>dialog.querySelectorAll('[data-character]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.character===selected)));
   function clearStudent(){
@@ -55,6 +55,13 @@ export function createCharacterPicker({onChoose,onClose,onStarted,initial='boy'}
     finally{controls.forEach(b=>b.disabled=false);dialog.removeEventListener('cancel',preventCancel);}
   };
   dialog.querySelector('#캐릭터닫기').onclick=()=>dialog.close();
-  dialog.addEventListener('close',()=>{cancelAnimationFrame(frameId);clearStudent();if(!confirmed)onClose?.();});
+  dialog.addEventListener('close',()=>{
+    cancelAnimationFrame(frameId);clearStudent();
+    // The hidden preview used to retain a second WebGL context and a duplicate
+    // GPU copy of the student throughout play. Keep the main world unchanged.
+    if(renderer){scene.traverse(o=>{o.geometry?.dispose();for(const m of [].concat(o.material??[]))m.dispose();});renderer.dispose();renderer.forceContextLoss();renderer=null;scene=null;
+      const replacement=canvas.cloneNode(false);canvas.replaceWith(replacement);canvas=replacement;}
+    if(!confirmed)onClose?.();
+  });
   return {open,isOpen:()=>dialog.open,getSelected:()=>selected,name:()=>CHARACTER_NAMES[selected]};
 }
