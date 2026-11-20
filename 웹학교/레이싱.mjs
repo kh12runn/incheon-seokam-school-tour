@@ -40,7 +40,7 @@ export function createMiniRacing({scene,camera,progress,onEnter,onExit,onShadow,
   for(const [id,b] of cards){const c=PARKED_CARS.find(c=>c.id===id),open=canUseCar(c,record.stamps);b.setAttribute('aria-pressed',String(id===selected.id));b.classList.toggle('잠금',!open);b.lastChild.textContent=open?'보유 중':'스탬프 '+stampsFor(c)+'개';}
   el('레이스스탬프').textContent=`누적 스탬프 ${record.stamps}개 · ${PARKED_CARS.filter(c=>canUseCar(c,record.stamps)).length}/${PARKED_CARS.length}대 보유`+(record.saved?' · 이 브라우저에 저장됨':' · 저장 불가: 현재 방문에서만 유지');
   el('레이스차량명').textContent=carName(selected);el('레이스특성').textContent=p.specialty;
-  const metrics=[['최고 속도',p.speed,33*1.15],['가속',p.accel,24*1.15],['출발',p.launch,32*1.15],['코너링',p.handling,11*1.15],['접지력',p.grip,30*1.15],['충돌 저항',p.resilience,1]];
+  const metrics=[['최고 속도',p.speed,33*1.05],['가속',p.accel,24*1.05],['출발',p.launch,32*1.05],['코너링',p.handling,11],['접지력',p.grip,30],['충돌 저항',p.resilience,1]];
   el('레이스성능').replaceChildren(...metrics.map(([name,value,max])=>{const label=document.createElement('label');label.textContent=name;const bar=document.createElement('meter');bar.min=0;bar.max=max;bar.value=value;label.append(bar);return label;}));
   el('레이스출발').disabled=!unlocked;el('레이스출발').textContent=unlocked?'다음 · 코스 선택하기 →':`스탬프 ${Math.max(0,required-record.stamps)}개 더 모으면 해금`;
   const next=[...PARKED_CARS].sort((a,b)=>stampsFor(a)-stampsFor(b)).find(c=>stampsFor(c)>record.stamps);

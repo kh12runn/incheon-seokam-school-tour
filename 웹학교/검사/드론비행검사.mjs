@@ -8,7 +8,8 @@ import {PARKED_CARS} from '../주차장.mjs';
 import {VEHICLE_PROFILES,canUseCar,stampsFor} from '../차량성능.mjs';
 import {RUN_SPEED} from '../달리기모션.mjs';
 const source=PARKED_CARS.find(c=>c.type==='drone'),p=VEHICLE_PROFILES.drone,champion=VEHICLE_PROFILES.champion;
-for(const key of ['speed','accel','launch','handling','grip','brake','boost'])assert.equal(p[key],champion[key]*1.15,key);
+for(const key of ['speed','accel','launch','brake','boost'])assert.equal(p[key],champion[key]*1.05,key);
+for(const key of ['handling','grip'])assert.equal(p[key],VEHICLE_PROFILES.sports[key]*.95,key);
 assert(p.resilience<champion.resilience);assert.equal(stampsFor(source),60);assert(!canUseCar(source,59));assert(canUseCar(source,60));assert.equal(FLIGHT.speed,RUN_SPEED*2);
 const data=JSON.parse(fs.readFileSync(new URL('../학교구조.json',import.meta.url),'utf8')),world=buildWorld(data),flight=createDroneFlight(world,source.id);
 let at={x:30,y:-40,z:-.26},last;
@@ -29,4 +30,4 @@ assert(player);assert(!driving.enter(player),'59 stamps locked');stamps=60;asser
 const step=(input,n=1)=>{for(let i=0;i<n;i++){const before=player;player=driving.update(1/60,player,input);physics.update(1/60,player,before,{canKick:false});driving.sync(1/60);if(driving.phase==='driving')player=driving.seat();}};
 step({},200);assert.equal(driving.phase,'driving');step({up:1},180);assert(driving.getState().flight.altitude>11);assert(driving.exit(),'Airborne exit requests landing');step({},400);assert.equal(driving.phase,'walking','Automatic landing completes dismount');assert(world.candidate(player.x,player.y,player.z));
 assert(driving.enter(player));step({},200);step({up:1},90);const paused={...car.body.position};driving.update(.1,player,{up:1},{playing:false});assert.deepEqual({...car.body.position},paused);const safe=driving.cancel();assert(world.candidate(safe.x,safe.y,safe.z));assert.equal(car.body.position.z,car.home.z+.52,'Cancel parks on ground');
-console.log({ok:true,unlock:60,speedMultiplier:1.15,flightSpeed:FLIGHT.speed,collisionWeakness:p.resilience,hover:true,walls:true,roofs:true,bounds:true,autoLanding:true,safeCancel:true});
+console.log({ok:true,unlock:60,speedMultiplier:1.05,sportsCorneringMultiplier:.95,flightSpeed:FLIGHT.speed,collisionWeakness:p.resilience,hover:true,walls:true,roofs:true,bounds:true,autoLanding:true,safeCancel:true});
