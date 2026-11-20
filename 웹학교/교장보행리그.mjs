@@ -21,7 +21,7 @@ function* transformGeometry(geometry,matrix){
 }
 // The approved GLBs are unrigged. Bake their original transforms, retain every
 // vertex/UV/material, then give limbs soft skin weights for a restrained walk.
-function* prepareWalkRig(model,{height=1.83,receiveShadow=true,continuousSleeves=false}={}){
+function* prepareWalkRig(model,{height=1.83,receiveShadow=true,continuousSleeves=false,rigidForearm=null}={}){
   model.updateMatrixWorld(true);
   // Latest approved single principal has adult proportions, regardless of GLB filename.
   const scale=height/1.83;
@@ -41,6 +41,7 @@ function* prepareWalkRig(model,{height=1.83,receiveShadow=true,continuousSleeves
     const geometry=object.geometry.clone();yield;
     yield* transformGeometry(geometry,object.matrixWorld);
     const pos=geometry.getAttribute('position');
+    const attachmentBone=rigidForearm?.(object);
     const indices=new Uint16Array(pos.count*4),weights=new Float32Array(pos.count*4);
     for(let i=0;i<pos.count;i++){
       const x=pos.getX(i)/scale,y=pos.getY(i)/scale,side=x<0?0:1;
@@ -51,7 +52,8 @@ function* prepareWalkRig(model,{height=1.83,receiveShadow=true,continuousSleeves
       const arm=smooth(.17,.25,Math.abs(x))*(1-smooth(1.41,1.53,y))*lowerArm;
       if(arm>.01){upper=side?7:5;lower=upper+1;amount=arm;bend=1-smooth(1.105,1.215,y);}
       else if(y<.94){upper=side?3:1;lower=upper+1;amount=1-smooth(.80,.94,y);bend=1-smooth(.395,.525,y);}
-      indices.set([0,upper,lower,0],i*4);weights.set([1-amount,amount*(1-bend),amount*bend,0],i*4);
+      if(attachmentBone!=null){indices[i*4]=attachmentBone;weights[i*4]=1;}
+      else{indices.set([0,upper,lower,0],i*4);weights.set([1-amount,amount*(1-bend),amount*bend,0],i*4);}
       if(i%4096===4095)yield;
     }
     geometry.setAttribute('skinIndex',new THREE.Uint16BufferAttribute(indices,4));geometry.setAttribute('skinWeight',new THREE.Float32BufferAttribute(weights,4));

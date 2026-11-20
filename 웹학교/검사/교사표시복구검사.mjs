@@ -1,9 +1,9 @@
 import assert from 'node:assert/strict';
 import * as T from '../외부도구/three.module.js';
-import {CLASS_TEACHERS,createClassTeachers} from '../담임선생님.mjs';
+import {CLASS_TEACHERS,ADDITIONAL_STAFF,createClassTeachers} from '../담임선생님.mjs';
 import {finishTeacherMaterials} from '../선생님재질.mjs';
 import {createPrincipalWalkRigAsync} from '../교장보행리그.mjs';
-const world={data:{rooms:CLASS_TEACHERS.map(c=>({id:c.roomId,bounds:[c.position.x-2,c.position.x+8,-7,0,c.position.z,c.position.z+3.4]}))},candidate:()=>true};
+const world={data:{rooms:[...CLASS_TEACHERS,...ADDITIONAL_STAFF].map(c=>({id:c.roomId,bounds:[c.position.x-2,c.position.x+8,-7,0,c.position.z,c.position.z+3.4]}))},candidate:()=>true};
 const model=()=>{const root=new T.Group();root.add(new T.Mesh(new T.BoxGeometry(.5,1.8,.3),new T.MeshStandardMaterial()));return root;};
 const until=async fn=>{for(let i=0;i<400&&!fn();i++)await new Promise(r=>setTimeout(r,5));assert(fn(),'Timed out');};
 const pending=[],downloads=[];
@@ -42,4 +42,12 @@ const slowRig=createClassTeachers(world,{fetchModel:async()=>model(),makeRig:asy
 slowRig.update(.016,corridor(3),'walk');await until(()=>slowRig.getStates()[3].hasModel);
 assert.equal(slowRig.getStates()[3].modelStatus,'loading','Original preview shown even while rig builds');
 releaseRig();await until(()=>slowRig.getStates()[3].modelStatus==='ready');for(const t of slowRig.teachers)t.evict();
+const officeStaff=ADDITIONAL_STAFF.filter(c=>c.roomId==='2F_STAFF');
+for(const config of officeStaff){
+ manager.update(.016,officeStaff[0].position,'walk');
+ await until(()=>manager.getStates().filter(s=>s.roomId==='2F_STAFF'&&s.hasModel).length>=officeStaff.indexOf(config)+1);
+}
+assert.equal(manager.getStates().filter(s=>s.roomId==='2F_STAFF'&&s.modelStatus==='ready'&&s.visible).length,3);
+manager.update(21,CLASS_TEACHERS[0].position,'overview');
+assert(manager.getStates().every(s=>!s.hasModel));
 console.log(JSON.stringify({ok:true,corridorVisible:true,previewBeforeRig:true,visibleBeforeFinish:true,independentRoomLoading:true,singleWorker:true,evictionCancelsWorker:true,cacheLimit:2,filterFailureKeepsAvatar:true}));

@@ -1,4 +1,6 @@
 import * as THREE from './외부도구/three.module.js';
+import {normalizePrincipalModel} from './교장실캐릭터.mjs';
+import {createPrincipalWalkRigAsync} from './교장보행리그.mjs';
 import {GLTFLoader} from './외부도구/GLTFLoader.js';
 import {createPrincipalFace,PRINCIPAL_FACE_VERSION,PRINCIPAL_HEAD_SCALE,PRINCIPAL_SKIN_COLOR,getPrincipalFaceState} from './교장선생님얼굴.mjs';
 import {applyApprovedPrincipalAppearance,PRINCIPAL_APPEARANCE_VERSION} from './교장선생님피부마감.mjs';
@@ -21,7 +23,7 @@ function label(p,value,pos,w,h){
   const map=new THREE.CanvasTexture(c);map.colorSpace=THREE.SRGBColorSpace;
   return put(p,new THREE.PlaneGeometry(w,h),new THREE.MeshStandardMaterial({map,roughness:.9}),pos);
 }
-export function createRunnerPrincipalNPC({prepareRender=async()=>{}}={}){
+function createFallbackRunnerNPC({prepareRender=async()=>{}}={}){
   const root=new THREE.Group();root.name='중앙현관 마라토너 교장선생님';
   root.userData.greetingHeight=2.12;
   const skin=paint(PRINCIPAL_SKIN_COLOR),blue=paint('#176f89'),coral=paint('#f18a68'),navy=paint('#21394e'),white=paint('#f0eee5'),sole=paint('#d8dedb'),black=paint('#151e26',.25),silver=paint('#b2bac2',.4);
@@ -118,4 +120,54 @@ export function createRunnerPrincipalNPC({prepareRender=async()=>{}}={}){
   applyApprovedPrincipalAppearance(root,{runner:true});
   root.visible=false;void prepareRender(root).then(()=>{renderReady=true;}).catch(error=>{console.warn('현관 교장선생님 재질 준비',error);renderReady=true;});
   return {root,update,getState:()=>({outfit:'running',accessories:['sunglasses','sun-visor','megaphone'],faceTexture:modelStatus,modelStatus,modelError,renderReady,faceVersion:PRINCIPAL_FACE_VERSION,appearanceVersion:PRINCIPAL_APPEARANCE_VERSION,height:RUNNER_PRINCIPAL_HEIGHT,headScale:PRINCIPAL_HEAD_SCALE,sameFaceAsOffice:true,fallbackFaceTexture:getPrincipalFaceState()})};
+}
+
+
+const tracksuitURL=new URL('./캐릭터모델/principal-runner.glb',import.meta.url);
+
+export function createRunnerPrincipalNPC({prepareRender=async()=>{}}={}){
+  const root=new THREE.Group();
+  root.name='중앙현관 운동복 교장선생님';
+  root.userData.greetingHeight=2.12;
+  let rig=null,fallback=null,ready=false,error=null;
+  async function load(){
+    try{
+      const response=await fetch(tracksuitURL,{signal:AbortSignal.timeout(45000)});
+      if(!response.ok)throw new Error('모델 HTTP '+response.status);
+      const {scene}=await loader.parseAsync(await response.arrayBuffer(),new URL('.',tracksuitURL).href);
+      const model=normalizePrincipalModel(scene,RUNNER_PRINCIPAL_HEIGHT);
+      // The source stance is centered at the origin. Exclude the megaphone's
+      // asymmetric reach from the horizontal offset used by the walk skeleton.
+      model.position.x=0;
+      model.position.z=0;
+      rig=await createPrincipalWalkRigAsync(model,{
+        height:RUNNER_PRINCIPAL_HEIGHT,continuousSleeves:true,
+        rigidForearm:mesh=>mesh.name.startsWith('Megaphone')?6:null
+      });
+      // The walk rig copied the geometry and shares the source materials.
+      scene.traverse(o=>{if(o.isMesh)o.geometry.dispose();});
+      await prepareRender(rig.root);
+      root.add(rig.root);ready=true;
+    }catch(reason){
+      error=String(reason?.message??reason);
+      console.warn('운동복 교장선생님 모델 로딩',error);
+      fallback=createFallbackRunnerNPC({prepareRender});root.add(fallback.root);
+    }
+  }
+  void load();
+  return {root,update(dt,state){
+    if(fallback){
+      fallback.update(dt,state);root.position.copy(fallback.root.position);root.rotation.copy(fallback.root.rotation);
+      fallback.root.position.set(0,0,0);fallback.root.rotation.set(0,0,0);fallback.root.visible=true;return;
+    }
+    root.position.set(state.position.x,state.position.z,-state.position.y);
+    root.rotation.y=state.heading;
+    rig?.update(dt,state);
+  },getState(){
+    if(fallback)return {...fallback.getState(),outfit:'running-fallback',modelError:error};
+    return {outfit:'tracksuit',accessories:['sunglasses','sun-visor','megaphone'],
+      faceTexture:ready?'ready':'loading',modelStatus:ready?'ready':'loading',
+      modelError:error,renderReady:ready,height:RUNNER_PRINCIPAL_HEIGHT,
+      sameFaceAsOffice:true,appearanceVersion:'tracksuit-20261120'};
+  }};
 }
