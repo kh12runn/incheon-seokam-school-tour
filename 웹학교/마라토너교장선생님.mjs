@@ -26,15 +26,15 @@ function label(p,value,pos,w,h){
 function createFallbackRunnerNPC({prepareRender=async()=>{}}={}){
   const root=new THREE.Group();root.name='중앙현관 마라토너 교장선생님';
   root.userData.greetingHeight=2.12;
-  const skin=paint(PRINCIPAL_SKIN_COLOR),blue=paint('#176f89'),coral=paint('#f18a68'),navy=paint('#21394e'),white=paint('#f0eee5'),sole=paint('#d8dedb'),black=paint('#151e26',.25),silver=paint('#b2bac2',.4);
+  const skin=paint(PRINCIPAL_SKIN_COLOR),charcoal=paint('#26272a'),coral=paint('#f18a68'),graphite=paint('#18191c'),white=paint('#f0eee5'),sole=paint('#d8dedb'),black=paint('#151e26',.25),silver=paint('#b2bac2',.4);
   const body=new THREE.Group();body.position.y=.96;root.add(body);
   ball(body,skin,[0,.35,0],[.188,.23,.111]);
-  put(body,new THREE.CylinderGeometry(.202,.168,.45,24),blue,[0,.25,0],[1,1,.62]);
-  ball(body,blue,[0,.445,0],[.181,.061,.112]);
+  put(body,new THREE.CylinderGeometry(.202,.168,.45,24),charcoal,[0,.25,0],[1,1,.62]);
+  ball(body,charcoal,[0,.445,0],[.181,.061,.112]);
   // Broad sleeveless straps and contrast side panels.
   for(const s of [-1,1]){
     line(body,coral,[[s*.15,.45,.063],[s*.192,.32,.061],[s*.17,.05,.069]],.014);
-    line(body,blue,[[s*.118,.34,.104],[s*.122,.52,.043],[s*.145,.46,-.064]],.031);
+    line(body,charcoal,[[s*.118,.34,.104],[s*.122,.52,.043],[s*.145,.46,-.064]],.031);
   }
   line(body,white,[[-.087,.466,.105],[0,.413,.123],[.087,.466,.105]],.008);
   label(body,'09',[0,.226,.130],.235,.13);
@@ -45,7 +45,7 @@ function createFallbackRunnerNPC({prepareRender=async()=>{}}={}){
   // Sports sunglasses: connected frame, dark lenses and side arms.
   for(const s of [-1,1]){
     const lens=ball(head,black,[s*.059,.173,.098],[.051,.030,.016]);lens.rotation.y=s*-.16;
-    line(head,navy,[[s*.010,.191,.112],[s*.060,.204,.105],[s*.112,.189,.081],[s*.110,.152,.082],[s*.052,.145,.113],[s*.010,.160,.114]],.005);
+    line(head,graphite,[[s*.010,.191,.112],[s*.060,.204,.105],[s*.112,.189,.081],[s*.110,.152,.082],[s*.052,.145,.113],[s*.010,.160,.114]],.005);
     line(head,black,[[s*.111,.183,.087],[s*.128,.180,-.042],[s*.121,.164,-.061]],.005);
     line(head,silver,[[s*.035,.186,.115],[s*.067,.188,.113]],.0012);
   }
@@ -61,19 +61,19 @@ function createFallbackRunnerNPC({prepareRender=async()=>{}}={}){
     gltf.scene.traverse(object=>{if(object.isMesh){object.castShadow=true;object.receiveShadow=true;}});
     await prepareRender(gltf.scene);root.add(gltf.scene);fallbackFace.visible=false;modelStatus='ready';
   }).catch(reason=>{modelStatus='error';modelError=String(reason?.message??reason);console.warn('러닝복 교장선생님 얼굴 모델 로드 실패',reason);});
-  ball(root,navy,[0,.965,0],[.176,.12,.11]);
+  ball(root,graphite,[0,.965,0],[.176,.12,.11]);
   const legs=[];
   for(const s of [-1,1]){
     const leg=new THREE.Group();leg.position.set(s*.094,.94,0);root.add(leg);legs.push(leg);
-    put(leg,new THREE.CylinderGeometry(.089,.081,.225,18),navy,[0,-.106,0]);
+    put(leg,new THREE.CylinderGeometry(.089,.081,.225,18),graphite,[0,-.106,0]);
     line(leg,coral,[[s*.081,-.015,.005],[s*.079,-.21,.005]],.007);
     ball(leg,skin,[0,-.295,.001],[.066,.145,.064]);
     ball(leg,skin,[0,-.415,.006],[.055,.059,.06]);
     ball(leg,skin,[0,-.576,-.009],[.05,.172,.055]);
     put(leg,new THREE.CylinderGeometry(.038,.038,.13,18),white,[0,-.755,0]);
-    line(leg,blue,[[-.025,-.705,.029],[0,-.705,.038],[.025,-.705,.029]],.005);
+    line(leg,charcoal,[[-.025,-.705,.029],[0,-.705,.038],[.025,-.705,.029]],.005);
     ball(leg,sole,[0,-.89,.052],[.072,.026,.141]);
-    ball(leg,blue,[0,-.859,.049],[.066,.048,.13]);
+    ball(leg,charcoal,[0,-.859,.049],[.066,.048,.13]);
     ball(leg,coral,[0,-.860,.142],[.057,.035,.039]);
     for(let i=0;i<3;i++)line(leg,white,[[-.025,-.817,.045+i*.02],[.025,-.817,.045+i*.02]],.0025);
     // Bend the calf/foot as a unit below the knee, retaining the approved outfit.
@@ -99,10 +99,10 @@ function createFallbackRunnerNPC({prepareRender=async()=>{}}={}){
   // Megaphone follows the right forearm and hand as one articulated group.
   const holding=arms[1];holding.rotation.x=-.28;holding.userData.forearm.rotation.x=-1.22;
   const megaphone=new THREE.Group();megaphone.name='오른손 메가폰';megaphone.position.set(0,-.229,.048);holding.userData.forearm.add(megaphone);megaphone.rotation.x=1.50;
-  cube(megaphone,navy,[0,.001,0],[.043,.13,.042]);
+  cube(megaphone,graphite,[0,.001,0],[.043,.13,.042]);
   const horn=put(megaphone,new THREE.CylinderGeometry(.113,.040,.235,32,1,true),white,[0,.095,.055]);horn.rotation.x=Math.PI/2;horn.material=new THREE.MeshStandardMaterial({color:'#f2eee6',side:THREE.DoubleSide,roughness:.65});
   const lip=put(megaphone,new THREE.TorusGeometry(.113,.012,10,40),coral,[0,.095,.172]);
-  const inner=put(megaphone,new THREE.CircleGeometry(.085,32),navy,[0,.095,.134]);
+  const inner=put(megaphone,new THREE.CircleGeometry(.085,32),graphite,[0,.095,.134]);
   ball(megaphone,silver,[0,.095,.148],[.034,.034,.018]);
   ball(megaphone,coral,[0,.095,-.067],[.047,.047,.037]);
   let t=0,walkBlend=0;
@@ -142,7 +142,11 @@ export function createRunnerPrincipalNPC({prepareRender=async()=>{}}={}){
       model.position.z=0;
       rig=await createPrincipalWalkRigAsync(model,{
         height:RUNNER_PRINCIPAL_HEIGHT,continuousSleeves:true,
-        rigidForearm:mesh=>mesh.name.startsWith('Megaphone')?6:null
+        rigidForearm(mesh){
+          if(mesh.name.startsWith('Megaphone'))return 6;
+          if(mesh.name.startsWith('Sports_watch'))return 8;
+          return null;
+        }
       });
       // The walk rig copied the geometry and shares the source materials.
       scene.traverse(o=>{if(o.isMesh)o.geometry.dispose();});
@@ -168,6 +172,6 @@ export function createRunnerPrincipalNPC({prepareRender=async()=>{}}={}){
     return {outfit:'tracksuit',accessories:['sunglasses','sun-visor','megaphone'],
       faceTexture:ready?'ready':'loading',modelStatus:ready?'ready':'loading',
       modelError:error,renderReady:ready,height:RUNNER_PRINCIPAL_HEIGHT,
-      sameFaceAsOffice:true,appearanceVersion:'tracksuit-20261120'};
+      sameFaceAsOffice:true,appearanceVersion:'black-running-sunglasses-20261120'};
   }};
 }

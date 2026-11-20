@@ -13,7 +13,7 @@ export async function verifyPrincipalGreetings(page,baseURL='http://127.0.0.1:80
     const lobbyText=await bubble('중앙현관').textContent();assert(/영어|퀴즈|행복|건강/.test(lobbyText),'현관의 다양한 교육·응원 문구');
     const runner=await page.evaluate(()=>schoolTour.getLobbyPrincipalState());assert(runner.accessories.length===3&&runner.faceTexture==='ready','러닝복·선글라스·선캡·메가폰, 교장실과 같은 얼굴 로드');
     assert(runner.sameFaceAsOffice&&runner.height===1.83,'교장실과 같은 얼굴·183cm 기준');
-    assert(runner.outfit==='tracksuit'&&runner.appearanceVersion==='tracksuit-20261120','운동복 교장선생님 새 모델 로드');
+    assert(runner.outfit==='tracksuit'&&runner.appearanceVersion==='black-running-sunglasses-20261120','검은 러닝복 교장선생님 모델 로드');
     await page.evaluate(()=>document.getElementById('메뉴').click());assert(!await bubble('중앙현관').isVisible(),'메뉴에서 숨김');
     await page.locator('#메뉴닫기').click();await page.locator('#월퀴즈말풍선').waitFor({state:'visible'});
     assert(await page.evaluate(()=>{const s=schoolTour.getState();return s.locked||s.freeLook||s.touch.active;}),'메뉴 X 닫은 뒤 조작 유지');
