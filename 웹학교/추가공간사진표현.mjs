@@ -1,14 +1,16 @@
 import * as THREE from './외부도구/three.module.js';
 import {magpieRoomDetails} from './까치방사진표현.mjs';
 import {cafeteriaChairs} from './급식의자표현.mjs';
+import {grade4ResearchDetails} from './사학년연수실사진표현.mjs';
 // Small code-native textures, not private source photographs.
 export function additionalRoomDetails(c){
  const group=new THREE.Group(),materials=new Map(),textures=new Map();
  if(c.magpieRoom)group.add(magpieRoomDetails(c));
+ if(c.grade4Room)group.add(grade4ResearchDetails(c));
  const mat=color=>{if(!materials.has(color))materials.set(color,new THREE.MeshStandardMaterial({color,roughness:.65}));return materials.get(color);};
  const box=(parent,w,h,d,x,y,z,color)=>{const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,d),mat(color));m.position.set(x,y,z);parent.add(m);return m;};
  if(c.reference.kind==='cafeteria')group.add(cafeteriaChairs(c.chairs));
- for(const chair of c.chairs.filter(q=>!q.magpieStudent&&c.reference.kind!=='cafeteria')){
+ for(const chair of c.chairs.filter(q=>!q.magpieStudent&&!q.grade4Chair&&c.reference.kind!=='cafeteria')){
   const g=new THREE.Group();g.position.set(chair.x,chair.z,-chair.y);g.rotation.y=chair.angle;g.scale.setScalar(chair.scale??1);group.add(g);
   box(g,.46,.065,.43,0,.43,0,chair.color);box(g,.44,.31,.06,0,.65,.20,chair.color);
   if(chair.office){
@@ -42,7 +44,13 @@ export function additionalRoomDetails(c){
   const key=p.style+'|'+p.color+'|'+(p.text??'');
   if(!textures.has(key)){
    const canvas=document.createElement('canvas');canvas.width=512;canvas.height=256;const ctx=canvas.getContext('2d');ctx.fillStyle=p.color??'#d8ddd0';ctx.fillRect(0,0,512,256);
-   if(p.style==='room-sign'){
+   if(p.style==='grade4-label'){
+    ctx.fillStyle='#334349';ctx.textAlign='center';ctx.textBaseline='middle';ctx.font='bold 64px "Malgun Gothic",sans-serif';ctx.fillText(p.text,256,128,470);
+   }else if(p.style==='grade4-board'){
+    ctx.fillStyle='#f0f0e7';ctx.fillRect(0,0,512,256);ctx.strokeStyle='#76847c';ctx.lineWidth=6;ctx.strokeRect(3,3,506,250);
+    ctx.lineWidth=1;for(let i=0;i<8;i++){ctx.beginPath();ctx.moveTo(20,18+i*15);ctx.lineTo(135,18+i*15);ctx.stroke();}
+    for(let i=0;i<4;i++){ctx.fillStyle=i%2?'#dbdfd7':'#fffef1';ctx.fillRect(28+i*108,142,87,96);ctx.fillStyle='#b8c3b8';for(let n=0;n<5;n++)ctx.fillRect(36+i*108,155+n*12,64,2);}
+   }else if(p.style==='room-sign'){
     ctx.fillStyle='#f5f3e8';ctx.font='bold 84px "Malgun Gothic",sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(p.text,256,128,460);
    }else if(p.style==='library-index'){
     ctx.fillStyle='#335d6a';ctx.font='bold 37px sans-serif';ctx.fillText('책터 도서관',34,48);ctx.font='25px sans-serif';ctx.fillText('함께 읽는 즐거움',34,226);

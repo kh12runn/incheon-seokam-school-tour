@@ -7,8 +7,10 @@ import {OCT6_REFERENCES} from './현관상담사진근거.mjs';
 import {OCT8_SPACE_REFERENCES,OCT8_BUILDERS} from './십월팔일특별실배치.mjs';
 import {research6PhotoLayout,computerPhotoLayout} from './연수실컴퓨터실수정.mjs';
 import {OCT13_SPACE_REFERENCES,OCT13_BUILDERS} from './십월십삼일특별실배치.mjs';
+import {GRADE4_RESEARCH_ID,GRADE4_REFERENCE,research4PhotoLayout} from './사학년연수실사진배치.mjs';
 // Geometry is fitted to the existing room bounds; photos do not resurvey walls.
 export const EXTRA_PHOTO_ROOMS={
+ [GRADE4_RESEARCH_ID]:GRADE4_REFERENCE,
  ...OCT13_SPACE_REFERENCES,
  ...OCT8_SPACE_REFERENCES,
  '1F_MAIN_LOBBY':{count:15,kind:'lobby',features:['양쪽 유리 출입문','반투명 하부 필름','벽걸이 TV와 안내 게시판','집 모양 독서 벤치','점자블록과 현관 매트']},
@@ -88,6 +90,7 @@ function makeRoom(room,worldBoxes,recipe){
 }
 
 const BUILDERS={
+ research4:research4PhotoLayout,
  ...OCT13_BUILDERS,
  ...OCT8_BUILDERS,
  science({add,table,cabinet,seat,sink,screen,panel}){
